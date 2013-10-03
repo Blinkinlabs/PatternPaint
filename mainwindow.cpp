@@ -1,11 +1,11 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QtSerialPort>
-#include <QtSerialPort/QSerialPortInfo>
 
 #include <cmath>
 #include <iostream>
+
+#include "blinkytape.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -13,15 +13,17 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
-        if(info.description().startsWith("BlinkyTape")) {
-            std::cout << "starten" << std::endl;
-            QSerialPort serial(info);
-            if (serial.open(QIODevice::ReadWrite)) {
+    float phase = 0;
+    while(true) {
+        QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
+        if(tapes.length() > 0) {
 
+            std::cout << "starten" << std::endl;
+            BlinkyTape tape;
+
+            std::cout << "connecting" << std::endl;
+            if(tape.connect(tapes[0])) {
                 std::cout << "writing" << std::endl;
-                float phase = 0;
-                while(true) {
                     int LED_COUNT = 60;
 
                     QByteArray LedData(LED_COUNT * 3, 0);
@@ -36,50 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
                     phase += .02;
 
-                    // Chunk it out
-                    int CHUNK_SIZE = 600;
-                    for(int p = 0; p < LED_COUNT * 3; p += CHUNK_SIZE) {
-                        int length = 0;
-                        if(p + CHUNK_SIZE < LedData.length()) {
-                            // send a whole chunk
-                            length = CHUNK_SIZE;
-                        }
-                        else {
-                            // send a partial chunk
-                            length = LedData.length() - p;
-                        }
-
-                        QByteArray chunk(length, 0);
-                        for(int i = 0; i < length; i++) {
-                            chunk[i] = LedData[p + i];
-                        }
-
-                        int written = serial.write(chunk);
-                        // if we didn't write everything, save it for later.
-                        if(written == -1) {
-                            exit(1);
-                            p -= CHUNK_SIZE;
-                        }
-                        else if(written != length) {
-                            exit(2);
-                            p-= length - written;
-                        }
-                        serial.flush();
-
-//                        std::cout << "p:" << p << " length:" << length << std::endl;
-                    }
-
-                    // Then send the flip command
-                    QByteArray data(3, 0);
-                    data[0] = 0xff;
-                    data[1] = 0xff;
-                    data[2] = 0xff;
-
-                    serial.write(data);
-                    serial.flush();
-                }
-
-                serial.close();
+                    tape.sendUpdate(LedData);
                 std::cout << "done" << std::endl;
             }
         }
