@@ -18,9 +18,11 @@ private:
 public:
     BlinkyTape(int ledCount = 60);
 
+    bool isConnected();
+
     bool connect(QSerialPortInfo info);
 
-//    void disconnect();
+    void disconnect();
 
     void sendUpdate(QByteArray colors);
 };

@@ -20,9 +20,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    blinkytape.cpp
+    blinkytape.cpp \
+    patterneditor.cpp \
+    colorpicker.cpp
 
 HEADERS  += mainwindow.h \
-    blinkytape.h
+    blinkytape.h \
+    patterneditor.h \
+    colorpicker.h
 
 FORMS    += mainwindow.ui

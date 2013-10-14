@@ -10,9 +10,10 @@ QList<QSerialPortInfo> BlinkyTape::findBlinkyTapes() {
         if(info.description().startsWith("BlinkyTape")) {
             tapes.push_back(info);
         }
-
-        // If it's a leonardo, though, it becomes a little unclear
-        // TODO: Leonard support: just accept them all?
+        // If it's a leonardo, it /may/ be a BlinkyTape running a user sketch
+        else if(info.description().startsWith("Arduino Leonardo")) {
+            tapes.push_back(info);
+        }
     }
 
     return tapes;
@@ -23,16 +24,40 @@ BlinkyTape::BlinkyTape(int ledCount)
     m_ledCount = ledCount;
 }
 
+bool BlinkyTape::isConnected() {
+    return m_serial.isOpen();
+}
 
 bool BlinkyTape::connect(QSerialPortInfo info) {
+    // TODO: Refuse if we are already open?
+
     m_serial.setPort(info);
 
     // TODO: Do something else if we can't open?
     return m_serial.open(QIODevice::ReadWrite);
 }
 
+void BlinkyTape::disconnect() {
+    if(isConnected()) {
+        m_serial.close();
+    }
+}
+
 void BlinkyTape::sendUpdate(QByteArray LedData)
 {
+    if(!isConnected()) {
+        // TODO: Signal error?
+        return;
+    }
+
+    // Kill anything that's 0xff
+    // TODO: Don't do this in-place
+    for(int i = 0; i < LedData.length(); i++) {
+        if(LedData[i] == (char)255) {
+            LedData[i] = 254;
+        }
+    }
+
     // Chunk it out
     int CHUNK_SIZE = 600;
     for(int p = 0; p < m_ledCount * 3; p += CHUNK_SIZE) {
@@ -51,7 +76,7 @@ void BlinkyTape::sendUpdate(QByteArray LedData)
             chunk[i] = LedData[p + i];
         }
 
-        std::cout << "writing out" << std::endl;
+//        std::cout << "writing out" << std::endl;
         int written = m_serial.write(chunk);
         // if we didn't write everything, save it for later.
         if(written == -1) {
@@ -62,11 +87,9 @@ void BlinkyTape::sendUpdate(QByteArray LedData)
             exit(101);
             p-= length - written;
         }
-        std::cout << "waiting for write" << std::endl;
+//        std::cout << "waiting for write" << std::endl;
         m_serial.flush();
-        std::cout << "done waiting for write" << std::endl;
-
-//                        std::cout << "p:" << p << " length:" << length << std::endl;
+//        std::cout << "done waiting for write" << std::endl;
     }
 
     // Then send the flip command
@@ -75,9 +98,9 @@ void BlinkyTape::sendUpdate(QByteArray LedData)
     data[1] = 0xff;
     data[2] = 0xff;
 
-    std::cout << "writing end" << std::endl;
+//    std::cout << "writing end" << std::endl;
     m_serial.write(data);
-    std::cout << "waiting for end" << std::endl;
+//    std::cout << "waiting for end" << std::endl;
     m_serial.flush();
-    std::cout << "done waiting for end" << std::endl;
+//    std::cout << "done waiting for end" << std::endl;
 }
