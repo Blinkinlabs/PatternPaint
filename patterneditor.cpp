@@ -13,9 +13,10 @@ void PatternEditor::init(int width, int height) {
 
     scale = 6;  // How big we want to make it
 
-    delete pattern;
-    delete gridPattern;
-    delete activeColor;
+    // TODO: Just leak for now
+    //delete pattern;
+    //delete gridPattern;
+    //delete activeColor;
 
     // Make a color image as default
     pattern = new QImage(width,height,QImage::Format_RGB32);
@@ -46,8 +47,14 @@ void PatternEditor::init(int width, int height) {
         painter.drawLine(0,y*scale,pattern->width()*scale,y*scale);
     }
 
-    activeColor = new QColor(0,0,0);
-    size = 1;
+    toolPreview = new QImage(width,height,QImage::Format_ARGB32);
+    toolPreview->fill(QColor(0,0,0,0));
+
+    toolColor = new QColor(0,0,0);
+    toolSize = 1;
+
+    // Turn on mouse tracking so we can draw a preview
+    setMouseTracking(true);
 
     update();
 }
@@ -79,9 +86,17 @@ void PatternEditor::mousePressEvent(QMouseEvent *event){
     QPainter painter(pattern);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter.setRenderHint(QPainter::Antialiasing, false);
-    painter.setPen(*activeColor);
-    painter.drawPoint(x,y);
-    painter.drawEllipse ( QPoint(x,y), size, size );
+    painter.setPen(*toolColor);
+
+    QBrush brush = painter.brush();
+    brush.setStyle(Qt::SolidPattern);
+    brush.setColor(*toolColor);
+    painter.setBrush(brush);
+
+    for(int i = -1; i < 2; i++) {
+        painter.drawPoint(x+i*pattern->width(),y);
+        painter.drawEllipse ( QPoint(x+i*pattern->width(),y), toolSize/2, toolSize/2 );
+    }
 
     update();
 }
@@ -90,25 +105,56 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
     int x = event->x()/scale;
     int y = event->y()/scale;
 
-    std::cout << "pressing in view, " << event->x() << "," << event->y() << std::endl;
-    std::cout << "pressing in view, " << x << "," << y << std::endl;
+    // If we aren't pressed down, just draw a preview
+    QPainter painter(toolPreview);
+    toolPreview->fill(QColor(0,0,0,0));
 
-    QPainter painter(pattern);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter.setRenderHint(QPainter::Antialiasing, false);
-    painter.setPen(*activeColor);
-    painter.drawPoint(x,y);
-    painter.drawEllipse ( QPoint(x,y), size, size );
+    painter.setPen(*toolColor);
+
+    QBrush brush = painter.brush();
+    brush.setStyle(Qt::SolidPattern);
+    brush.setColor(*toolColor);
+    painter.setBrush(brush);
+
+    for(int i = -1; i < 2; i++) {
+        painter.drawPoint(x+i*pattern->width(),y);
+        painter.drawEllipse ( QPoint(x+i*pattern->width(),y), toolSize/2, toolSize/2 );
+    }
+
+    if( event->buttons() &  Qt::LeftButton ) {
+        QPainter painter(pattern);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
+        painter.setRenderHint(QPainter::Antialiasing, false);
+        painter.setPen(*toolColor);
+
+
+        QBrush brush = painter.brush();
+        brush.setStyle(Qt::SolidPattern);
+        brush.setColor(*toolColor);
+        painter.setBrush(brush);
+
+        for(int i = -1; i < 2; i++) {
+            painter.drawPoint(x+i*pattern->width(),y);
+            painter.drawEllipse ( QPoint(x+i*pattern->width(),y), toolSize/2, toolSize/2 );
+        }
+    }
 
     update();
 }
 
 void PatternEditor::setToolColor(QColor color) {
-    activeColor->operator =(color);
+    toolColor->operator =(color);
 }
 
-void PatternEditor::setToolSize(int s) {
-    size = s;
+void PatternEditor::setToolSize(int size) {
+    toolSize = size;
+}
+
+void PatternEditor::setPlaybackRow(int row) {
+    playbackRow = row;
+    update();
 }
 
 void PatternEditor::paintEvent(QPaintEvent * /* event */)
@@ -118,4 +164,9 @@ void PatternEditor::paintEvent(QPaintEvent * /* event */)
     painter.setRenderHint(QPainter::Antialiasing, false);
     painter.drawImage(QRect(0,0,pattern->width()*scale, pattern->height()*scale),*pattern);
     painter.drawImage(0,0,*gridPattern);
+    painter.drawImage(QRect(0,0,pattern->width()*scale, pattern->height()*scale),*toolPreview);
+
+    painter.setPen(QColor(255,255,255));
+    painter.drawRect(playbackRow*scale,0,scale, height()-1);
+    painter.fillRect(playbackRow*scale,0,scale, height(),QColor(255,255,255,100));
 }

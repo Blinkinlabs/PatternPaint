@@ -24,19 +24,23 @@ protected:
     void paintEvent(QPaintEvent *event);
 
 private:
-    QImage *pattern;
-    QImage *gridPattern;
-
-    QColor *activeColor;
-    int size;
-
+    QImage *pattern;        // The actual image
+    QImage *gridPattern;    // Holds the pre-rendered grid overlay
+    QImage *toolPreview;    // Holds a preview of the current tool
     int scale;
+
+    QColor *toolColor;
+    int toolSize;
+
+
+    int playbackRow;
 
 signals:
 
 public slots:
     void setToolColor(QColor color);
     void setToolSize(int size);
+    void setPlaybackRow(int row);
 };
 
 #endif // PATTERNEDITOR_H

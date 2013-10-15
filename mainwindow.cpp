@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Our pattern editor wants to get some notifications
     connect(ui->colorPicker, SIGNAL(colorChanged(QColor)), ui->patternEditor, SLOT(setToolColor(QColor)));
-//    connect(ui->penSize, SIGNAL(valueChanged(int)), ui->patternEditor, SLOT(setToolSize(int)));
+    connect(ui->penSize, SIGNAL(valueChanged(int)), ui->patternEditor, SLOT(setToolSize(int)));
 
     m_drawTimer = new QTimer(this);
     connect(m_drawTimer, SIGNAL(timeout()), this, SLOT(drawTimerTimeout()));
@@ -55,10 +55,6 @@ void MainWindow::on_disconnectButton_clicked()
 {
     if(tape.isConnected()) {
         tape.disconnect();
-        std::cout << "Disconnected, new connected state:" << std::boolalpha  << tape.isConnected() << std::endl;
-    }
-    else {
-        std::cout << "Not connected" << std::endl;
     }
 }
 
@@ -79,6 +75,7 @@ void MainWindow::drawTimerTimeout() {
         tape.sendUpdate(ledData);
 
         n = (n+1)%60;
+        ui->patternEditor->setPlaybackRow(n);
     }
 }
 

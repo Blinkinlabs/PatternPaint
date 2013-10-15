@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>496</width>
-    <height>406</height>
+    <width>493</width>
+    <height>394</height>
    </rect>
   </property>
   <property name="palette">
@@ -133,7 +133,7 @@
      <number>1</number>
     </property>
     <property name="maximum">
-     <number>200</number>
+     <number>100</number>
     </property>
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
@@ -187,7 +187,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>496</width>
+     <width>493</width>
      <height>22</height>
     </rect>
    </property>
