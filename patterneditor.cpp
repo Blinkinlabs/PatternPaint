@@ -51,7 +51,7 @@ void PatternEditor::init(int width, int height) {
     toolPreview->fill(QColor(0,0,0,0));
 
     toolColor = new QColor(0,0,0);
-    toolSize = 1;
+    toolSize = 2;
 
     // Turn on mouse tracking so we can draw a preview
     setMouseTracking(true);
@@ -93,10 +93,8 @@ void PatternEditor::mousePressEvent(QMouseEvent *event){
     brush.setColor(*toolColor);
     painter.setBrush(brush);
 
-    for(int i = -1; i < 2; i++) {
-        painter.drawPoint(x+i*pattern->width(),y);
-        painter.drawEllipse ( QPoint(x+i*pattern->width(),y), toolSize/2, toolSize/2 );
-    }
+    painter.drawPoint(x,y);
+    painter.drawEllipse ( QPoint(x,y), toolSize/2, toolSize/2 );
 
     update();
 }
@@ -118,10 +116,8 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
     brush.setColor(*toolColor);
     painter.setBrush(brush);
 
-    for(int i = -1; i < 2; i++) {
-        painter.drawPoint(x+i*pattern->width(),y);
-        painter.drawEllipse ( QPoint(x+i*pattern->width(),y), toolSize/2, toolSize/2 );
-    }
+    painter.drawPoint(x,y);
+    painter.drawEllipse ( QPoint(x,y), toolSize/2, toolSize/2 );
 
     if( event->buttons() &  Qt::LeftButton ) {
         QPainter painter(pattern);
@@ -135,10 +131,8 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
         brush.setColor(*toolColor);
         painter.setBrush(brush);
 
-        for(int i = -1; i < 2; i++) {
-            painter.drawPoint(x+i*pattern->width(),y);
-            painter.drawEllipse ( QPoint(x+i*pattern->width(),y), toolSize/2, toolSize/2 );
-        }
+        painter.drawPoint(x,y);
+        painter.drawEllipse ( QPoint(x,y), toolSize/2, toolSize/2 );
     }
 
     update();
