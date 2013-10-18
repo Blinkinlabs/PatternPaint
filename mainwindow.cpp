@@ -65,9 +65,9 @@ void MainWindow::drawTimerTimeout() {
         int LED_COUNT = 60;
         QByteArray ledData(LED_COUNT * 3, 0);
 
-        QImage *img = ui->patternEditor->getPattern();
+        QImage img = ui->patternEditor->getPattern();
         for(int i = 0; i < LED_COUNT; i++) {
-            int color = img->pixel(n,i);
+            int color = img.pixel(n,i);
             ledData[i*3  ] = (color >> 16) & 0xff;
             ledData[i*3+1] = (color >> 8) & 0xff;
             ledData[i*3+2] = (color) & 0xff;

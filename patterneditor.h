@@ -15,7 +15,7 @@ public:
 
     void init(QString filename);
 
-    QImage *getPattern() { return pattern; }
+    QImage getPattern() { return pattern; }
 
     void mousePressEvent(QMouseEvent * event);
     void mouseMoveEvent(QMouseEvent * event);
@@ -24,12 +24,13 @@ protected:
     void paintEvent(QPaintEvent *event);
 
 private:
-    QImage *pattern;        // The actual image
-    QImage *gridPattern;    // Holds the pre-rendered grid overlay
-    QImage *toolPreview;    // Holds a preview of the current tool
-    int scale;
+    QImage pattern;        // The actual image
+    QImage gridPattern;    // Holds the pre-rendered grid overlay
+    QImage toolPreview;    // Holds a preview of the current tool
+    int xScale;
+    int yScale;
 
-    QColor *toolColor;
+    QColor toolColor;
     int toolSize;
 
 
