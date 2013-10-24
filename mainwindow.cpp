@@ -1,3 +1,4 @@
+#include "ledwriter.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -106,3 +107,9 @@ void MainWindow::on_actionLoad_Image_triggered()
     ui->patternEditor->init(fileName);
 }
 
+void MainWindow::on_uploadButton_clicked()
+{
+    LedWriter a;
+    a.loadAnimation(ui->patternEditor->getPattern());
+    a.makeCHeader();
+}

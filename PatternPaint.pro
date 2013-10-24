@@ -22,11 +22,13 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     blinkytape.cpp \
     patterneditor.cpp \
-    colorpicker.cpp
+    colorpicker.cpp \
+    ledwriter.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
     patterneditor.h \
-    colorpicker.h
+    colorpicker.h \
+    ledwriter.h
 
 FORMS    += mainwindow.ui

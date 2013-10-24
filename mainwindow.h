@@ -33,6 +33,8 @@ private slots:
 
     void on_actionLoad_Image_triggered();
 
+    void on_uploadButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 
