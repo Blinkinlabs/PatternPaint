@@ -111,5 +111,14 @@ void MainWindow::on_uploadButton_clicked()
 {
     LedWriter a;
     a.loadAnimation(ui->patternEditor->getPattern());
-    a.makeCHeader();
+//    a.makeCHeader();
+
+    // Only if we are already conected, try to reset the strip.
+    if(tape.isConnected()) {
+        tape.resetToBootloader();
+    }
+
+    // Quick, make a list of all serial ports
+
+
 }

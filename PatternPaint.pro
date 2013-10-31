@@ -23,12 +23,14 @@ SOURCES += main.cpp\
     blinkytape.cpp \
     patterneditor.cpp \
     colorpicker.cpp \
-    ledwriter.cpp
+    ledwriter.cpp \
+    avrprogrammer.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
     patterneditor.h \
     colorpicker.h \
-    ledwriter.h
+    ledwriter.h \
+    avrprogrammer.h
 
 FORMS    += mainwindow.ui

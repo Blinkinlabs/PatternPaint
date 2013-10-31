@@ -132,6 +132,6 @@ void LedWriter::makeCHeader() {
     stream.close();
 }
 
-void LedWrite::makeBinary() {
-    //
+void LedWriter::makeBinary() {
+    // TODO: Implmement me!
 }

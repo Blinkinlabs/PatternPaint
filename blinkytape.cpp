@@ -1,6 +1,7 @@
 #include "blinkytape.h"
 
 #include <iostream>
+#include <termios.h>
 
 QList<QSerialPortInfo> BlinkyTape::findBlinkyTapes() {
     QList<QSerialPortInfo> tapes;
@@ -24,10 +25,6 @@ BlinkyTape::BlinkyTape(int ledCount)
     m_ledCount = ledCount;
 }
 
-bool BlinkyTape::isConnected() {
-    return m_serial.isOpen();
-}
-
 bool BlinkyTape::connect(QSerialPortInfo info) {
     // TODO: Refuse if we are already open?
 
@@ -41,6 +38,25 @@ void BlinkyTape::disconnect() {
     if(isConnected()) {
         m_serial.close();
     }
+}
+
+void BlinkyTape::resetToBootloader() {
+    if(isConnected()) {
+        std::cout << "Resetting" << std::endl;
+        m_serial.setBaudRate(QSerialPort::Baud1200);
+        m_serial.setSettingsRestoredOnClose(false);
+        std::cout << m_serial.baudRate() << std::endl;
+        std::cout << m_serial.settingsRestoredOnClose() << std::endl;
+
+        m_serial.close();
+
+        std::cout << m_serial.baudRate() << std::endl;
+        std::cout << m_serial.error() << std::endl;
+    }
+}
+
+bool BlinkyTape::isConnected() {
+    return m_serial.isOpen();
 }
 
 void BlinkyTape::sendUpdate(QByteArray LedData)

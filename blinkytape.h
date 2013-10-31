@@ -14,11 +14,13 @@ public:
 
     BlinkyTape(int ledCount = 60);
 
-    bool isConnected();
-
     bool connect(QSerialPortInfo info);
-
     void disconnect();
+
+    // Attempt to reset the tape, by setting the baud rate to 1200
+    void resetToBootloader();
+
+    bool isConnected();
 
     void sendUpdate(QByteArray colors);
 
