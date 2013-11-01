@@ -52,7 +52,7 @@ public:
 //    bool programmerHardwareVersion( long * major, long * minor );
 
 private:
-    QSerialPort m_serial;
+    QSerialPort serial;
 };
 
 #endif // AVRPROGRAMMER_H

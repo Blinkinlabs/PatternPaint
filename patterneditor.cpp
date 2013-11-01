@@ -16,17 +16,18 @@ void PatternEditor::init(int width, int height)
 
     // Make a color image as default
     pattern = QImage(width,height,QImage::Format_RGB32);
-    float phase = 0;
-    for(int x = 0; x < pattern.width();x++) {
-        for(int y = 0; y < pattern.height(); y++) {
+    pattern.fill(0);
+//    float phase = 0;
+//    for(int x = 0; x < pattern.width();x++) {
+//        for(int y = 0; y < pattern.height(); y++) {
 
-            int color = (((int)((std::sin(phase        + y/12.0) + 1)*127)) << 16)
-                      + (((int)((std::sin(phase + 2.09 + y/12.0) + 1)*127)) << 8)
-                      + (((int)((std::sin(phase + 4.18 + y/12.0) + 1)*127))     );
-            pattern.setPixel(x,y,color);
-        }
-        phase += .105;
-    }
+//            int color = (((int)((std::sin(phase        + y/12.0) + 1)*127)) << 16)
+//                      + (((int)((std::sin(phase + 2.09 + y/12.0) + 1)*127)) << 8)
+//                      + (((int)((std::sin(phase + 4.18 + y/12.0) + 1)*127))     );
+//            pattern.setPixel(x,y,color);
+//        }
+//        phase += .105;
+//    }
 
     // And make a grid pattern to superimpose over the image
     gridPattern = QImage(width*xScale+1,height*yScale+1,QImage::Format_ARGB32);

@@ -25,9 +25,9 @@ public:
     void sendUpdate(QByteArray colors);
 
 private:
-    QSerialPort m_serial;
+    QSerialPort serial;
 
-    int m_ledCount;
+    int ledCount;
 };
 
 #endif // BLINKYTAPE_H

@@ -1,3 +1,4 @@
+#include "avrprogrammer.h"
 #include "blinkytape.h"
 
 #include <iostream>
@@ -6,6 +7,8 @@
 QList<QSerialPortInfo> BlinkyTape::findBlinkyTapes() {
     QList<QSerialPortInfo> tapes;
 
+    // TODO: Should we use VID/PID here instead of descriptions?
+    // Maybe it's not the most important thing in the world.
     foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
         // If the description is BlinkyTape, we're sure to have a match
         if(info.description().startsWith("BlinkyTape")) {
@@ -20,43 +23,109 @@ QList<QSerialPortInfo> BlinkyTape::findBlinkyTapes() {
     return tapes;
 }
 
-BlinkyTape::BlinkyTape(int ledCount)
+BlinkyTape::BlinkyTape(int ledCount_)
 {
-    m_ledCount = ledCount;
+    ledCount = ledCount_;
 }
 
 bool BlinkyTape::connect(QSerialPortInfo info) {
     // TODO: Refuse if we are already open?
-
-    m_serial.setPort(info);
+    serial.setPort(info);
 
     // TODO: Do something else if we can't open?
-    return m_serial.open(QIODevice::ReadWrite);
+    return serial.open(QIODevice::ReadWrite);
 }
 
 void BlinkyTape::disconnect() {
     if(isConnected()) {
-        m_serial.close();
+        serial.close();
     }
 }
 
 void BlinkyTape::resetToBootloader() {
-    if(isConnected()) {
-        std::cout << "Resetting" << std::endl;
-        m_serial.setBaudRate(QSerialPort::Baud1200);
-        m_serial.setSettingsRestoredOnClose(false);
-        std::cout << m_serial.baudRate() << std::endl;
-        std::cout << m_serial.settingsRestoredOnClose() << std::endl;
-
-        m_serial.close();
-
-        std::cout << m_serial.baudRate() << std::endl;
-        std::cout << m_serial.error() << std::endl;
+    // We can't reset if we weren't already connected...
+    if(!isConnected()) {
+        return;
     }
+
+    // First, record the currently available BlinkyTapes
+    QList<QSerialPortInfo> preResetTapes = BlinkyTape::findBlinkyTapes();
+    std::cout << "Current tapes: " << preResetTapes.length() << std::endl;
+    for(int i = 0; i < preResetTapes.length(); i++) {
+        std::cout << preResetTapes.at(i).portName().toStdString() << std::endl;
+    }
+
+    // Next, record the currently active port (TODO: do we care???)
+    QSerialPortInfo currentPort(serial);
+
+    // Now, set the currently connected tapes baud rate to 1200, then close it to
+    // apply the 1200 baud reset
+    // TODO: This seems to work on OS X, test on Windows and Linux
+    std::cout << "Resetting" << std::endl;
+    serial.setBaudRate(QSerialPort::Baud1200);
+    serial.setSettingsRestoredOnClose(false);
+    serial.close();
+
+    // Wait until we see a serial port drop out
+    // TODO: Is this guarinteed to happen?
+    #define RESET_TIMEOUT_MS 2000
+    QDateTime time = QDateTime::currentDateTime();
+
+    QList<QSerialPortInfo> midResetTapes;
+    bool portDropped = false;
+    while(!portDropped && time.msecsTo(QDateTime::currentDateTime()) < RESET_TIMEOUT_MS) {
+        midResetTapes = BlinkyTape::findBlinkyTapes();
+        if (midResetTapes.length() == preResetTapes.length() - 1) {
+            portDropped = true;
+            std::cout << "Port dropped, hooray!" << std::endl;
+        }
+    }
+    if (portDropped == false) {
+        // TODO: Timeout error waiting for port to dissappear.
+        std::cout << "Timeout waiting for port to disappear..." << std::endl;
+        return;
+    }
+
+    // Wait until we see a serial port appear again.
+    QList<QSerialPortInfo> postResetTapes;
+    bool portAdded = false;
+    while(!portAdded && time.msecsTo(QDateTime::currentDateTime()) < RESET_TIMEOUT_MS) {
+        postResetTapes = BlinkyTape::findBlinkyTapes();
+        if (postResetTapes.length() == midResetTapes.length() + 1) {
+            portAdded = true;
+            std::cout << "Port added, hooray!" << std::endl;
+        }
+    }
+    if(!portAdded) {
+        std::cout << "Timeout waiting for port to appear..." << std::endl;
+        return;
+    }
+
+    // Remove all of the tapes that are in the mid-reset list from the post-reset list
+    std::cout << "Post-reset tapes: " << postResetTapes.length() << std::endl;
+    for(int i = 0; i < midResetTapes.length(); i++) {
+        for(int j = 0; j < postResetTapes.length(); j++) {
+            if(midResetTapes.at(i).portName() == postResetTapes.at(j).portName()) {
+                postResetTapes.removeAt(j);
+                break;
+            }
+        }
+    }
+
+    // Now, we should only have one new port.
+    if(postResetTapes.length() != 1) {
+        std::cout << "Too many or two few ports, something went wrong??" << std::endl;
+    }
+
+    std::cout << "Bootloader waiting on: " << postResetTapes.at(0).portName().toStdString() << std::endl;
+
+    AvrProgrammer programmer;
+    programmer.connect(postResetTapes.at(0));
+    programmer.enterProgrammingMode();
 }
 
 bool BlinkyTape::isConnected() {
-    return m_serial.isOpen();
+    return serial.isOpen();
 }
 
 void BlinkyTape::sendUpdate(QByteArray LedData)
@@ -76,7 +145,7 @@ void BlinkyTape::sendUpdate(QByteArray LedData)
 
     // Chunk it out
     int CHUNK_SIZE = 600;
-    for(int p = 0; p < m_ledCount * 3; p += CHUNK_SIZE) {
+    for(int p = 0; p < ledCount * 3; p += CHUNK_SIZE) {
         int length = 0;
         if(p + CHUNK_SIZE < LedData.length()) {
             // send a whole chunk
@@ -93,7 +162,7 @@ void BlinkyTape::sendUpdate(QByteArray LedData)
         }
 
 //        std::cout << "writing out" << std::endl;
-        int written = m_serial.write(chunk);
+        int written = serial.write(chunk);
         // if we didn't write everything, save it for later.
         if(written == -1) {
             exit(100);
@@ -104,7 +173,7 @@ void BlinkyTape::sendUpdate(QByteArray LedData)
             p-= length - written;
         }
 //        std::cout << "waiting for write" << std::endl;
-        m_serial.flush();
+        serial.flush();
 //        std::cout << "done waiting for write" << std::endl;
     }
 
@@ -115,8 +184,8 @@ void BlinkyTape::sendUpdate(QByteArray LedData)
     data[2] = 0xff;
 
 //    std::cout << "writing end" << std::endl;
-    m_serial.write(data);
+    serial.write(data);
 //    std::cout << "waiting for end" << std::endl;
-    m_serial.flush();
+    serial.flush();
 //    std::cout << "done waiting for end" << std::endl;
 }
