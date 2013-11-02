@@ -8,6 +8,8 @@ AvrProgrammer::AvrProgrammer()
 bool AvrProgrammer::connect(QSerialPortInfo info) {
     // TODO: Refuse if we are already open?
 
+    std::cout << info.manufacturer().toStdString() << std::endl;
+    serial.setBaudRate(QSerialPort::Baud115200);  // TODO: Delete me
     serial.setPort(info);
 
     // TODO: Do something else if we can't open?
@@ -15,13 +17,77 @@ bool AvrProgrammer::connect(QSerialPortInfo info) {
 }
 
 void AvrProgrammer::disconnect() {
-    if(isConnected()) {
-        serial.close();
+    if(!isConnected()) {
+        return;
     }
+
+    serial.close();
 }
 
 bool AvrProgrammer::isConnected() {
     return serial.isOpen();
+}
+
+bool AvrProgrammer::sendCommand(QByteArray command) {
+    #define WRITE_TIMEOUT_MS 500
+
+    // TODO: Check error? check connected??
+
+    if(serial.write(command) != command.length()) {
+        std::cout << "Error writing to device" << std::endl;
+        return false;
+    }
+
+    if(serial.error() != QSerialPort::NoError) {
+        std::cout << serial.errorString().toStdString() << std::endl;
+        return false;
+    }
+
+    serial.waitForBytesWritten(WRITE_TIMEOUT_MS);
+    if(serial.bytesToWrite() > 0) {
+        std::cout << "Fuck, timeout on write!" << std:: endl;
+        return false;
+    }
+
+    return true;
+}
+
+bool AvrProgrammer::checkResponse(QByteArray expectedResponse) {
+    #define READ_TIMEOUT_MS 500
+
+    QByteArray response = serial.readAll();
+    while (serial.waitForReadyRead(READ_TIMEOUT_MS)) {
+        response += serial.readAll();
+    }
+
+    if(response.length() != expectedResponse.length()) {
+        std::cout << "Fuck, didnt get correct amout of data! got: " << response.length() << std::endl;
+        return false;
+    }
+
+    if(serial.error() != QSerialPort::NoError) {
+        std::cout << serial.errorString().toStdString() << std::endl;
+        return false;
+    }
+
+    if( response != expectedResponse) {
+        std::cout << "Fuck, response didn't match!:" << response.at(0) << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+bool AvrProgrammer::checkSoftwareIdentifier() {
+    if(!sendCommand(QByteArray("S"))) {
+        return false;
+    }
+
+    if(!checkResponse(QByteArray("CATERIN"))) {
+        return false;
+    }
+
+    return true;
 }
 
 void AvrProgrammer::enterProgrammingMode() {
@@ -30,55 +96,11 @@ void AvrProgrammer::enterProgrammingMode() {
         return;
     }
 
-    QByteArray buffer;
-    buffer.append('Z');
-    buffer.append('\r');
-    buffer.append('Z');
-    buffer.append('\r');
-    buffer.append('Z');
-    buffer.append('\r');
-    buffer.append('Z');
-    buffer.append('\r');
-    buffer.append('Z');
-    buffer.append('\r');
-    buffer.append('Z');
-    buffer.append('\r');
-
-    std::cout << buffer.length() << std::endl;
-
-    serial.clearError();
-    if(serial.write(buffer) != buffer.length()) {
-        std::cout << "Error writing to device" << std::endl;
-    }
-
-    if(serial.error() != QSerialPort::NoError) {
-        std::cout << serial.errorString().toStdString() << std::endl;
-    }
-
-    serial.waitForBytesWritten(500);
-    if(serial.bytesToWrite() > 0) {
-        std::cout << "Fuck, timeout on write!" << std:: endl;
+    if(!checkSoftwareIdentifier()) {
         return;
     }
 
-    #define READ_TIMEOUT_MS 500
-    QDateTime time = QDateTime::currentDateTime();
-
-    int expectedDataLen = 1;
-
-    QByteArray returnData;
-    while(returnData.length() != expectedDataLen && time.msecsTo(QDateTime::currentDateTime()) < READ_TIMEOUT_MS) {
-        returnData += serial.read(1);
-    }
-    if(returnData.length() != expectedDataLen) {
-        std::cout << "Fuck, didnt get correct amout of data! got: " << returnData.length() << std::endl;
-        return;
-    }
-
-    if( returnData.at(0) != '\r') {
-        // TODO: Return code invalid, bail!
-        std::cout << "Fuck, didn't get a CR back, got:" << (int)returnData.at(0) << std::endl;
-    }
+    std::cout << "Great!" << std::endl;
 }
 
 void AvrProgrammer::leaveProgrammingMode() {

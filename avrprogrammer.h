@@ -53,6 +53,15 @@ public:
 
 private:
     QSerialPort serial;
+
+    // Send a command to a connected bootloader
+    bool sendCommand(QByteArray command);
+
+    // Check that a known response was received
+    bool checkResponse(QByteArray response);
+
+    // Check that we are talking to the correct bootloader
+    bool checkSoftwareIdentifier();
 };
 
 #endif // AVRPROGRAMMER_H
