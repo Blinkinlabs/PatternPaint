@@ -13,6 +13,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // TODO: Run on windows to see if this works
+    setWindowIcon(QIcon(":/resources/images/blinkytape.jpg"));
+
     // TODO: Standard init in QWidget we can override instead?
     ui->patternEditor->init(60,60);
     ui->colorPicker->init();

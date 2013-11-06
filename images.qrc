@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/resources">
+        <file>images/BlinkyTape.jpg</file>
+    </qresource>
+</RCC>
