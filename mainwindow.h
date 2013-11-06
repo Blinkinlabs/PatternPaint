@@ -21,9 +21,7 @@ public:
     BlinkyTape tape;
 
 private slots:
-    void on_connectButton_clicked();
-
-    void on_disconnectButton_clicked();
+    void on_tapeConnectDisconnect_clicked();
 
     void drawTimerTimeout();
 
@@ -34,6 +32,8 @@ private slots:
     void on_actionLoad_Image_triggered();
 
     void on_uploadButton_clicked();
+
+    void on_tapeConnectionStatusChanged(bool status);
 
 private:
     Ui::MainWindow *ui;

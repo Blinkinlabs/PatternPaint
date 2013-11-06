@@ -24,9 +24,17 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->colorPicker, SIGNAL(colorChanged(QColor)), ui->patternEditor, SLOT(setToolColor(QColor)));
     connect(ui->penSize, SIGNAL(valueChanged(int)), ui->patternEditor, SLOT(setToolSize(int)));
 
+    // The draw timer tells the animation to advance
     m_drawTimer = new QTimer(this);
     connect(m_drawTimer, SIGNAL(timeout()), this, SLOT(drawTimerTimeout()));
     m_drawTimer->start(33);
+
+    // Modify our UI when the tape connection status changes
+    connect(&tape, SIGNAL(connectionStatusChanged(bool)),this,SLOT(on_tapeConnectionStatusChanged(bool)));
+
+    // Set some default values for the painting interface
+    ui->penSize->setSliderPosition(2);
+    ui->animationSpeed->setSliderPosition(30);
 }
 
 MainWindow::~MainWindow()
@@ -34,31 +42,17 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_connectButton_clicked()
-{
-    if(tape.isConnected()) {
-        std::cout << "already connected to a tape!" << std::endl;
-        return;
-    }
-    std::cout << "ok, lets find a tape!" << std::endl;
-
-
-    QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
-    if(tapes.length() > 0) {
-        std::cout << "connecting" << std::endl;
-        if(tape.connect(tapes[0])) {
-            // TODO: Stop after the first tape?
-        }
-    }
-    else {
-        std::cout << "No tapes to connect to!" << std::endl;
-    }
-}
-
-void MainWindow::on_disconnectButton_clicked()
+void MainWindow::on_tapeConnectDisconnect_clicked()
 {
     if(tape.isConnected()) {
         tape.disconnect();
+    }
+    else {
+        QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
+        if(tapes.length() > 0) {
+            // TODO: Try another one if this one fails?
+            tape.connect(tapes[0]);
+        }
     }
 }
 
@@ -78,7 +72,7 @@ void MainWindow::drawTimerTimeout() {
         }
         tape.sendUpdate(ledData);
 
-        n = (n+1)%60;
+        n = (n+1)%img.width();
         ui->patternEditor->setPlaybackRow(n);
     }
 }
@@ -130,16 +124,18 @@ void MainWindow::on_uploadButton_clicked()
 //        }
 //    }
 
-    int LED_COUNT = 60;
     QByteArray ledData;
     QImage img = ui->patternEditor->getPattern();
 
     for(int frame = 0; frame < animation.width(); frame++) {
         for(int pixel = 0; pixel < animation.height(); pixel++) {
             int color = img.pixel(frame, pixel);
-            ledData.append((color >> 16) & 0xff);
-            ledData.append((color >>  8) & 0xff);
-            ledData.append((color)       & 0xff);
+//            ledData.append((color >> 16) & 0xff);
+//            ledData.append((color >>  8) & 0xff);
+//            ledData.append((color)       & 0xff);
+            ledData.append(qRed(color));
+            ledData.append(qGreen(color));
+            ledData.append(qBlue(color));
         }
     }
 
@@ -148,4 +144,17 @@ void MainWindow::on_uploadButton_clicked()
         tape.uploadAnimation(ledData);
     }
 
+}
+
+void MainWindow::on_tapeConnectionStatusChanged(bool status)
+{
+    std::cout << "status changed!" << std::endl;
+    if(status) {
+        ui->tapeConnectDisconnect->setText("Disconnect");
+        ui->uploadButton->setEnabled(true);
+    }
+    else {
+        ui->tapeConnectDisconnect->setText("Connect");
+        ui->uploadButton->setEnabled(false);
+    }
 }

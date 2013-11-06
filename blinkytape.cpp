@@ -29,18 +29,27 @@ BlinkyTape::BlinkyTape(int ledCount_)
 }
 
 bool BlinkyTape::connect(QSerialPortInfo info) {
-    // TODO: Refuse if we are already open?
+    if(isConnected()) {
+        return false;
+    }
     serial.setPort(info);
 
     // TODO: Do something else if we can't open?
     serial.setBaudRate(QSerialPort::Baud115200);
 
-    return serial.open(QIODevice::ReadWrite);
+    serial.open(QIODevice::ReadWrite);
+
+    if(isConnected()) {
+      emit(connectionStatusChanged(isConnected()));
+    }
+
+    return isConnected();
 }
 
 void BlinkyTape::disconnect() {
     if(isConnected()) {
         serial.close();
+        emit(connectionStatusChanged(isConnected()));
     }
 }
 
@@ -69,6 +78,7 @@ void BlinkyTape::uploadAnimation(QByteArray animation) {
     serial.setBaudRate(QSerialPort::Baud1200);
     serial.setSettingsRestoredOnClose(false);
     serial.close();
+    emit(connectionStatusChanged(isConnected()));
 
     // Wait until we see a serial port drop out
     // TODO: Is this guarinteed to happen?

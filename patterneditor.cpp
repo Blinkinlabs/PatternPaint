@@ -37,11 +37,6 @@ void PatternEditor::init(int width, int height)
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter.setRenderHint(QPainter::Antialiasing, false);
 
-//    painter.setPen(QColor(80,80,80));
-//    for(int y = 0; y <= pattern.height(); y++) {
-//        painter.drawLine(0,y*yScale,pattern.width()*xScale,y*yScale);
-//    }
-
     painter.setPen(QColor(40,40,40));
     for(int x = 0; x <= pattern.width(); x++) {
         painter.drawLine(x*xScale,0,x*xScale,pattern.height()*yScale-1);
@@ -56,6 +51,12 @@ void PatternEditor::init(int width, int height)
 
     // Turn on mouse tracking so we can draw a preview
     setMouseTracking(true);
+
+    // Set the widget size
+    setMinimumHeight(pattern.height()*yScale);
+    setMaximumHeight(pattern.height()*yScale);
+    setMinimumWidth(pattern.width()*xScale);
+//    setMaximumWidth(pattern.width()*xScale);  // Disable max width until we can hook window resizing up properly
 
     update();
 }
@@ -155,6 +156,8 @@ void PatternEditor::paintEvent(QPaintEvent * /* event */)
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter.setRenderHint(QPainter::Antialiasing, false);
 
+    painter.drawRect(0,0,width()-1, height()-1);
+
     // Draw the image
     painter.drawImage(QRect(0,0,pattern.width()*xScale, pattern.height()*yScale),pattern);
     painter.drawImage(QRect(0,0,pattern.width()*xScale, pattern.height()*yScale),toolPreview);
@@ -162,6 +165,6 @@ void PatternEditor::paintEvent(QPaintEvent * /* event */)
 
     // Draw the playback indicator
     painter.setPen(QColor(255,255,255));
-    painter.drawRect(playbackRow*xScale,0,xScale-1, height()-1);
-    painter.fillRect(playbackRow*xScale,0,xScale-1, height(),QColor(255,255,255,100));
+    painter.drawRect(playbackRow*xScale,0,xScale-1, pattern.height()*yScale-1);
+    painter.fillRect(playbackRow*xScale,0,xScale-1, pattern.height()*yScale,QColor(255,255,255,100));
 }
