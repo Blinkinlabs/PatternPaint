@@ -81,9 +81,6 @@ void PatternEditor::mousePressEvent(QMouseEvent *event){
     int x = event->x()/xScale;
     int y = event->y()/yScale;
 
-    std::cout << "pressing in view, " << event->x() << "," << event->y() << std::endl;
-    std::cout << "pressing in view, " << x << "," << y << std::endl;
-
     QPainter painter(&pattern);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter.setRenderHint(QPainter::Antialiasing, false);

@@ -31,6 +31,10 @@ HEADERS  += mainwindow.h \
     patterneditor.h \
     colorpicker.h \
     ledwriter.h \
-    avrprogrammer.h
+    avrprogrammer.h \
+    PatternPlayer_Sketch.h
 
 FORMS    += mainwindow.ui
+
+RESOURCES += \
+    images.qrc

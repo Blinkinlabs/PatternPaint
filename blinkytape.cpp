@@ -33,6 +33,8 @@ bool BlinkyTape::connect(QSerialPortInfo info) {
     serial.setPort(info);
 
     // TODO: Do something else if we can't open?
+    serial.setBaudRate(QSerialPort::Baud115200);
+
     return serial.open(QIODevice::ReadWrite);
 }
 
@@ -83,7 +85,7 @@ void BlinkyTape::resetToBootloader() {
     if (portDropped == false) {
         // TODO: Timeout error waiting for port to dissappear.
         std::cout << "Timeout waiting for port to disappear..." << std::endl;
-        return;
+//        return;
     }
 
     // Wait until we see a serial port appear again.
@@ -91,7 +93,8 @@ void BlinkyTape::resetToBootloader() {
     bool portAdded = false;
     while(!portAdded && time.msecsTo(QDateTime::currentDateTime()) < RESET_TIMEOUT_MS) {
         postResetTapes = BlinkyTape::findBlinkyTapes();
-        if (postResetTapes.length() == midResetTapes.length() + 1) {
+//        if (postResetTapes.length() == midResetTapes.length() + 1) {
+        if (postResetTapes.length() > 0) {
             portAdded = true;
             std::cout << "Port added, hooray!" << std::endl;
         }
