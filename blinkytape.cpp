@@ -44,7 +44,9 @@ void BlinkyTape::disconnect() {
     }
 }
 
-void BlinkyTape::resetToBootloader() {
+void BlinkyTape::uploadAnimation(QByteArray animation) {
+    // TODO: Rethink the layout of this process, it's muddled.
+
     // We can't reset if we weren't already connected...
     if(!isConnected()) {
         return;
@@ -85,7 +87,7 @@ void BlinkyTape::resetToBootloader() {
     if (portDropped == false) {
         // TODO: Timeout error waiting for port to dissappear.
         std::cout << "Timeout waiting for port to disappear..." << std::endl;
-//        return;
+        return;
     }
 
     // Wait until we see a serial port appear again.
@@ -93,8 +95,8 @@ void BlinkyTape::resetToBootloader() {
     bool portAdded = false;
     while(!portAdded && time.msecsTo(QDateTime::currentDateTime()) < RESET_TIMEOUT_MS) {
         postResetTapes = BlinkyTape::findBlinkyTapes();
-//        if (postResetTapes.length() == midResetTapes.length() + 1) {
-        if (postResetTapes.length() > 0) {
+        if (postResetTapes.length() == midResetTapes.length() + 1) {
+//        if (postResetTapes.length() > 0) {
             portAdded = true;
             std::cout << "Port added, hooray!" << std::endl;
         }
@@ -124,7 +126,7 @@ void BlinkyTape::resetToBootloader() {
 
     AvrProgrammer programmer;
     programmer.connect(postResetTapes.at(0));
-    programmer.enterProgrammingMode();
+    programmer.uploadAnimation(animation);
 }
 
 bool BlinkyTape::isConnected() {
@@ -164,7 +166,6 @@ void BlinkyTape::sendUpdate(QByteArray LedData)
             chunk[i] = LedData[p + i];
         }
 
-//        std::cout << "writing out" << std::endl;
         int written = serial.write(chunk);
         // if we didn't write everything, save it for later.
         if(written == -1) {

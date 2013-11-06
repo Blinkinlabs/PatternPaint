@@ -147,10 +147,11 @@ bool AvrProgrammer::setAddress(int address) {
         return false;
     }
 
+    // Note that the address her is word aligned.
     QByteArray command;
     command.append('A');
-    command.append((address >> 8) & 0xFF);
-    command.append((address >> 0) & 0xFF);
+    command.append((address >> 9) & 0xFF);
+    command.append((address >> 1) & 0xFF);
 
     if(!sendCommand(command)) {
         return false;
@@ -208,6 +209,18 @@ bool AvrProgrammer::readFlash(QByteArray& data, int startAddress, int lengthByte
         return false;
     }
 
+    // TODO: Delete me.
+    for(int i = 0; i < response.length(); i++) {
+        if(i%16 == 0) {
+            std::cout << std::setfill('0') << std::setw(4) << std::hex << i << ": ";
+        }
+        std::cout << std::setfill('0') << std::setw(2) << std::hex << ((int)(response.at(i) & 0xFF)) << " ";
+        if(i%16 == 15) {
+            std::cout << std::endl;
+        }
+    }
+    std::cout << std::endl;
+
     // Copy the response to return it to the calling function
     data = response;
 
@@ -222,6 +235,7 @@ bool AvrProgrammer::writeFlash(QByteArray& data, int startAddress) {
         return false;
     }
 
+    // TODO: Is this necessicary?
     if(startAddress%pageSizeBytes) {
         std::cout << "Bad start address, must align with page boundary" << std::endl;
         return false;
@@ -246,9 +260,21 @@ bool AvrProgrammer::writeFlash(QByteArray& data, int startAddress) {
 
         int currentChunkSize = std::min(pageSizeBytes, data.length() - currentChunkPosition);
 
-        std::cout << "Chunk position: " << std::setfill('0') << std::setw(4) << std::hex << currentChunkPosition
-                  << " size: " << std::setfill('0') << std::setw(4) << std::hex << currentChunkSize
-                  << std::endl;
+//        std::cout << "Chunk position: " << std::setfill('0') << std::setw(4) << std::hex << startAddress + currentChunkPosition
+//                  << " size: " << std::setfill('0') << std::setw(4) << std::hex << currentChunkSize
+//                  << std::endl;
+
+        std::cout << std::setfill('0') << std::setw(4) << std::hex << startAddress + currentChunkPosition;
+        for(int i = 0; i < data.mid(currentChunkPosition,currentChunkSize).length(); i++) {
+            if(i%16 == 0) {
+                std::cout << ": ";
+            }
+            std::cout << std::setfill('0') << std::setw(2) << std::hex << ((int)(data.mid(currentChunkPosition,currentChunkSize).at(i) & 0xFF)) << " ";
+            if(i%16 == 15) {
+                std::cout << std::endl << "    ";
+            }
+        }
+        std::cout << std::endl;
 
         QByteArray command;
         command.append('B'); // command: read memory
@@ -272,7 +298,7 @@ bool AvrProgrammer::writeFlash(QByteArray& data, int startAddress) {
     return true;
 }
 
-void AvrProgrammer::enterProgrammingMode() {
+void AvrProgrammer::uploadAnimation(QByteArray animation) {
 
     if(!isConnected()) {
         std::cout << "not connected!" << std::endl;
@@ -280,36 +306,65 @@ void AvrProgrammer::enterProgrammingMode() {
     }
 
     if(!checkDeviceSignature()) {
+        std::cout << "bad device signature!" << std::endl;
         return;
     }
 
-    QByteArray readFromFlash;
-    int startAddress = 0;
-    int lengthBytes = 28672; // 4k is reserved for the bootloader, so don't bother reading it.
-    if(!readFlash(readFromFlash, startAddress, lengthBytes)) {
-        return;
-    }
-
-    // TODO: Delete me.
-    for(int i = 0; i < readFromFlash.length(); i++) {
-        if(i%16 == 0) {
-            std::cout << std::setfill('0') << std::setw(4) << std::hex << i << ": ";
-        }
-        std::cout << std::setfill('0') << std::setw(2) << std::hex << ((int)(readFromFlash.at(i) & 0xFF)) << " ";
-        if(i%16 == 15) {
-            std::cout << std::endl;
-        }
-    }
-    std::cout << std::endl;
-
-    std::cout << "is..." << std::endl;
+    // First, convert the sketch binary data into a qbytearray
     QByteArray sketch(PatternPlayerSketch,PATTERNPLAYER_LENGTH);
-    std::cout << "OK!" << std::endl;
 
+    // Next, append the image data to it
+    // TODO: Compress the animation
+    sketch += animation;
+
+    // The entire sketch must fit into the available memory, minus a single page
+    // at the end of flash for the configuration header
+    // TODO: Could save ~100 bytes if we let the sketch spill into the unused portion
+    // of the header.
+    if(sketch.length() > FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE) {
+        std::cout << "sketch can't fit into memory!" << std::endl;
+        return;
+    }
+
+    // Finally, write the metadata about the animation to the end of flash
+    QByteArray metadata(FLASH_MEMORY_PAGE_SIZE, 0xFF); // TODO: Connect this to the block size
+    metadata[metadata.length()-4] = (PATTERNPLAYER_LENGTH >> 8) & 0xFF;
+    metadata[metadata.length()-3] = (PATTERNPLAYER_LENGTH     ) & 0xFF;
+    metadata[metadata.length()-2] = ((animation.length()/3/60) >> 8) & 0xFF;
+    metadata[metadata.length()-1] = ((animation.length()/3/60)     ) & 0xFF;
+
+    std::cout << std::hex;
+    std::cout <<  "Sketch size (bytes): 0x" << PATTERNPLAYER_LENGTH << std::endl;
+    std::cout << "Animation size (bytes): 0x" << animation.length() << std::endl;
+    std::cout << "Image size (bytes): 0x" << sketch.length() << std::endl;
+
+    std::cout << "Animation address: 0x"
+              << (int)metadata.at(124)
+              << (int)metadata.at(125) << std::endl;
+    std::cout << "Animation length: 0x"
+              << (int)metadata.at(126)
+              << (int)metadata.at(127) << std::endl;
+
+
+    // Now, write the combined sketch and animation to flash
     if(!writeFlash(sketch,0)) {
         return;
     }
 
+    // Now, write the animation metadata to the end of flash
+    if(!writeFlash(metadata, 0x7000 - 0x80)) {
+        return;
+    }
+
+    // TODO: Compare this to what we just wrote as a verification step.
+    QByteArray readFromFlash;
+    int startAddress = 0;
+    int lengthBytes = FLASH_MEMORY_AVAILABLE; // 4k is reserved for the bootloader, so don't bother reading it.
+    if(!readFlash(readFromFlash, startAddress, lengthBytes)) {
+        return;
+    }
+
+    // Finally, reset the strip to start the animation.
     if(!reset()) {
         return;
     }

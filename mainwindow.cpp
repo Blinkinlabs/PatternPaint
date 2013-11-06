@@ -112,16 +112,40 @@ void MainWindow::on_actionLoad_Image_triggered()
 
 void MainWindow::on_uploadButton_clicked()
 {
-    LedWriter a;
-    a.loadAnimation(ui->patternEditor->getPattern());
+//    LedWriter a;
+//    a.loadAnimation(ui->patternEditor->getPattern());
 //    a.makeCHeader();
+
+    // Convert the animation into a QByteArray
+    // The RGB encoder just stores the data as R,G,B over and over again.
+    QImage animation =  ui->patternEditor->getPattern();
+//    QByteArray animationData;
+
+//    for(int frame = 0; frame < animation.width(); frame++) {
+//        for(int pixel = 0; pixel < animation.height(); pixel++) {
+//            int color = animation.pixel(frame, pixel);
+//            animationData.append(qRed(color));
+//            animationData.append(qGreen(color));
+//            animationData.append(qBlue(color));
+//        }
+//    }
+
+    int LED_COUNT = 60;
+    QByteArray ledData;
+    QImage img = ui->patternEditor->getPattern();
+
+    for(int frame = 0; frame < animation.width(); frame++) {
+        for(int pixel = 0; pixel < animation.height(); pixel++) {
+            int color = img.pixel(frame, pixel);
+            ledData.append((color >> 16) & 0xff);
+            ledData.append((color >>  8) & 0xff);
+            ledData.append((color)       & 0xff);
+        }
+    }
 
     // Only if we are already conected, try to reset the strip.
     if(tape.isConnected()) {
-        tape.resetToBootloader();
+        tape.uploadAnimation(ledData);
     }
-
-    // Quick, make a list of all serial ports
-
 
 }

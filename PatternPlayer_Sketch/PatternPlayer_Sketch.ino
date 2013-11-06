@@ -51,7 +51,7 @@ void setup()
              + (pgm_read_byte(FRAME_COUNT_ADDRESS + 1));
              
   
-  pov.init(frameCount, frameData, ENCODING_16RLE, LED_COUNT);
+  pov.init(frameCount, frameData, ENCODING_NONE, LED_COUNT);
   
 }
 
@@ -96,6 +96,6 @@ void loop()
   }
   
   pov.draw(leds);
-  delay(20);
+  delay(50);
 }
 

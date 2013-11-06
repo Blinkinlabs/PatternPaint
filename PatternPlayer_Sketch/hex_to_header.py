@@ -47,7 +47,7 @@ def HexToHeader(fileName):
 // Automatically generated file...
 
 """
-  print "#define PATTERNPLAYER_ADDRESS  %i"%(0)  #TODO: fill in first address!
+  print "#define PATTERNPLAYER_ADDRESS  0x%04X"%(0)  #TODO: fill in first address!
   print "#define PATTERNPLAYER_LENGTH   %i"%(len(headerData)/2)
   print ""
 

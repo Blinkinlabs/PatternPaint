@@ -32,9 +32,13 @@ HEADERS  += mainwindow.h \
     colorpicker.h \
     ledwriter.h \
     avrprogrammer.h \
-    PatternPlayer_Sketch.h
+    PatternPlayer_Sketch.h \
+    ColorSwirl_Sketch.h
 
 FORMS    += mainwindow.ui
+
+# OS X only
+ICON = images/blinkytape.icns
 
 RESOURCES += \
     images.qrc

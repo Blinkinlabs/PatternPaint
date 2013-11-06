@@ -17,8 +17,8 @@ public:
     bool connect(QSerialPortInfo info);
     void disconnect();
 
-    // Attempt to reset the tape, by setting the baud rate to 1200
-    void resetToBootloader();
+    // Attempt to upload a new animation to the tape
+    void uploadAnimation(QByteArray animation);
 
     bool isConnected();
 

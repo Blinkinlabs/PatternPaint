@@ -4,14 +4,15 @@
 #include <QtSerialPort>
 
 
+/// Some defines that should go into a processor-specific class
+#define FLASH_MEMORY_AVAILABLE 0x7000  // Amount of application space in the flash
+#define FLASH_MEMORY_PAGE_SIZE 0x80    // Size of a page of memory in our flash
+
 // Given a serial object that is suspected to have an AVR109-compatible booloader
 // attached to it (ie, caterina), use it to load a new user program.
 //
 // Note that these are just commands; you still need to send them in the
 // correct sequence.
-//
-// Based on AVRProgrammer from AVR911 - AVR Open-source Programmer
-// https://code.google.com/p/avrosp/source/browse/trunk/SourceCode/AVRInSystemProg.hpp
 class AvrProgrammer
 {
 public:
@@ -22,33 +23,8 @@ public:
 
     bool isConnected();
 
-    void enterProgrammingMode();
-
-//    bool chipErase();
-
-//    bool readOSCCAL( long pos, long * value );
-//    bool readSignature( long * sig0, long * sig1, long * sig2 );
-//    bool checkSignature( long sig0, long sig1, long sig2 );
-
-//    bool writeFlashByte( long address, long value );
-//    bool writeEEPROMByte( long address, long value );
-
-//    bool writeFlash( HEXFile * data );
-//    bool readFlash( HEXFile * data );
-
-//    bool writeEEPROM( HEXFile * data );
-//    bool readEEPROM( HEXFile * data );
-
-//    bool writeLockBits( long bits );
-//    bool readLockBits( long * bits );
-
-//    bool writeFuseBits( long bits );
-//    bool readFuseBits( long * bits );
-//    bool writeExtendedFuseBits( long bits );
-//    bool readExtendedFuseBits( long * bits );
-
-//    bool programmerSoftwareVersion( long * major, long * minor );
-//    bool programmerHardwareVersion( long * major, long * minor );
+    // TODO: Break this up, place in blinkytape instead?
+    void uploadAnimation(QByteArray animation);
 
     /// High-level interface functions
 
