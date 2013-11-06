@@ -298,7 +298,7 @@ bool AvrProgrammer::writeFlash(QByteArray& data, int startAddress) {
     return true;
 }
 
-void AvrProgrammer::uploadAnimation(QByteArray animation) {
+void AvrProgrammer::uploadAnimation(QByteArray animation, int frameRate) {
 
     if(!isConnected()) {
         std::cout << "not connected!" << std::endl;
@@ -328,10 +328,12 @@ void AvrProgrammer::uploadAnimation(QByteArray animation) {
 
     // Finally, write the metadata about the animation to the end of flash
     QByteArray metadata(FLASH_MEMORY_PAGE_SIZE, 0xFF); // TODO: Connect this to the block size
-    metadata[metadata.length()-4] = (PATTERNPLAYER_LENGTH >> 8) & 0xFF;
-    metadata[metadata.length()-3] = (PATTERNPLAYER_LENGTH     ) & 0xFF;
-    metadata[metadata.length()-2] = ((animation.length()/3/60) >> 8) & 0xFF;
-    metadata[metadata.length()-1] = ((animation.length()/3/60)     ) & 0xFF;
+    metadata[metadata.length()-6] = (PATTERNPLAYER_LENGTH >> 8) & 0xFF;
+    metadata[metadata.length()-5] = (PATTERNPLAYER_LENGTH     ) & 0xFF;
+    metadata[metadata.length()-4] = ((animation.length()/3/60) >> 8) & 0xFF;
+    metadata[metadata.length()-3] = ((animation.length()/3/60)     ) & 0xFF;
+    metadata[metadata.length()-2] = (1000/frameRate >> 8) & 0xFF;
+    metadata[metadata.length()-1] = (1000/frameRate     ) & 0xFF;
 
     std::cout << std::hex;
     std::cout <<  "Sketch size (bytes): 0x" << PATTERNPLAYER_LENGTH << std::endl;

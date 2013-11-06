@@ -106,23 +106,9 @@ void MainWindow::on_actionLoad_Image_triggered()
 
 void MainWindow::on_uploadButton_clicked()
 {
-//    LedWriter a;
-//    a.loadAnimation(ui->patternEditor->getPattern());
-//    a.makeCHeader();
-
     // Convert the animation into a QByteArray
     // The RGB encoder just stores the data as R,G,B over and over again.
     QImage animation =  ui->patternEditor->getPattern();
-//    QByteArray animationData;
-
-//    for(int frame = 0; frame < animation.width(); frame++) {
-//        for(int pixel = 0; pixel < animation.height(); pixel++) {
-//            int color = animation.pixel(frame, pixel);
-//            animationData.append(qRed(color));
-//            animationData.append(qGreen(color));
-//            animationData.append(qBlue(color));
-//        }
-//    }
 
     QByteArray ledData;
     QImage img = ui->patternEditor->getPattern();
@@ -130,9 +116,6 @@ void MainWindow::on_uploadButton_clicked()
     for(int frame = 0; frame < animation.width(); frame++) {
         for(int pixel = 0; pixel < animation.height(); pixel++) {
             int color = img.pixel(frame, pixel);
-//            ledData.append((color >> 16) & 0xff);
-//            ledData.append((color >>  8) & 0xff);
-//            ledData.append((color)       & 0xff);
             ledData.append(qRed(color));
             ledData.append(qGreen(color));
             ledData.append(qBlue(color));
@@ -141,7 +124,7 @@ void MainWindow::on_uploadButton_clicked()
 
     // Only if we are already conected, try to reset the strip.
     if(tape.isConnected()) {
-        tape.uploadAnimation(ledData);
+        tape.uploadAnimation(ledData,ui->animationSpeed->value());
     }
 
 }

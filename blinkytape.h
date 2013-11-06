@@ -19,7 +19,7 @@ public:
     void disconnect();
 
     // Attempt to upload a new animation to the tape
-    void uploadAnimation(QByteArray animation);
+    void uploadAnimation(QByteArray animation, int frameRate);
 
     bool isConnected();
 

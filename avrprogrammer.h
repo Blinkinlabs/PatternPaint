@@ -24,7 +24,7 @@ public:
     bool isConnected();
 
     // TODO: Break this up, place in blinkytape instead?
-    void uploadAnimation(QByteArray animation);
+    void uploadAnimation(QByteArray animation, int frameRate);
 
     /// High-level interface functions
 

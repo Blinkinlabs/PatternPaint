@@ -53,7 +53,7 @@ void BlinkyTape::disconnect() {
     }
 }
 
-void BlinkyTape::uploadAnimation(QByteArray animation) {
+void BlinkyTape::uploadAnimation(QByteArray animation, int frameRate) {
     // TODO: Rethink the layout of this process, it's muddled.
 
     // We can't reset if we weren't already connected...
@@ -136,7 +136,7 @@ void BlinkyTape::uploadAnimation(QByteArray animation) {
 
     AvrProgrammer programmer;
     programmer.connect(postResetTapes.at(0));
-    programmer.uploadAnimation(animation);
+    programmer.uploadAnimation(animation, frameRate);
 }
 
 bool BlinkyTape::isConnected() {

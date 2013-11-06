@@ -25,6 +25,8 @@ struct CRGB leds[LED_COUNT];
 
 Animation pov;
 
+int frameDelay = 30; // Number of ms each frame should be displayed.
+
 void setup()
 {  
   Serial.begin(57600);
@@ -39,9 +41,10 @@ void setup()
   prog_uint8_t* frameData;
 
   // These could be whereever, but need to agree with Processing.
-  #define CONTROL_DATA_ADDRESS (0x7000 - 4)
+  #define CONTROL_DATA_ADDRESS (0x7000 - 6)
   #define FRAME_DATA_ADDRESS   (CONTROL_DATA_ADDRESS)
   #define FRAME_COUNT_ADDRESS  (CONTROL_DATA_ADDRESS + 2)
+  #define FRAME_DELAY_ADDRESS  (CONTROL_DATA_ADDRESS + 4)
 
   frameData  =
   (prog_uint8_t*)((pgm_read_byte(FRAME_DATA_ADDRESS    ) << 8)
@@ -50,6 +53,8 @@ void setup()
   frameCount = (pgm_read_byte(FRAME_COUNT_ADDRESS    ) << 8)
              + (pgm_read_byte(FRAME_COUNT_ADDRESS + 1));
              
+  frameDelay = (pgm_read_byte(FRAME_DELAY_ADDRESS    ) << 8)
+             + (pgm_read_byte(FRAME_DELAY_ADDRESS + 1));
   
   pov.init(frameCount, frameData, ENCODING_NONE, LED_COUNT);
   
@@ -96,6 +101,7 @@ void loop()
   }
   
   pov.draw(leds);
-  delay(50);
+  // TODO: More sophisticated wait loop to get constant framerate.
+  delay(frameDelay);
 }
 
