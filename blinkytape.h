@@ -15,23 +15,27 @@ public:
 
     BlinkyTape(int ledCount = 60);
 
-    bool connect(QSerialPortInfo info);
-    void disconnect();
+    bool isConnected();
+
+    void open(QSerialPortInfo info);
+    void close();
+
+    void sendUpdate(QByteArray colors);
 
     // Attempt to upload a new animation to the tape
     void uploadAnimation(QByteArray animation, int frameRate);
 
-    bool isConnected();
-
-    void sendUpdate(QByteArray colors);
-
 private:
-    QSerialPort serial;
-
+    // TODO: Destructor!
+    QSerialPort* serial;
     int ledCount;
 
 signals:
-   void connectionStatusChanged(bool status);
+    void connectionStatusChanged(bool status);
+
+private slots:
+    void handleError(QSerialPort::SerialPortError error);
+
 };
 
 #endif // BLINKYTAPE_H

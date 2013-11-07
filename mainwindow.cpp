@@ -42,19 +42,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_tapeConnectDisconnect_clicked()
-{
-    if(tape.isConnected()) {
-        tape.disconnect();
-    }
-    else {
-        QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
-        if(tapes.length() > 0) {
-            // TODO: Try another one if this one fails?
-            tape.connect(tapes[0]);
-        }
-    }
-}
 
 void MainWindow::drawTimerTimeout() {
     if(tape.isConnected()) {
@@ -74,6 +61,21 @@ void MainWindow::drawTimerTimeout() {
 
         n = (n+1)%img.width();
         ui->patternEditor->setPlaybackRow(n);
+    }
+}
+
+
+void MainWindow::on_tapeConnectDisconnect_clicked()
+{
+    if(tape.isConnected()) {
+        tape.close();
+    }
+    else {
+        QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
+        if(tapes.length() > 0) {
+            // TODO: Try another one if this one fails?
+            tape.open(tapes[0]);
+        }
     }
 }
 
@@ -106,6 +108,10 @@ void MainWindow::on_actionLoad_Image_triggered()
 
 void MainWindow::on_uploadButton_clicked()
 {
+    if(!tape.isConnected()) {
+        return;
+    }
+
     // Convert the animation into a QByteArray
     // The RGB encoder just stores the data as R,G,B over and over again.
     QImage animation =  ui->patternEditor->getPattern();
@@ -122,11 +128,8 @@ void MainWindow::on_uploadButton_clicked()
         }
     }
 
-    // Only if we are already conected, try to reset the strip.
-    if(tape.isConnected()) {
-        tape.uploadAnimation(ledData,ui->animationSpeed->value());
-    }
-
+    std::cout << "MainWindow::on_uploadButton_clicked: " << thread() << std::endl;
+    tape.uploadAnimation(ledData,ui->animationSpeed->value());
 }
 
 void MainWindow::on_tapeConnectionStatusChanged(bool status)

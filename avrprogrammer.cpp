@@ -260,10 +260,6 @@ bool AvrProgrammer::writeFlash(QByteArray& data, int startAddress) {
 
         int currentChunkSize = std::min(pageSizeBytes, data.length() - currentChunkPosition);
 
-//        std::cout << "Chunk position: " << std::setfill('0') << std::setw(4) << std::hex << startAddress + currentChunkPosition
-//                  << " size: " << std::setfill('0') << std::setw(4) << std::hex << currentChunkSize
-//                  << std::endl;
-
         std::cout << std::setfill('0') << std::setw(4) << std::hex << startAddress + currentChunkPosition;
         for(int i = 0; i < data.mid(currentChunkPosition,currentChunkSize).length(); i++) {
             if(i%16 == 0) {

@@ -4,6 +4,7 @@
 #include <QMainWindow>
 
 #include "blinkytape.h"
+//#include "blinkytapethreaded.h"
 #include "patterneditor.h"
 
 namespace Ui {
@@ -19,6 +20,7 @@ public:
     ~MainWindow();
 
     BlinkyTape tape;
+//    BlinkyTapeThreaded tape;
 
 private slots:
     void on_tapeConnectDisconnect_clicked();

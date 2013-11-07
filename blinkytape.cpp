@@ -1,6 +1,5 @@
 #include "avrprogrammer.h"
 #include "blinkytape.h"
-
 #include <iostream>
 #include <termios.h>
 
@@ -26,34 +25,73 @@ QList<QSerialPortInfo> BlinkyTape::findBlinkyTapes() {
 BlinkyTape::BlinkyTape(int ledCount_)
 {
     ledCount = ledCount_;
+
+    serial = new QSerialPort(this);
+    connect(serial, SIGNAL(error(QSerialPort::SerialPortError)), this,
+            SLOT(handleError(QSerialPort::SerialPortError)));
 }
 
-bool BlinkyTape::connect(QSerialPortInfo info) {
-    if(isConnected()) {
-        return false;
+void BlinkyTape::handleError(QSerialPort::SerialPortError error)
+{
+    // TODO: handle other error types?
+    if (error == QSerialPort::ResourceError) {
+        std::cout << "Critical error:" << serial->errorString().toStdString() << std::endl;
+        close();
     }
-    serial.setPort(info);
+}
+
+void BlinkyTape::open(QSerialPortInfo info) {
+    if(isConnected()) {
+        return;
+    }
 
     // TODO: Do something else if we can't open?
-    serial.setBaudRate(QSerialPort::Baud115200);
-
-    serial.open(QIODevice::ReadWrite);
+    serial->setPort(info);
+    serial->setBaudRate(QSerialPort::Baud115200);
+    serial->open(QIODevice::ReadWrite);
 
     if(isConnected()) {
-      emit(connectionStatusChanged(isConnected()));
-    }
-
-    return isConnected();
-}
-
-void BlinkyTape::disconnect() {
-    if(isConnected()) {
-        serial.close();
         emit(connectionStatusChanged(isConnected()));
     }
 }
 
+void BlinkyTape::close() {
+    serial->close();
+
+    emit(connectionStatusChanged(isConnected()));
+}
+
+bool BlinkyTape::isConnected() {
+    return serial->isOpen();
+}
+
+void BlinkyTape::sendUpdate(QByteArray LedData)
+{
+    if(!isConnected()) {
+        // TODO: Signal error?
+        return;
+    }
+
+    if(LedData.length() != ledCount*3) {
+        return;
+    }
+
+    // Kill anything that's 0xff
+    for(int i = 0; i < LedData.length(); i++) {
+        if(LedData[i] == (char)255) {
+            LedData[i] = 254;
+        }
+    }
+
+    // Append an 0xFF to signal the flip command
+    LedData.append(0xFF);
+
+    serial->write(LedData);
+}
+
 void BlinkyTape::uploadAnimation(QByteArray animation, int frameRate) {
+    std::cout << "BlinkyTape::uploadAnimation: " << thread() << std::endl;
+
     // TODO: Rethink the layout of this process, it's muddled.
 
     // We can't reset if we weren't already connected...
@@ -69,15 +107,15 @@ void BlinkyTape::uploadAnimation(QByteArray animation, int frameRate) {
     }
 
     // Next, record the currently active port (TODO: do we care???)
-    QSerialPortInfo currentPort(serial);
+    QSerialPortInfo currentPort(*serial);
 
     // Now, set the currently connected tapes baud rate to 1200, then close it to
     // apply the 1200 baud reset
     // TODO: This seems to work on OS X, test on Windows and Linux
     std::cout << "Resetting" << std::endl;
-    serial.setBaudRate(QSerialPort::Baud1200);
-    serial.setSettingsRestoredOnClose(false);
-    serial.close();
+    serial->setBaudRate(QSerialPort::Baud1200);
+    serial->setSettingsRestoredOnClose(false);
+    serial->close();
     emit(connectionStatusChanged(isConnected()));
 
     // Wait until we see a serial port drop out
@@ -137,69 +175,4 @@ void BlinkyTape::uploadAnimation(QByteArray animation, int frameRate) {
     AvrProgrammer programmer;
     programmer.connect(postResetTapes.at(0));
     programmer.uploadAnimation(animation, frameRate);
-}
-
-bool BlinkyTape::isConnected() {
-    return serial.isOpen();
-}
-
-void BlinkyTape::sendUpdate(QByteArray LedData)
-{
-    if(!isConnected()) {
-        // TODO: Signal error?
-        return;
-    }
-
-    // Kill anything that's 0xff
-    // TODO: Don't do this in-place
-    for(int i = 0; i < LedData.length(); i++) {
-        if(LedData[i] == (char)255) {
-            LedData[i] = 254;
-        }
-    }
-
-    // Chunk it out
-    int CHUNK_SIZE = 600;
-    for(int p = 0; p < ledCount * 3; p += CHUNK_SIZE) {
-        int length = 0;
-        if(p + CHUNK_SIZE < LedData.length()) {
-            // send a whole chunk
-            length = CHUNK_SIZE;
-        }
-        else {
-            // send a partial chunk
-            length = LedData.length() - p;
-        }
-
-        QByteArray chunk(length, 0);
-        for(int i = 0; i < length; i++) {
-            chunk[i] = LedData[p + i];
-        }
-
-        int written = serial.write(chunk);
-        // if we didn't write everything, save it for later.
-        if(written == -1) {
-            exit(100);
-            p -= CHUNK_SIZE;
-        }
-        else if(written != length) {
-            exit(101);
-            p-= length - written;
-        }
-//        std::cout << "waiting for write" << std::endl;
-        serial.flush();
-//        std::cout << "done waiting for write" << std::endl;
-    }
-
-    // Then send the flip command
-    QByteArray data(3, 0);
-    data[0] = 0xff;
-    data[1] = 0xff;
-    data[2] = 0xff;
-
-//    std::cout << "writing end" << std::endl;
-    serial.write(data);
-//    std::cout << "waiting for end" << std::endl;
-    serial.flush();
-//    std::cout << "done waiting for end" << std::endl;
 }
