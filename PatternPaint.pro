@@ -25,7 +25,6 @@ SOURCES += main.cpp\
     colorpicker.cpp \
     ledwriter.cpp \
     avrprogrammer.cpp
-#    blinkytapethreaded.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
@@ -35,7 +34,6 @@ HEADERS  += mainwindow.h \
     avrprogrammer.h \
     PatternPlayer_Sketch.h \
     ColorSwirl_Sketch.h
-#   blinkytapethreaded.h
 
 FORMS    += mainwindow.ui
 
