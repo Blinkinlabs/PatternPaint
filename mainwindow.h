@@ -27,11 +27,19 @@ private slots:
 
     void drawTimerTimeout();
 
+    void on_actionOpen_Animation_triggered();
+
+    void on_actionSave_Animation_triggered();
+
+    void on_actionExit_triggered();
+
+    void on_actionAbout_triggered();
+
     void on_animationSpeed_valueChanged(int value);
 
     void on_animationPlayPause_clicked();
 
-    void on_actionLoad_Image_triggered();
+
 
     void on_uploadButton_clicked();
 

@@ -3,9 +3,13 @@
 #include "ui_mainwindow.h"
 
 #include <QFileDialog>
+#include <QMessageBox>
 #include <cmath>
 #include <iostream>
 
+// TODO: Change this when we connect to a tape, etc?
+#define BLINKYTAPE_STRIP_HEIGHT 60
+#define DEFAULT_ANIMATION_LENGTH 60
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -17,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowIcon(QIcon(":/resources/images/blinkytape.jpg"));
 
     // TODO: Standard init in QWidget we can override instead?
-    ui->patternEditor->init(60,60);
+    ui->patternEditor->init(DEFAULT_ANIMATION_LENGTH,BLINKYTAPE_STRIP_HEIGHT);
     ui->colorPicker->init();
 
     // Our pattern editor wants to get some notifications
@@ -97,13 +101,44 @@ void MainWindow::on_animationPlayPause_clicked()
     }
 }
 
-void MainWindow::on_actionLoad_Image_triggered()
+void MainWindow::on_actionOpen_Animation_triggered()
 {
     // TODO: Add a simple image gallery thing instead of this, and push
     // this to 'import' and 'export'
     QString fileName = QFileDialog::getOpenFileName(this,
-        tr("Open Image"), "/home/jana", tr("Image Files (*.png *.jpg *.bmp)"));
+        tr("Open Animation"), "", tr("Animation Files (*.png *.jpg *.bmp)"));
+
+    if(fileName.length() == 0) {
+        return;
+    }
+
+    // TODO: Test if the file exists?
     ui->patternEditor->init(fileName);
+}
+
+void MainWindow::on_actionSave_Animation_triggered()
+{
+    //TODO: Track if we already had an open file to enable this, add save as?
+
+    // TODO: Add a simple image gallery thing instead of this, and push
+    // this to 'import' and 'export'
+    QString fileName = QFileDialog::getSaveFileName(this,
+        tr("Save Animation"), "", tr("Animation Files (*.png *.jpg *.bmp)"));
+
+    if(fileName.length() == 0) {
+        return;
+    }
+
+    // TODO: Alert the user if this failed.
+    if(!ui->patternEditor->getPattern().save(fileName)) {
+        QMessageBox::warning(this, tr("Error"), tr("Error, cannot write file %1.")
+                       .arg(fileName));
+    }
+}
+
+void MainWindow::on_actionExit_triggered()
+{
+    this->close();
 }
 
 void MainWindow::on_uploadButton_clicked()
@@ -143,4 +178,13 @@ void MainWindow::on_tapeConnectionStatusChanged(bool status)
         ui->tapeConnectDisconnect->setText("Connect");
         ui->uploadButton->setEnabled(false);
     }
+}
+
+void MainWindow::on_actionAbout_triggered()
+{
+    QMessageBox::about(this, tr("About Pattern Paint"),
+                       tr("<b>PatternPaint</b> is companion software for the BlinkyTape. "
+                          "It allows you to create animations for your BlinkyTape in "
+                          "real-time, and save your designs to the BlinkyTape for "
+                          "playback on-the-go."));
 }

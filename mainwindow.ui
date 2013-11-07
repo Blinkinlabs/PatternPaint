@@ -217,7 +217,6 @@
         <height>16777215</height>
        </size>
       </property>
-      <zorder>widget</zorder>
      </widget>
     </item>
    </layout>
@@ -235,26 +234,47 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionLoad_Image"/>
-    <addaction name="actionSave_Image"/>
+    <addaction name="actionOpen_Animation"/>
+    <addaction name="actionSave_Animation"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuHelp"/>
   </widget>
-  <action name="actionLoad_Image">
+  <action name="actionOpen_Animation">
    <property name="text">
-    <string>Load Image</string>
+    <string>Open Animation</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Animation</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="actionSave_Image">
+  <action name="actionSave_Animation">
    <property name="text">
-    <string>Save Image</string>
+    <string>Save Animation</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>

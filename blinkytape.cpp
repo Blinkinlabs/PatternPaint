@@ -47,7 +47,7 @@ void BlinkyTape::open(QSerialPortInfo info) {
 
     // TODO: Do something else if we can't open?
     serial->setPort(info);
-    serial->setBaudRate(QSerialPort::Baud115200);
+//    serial->setBaudRate(QSerialPort::Baud115200);
     serial->open(QIODevice::ReadWrite);
 
     if(isConnected()) {
@@ -69,14 +69,18 @@ void BlinkyTape::sendUpdate(QByteArray LedData)
 {
     if(!isConnected()) {
         // TODO: Signal error?
+        std::cout << "Strip not connected, not sending update!" << std::endl;
         return;
     }
+
+    // TODO: Check if we can write to the device?
 
     if(LedData.length() != ledCount*3) {
+        std::cout << "Length not correct, not sending update!" << std::endl;
         return;
     }
 
-    // Kill anything that's 0xff
+    // Trim anything that's 0xff
     for(int i = 0; i < LedData.length(); i++) {
         if(LedData[i] == (char)255) {
             LedData[i] = 254;
@@ -86,7 +90,11 @@ void BlinkyTape::sendUpdate(QByteArray LedData)
     // Append an 0xFF to signal the flip command
     LedData.append(0xFF);
 
-    serial->write(LedData);
+    int writeLength = serial->write(LedData);
+    if(writeLength != LedData.length()) {
+        std::cout << "Error writing all the data out, expected:" << LedData.length()
+                  << ", wrote: " << writeLength << std::endl;
+    }
 }
 
 void BlinkyTape::uploadAnimation(QByteArray animation, int frameRate) {

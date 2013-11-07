@@ -13,7 +13,7 @@ public:
 
     void init(int width, int height);
 
-    void init(QString filename);
+    bool init(QString fileName);
 
     QImage getPattern() { return pattern; }
 
@@ -32,7 +32,6 @@ private:
 
     QColor toolColor;
     int toolSize;
-
 
     int playbackRow;
 

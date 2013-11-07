@@ -4,6 +4,9 @@
 #include <cmath>
 #include <QtWidgets>
 
+// TODO: Change this when we connect to a tape, etc?
+#define BLINKYTAPE_STRIP_HEIGHT 60
+
 PatternEditor::PatternEditor(QWidget *parent) :
     QWidget(parent)
 {
@@ -46,7 +49,7 @@ void PatternEditor::init(int width, int height)
     toolPreview = QImage(width,height,QImage::Format_ARGB32);
     toolPreview.fill(QColor(0,0,0,0));
 
-    toolColor = QColor(0,0,0);
+    toolColor = QColor(255,255,255);
     toolSize = 2;
 
     // Turn on mouse tracking so we can draw a preview
@@ -61,21 +64,31 @@ void PatternEditor::init(int width, int height)
     update();
 }
 
-void PatternEditor::init(QString filename) {
+bool PatternEditor::init(QString fileName) {
     // TODO: How to handle stuff that's not the right size?
-    // just wedge it in?
-    QImage newPattern(filename);
+    // Right now we just take the top part, could resize instead.
+    QImage newPattern;
 
-    // TODO: Stop if we couldn't open the file
+    if(!newPattern.load(fileName)) {
+        return false;
+    }
+
+    // If the pattern doesn't fit, scale it.
+    // TODO: Display an import dialog to let the user decide what to do?
+    if(newPattern.height() > BLINKYTAPE_STRIP_HEIGHT) {
+        newPattern = newPattern.scaledToHeight(BLINKYTAPE_STRIP_HEIGHT);
+    }
+
     // TODO: Implement 'save' check?
 
-    init(newPattern.width(),60);
+    init(newPattern.width(),BLINKYTAPE_STRIP_HEIGHT);
     pattern.fill(QColor(0,0,0));
 
     QPainter painter(&pattern);
     painter.drawImage(0,0,newPattern);
 
     update();
+    return true;
 }
 
 void PatternEditor::mousePressEvent(QMouseEvent *event){
