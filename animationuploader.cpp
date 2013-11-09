@@ -3,18 +3,13 @@
 
 #include <qDebug>
 
-
+#define RESET_WAIT_INTERVAL 2000 // Amount of time, in ms, to wait after resetting the device before looking for it
 #define MAX_TIMER_INTERVAL 5000  // Longest time, in ms, that we will wait for a signal before we cancel this process.
 
 AnimationUploader::AnimationUploader(QObject *parent) :
     QObject(parent)
 {
     processTimer = new QTimer(this);
-
-    watchdogTimer = new QTimer(this);
-    connect(watchdogTimer, SIGNAL(timeout()), this, SLOT(watchdogTimer_timeout()));
-
-//    connect(&serial, SIGNAL(readyRead()), this, SLOT(doWork()));
 
     state = State_Ready;
 }
@@ -52,21 +47,12 @@ void AnimationUploader::startUpload(BlinkyTape& tape, QByteArray animation, int 
     metadata[metadata.length()-2] = (1000/frameRate >> 8) & 0xFF;
     metadata[metadata.length()-1] = (1000/frameRate     ) & 0xFF;
 
-    std::cout << std::hex;
-    std::cout <<  "Sketch size (bytes): 0x" << PATTERNPLAYER_LENGTH << std::endl;
-    std::cout << "Animation size (bytes): 0x" << animation.length() << std::endl;
-    std::cout << "Image size (bytes): 0x" << sketch.length() << std::endl;
-    std::cout << "Metadata size (bytes): 0x" << metadata.length() << std::endl;
-
-    std::cout << "Animation address: 0x"
-              << (int)metadata.at(122)
-              << (int)metadata.at(123) << std::endl;
-    std::cout << "Animation length: 0x"
-              << (int)metadata.at(124)
-              << (int)metadata.at(125) << std::endl;
-    std::cout << "Animation Delay: 0x"
-              << (int)metadata.at(126)
-              << (int)metadata.at(127) << std::endl;
+    char buff[100];
+    snprintf(buff, 100, "Sketch size: %iB, animation size: %iB, metadata size: %iB",
+             PATTERNPLAYER_LENGTH,
+             animation.length(),
+             metadata.length());
+    qDebug() << buff;
 
     // The entire sketch must fit into the available memory, minus a single page
     // at the end of flash for the configuration header
@@ -106,7 +92,7 @@ void AnimationUploader::startUpload(BlinkyTape& tape, QByteArray animation, int 
     // NOTE: Waiting to be sure that the port disappears doesn't seem to be reliable;
     // we don't necessicarily get a notification about that quick enough.
     state = State_WaitForBootloaderPort;
-    processTimer->singleShot(2000,this,SLOT(doWork()));
+    processTimer->singleShot(RESET_WAIT_INTERVAL,this,SLOT(doWork()));
 }
 
 
@@ -115,13 +101,11 @@ void AnimationUploader::doWork() {
 
     qDebug() << "In doWork state=" << state;
 
-    watchdogTimer->start(MAX_TIMER_INTERVAL); // Kick the watchdog.
-
     // Continue the current state
     switch(state) {
     case State_WaitForBootloaderPort:
         {
-            // 1000 ms ago, we reset the BlinkyTape. It should now be in bootloader mode.
+            // RESET_WAIT_INTERVAL ms ago, we reset the BlinkyTape. It should now be in bootloader mode.
             // Compare the the blinkyTapes that we have now to the previous ones. If there
             // is a new one, then try to attach to it. Otherwise, stop.
 
@@ -159,9 +143,12 @@ void AnimationUploader::doWork() {
             qDebug() << "Bootloader waiting on: " << postResetTapes.at(0).portName();
 
             // Try to create a new programmer by connecting to the port
-            if(!programmer.connectSerial(postResetTapes.at(0))) {
+            if(!programmer.openSerial(postResetTapes.at(0))) {
                 qCritical() << "could not connect to programmer!";
                 return;
+            }
+            else {
+                qDebug() << "Connected to programmer!";
             }
 
             // Send Check Device Signature command

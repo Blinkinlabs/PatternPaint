@@ -1,38 +1,48 @@
 #include "avrprogrammer.h"
 #include <QDebug>
 
+#define COMMAND_TIMEOUT_TIME 2000
 #define PAGE_SIZE_BYTES 128
 
 AvrProgrammer::AvrProgrammer(QObject *parent) :
     QObject(parent)
 {
+    commandTimeoutTimer = new QTimer(this);
+    commandTimeoutTimer->setSingleShot(true);
+
     serial = NULL;
 }
 
-bool AvrProgrammer::connectSerial(QSerialPortInfo info) {
-    // If the serial device doesn't exist, start a new one.
+bool AvrProgrammer::openSerial(QSerialPortInfo info) {
     if(serial == NULL) {
         serial = new QSerialPort(this);
+        connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
+                this, SLOT(handleSerialError(QSerialPort::SerialPortError)));
         connect(serial,SIGNAL(readyRead()),this,SLOT(handleReadData()));
     }
 
-    if(serial->isOpen()) {
-        qCritical() << "Already connected to a serial device";
+    if(isConnected()) {
+        qCritical("Already connected to a programmer");
         return false;
     }
 
     qDebug() << "connecting to " << info.portName();
     serial->setPort(info);
+    serial->open(QIODevice::ReadWrite);
 
-    // TODO: Do something else if we can't open?
-    return serial->open(QIODevice::ReadWrite);
+    if(!isConnected()) {
+        return false;
+    }
+
+    return true;
 }
 
-void AvrProgrammer::disconnectSerial() {
+void AvrProgrammer::closeSerial() {
     if(serial == NULL) {
         return;
     }
 
+    serial->close();
     serial->deleteLater();
     serial = NULL;
 }
@@ -70,6 +80,11 @@ void AvrProgrammer::processCommandQueue() {
         qCritical() << "Error writing to device";
         return;
     }
+
+    // Start the timer; the command must complete before it fires, or it
+    // is considered an error. This is to prevent a misbehaving device from hanging
+    // the programmer code.
+    commandTimeoutTimer->start(COMMAND_TIMEOUT_TIME);
 }
 
 void AvrProgrammer::handleReadData() {
@@ -92,8 +107,6 @@ void AvrProgrammer::handleReadData() {
         return;
     }
 
-    // At this point, we've gotten all of the data that we expected.
-
     // If the command was to read from flash, short-circuit the response data check.
     if(commandQueue.front().commandName == "readFlash") {
         // TODO: Test me?
@@ -107,10 +120,13 @@ void AvrProgrammer::handleReadData() {
         return;
     }
 
+    // At this point, we've gotten all of the data that we expected.
+    commandTimeoutTimer->stop();
+
     // If the command was reset, disconnect from the programmer
     if(commandQueue.front().commandName == "reset") {
         qDebug() << "Disconnecting from programmer";
-        disconnectSerial();
+        closeSerial();
     }
 
     qDebug() << "Command completed successfully: " << commandQueue.front().commandName;
@@ -125,19 +141,34 @@ void AvrProgrammer::handleReadData() {
 
 void AvrProgrammer::handleSerialError(QSerialPort::SerialPortError error)
 {
+    if(error == QSerialPort::NoError) {
+        // The serial library appears to emit an extraneous SerialPortError
+        // when open() is called. Just ignore it.
+        return;
+    }
+
+    if(serial == NULL) {
+        qCritical() << "Got error after serial device was deleted!";
+        emit(SIGNAL(error("serial error")));
+        return;
+    }
+
+    qCritical() << serial->errorString();
+
     // TODO: handle other error types?
     if (error == QSerialPort::ResourceError) {
-        qCritical() << serial->errorString();
-
-        serial->close();
-        serial->clearError();
-
         emit(SIGNAL(error(serial->errorString())));
+        closeSerial();
+        commandQueue.clear();
     }
-    else {
-        qCritical() << "Serial error not handled:" << serial->errorString();
-        emit(SIGNAL(error("Serial error not handled:" + serial->errorString())));
-    }
+}
+
+void AvrProgrammer::handleCommandTimeout()
+{
+    qCritical() << "Command timed out, disconnecting from programmer";
+    emit(SIGNAL(error("Command timed out, disconnecting from programmer")));
+    closeSerial();
+    commandQueue.clear();
 }
 
 // Send the command to probe for the device signature, and register the expected response

@@ -31,9 +31,9 @@
      <colorrole role="Window">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>13</red>
-        <green>88</green>
-        <blue>146</blue>
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
        </color>
       </brush>
      </colorrole>
@@ -51,9 +51,9 @@
      <colorrole role="Window">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>13</red>
-        <green>88</green>
-        <blue>146</blue>
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
        </color>
       </brush>
      </colorrole>
@@ -62,18 +62,18 @@
      <colorrole role="Base">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>13</red>
-        <green>88</green>
-        <blue>146</blue>
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
        </color>
       </brush>
      </colorrole>
      <colorrole role="Window">
       <brush brushstyle="SolidPattern">
        <color alpha="255">
-        <red>13</red>
-        <green>88</green>
-        <blue>146</blue>
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
        </color>
       </brush>
      </colorrole>
@@ -89,24 +89,32 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <property name="leftMargin">
-     <number>12</number>
+     <number>0</number>
     </property>
     <property name="topMargin">
-     <number>12</number>
+     <number>0</number>
     </property>
     <property name="rightMargin">
-     <number>12</number>
+     <number>0</number>
     </property>
     <property name="bottomMargin">
-     <number>12</number>
+     <number>0</number>
     </property>
     <item>
-     <widget class="QWidget" name="widget" native="true">
+     <widget class="QWidget" name="patternToolbox" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QWidget#patternToolbox {
+  background:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0.9801 rgba(119, 203, 245, 255), stop:1 rgba(0, 0, 0, 255))
+}</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <property name="leftMargin">
@@ -116,7 +124,7 @@
         <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>5</number>
        </property>
        <property name="bottomMargin">
         <number>0</number>
@@ -125,6 +133,12 @@
         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0,0,0">
          <item>
           <widget class="ColorPicker" name="colorPicker" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="minimumSize">
             <size>
              <width>101</width>
@@ -199,6 +213,9 @@
     </item>
     <item>
      <widget class="PatternEditor" name="patternEditor" native="true">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>1</horstretch>
@@ -245,7 +262,7 @@
     </property>
     <addaction name="actionAbout"/>
     <addaction name="separator"/>
-    <addaction name="actionSystem_Report"/>
+    <addaction name="actionSystem_Information"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
@@ -279,9 +296,9 @@
     <string>About</string>
    </property>
   </action>
-  <action name="actionSystem_Report">
+  <action name="actionSystem_Information">
    <property name="text">
-    <string>System Report</string>
+    <string>System Information</string>
    </property>
   </action>
  </widget>
@@ -300,6 +317,13 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>penSize</tabstop>
+  <tabstop>animationPlayPause</tabstop>
+  <tabstop>animationSpeed</tabstop>
+  <tabstop>uploadButton</tabstop>
+  <tabstop>tapeConnectDisconnect</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

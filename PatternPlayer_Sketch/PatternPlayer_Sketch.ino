@@ -1,7 +1,6 @@
 #include <FastSPI_LED2.h>
 #include <avr/pgmspace.h>
 #include <Animation.h>
-#include "pov.h"
 
 #define LED_COUNT 60
 struct CRGB leds[LED_COUNT];
@@ -55,9 +54,8 @@ void setup()
              
   frameDelay = (pgm_read_byte(FRAME_DELAY_ADDRESS    ) << 8)
              + (pgm_read_byte(FRAME_DELAY_ADDRESS + 1));
-  
-  pov.init(frameCount, frameData, ENCODING_NONE, LED_COUNT);
-  
+             
+    pov.init(frameCount, frameData, ENCODING_NONE, LED_COUNT);
 }
 
 void serialLoop() {

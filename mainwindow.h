@@ -36,7 +36,7 @@ private slots:
 
     void on_actionAbout_triggered();
 
-    void on_actionSystem_Report_triggered();
+    void on_actionSystem_Information_triggered();
 
     void on_animationSpeed_valueChanged(int value);
 
@@ -44,7 +44,7 @@ private slots:
 
     void on_uploadButton_clicked();
 
-    void on_tapeConnectionStatusChanged(bool status);
+    void on_tapeConnectionStatusChanged(bool connected);
 
     void on_uploadProgressChanged(float progress);
 

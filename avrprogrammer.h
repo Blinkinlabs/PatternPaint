@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QtSerialPort>
+#include <QTimer>
 
 // Given a serial object that is suspected to have an AVR109-compatible booloader
 // attached to it (ie, caterina), use it to load a new user program.
@@ -14,8 +15,8 @@ class AvrProgrammer : public QObject
 public:
     explicit AvrProgrammer(QObject *parent = 0);
 
-    bool connectSerial(QSerialPortInfo info);
-    void disconnectSerial();
+    bool openSerial(QSerialPortInfo info);
+    void closeSerial();
 
     bool isConnected();
 
@@ -43,7 +44,7 @@ public:
     // Check that we are talking to the correct device
     void checkDeviceSignature();
 
-    // Reset the processor by forcing its countdown timer to expire.
+    // Instruct the programmer to reset. This has the side effect of deleting the device.
     void reset();
 
 signals:
@@ -56,6 +57,9 @@ private slots:
 
     // Handle an error from the serial port
     void handleSerialError(QSerialPort::SerialPortError error);
+
+    // Self-enforced communications timeout
+    void handleCommandTimeout();
 
 private:
     struct Command {
@@ -76,7 +80,8 @@ private:
     QQueue<Command> commandQueue;
     QByteArray responseData;    // Data we actually received
 
-    /// Convenience serial functions
+    QTimer *commandTimeoutTimer; // Timer fires if a command has failed to complete quickly enough
+
     // Queue a new command
     void queueCommand(QString commandName, QByteArray commandData, QByteArray expectedResponseData);
 

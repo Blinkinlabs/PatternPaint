@@ -5,7 +5,7 @@
 #include <QList>
 #include <QtSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
-
+#include <QColor>
 
 /// Some defines that should go into a processor-specific class
 #define FLASH_MEMORY_AVAILABLE 0x7000  // Amount of application space in the flash
@@ -17,6 +17,7 @@ class BlinkyTape : public QObject
     Q_OBJECT
 public:
     static QList<QSerialPortInfo> findBlinkyTapes();
+    static QRgb correctBrightness(QRgb uncorrected);
 
     BlinkyTape(QObject *parent = 0, int ledCount = 60);
 
@@ -24,15 +25,12 @@ public:
 
     bool isConnected();
 
-    void open(QSerialPortInfo info);
+    bool open(QSerialPortInfo info);
     void close();
 
     void sendUpdate(QByteArray colors);
 
     bool getPortInfo(QSerialPortInfo &info);
-
-    // Attempt to upload a new animation to the tape
-    void uploadAnimation(QByteArray animation, int frameRate);
 
     // Atempt to reset the strip by setting it's baud rate to 1200 and closing it.
     void reset();
@@ -45,7 +43,7 @@ signals:
     void connectionStatusChanged(bool status);
 
 private slots:
-    void handleError(QSerialPort::SerialPortError error);
+    void handleSerialError(QSerialPort::SerialPortError error);
 
 };
 

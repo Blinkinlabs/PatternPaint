@@ -1,15 +1,11 @@
 #include "ledwriter.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <systeminformation.h>
 
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDebug>
-
-#include <QSerialPortInfo>
-#include <QSysInfo>
-#include <QLibraryInfo>
-
 
 // TODO: Change this when we connect to a tape, etc?
 #define BLINKYTAPE_STRIP_HEIGHT 60
@@ -59,18 +55,18 @@ MainWindow::~MainWindow()
 
 
 void MainWindow::drawTimer_timeout() {
-    if(tape.isConnected()) {
-        static int n = 0;
+    // TODO: move this state to somewhere; the patterneditor class maybe?
+    static int n = 0;
 
-        int LED_COUNT = 60;
-        QByteArray ledData(LED_COUNT * 3, 0);
+    if(tape.isConnected()) {
+        QByteArray ledData;
 
         QImage img = ui->patternEditor->getPattern();
-        for(int i = 0; i < LED_COUNT; i++) {
-            int color = img.pixel(n,i);
-            ledData[i*3  ] = (color >> 16) & 0xff;
-            ledData[i*3+1] = (color >> 8) & 0xff;
-            ledData[i*3+2] = (color) & 0xff;
+        for(int i = 0; i < BLINKYTAPE_STRIP_HEIGHT; i++) {
+            QRgb color = BlinkyTape::correctBrightness(img.pixel(n, i));
+            ledData.append(qRed(color));
+            ledData.append(qGreen(color));
+            ledData.append(qBlue(color));
         }
         tape.sendUpdate(ledData);
 
@@ -170,7 +166,7 @@ void MainWindow::on_uploadButton_clicked()
 
     for(int frame = 0; frame < animation.width(); frame++) {
         for(int pixel = 0; pixel < animation.height(); pixel++) {
-            int color = img.pixel(frame, pixel);
+            QRgb color = BlinkyTape::correctBrightness(img.pixel(frame, pixel));
             ledData.append(qRed(color));
             ledData.append(qGreen(color));
             ledData.append(qBlue(color));
@@ -181,10 +177,10 @@ void MainWindow::on_uploadButton_clicked()
     uploader.startUpload(tape, ledData,ui->animationSpeed->value());
 }
 
-void MainWindow::on_tapeConnectionStatusChanged(bool status)
+void MainWindow::on_tapeConnectionStatusChanged(bool connected)
 {
-    qDebug() << "status changed!";
-    if(status) {
+    qDebug() << "status changed, connected=" << connected;
+    if(connected) {
         ui->tapeConnectDisconnect->setText("Disconnect");
         ui->uploadButton->setEnabled(true);
     }
@@ -203,95 +199,14 @@ void MainWindow::on_actionAbout_triggered()
                        "playback on-the-go.");
 }
 
-void MainWindow::on_actionSystem_Report_triggered()
+void MainWindow::on_actionSystem_Information_triggered()
 {
-    // TODO: move to separate class
-
-    QString report;
-
-    QString osName;
-
-    report.append("Pattern Paint (Unknown version)\r");
-    report.append("  Build Date: ");
-    report.append(__DATE__);
-    report.append(" ");
-    report.append(__TIME__);
-    report.append("\r");
-
-#if defined(Q_OS_WIN)
-    switch(QSysInfo::windowsVersion()) {
-    case QSysInfo::WV_2000:
-        osName = "Windows 2000";
-        break;
-    case QSysInfo::WV_2003:
-        osName = "Windows 2003";
-        break;
-    case QSysInfo::WV_VISTA:
-        osName = "Windows Vista";
-        break;
-    case QSysInfo::WV_WINDOWS7:
-        osName = "Windows 7";
-        break;
-    case QSysInfo::WV_WINDOWS8:
-        osName = "Windows 8";
-        break;
-    default
-        osName = "Windows (Unknown Version)";
-        break;
-    }
-#elif defined(Q_OS_MAC)
-    switch(QSysInfo::macVersion()) {
-    case QSysInfo::MV_SNOWLEOPARD:
-        osName = "OS X 10.6 (Snow Leopard)";
-        break;
-    case QSysInfo::MV_LION:
-        osName = "OS X 10.7 (Lion)";
-        break;
-    case QSysInfo::MV_MOUNTAINLION:
-        osName = "OS X 10.8 (Mountain Lion)";
-        break;
-    case QSysInfo::MV_MAVERICKS:
-        osName = "OS X 10.9 (Mavericks)";
-        break;
-    default:
-        osName = "OS X (Unknown version)";
-        break;
-    }
-#else
-// TODO: Linux
-    osName = "Unknown";
-#endif
-    report.append("Operating system: " + osName + "\r");
-
-    report.append("QT information:\r");
-    report.append("  buildDate: " + QLibraryInfo::buildDate().toString() + "\r");
-    report.append("  licensee: " + QLibraryInfo::licensee() + "\r");
-    report.append("  path: " + QLibraryInfo::location(QLibraryInfo::LibrariesPath) + "\r");
-
-    report.append("Detected Serial Ports: \r");
-    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
-        report.append("  " + info.portName() + "\r");
-        report.append("    Manufacturer: " + info.manufacturer() + "\r");
-        report.append("    Description: " + info.description() + "\r");
-        report.append("    VID: " + QString::number(info.vendorIdentifier()) + "\r");
-        report.append("    PID: " + QString::number(info.productIdentifier()) + "\r");
-    }
-
-    report.append("Detected BlinkyTapes: \r");
-    foreach (const QSerialPortInfo &info, BlinkyTape::findBlinkyTapes()) {
-        report.append("  " + info.portName() + "\r");
-        report.append("    Manufacturer: " + info.manufacturer() + "\r");
-        report.append("    Description: " + info.description() + "\r");
-        report.append("    VID: " + QString::number(info.vendorIdentifier()) + "\r");
-        report.append("    PID: " + QString::number(info.productIdentifier()) + "\r");
-    }
-
-
-    QMessageBox::about(this, "System Information",
-                       report);
+    // TODO: store this somewhere, for later disposal.
+    SystemInformation* info = new SystemInformation(this);
+    info->show();
 }
 
 void MainWindow::on_uploadProgressChanged(float progress)
 {
-    qDebug() << "Upload progess: ";
+    qDebug() << "Upload progess: " << progress;
 }

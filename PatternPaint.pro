@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     colorpicker.cpp \
     ledwriter.cpp \
     avrprogrammer.cpp \
-    animationuploader.cpp
+    animationuploader.cpp \
+    systeminformation.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
@@ -34,9 +35,11 @@ HEADERS  += mainwindow.h \
     ledwriter.h \
     avrprogrammer.h \
     animationuploader.h \
-    PatternPlayer_Sketch.h
+    PatternPlayer_Sketch.h \
+    systeminformation.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    systeminformation.ui
 
 # OS X only
 ICON = images/blinkytape.icns

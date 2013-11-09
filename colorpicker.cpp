@@ -38,6 +38,7 @@ void ColorPicker::init() {
     drawRect( cw, h/2, 5, h/2, QColor(0,0,0) );
 
     // draw grey scale.
+    // TODO: Why the -1 hint here?
     for( int j=0; j<h; j++ )
     {
         int g = 255 - (int)(j/(float)(h-1) * 255 );
@@ -69,13 +70,20 @@ void ColorPicker::drawRect( int rx, int ry, int rw, int rh, QColor rc )
     QPainter painter(&colorImage);
     painter.setPen(rc);
 
-    for(int i=rx; i<rx+rw; i++)
-    {
-        for(int j=ry; j<ry+rh; j++)
-        {
-            painter.drawPoint(i,j);
-        }
-    }
+    QBrush brush = painter.brush();
+    brush.setStyle(Qt::SolidPattern);
+    brush.setColor(rc);
+    painter.setBrush(brush);
+
+    painter.drawRect(rx, ry, rw, rh);
+
+//    for(int i=rx; i<rx+rw; i++)
+//    {
+//        for(int j=ry; j<ry+rh; j++)
+//        {
+//            painter.drawPoint(i,j);
+//        }
+//    }
 }
 
 void ColorPicker::setNewColor(QColor color) {
