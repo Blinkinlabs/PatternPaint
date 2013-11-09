@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     patterneditor.cpp \
     colorpicker.cpp \
     ledwriter.cpp \
-    avrprogrammer.cpp
+    avrprogrammer.cpp \
+    animationuploader.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
@@ -32,8 +33,8 @@ HEADERS  += mainwindow.h \
     colorpicker.h \
     ledwriter.h \
     avrprogrammer.h \
-    PatternPlayer_Sketch.h \
-    ColorSwirl_Sketch.h
+    animationuploader.h \
+    PatternPlayer_Sketch.h
 
 FORMS    += mainwindow.ui
 

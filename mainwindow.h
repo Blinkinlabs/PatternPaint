@@ -4,7 +4,7 @@
 #include <QMainWindow>
 
 #include "blinkytape.h"
-//#include "blinkytapethreaded.h"
+#include "animationuploader.h"
 #include "patterneditor.h"
 
 namespace Ui {
@@ -20,12 +20,13 @@ public:
     ~MainWindow();
 
     BlinkyTape tape;
-//    BlinkyTapeThreaded tape;
+
+    AnimationUploader uploader;
 
 private slots:
     void on_tapeConnectDisconnect_clicked();
 
-    void drawTimerTimeout();
+    void drawTimer_timeout();
 
     void on_actionOpen_Animation_triggered();
 
@@ -35,20 +36,22 @@ private slots:
 
     void on_actionAbout_triggered();
 
+    void on_actionSystem_Report_triggered();
+
     void on_animationSpeed_valueChanged(int value);
 
     void on_animationPlayPause_clicked();
-
-
 
     void on_uploadButton_clicked();
 
     void on_tapeConnectionStatusChanged(bool status);
 
+    void on_uploadProgressChanged(float progress);
+
 private:
     Ui::MainWindow *ui;
 
-    QTimer *m_drawTimer;
+    QTimer *drawTimer;
 };
 
 #endif // MAINWINDOW_H

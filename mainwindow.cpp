@@ -4,8 +4,12 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
-#include <cmath>
-#include <iostream>
+#include <QDebug>
+
+#include <QSerialPortInfo>
+#include <QSysInfo>
+#include <QLibraryInfo>
+
 
 // TODO: Change this when we connect to a tape, etc?
 #define BLINKYTAPE_STRIP_HEIGHT 60
@@ -16,6 +20,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    // TODO: should this go somewhere else?
+    qSetMessagePattern("%{type} %{function}: %{message}");
 
     // TODO: Run on windows to see if this works
     setWindowIcon(QIcon(":/resources/images/blinkytape.jpg"));
@@ -29,12 +36,16 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->penSize, SIGNAL(valueChanged(int)), ui->patternEditor, SLOT(setToolSize(int)));
 
     // The draw timer tells the animation to advance
-    m_drawTimer = new QTimer(this);
-    connect(m_drawTimer, SIGNAL(timeout()), this, SLOT(drawTimerTimeout()));
-    m_drawTimer->start(33);
+    drawTimer = new QTimer(this);
+    connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
+    drawTimer->start(33);
 
     // Modify our UI when the tape connection status changes
     connect(&tape, SIGNAL(connectionStatusChanged(bool)),this,SLOT(on_tapeConnectionStatusChanged(bool)));
+
+    // Respond to the uploader
+    // TODO: Should this be a separate view? it seems weird to have it chillin all static like.
+    connect(&uploader, SIGNAL(progressChanged(float)),this,SLOT(on_uploadProgressChanged(float)));
 
     // Set some default values for the painting interface
     ui->penSize->setSliderPosition(2);
@@ -47,7 +58,7 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::drawTimerTimeout() {
+void MainWindow::drawTimer_timeout() {
     if(tape.isConnected()) {
         static int n = 0;
 
@@ -72,12 +83,16 @@ void MainWindow::drawTimerTimeout() {
 void MainWindow::on_tapeConnectDisconnect_clicked()
 {
     if(tape.isConnected()) {
+        qDebug() << "Disconnecting from tape";
         tape.close();
     }
     else {
         QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
+        qDebug() << "Tapes found:" << tapes.length();
+
         if(tapes.length() > 0) {
             // TODO: Try another one if this one fails?
+            qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
             tape.open(tapes[0]);
         }
     }
@@ -85,18 +100,17 @@ void MainWindow::on_tapeConnectDisconnect_clicked()
 
 void MainWindow::on_animationSpeed_valueChanged(int value)
 {
-    std::cout << "Changed animation speed: " << value << std::endl;
-    m_drawTimer->setInterval(1000/value);
+    drawTimer->setInterval(1000/value);
 }
 
 void MainWindow::on_animationPlayPause_clicked()
 {
-    if(m_drawTimer->isActive()) {
-        m_drawTimer->stop();
+    if(drawTimer->isActive()) {
+        drawTimer->stop();
         ui->animationPlayPause->setText("Play");
     }
     else {
-        m_drawTimer->start();
+        drawTimer->start();
         ui->animationPlayPause->setText("Pause");
     }
 }
@@ -163,13 +177,13 @@ void MainWindow::on_uploadButton_clicked()
         }
     }
 
-    std::cout << "MainWindow::on_uploadButton_clicked: " << thread() << std::endl;
-    tape.uploadAnimation(ledData,ui->animationSpeed->value());
+//    tape.uploadAnimation(ledData,ui->animationSpeed->value());
+    uploader.startUpload(tape, ledData,ui->animationSpeed->value());
 }
 
 void MainWindow::on_tapeConnectionStatusChanged(bool status)
 {
-    std::cout << "status changed!" << std::endl;
+    qDebug() << "status changed!";
     if(status) {
         ui->tapeConnectDisconnect->setText("Disconnect");
         ui->uploadButton->setEnabled(true);
@@ -182,9 +196,102 @@ void MainWindow::on_tapeConnectionStatusChanged(bool status)
 
 void MainWindow::on_actionAbout_triggered()
 {
-    QMessageBox::about(this, tr("About Pattern Paint"),
-                       tr("<b>PatternPaint</b> is companion software for the BlinkyTape. "
-                          "It allows you to create animations for your BlinkyTape in "
-                          "real-time, and save your designs to the BlinkyTape for "
-                          "playback on-the-go."));
+    QMessageBox::about(this, "Pattern Paint",
+                       "<b>PatternPaint</b> is companion software for the BlinkyTape. "
+                       "It allows you to create animations for your BlinkyTape in "
+                       "real-time, and save your designs to the BlinkyTape for "
+                       "playback on-the-go.");
+}
+
+void MainWindow::on_actionSystem_Report_triggered()
+{
+    // TODO: move to separate class
+
+    QString report;
+
+    QString osName;
+
+    report.append("Pattern Paint (Unknown version)\r");
+    report.append("  Build Date: ");
+    report.append(__DATE__);
+    report.append(" ");
+    report.append(__TIME__);
+    report.append("\r");
+
+#if defined(Q_OS_WIN)
+    switch(QSysInfo::windowsVersion()) {
+    case QSysInfo::WV_2000:
+        osName = "Windows 2000";
+        break;
+    case QSysInfo::WV_2003:
+        osName = "Windows 2003";
+        break;
+    case QSysInfo::WV_VISTA:
+        osName = "Windows Vista";
+        break;
+    case QSysInfo::WV_WINDOWS7:
+        osName = "Windows 7";
+        break;
+    case QSysInfo::WV_WINDOWS8:
+        osName = "Windows 8";
+        break;
+    default
+        osName = "Windows (Unknown Version)";
+        break;
+    }
+#elif defined(Q_OS_MAC)
+    switch(QSysInfo::macVersion()) {
+    case QSysInfo::MV_SNOWLEOPARD:
+        osName = "OS X 10.6 (Snow Leopard)";
+        break;
+    case QSysInfo::MV_LION:
+        osName = "OS X 10.7 (Lion)";
+        break;
+    case QSysInfo::MV_MOUNTAINLION:
+        osName = "OS X 10.8 (Mountain Lion)";
+        break;
+    case QSysInfo::MV_MAVERICKS:
+        osName = "OS X 10.9 (Mavericks)";
+        break;
+    default:
+        osName = "OS X (Unknown version)";
+        break;
+    }
+#else
+// TODO: Linux
+    osName = "Unknown";
+#endif
+    report.append("Operating system: " + osName + "\r");
+
+    report.append("QT information:\r");
+    report.append("  buildDate: " + QLibraryInfo::buildDate().toString() + "\r");
+    report.append("  licensee: " + QLibraryInfo::licensee() + "\r");
+    report.append("  path: " + QLibraryInfo::location(QLibraryInfo::LibrariesPath) + "\r");
+
+    report.append("Detected Serial Ports: \r");
+    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
+        report.append("  " + info.portName() + "\r");
+        report.append("    Manufacturer: " + info.manufacturer() + "\r");
+        report.append("    Description: " + info.description() + "\r");
+        report.append("    VID: " + QString::number(info.vendorIdentifier()) + "\r");
+        report.append("    PID: " + QString::number(info.productIdentifier()) + "\r");
+    }
+
+    report.append("Detected BlinkyTapes: \r");
+    foreach (const QSerialPortInfo &info, BlinkyTape::findBlinkyTapes()) {
+        report.append("  " + info.portName() + "\r");
+        report.append("    Manufacturer: " + info.manufacturer() + "\r");
+        report.append("    Description: " + info.description() + "\r");
+        report.append("    VID: " + QString::number(info.vendorIdentifier()) + "\r");
+        report.append("    PID: " + QString::number(info.productIdentifier()) + "\r");
+    }
+
+
+    QMessageBox::about(this, "System Information",
+                       report);
+}
+
+void MainWindow::on_uploadProgressChanged(float progress)
+{
+    qDebug() << "Upload progess: ";
 }
