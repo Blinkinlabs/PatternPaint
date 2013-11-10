@@ -33,7 +33,7 @@ public:
 
 signals:
     // Sends an update about the upload progress, from 0 to 1
-    void progressChanged(float progress);
+    void progressChanged(int progress);
 
     // Sends a signal at end of upload to report the result.
     void finished(bool result);

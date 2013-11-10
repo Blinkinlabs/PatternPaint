@@ -38,21 +38,35 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
     drawTimer->start(33);
 
+    tape = new BlinkyTape(this);
+
     // Modify our UI when the tape connection status changes
-    connect(&tape, SIGNAL(connectionStatusChanged(bool)),
+    connect(tape, SIGNAL(connectionStatusChanged(bool)),
             this,SLOT(on_tapeConnectionStatusChanged(bool)));
 
-    // Respond to the uploader
+
+    uploader = new AnimationUploader(this);
+
     // TODO: Should this be a separate view? it seems weird to have it chillin
     // all static like.
-    connect(&uploader, SIGNAL(progressChanged(float)),
-            this, SLOT(on_uploaderProgressChanged(float)));
-    connect(&uploader, SIGNAL(finished(bool)),
+    connect(uploader, SIGNAL(progressChanged(int)),
+            this, SLOT(on_uploaderProgressChanged(int)));
+    connect(uploader, SIGNAL(finished(bool)),
             this, SLOT(on_uploaderFinished(bool)));
 
     // Set some default values for the painting interface
     ui->penSize->setSliderPosition(2);
     ui->animationSpeed->setSliderPosition(30);
+
+
+    // Pre-set the upload progress dialog
+    progress = new QProgressDialog(this);
+    progress->setWindowTitle("Uploader");
+    progress->setLabelText("Uploading animation to BlinkyTape...");
+    progress->setMinimum(0);
+    progress->setMaximum(150);
+    progress->setWindowModality(Qt::WindowModal);
+    progress->setAutoClose(false);
 }
 
 MainWindow::~MainWindow()
@@ -65,7 +79,7 @@ void MainWindow::drawTimer_timeout() {
     // TODO: move this state to somewhere; the patterneditor class maybe?
     static int n = 0;
 
-    if(tape.isConnected()) {
+    if(tape->isConnected()) {
         QByteArray ledData;
 
         QImage img = ui->patternEditor->getPattern();
@@ -75,7 +89,7 @@ void MainWindow::drawTimer_timeout() {
             ledData.append(qGreen(color));
             ledData.append(qBlue(color));
         }
-        tape.sendUpdate(ledData);
+        tape->sendUpdate(ledData);
 
         n = (n+1)%img.width();
         ui->patternEditor->setPlaybackRow(n);
@@ -85,9 +99,9 @@ void MainWindow::drawTimer_timeout() {
 
 void MainWindow::on_tapeConnectDisconnect_clicked()
 {
-    if(tape.isConnected()) {
+    if(tape->isConnected()) {
         qDebug() << "Disconnecting from tape";
-        tape.close();
+        tape->close();
     }
     else {
         QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
@@ -96,7 +110,7 @@ void MainWindow::on_tapeConnectDisconnect_clicked()
         if(tapes.length() > 0) {
             // TODO: Try another one if this one fails?
             qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
-            tape.open(tapes[0]);
+            tape->open(tapes[0]);
         }
     }
 }
@@ -160,7 +174,7 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_uploadButton_clicked()
 {
-    if(!tape.isConnected()) {
+    if(!(tape->isConnected())) {
         return;
     }
 
@@ -180,8 +194,11 @@ void MainWindow::on_uploadButton_clicked()
         }
     }
 
-//    tape.uploadAnimation(ledData,ui->animationSpeed->value());
-    uploader.startUpload(tape, ledData,ui->animationSpeed->value());
+    uploader->startUpload(*tape, ledData,ui->animationSpeed->value());
+
+    progress->setValue(progress->minimum());
+    progress->show();
+
 }
 
 void MainWindow::on_tapeConnectionStatusChanged(bool connected)
@@ -213,17 +230,24 @@ void MainWindow::on_actionSystem_Information_triggered()
     info->show();
 }
 
-void MainWindow::on_uploaderProgressChanged(float progress)
+void MainWindow::on_uploaderProgressChanged(int progressValue)
 {
-    qDebug() << "Uploader progess:" << progress;
+    // Clip the progress to maximum, until we work out a better way to estimate it.
+    if(progressValue >= progress->maximum()) {
+        progressValue = progress->maximum() - 1;
+    }
+
+    progress->setValue(progressValue);
 }
 
 void MainWindow::on_uploaderFinished(bool result)
 {
     qDebug() << "Uploader finished! Result:" << result;
 
+    progress->hide();
+
     // Reconnect to the BlinkyTape
-    if(!tape.isConnected()) {
+    if(!tape->isConnected()) {
         // TODO: Make connect() function that does this automagically?
         QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
         qDebug() << "Tapes found:" << tapes.length();
@@ -231,7 +255,7 @@ void MainWindow::on_uploaderFinished(bool result)
         if(tapes.length() > 0) {
             // TODO: Try another one if this one fails?
             qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
-            tape.open(tapes[0]);
+            tape->open(tapes[0]);
         }
     }
 }

@@ -37,8 +37,7 @@ void AnimationUploader::handleProgrammerError(QString error) {
 void AnimationUploader::handleProgrammerCommandFinished(QString command, QByteArray returnData) {
     // TODO: Update our progress somehow? But how to tell how far we've gotten?
     qDebug() << "Command finished:" << command;
-    progress += .1;
-    emit(progressChanged(progress));
+    updateProgress(progress + 1);
 
     // we know reset is the last command, so the BlinkyTape should be ready soon.
     // Schedule a timer to emit the message shortly.

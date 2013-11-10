@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QProgressDialog>
 
 #include "blinkytape.h"
 #include "animationuploader.h"
@@ -18,10 +19,6 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-
-    BlinkyTape tape;
-
-    AnimationUploader uploader;
 
 private slots:
     void on_tapeConnectDisconnect_clicked();
@@ -46,7 +43,7 @@ private slots:
 
     void on_tapeConnectionStatusChanged(bool connected);
 
-    void on_uploaderProgressChanged(float progress);
+    void on_uploaderProgressChanged(int progress);
 
     void on_uploaderFinished(bool result);
 
@@ -54,6 +51,9 @@ private:
     Ui::MainWindow *ui;
 
     QTimer *drawTimer;
+    QProgressDialog* progress;
+    BlinkyTape* tape;
+    AnimationUploader* uploader;
 };
 
 #endif // MAINWINDOW_H
