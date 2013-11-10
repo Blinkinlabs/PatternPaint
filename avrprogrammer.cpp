@@ -130,7 +130,7 @@ void AvrProgrammer::handleReadData() {
     }
 
     qDebug() << "Command completed successfully: " << commandQueue.front().commandName;
-    emit(SIGNAL(commandFinished(commandQueue.front().commandName, responseData)));
+    emit(commandFinished(commandQueue.front().commandName,responseData));
     commandQueue.pop_front();
 
     // Start another command, if there is one.
@@ -139,9 +139,9 @@ void AvrProgrammer::handleReadData() {
     }
 }
 
-void AvrProgrammer::handleSerialError(QSerialPort::SerialPortError error)
+void AvrProgrammer::handleSerialError(QSerialPort::SerialPortError serialError)
 {
-    if(error == QSerialPort::NoError) {
+    if(serialError == QSerialPort::NoError) {
         // The serial library appears to emit an extraneous SerialPortError
         // when open() is called. Just ignore it.
         return;
@@ -149,15 +149,15 @@ void AvrProgrammer::handleSerialError(QSerialPort::SerialPortError error)
 
     if(serial == NULL) {
         qCritical() << "Got error after serial device was deleted!";
-        emit(SIGNAL(error("serial error")));
+        emit(error("serial error"));
         return;
     }
 
     qCritical() << serial->errorString();
 
     // TODO: handle other error types?
-    if (error == QSerialPort::ResourceError) {
-        emit(SIGNAL(error(serial->errorString())));
+    if (serialError == QSerialPort::ResourceError) {
+        emit(error(serial->errorString()));
         closeSerial();
         commandQueue.clear();
     }
@@ -166,7 +166,7 @@ void AvrProgrammer::handleSerialError(QSerialPort::SerialPortError error)
 void AvrProgrammer::handleCommandTimeout()
 {
     qCritical() << "Command timed out, disconnecting from programmer";
-    emit(SIGNAL(error("Command timed out, disconnecting from programmer")));
+    emit(error("Command timed out, disconnecting from programmer"));
     closeSerial();
     commandQueue.clear();
 }

@@ -3,8 +3,15 @@
 
 #include <qDebug>
 
-#define RESET_WAIT_INTERVAL 2000 // Amount of time, in ms, to wait after resetting the device before looking for it
-#define MAX_TIMER_INTERVAL 5000  // Longest time, in ms, that we will wait for a signal before we cancel this process.
+// Amount of time, in ms, to wait after resetting the device before looking for it
+#define RESET_WAIT_INTERVAL 2000
+
+// Longest time, in ms, that we will wait for a signal before we cancel this process.
+#define MAX_TIMER_INTERVAL 3000
+
+// How long to wait between receiving notification that the programmer has been
+// reset, and notifying the caller that we are finished
+#define PROGRAMMER_RESET_DELAY 1000
 
 AnimationUploader::AnimationUploader(QObject *parent) :
     QObject(parent)
@@ -12,6 +19,37 @@ AnimationUploader::AnimationUploader(QObject *parent) :
     processTimer = new QTimer(this);
 
     state = State_Ready;
+
+    connect(&programmer,SIGNAL(error(QString)),
+            this,SLOT(handleProgrammerError(QString)));
+    connect(&programmer,SIGNAL(commandFinished(QString,QByteArray)),
+            this,SLOT(handleProgrammerCommandFinished(QString,QByteArray)));
+}
+
+void AnimationUploader::handleProgrammerError(QString error) {
+    qCritical() << error;
+    // TODO: not sure if we should do this, or let the programmer handle it?
+    programmer.closeSerial();
+
+    emit(finished(false));
+}
+
+void AnimationUploader::handleProgrammerCommandFinished(QString command, QByteArray returnData) {
+    // TODO: Update our progress somehow? But how to tell how far we've gotten?
+    qDebug() << "Command finished:" << command;
+    progress += .1;
+    emit(progressChanged(progress));
+
+    // we know reset is the last command, so the BlinkyTape should be ready soon.
+    // Schedule a timer to emit the message shortly.
+    if(command == "reset") {
+        QTimer::singleShot(PROGRAMMER_RESET_DELAY, this,SLOT(handleResetTimer()));
+    }
+}
+
+void AnimationUploader::handleResetTimer()
+{
+    emit(finished(true));
 }
 
 void AnimationUploader::updateProgress(int newProgress) {
@@ -173,11 +211,4 @@ void AnimationUploader::doWork() {
         break;
     }
 
-}
-
-
-void AnimationUploader::watchdogTimer_timeout() {
-    watchdogTimer->stop();
-    qCritical() << "Watchdog tripped, we're done.";
-    // TODO: Clear everything out.
 }

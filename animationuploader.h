@@ -35,10 +35,19 @@ signals:
     // Sends an update about the upload progress, from 0 to 1
     void progressChanged(float progress);
 
-private slots:
-    void watchdogTimer_timeout();  // If we get here, we're in big trouble, something broke.
+    // Sends a signal at end of upload to report the result.
+    void finished(bool result);
 
+private slots:
     void doWork();  // Handle the next section of work, whatever it is
+
+    void handleProgrammerError(QString error);
+
+    void handleProgrammerCommandFinished(QString command, QByteArray returnData);
+
+    // Delay timer, lets us wait some time between receiving a finished command, and
+    // passing the message along (to give the serial device some time to reset itself).
+    void handleResetTimer();
 
 private:
     enum State {
@@ -52,8 +61,6 @@ private:
 
     QTimer *processTimer;
 
-    QTimer *watchdogTimer;  // Set this to longer than the current operation is
-                           // expected to take, and fail the upload if it fires.
     float progress;        // TODO: deleteme?
 
     State state;            // The state that we just completed

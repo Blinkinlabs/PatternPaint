@@ -46,7 +46,9 @@ private slots:
 
     void on_tapeConnectionStatusChanged(bool connected);
 
-    void on_uploadProgressChanged(float progress);
+    void on_uploaderProgressChanged(float progress);
+
+    void on_uploaderFinished(bool result);
 
 private:
     Ui::MainWindow *ui;

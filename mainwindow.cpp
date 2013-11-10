@@ -28,8 +28,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->colorPicker->init();
 
     // Our pattern editor wants to get some notifications
-    connect(ui->colorPicker, SIGNAL(colorChanged(QColor)), ui->patternEditor, SLOT(setToolColor(QColor)));
-    connect(ui->penSize, SIGNAL(valueChanged(int)), ui->patternEditor, SLOT(setToolSize(int)));
+    connect(ui->colorPicker, SIGNAL(colorChanged(QColor)),
+            ui->patternEditor, SLOT(setToolColor(QColor)));
+    connect(ui->penSize, SIGNAL(valueChanged(int)),
+            ui->patternEditor, SLOT(setToolSize(int)));
 
     // The draw timer tells the animation to advance
     drawTimer = new QTimer(this);
@@ -37,11 +39,16 @@ MainWindow::MainWindow(QWidget *parent) :
     drawTimer->start(33);
 
     // Modify our UI when the tape connection status changes
-    connect(&tape, SIGNAL(connectionStatusChanged(bool)),this,SLOT(on_tapeConnectionStatusChanged(bool)));
+    connect(&tape, SIGNAL(connectionStatusChanged(bool)),
+            this,SLOT(on_tapeConnectionStatusChanged(bool)));
 
     // Respond to the uploader
-    // TODO: Should this be a separate view? it seems weird to have it chillin all static like.
-    connect(&uploader, SIGNAL(progressChanged(float)),this,SLOT(on_uploadProgressChanged(float)));
+    // TODO: Should this be a separate view? it seems weird to have it chillin
+    // all static like.
+    connect(&uploader, SIGNAL(progressChanged(float)),
+            this, SLOT(on_uploaderProgressChanged(float)));
+    connect(&uploader, SIGNAL(finished(bool)),
+            this, SLOT(on_uploaderFinished(bool)));
 
     // Set some default values for the painting interface
     ui->penSize->setSliderPosition(2);
@@ -206,7 +213,25 @@ void MainWindow::on_actionSystem_Information_triggered()
     info->show();
 }
 
-void MainWindow::on_uploadProgressChanged(float progress)
+void MainWindow::on_uploaderProgressChanged(float progress)
 {
-    qDebug() << "Upload progess: " << progress;
+    qDebug() << "Uploader progess:" << progress;
+}
+
+void MainWindow::on_uploaderFinished(bool result)
+{
+    qDebug() << "Uploader finished! Result:" << result;
+
+    // Reconnect to the BlinkyTape
+    if(!tape.isConnected()) {
+        // TODO: Make connect() function that does this automagically?
+        QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
+        qDebug() << "Tapes found:" << tapes.length();
+
+        if(tapes.length() > 0) {
+            // TODO: Try another one if this one fails?
+            qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
+            tape.open(tapes[0]);
+        }
+    }
 }

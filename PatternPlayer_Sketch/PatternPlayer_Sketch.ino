@@ -58,12 +58,16 @@ void setup()
     pov.init(frameCount, frameData, ENCODING_NONE, LED_COUNT);
 }
 
+
 void serialLoop() {
   static int pixelIndex;
+  
+  unsigned long lastReceiveTime = millis();
 
   while(true) {
 
     if(Serial.available() > 2) {
+      lastReceiveTime = millis();
 
       uint8_t buffer[3]; // Buffer to store three incoming bytes used to compile a single LED color
 
@@ -84,6 +88,14 @@ void serialLoop() {
           pixelIndex++;
         }
       }
+    }
+    
+    // If we haven't received data in 4 seconds, return to playing back our animation
+    if(millis() > lastReceiveTime + 4000) {
+      while(Serial.available() > 0) {
+        Serial.read();
+      }
+      return;
     }
   }
 }
