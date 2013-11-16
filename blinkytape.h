@@ -11,6 +11,16 @@
 #define FLASH_MEMORY_AVAILABLE 0x7000  // Amount of application space in the flash
 #define FLASH_MEMORY_PAGE_SIZE 0x80    // Size of a page of memory in our flash
 
+#define BLINKYTAPE_SKETCH_VID 0x1D50
+#define BLINKYTAPE_SKETCH_PID 0x605E
+#define BLINKYTAPE_BOOTLOADER_VID 0x1D50
+#define BLINKYTAPE_BOOTLOADER_PID 0x606C
+
+#define LEONARDO_SKETCH_VID 0x2341
+#define LEONARDO_SKETCH_PID 0x8036
+#define LEONARDO_BOOTLOADER_VID 0x2341
+#define LEONARDO_BOOTLOADER_PID 0x0036
+
 /// Connect to a BlinkyTape over a serial port, and manage sending data to it.
 class BlinkyTape : public QObject
 {

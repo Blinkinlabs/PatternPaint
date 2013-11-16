@@ -4,17 +4,6 @@
 
 #include <cmath>
 
-
-#define BLINKYTAPE_SKETCH_VID 0x1D50
-#define BLINKYTAPE_SKETCH_PID 0x605E
-#define BLINKYTAPE_BOOTLOADER_VID 0x1D50
-#define BLINKYTAPE_BOOTLOADER_PID 0x606C
-
-#define LEONARDO_SKETCH_VID 0x2341
-#define LEONARDO_SKETCH_PID 0x8036
-#define LEONARDO_BOOTLOADER_VID 0x2341
-#define LEONARDO_BOOTLOADER_PID 0x0036
-
 // TODO: Support a method for loading these from preferences file
 QList<QSerialPortInfo> BlinkyTape::findBlinkyTapes()
 {

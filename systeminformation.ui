@@ -15,7 +15,14 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QTextBrowser" name="infoBrowser"/>
+    <widget class="QTextBrowser" name="infoBrowser">
+     <property name="font">
+      <font>
+       <family>Geeza Pro</family>
+       <pointsize>11</pointsize>
+      </font>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
