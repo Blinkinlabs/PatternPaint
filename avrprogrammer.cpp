@@ -1,7 +1,7 @@
 #include "avrprogrammer.h"
 #include <QDebug>
 
-#define COMMAND_TIMEOUT_TIME 2000
+#define COMMAND_TIMEOUT_TIME 1000
 #define PAGE_SIZE_BYTES 128
 
 AvrProgrammer::AvrProgrammer(QObject *parent) :

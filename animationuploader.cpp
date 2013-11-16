@@ -146,35 +146,47 @@ void AnimationUploader::doWork() {
             // Compare the the blinkyTapes that we have now to the previous ones. If there
             // is a new one, then try to attach to it. Otherwise, stop.
 
-            // Wait until we see a serial port appear again.
+//            // Wait until we see a serial port appear again.
+//            QList<QSerialPortInfo> postResetTapes;
+//            bool portAdded = false;
+
+//            postResetTapes = BlinkyTape::findBlinkyTapes();
+//            if (postResetTapes.length() == preResetTapes.length() + 1) {
+//                portAdded = true;
+//                qCritical() << "Port added, hooray!";
+//            }
+//            if(!portAdded) {
+//                qCritical() << "Timeout waiting for port to appear...";
+//                return;
+//            }
+
+//            // Remove all of the tapes that are in the mid-reset list from the post-reset list
+//            qDebug() << "Post-reset tapes: " << postResetTapes.length();
+//            for(int i = 0; i < preResetTapes.length(); i++) {
+//                for(int j = 0; j < postResetTapes.length(); j++) {
+//                    if(preResetTapes.at(i).portName() == postResetTapes.at(j).portName()) {
+//                        postResetTapes.removeAt(j);
+//                        break;
+//                    }
+//                }
+//            }
+
+//            // Now, we should only have one new port.
+//            if(postResetTapes.length() != 1) {
+//                qCritical() << "Too many or two few ports, something went wrong??";
+//                return; // TODO: Fail.
+//            }
+
             QList<QSerialPortInfo> postResetTapes;
-            bool portAdded = false;
-
-            postResetTapes = BlinkyTape::findBlinkyTapes();
-            if (postResetTapes.length() == preResetTapes.length() + 1) {
-                portAdded = true;
-                qCritical() << "Port added, hooray!";
-            }
-            if(!portAdded) {
-                qCritical() << "Timeout waiting for port to appear...";
-                return;
-            }
-
-            // Remove all of the tapes that are in the mid-reset list from the post-reset list
-            qDebug() << "Post-reset tapes: " << postResetTapes.length();
-            for(int i = 0; i < preResetTapes.length(); i++) {
-                for(int j = 0; j < postResetTapes.length(); j++) {
-                    if(preResetTapes.at(i).portName() == postResetTapes.at(j).portName()) {
-                        postResetTapes.removeAt(j);
-                        break;
-                    }
-                }
-            }
+            postResetTapes = BlinkyTape::findBlinkyTapeBootloaders();
 
             // Now, we should only have one new port.
-            if(postResetTapes.length() != 1) {
-                qCritical() << "Too many or two few ports, something went wrong??";
+            if(postResetTapes.length() == 0) {
+                qCritical() << "Didn't detect a bootloader, something went wrong!";
                 return; // TODO: Fail.
+            }
+            if(postResetTapes.length() > 1) {
+                qWarning() << "Too many bootloaders, something is amiss.";
             }
 
             qDebug() << "Bootloader waiting on: " << postResetTapes.at(0).portName();

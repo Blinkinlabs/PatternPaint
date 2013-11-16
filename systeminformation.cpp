@@ -78,8 +78,8 @@ SystemInformation::SystemInformation(QWidget *parent) :
         report.append("  " + info.portName() + "\r");
         report.append("    Manufacturer: " + info.manufacturer() + "\r");
         report.append("    Description: " + info.description() + "\r");
-        report.append("    VID: " + QString::number(info.vendorIdentifier()) + "\r");
-        report.append("    PID: " + QString::number(info.productIdentifier()) + "\r");
+        report.append("    VID: 0x" + QString::number(info.vendorIdentifier(),16) + "\r");
+        report.append("    PID: 0x" + QString::number(info.productIdentifier(),16) + "\r");
     }
 
     report.append("Detected BlinkyTapes: \r");
@@ -87,8 +87,17 @@ SystemInformation::SystemInformation(QWidget *parent) :
         report.append("  " + info.portName() + "\r");
         report.append("    Manufacturer: " + info.manufacturer() + "\r");
         report.append("    Description: " + info.description() + "\r");
-        report.append("    VID: " + QString::number(info.vendorIdentifier()) + "\r");
-        report.append("    PID: " + QString::number(info.productIdentifier()) + "\r");
+        report.append("    VID: 0x" + QString::number(info.vendorIdentifier(),16) + "\r");
+        report.append("    PID: 0x" + QString::number(info.productIdentifier(),16) + "\r");
+    }
+
+    report.append("Detected BlinkyTape Bootloaders: \r");
+    foreach (const QSerialPortInfo &info, BlinkyTape::findBlinkyTapeBootloaders()) {
+        report.append("  " + info.portName() + "\r");
+        report.append("    Manufacturer: " + info.manufacturer() + "\r");
+        report.append("    Description: " + info.description() + "\r");
+        report.append("    VID: 0x" + QString::number(info.vendorIdentifier(),16) + "\r");
+        report.append("    PID: 0x" + QString::number(info.productIdentifier(),16) + "\r");
     }
 
     ui->infoBrowser->setText(report);

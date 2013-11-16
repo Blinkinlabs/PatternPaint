@@ -5,6 +5,17 @@
 #include <cmath>
 
 
+#define BLINKYTAPE_SKETCH_VID 0x1D50
+#define BLINKYTAPE_SKETCH_PID 0x605E
+#define BLINKYTAPE_BOOTLOADER_VID 0x1D50
+#define BLINKYTAPE_BOOTLOADER_PID 0x606C
+
+#define LEONARDO_SKETCH_VID 0x2341
+#define LEONARDO_SKETCH_PID 0x8036
+#define LEONARDO_BOOTLOADER_VID 0x2341
+#define LEONARDO_BOOTLOADER_PID 0x0036
+
+// TODO: Support a method for loading these from preferences file
 QList<QSerialPortInfo> BlinkyTape::findBlinkyTapes()
 {
     QList<QSerialPortInfo> tapes;
@@ -12,13 +23,39 @@ QList<QSerialPortInfo> BlinkyTape::findBlinkyTapes()
     // TODO: Should we use VID/PID here instead of descriptions?
     // Maybe it's not the most important thing in the world.
     foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
-        // If the description is BlinkyTape, we're sure to have a match
-        if(info.description().startsWith("BlinkyTape")) {
+        // Only connect to know BlinkyTapes
+        if(info.vendorIdentifier() == BLINKYTAPE_SKETCH_VID
+           && info.productIdentifier() == BLINKYTAPE_SKETCH_PID) {
             tapes.push_back(info);
         }
         // If it's a leonardo, it /may/ be a BlinkyTape running a user sketch
-        else if(info.description().startsWith("Arduino Leonardo")) {
+        else if(info.vendorIdentifier() == LEONARDO_SKETCH_VID
+                && info.productIdentifier() == LEONARDO_SKETCH_PID) {
+                 tapes.push_back(info);
+        }
+    }
+
+    return tapes;
+}
+
+// TODO: Support a method for loading these from preferences file
+QList<QSerialPortInfo> BlinkyTape::findBlinkyTapeBootloaders()
+{
+    QList<QSerialPortInfo> tapes;
+    // TODO: Should we use VID/PID here instead of descriptions?
+    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
+        qDebug() << info.productIdentifier();
+        qDebug() << info.vendorIdentifier();
+
+        // Only connect to know BlinkyTapes
+        if(info.vendorIdentifier() == BLINKYTAPE_BOOTLOADER_VID
+           && info.productIdentifier() == BLINKYTAPE_BOOTLOADER_PID) {
             tapes.push_back(info);
+        }
+        // If it's a leonardo, it /may/ be a BlinkyTape running a user sketch
+        else if(info.vendorIdentifier() == LEONARDO_BOOTLOADER_VID
+                && info.productIdentifier() == LEONARDO_BOOTLOADER_PID) {
+                 tapes.push_back(info);
         }
     }
 

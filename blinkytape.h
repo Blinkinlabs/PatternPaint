@@ -17,6 +17,7 @@ class BlinkyTape : public QObject
     Q_OBJECT
 public:
     static QList<QSerialPortInfo> findBlinkyTapes();
+    static QList<QSerialPortInfo> findBlinkyTapeBootloaders();
     static QRgb correctBrightness(QRgb uncorrected);
 
     BlinkyTape(QObject *parent = 0, int ledCount = 60);

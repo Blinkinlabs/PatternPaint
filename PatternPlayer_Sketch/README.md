@@ -5,10 +5,9 @@ To convert the sketch into a .h file for PatternPaint:
 2. In Arduino Preferences, check that 'Show verbose output during: compilation' is selected.
 3. Press Command+R to compile the sketch
 4. Scroll down to the bottom of the output window; the second to last line should show the location of a .hex file. Mine looks something like this:
-/var/folders/0d/6pr0k02913z3b7w9pm8gbc180000gn/T/build4201988184645967020.tmp/PatternPlayer_Sketch.cpp.hex
+/var/folders/0d/6pr0k02913z3b7w9pm8gbc180000gn/T/build4984830816021265745.tmp/PatternPlayer_Sketch.cpp.hex
 5. Run the included Python sketch to convert the hex file into a c++ data header:
-
-6. Copy this new header into the Pattern Paint program, compile it, and enjoy!
+./hex_to_header.py /var/folders/0d/6pr0k02913z3b7w9pm8gbc180000gn/T/build4984830816021265745.tmp/PatternPlayer_Sketch.cpp.hex > ../PatternPlayer_Sketch.h
 
 
 These are the steps that happen when you click upload in pattern paint:
