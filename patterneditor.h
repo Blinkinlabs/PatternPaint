@@ -20,6 +20,8 @@ public:
     void mousePressEvent(QMouseEvent * event);
     void mouseMoveEvent(QMouseEvent * event);
 
+    void leaveEvent(QEvent * event);
+
 protected:
     void paintEvent(QPaintEvent *event);
 

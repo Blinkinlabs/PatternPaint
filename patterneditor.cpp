@@ -109,6 +109,13 @@ void PatternEditor::mousePressEvent(QMouseEvent *event){
     update();
 }
 
+void PatternEditor::leaveEvent(QEvent * event) {
+    QPainter painter(&toolPreview);
+    toolPreview.fill(QColor(0,0,0,0));
+
+    update();
+}
+
 void PatternEditor::mouseMoveEvent(QMouseEvent *event){
     int x = event->x()/xScale;
     int y = event->y()/yScale;
