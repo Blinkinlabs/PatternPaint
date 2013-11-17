@@ -99,9 +99,7 @@ void serialLoop() {
     
     // If we haven't received data in 4 seconds, return to playing back our animation
     if(millis() > lastReceiveTime + 4000) {
-      while(Serial.available() > 0) {
-        Serial.read();
-      }
+      // TODO: Somehow the serial port gets trashed here, how to reset it?
       return;
     }
   }
@@ -113,7 +111,7 @@ int led = 13;
 void loop()
 {
   // If'n we get some data, switch to passthrough mode
-  if(Serial.available() > 0) {
+  if(Serial.available() > 2) {
     serialLoop();
   }
   
