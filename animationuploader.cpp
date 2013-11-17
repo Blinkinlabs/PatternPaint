@@ -3,14 +3,15 @@
 
 #include <qDebug>
 
-// Amount of time, in ms, to wait after resetting the device before looking for it
-#define RESET_WAIT_INTERVAL 5000
+/// Interval between polling the serial port list for new devices
+#define WAIT_FOR_BOOTLOADER_POLL_INTERVAL 200
 
-// Longest time, in ms, that we will wait for a signal before we cancel this process.
-#define MAX_TIMER_INTERVAL 3000
+/// Maximum time to wait before giving up on finding a bootloader
+#define WAIT_FOR_BOOTLOADER_TIMEOUT 10000
 
-// How long to wait between receiving notification that the programmer has been
-// reset, and notifying the caller that we are finished
+
+/// How long to wait between receiving notification that the programmer has been
+/// reset, and notifying the caller that we are finished
 #define PROGRAMMER_RESET_DELAY 1000
 
 AnimationUploader::AnimationUploader(QObject *parent) :
@@ -28,8 +29,11 @@ AnimationUploader::AnimationUploader(QObject *parent) :
 
 void AnimationUploader::handleProgrammerError(QString error) {
     qCritical() << error;
+
     // TODO: not sure if we should do this, or let the programmer handle it?
-    programmer.closeSerial();
+    if(programmer.isConnected()) {
+        programmer.closeSerial();
+    }
 
     emit(finished(false));
 }
@@ -41,6 +45,7 @@ void AnimationUploader::handleProgrammerCommandFinished(QString command, QByteAr
 
     // we know reset is the last command, so the BlinkyTape should be ready soon.
     // Schedule a timer to emit the message shortly.
+    // TODO: Let the receiver handle this instead.
     if(command == "reset") {
         QTimer::singleShot(PROGRAMMER_RESET_DELAY, this,SLOT(handleResetTimer()));
     }
@@ -50,6 +55,7 @@ void AnimationUploader::handleResetTimer()
 {
     emit(finished(true));
 }
+
 
 void AnimationUploader::updateProgress(int newProgress) {
     progress = newProgress;
@@ -102,34 +108,14 @@ void AnimationUploader::startUpload(BlinkyTape& tape, QByteArray animation, int 
     }
 
     /// Attempt to reset the strip using the 1200 baud rate method, and identify the newly connected bootloader
-    // TODO: Record the sketch and metadata somewhere so we can actually program them later!
-
-
-    // First, record the currently available BlinkyTapes
-    preResetTapes = BlinkyTape::findBlinkyTapes();
-
-    // Next, remove the currently active port from the list of available BlinkyTapes
-    QSerialPortInfo currentPort;
-    if(!tape.getPortInfo(currentPort)) {
-        return;
-    }
-
-    for(int i = 0; i < preResetTapes.length(); i++) {
-        if(preResetTapes.at(i).portName() == currentPort.portName()) {
-            preResetTapes.removeAt(i);
-            break;
-        }
-    }
-
+    ///
     // Next, tell the tape to reset.
     tape.reset();
 
-    // Now, we want to wait 1 second and then start scanning to see if the port reappears
-    // TODO: Is one second correct?
-    // NOTE: Waiting to be sure that the port disappears doesn't seem to be reliable;
-    // we don't necessicarily get a notification about that quick enough.
+    // Now, start the polling processes to detect a new bootloader
+    stateStartTime = QDateTime::currentDateTime();
     state = State_WaitForBootloaderPort;
-    processTimer->singleShot(RESET_WAIT_INTERVAL,this,SLOT(doWork()));
+    processTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
 }
 
 
@@ -142,49 +128,23 @@ void AnimationUploader::doWork() {
     switch(state) {
     case State_WaitForBootloaderPort:
         {
-            // RESET_WAIT_INTERVAL ms ago, we reset the BlinkyTape. It should now be in bootloader mode.
-            // Compare the the blinkyTapes that we have now to the previous ones. If there
-            // is a new one, then try to attach to it. Otherwise, stop.
-
-//            // Wait until we see a serial port appear again.
-//            QList<QSerialPortInfo> postResetTapes;
-//            bool portAdded = false;
-
-//            postResetTapes = BlinkyTape::findBlinkyTapes();
-//            if (postResetTapes.length() == preResetTapes.length() + 1) {
-//                portAdded = true;
-//                qCritical() << "Port added, hooray!";
-//            }
-//            if(!portAdded) {
-//                qCritical() << "Timeout waiting for port to appear...";
-//                return;
-//            }
-
-//            // Remove all of the tapes that are in the mid-reset list from the post-reset list
-//            qDebug() << "Post-reset tapes: " << postResetTapes.length();
-//            for(int i = 0; i < preResetTapes.length(); i++) {
-//                for(int j = 0; j < postResetTapes.length(); j++) {
-//                    if(preResetTapes.at(i).portName() == postResetTapes.at(j).portName()) {
-//                        postResetTapes.removeAt(j);
-//                        break;
-//                    }
-//                }
-//            }
-
-//            // Now, we should only have one new port.
-//            if(postResetTapes.length() != 1) {
-//                qCritical() << "Too many or two few ports, something went wrong??";
-//                return; // TODO: Fail.
-//            }
-
+            // Scan to see if there is a bootloader present
             QList<QSerialPortInfo> postResetTapes;
             postResetTapes = BlinkyTape::findBlinkyTapeBootloaders();
 
-            // Now, we should only have one new port.
+            // If we didn't detect a bootloader and still have time, then queue the timer and
+            // wait. Otherwise, we timed out, so fail.
             if(postResetTapes.length() == 0) {
-                qCritical() << "Didn't detect a bootloader, something went wrong!";
-                return; // TODO: Fail.
+                if(stateStartTime.msecsTo(QDateTime::currentDateTime())
+                        > WAIT_FOR_BOOTLOADER_TIMEOUT) {
+                    handleProgrammerError("Didn't detect a bootloader, something went wrong!");
+                    return;
+                }
+
+                processTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
+                return;
             }
+
             if(postResetTapes.length() > 1) {
                 qWarning() << "Too many bootloaders, something is amiss.";
             }
@@ -193,7 +153,7 @@ void AnimationUploader::doWork() {
 
             // Try to create a new programmer by connecting to the port
             if(!programmer.openSerial(postResetTapes.at(0))) {
-                qCritical() << "could not connect to programmer!";
+                handleProgrammerError("could not connect to programmer!");
                 return;
             }
             else {

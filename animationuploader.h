@@ -59,16 +59,19 @@ private:
         State_Finished,
     };
 
+    /// Timer that fires
     QTimer *processTimer;
 
     float progress;        // TODO: deleteme?
 
-    State state;            // The state that we just completed
+    /// Time that we transitioned into the current state
+    QDateTime stateStartTime;
 
+    /// Current command state
+    State state;
+
+    // Update any listeners with the latest progress
     void updateProgress(int newProgress);
-
-    /// Intermediate variables used during states
-    QList<QSerialPortInfo> preResetTapes;  // List of BlinkyTapes existant before the target one was reset. Used as a mask.
 
     AvrProgrammer programmer;
 

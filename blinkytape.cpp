@@ -7,12 +7,14 @@
 // TODO: Support a method for loading these from preferences file
 QList<QSerialPortInfo> BlinkyTape::findBlinkyTapes()
 {
+    QList<QSerialPortInfo> serialPorts = QSerialPortInfo::availablePorts();
     QList<QSerialPortInfo> tapes;
 
-    // TODO: Should we use VID/PID here instead of descriptions?
-    // Maybe it's not the most important thing in the world.
-    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
-        // Only connect to know BlinkyTapes
+    foreach (const QSerialPortInfo &info, serialPorts) {
+        qDebug() << "VID:" << info.vendorIdentifier()
+                 << "PID:" << info.productIdentifier();
+
+        // Only connect to known BlinkyTapes
         if(info.vendorIdentifier() == BLINKYTAPE_SKETCH_VID
            && info.productIdentifier() == BLINKYTAPE_SKETCH_PID) {
             tapes.push_back(info);
@@ -30,13 +32,14 @@ QList<QSerialPortInfo> BlinkyTape::findBlinkyTapes()
 // TODO: Support a method for loading these from preferences file
 QList<QSerialPortInfo> BlinkyTape::findBlinkyTapeBootloaders()
 {
+    QList<QSerialPortInfo> serialPorts = QSerialPortInfo::availablePorts();
     QList<QSerialPortInfo> tapes;
-    // TODO: Should we use VID/PID here instead of descriptions?
-    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
-        qDebug() << info.productIdentifier();
-        qDebug() << info.vendorIdentifier();
 
-        // Only connect to know BlinkyTapes
+    foreach (const QSerialPortInfo &info, serialPorts) {
+        qDebug() << "VID:" << info.vendorIdentifier()
+                 << "PID:" << info.productIdentifier();
+
+        // Only connect to known BlinkyTapes
         if(info.vendorIdentifier() == BLINKYTAPE_BOOTLOADER_VID
            && info.productIdentifier() == BLINKYTAPE_BOOTLOADER_PID) {
             tapes.push_back(info);
