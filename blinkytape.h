@@ -47,14 +47,29 @@ public:
     void reset();
 
 private:
+    /// Serial port the BlinkyTape is connected to
     QSerialPort* serial;
+
+    // Number of LEDs on the BlinkyTape
     int ledCount;
+
+#if defined(Q_OS_WIN)
+    // Windows only: Timer that periodically checks if the serial device is
+    // still present (it seems to disappear without sending an error?)
+    // Handle this by periodically scanning for available BlinkyTapes, and
+    // close this one if it no longer in the list
+    // TODO: Pull the latest QtSerialPort, it seems to have a fix for this
+    QTimer *connectionScannerTimer;
+#endif
 
 signals:
     void connectionStatusChanged(bool status);
 
 private slots:
     void handleSerialError(QSerialPort::SerialPortError error);
+
+    // TODO: Windows only
+    void handleConnectionScannerTimer();
 
 };
 

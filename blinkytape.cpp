@@ -4,6 +4,9 @@
 
 #include <cmath>
 
+/// Interval between scans to see if the device is still connected
+#define CONNECTION_SCANNER_INTERVAL 100
+
 // TODO: Support a method for loading these from preferences file
 QList<QSerialPortInfo> BlinkyTape::findBlinkyTapes()
 {
@@ -11,9 +14,6 @@ QList<QSerialPortInfo> BlinkyTape::findBlinkyTapes()
     QList<QSerialPortInfo> tapes;
 
     foreach (const QSerialPortInfo &info, serialPorts) {
-        qDebug() << "VID:" << info.vendorIdentifier()
-                 << "PID:" << info.productIdentifier();
-
         // Only connect to known BlinkyTapes
         if(info.vendorIdentifier() == BLINKYTAPE_SKETCH_VID
            && info.productIdentifier() == BLINKYTAPE_SKETCH_PID) {
@@ -36,9 +36,6 @@ QList<QSerialPortInfo> BlinkyTape::findBlinkyTapeBootloaders()
     QList<QSerialPortInfo> tapes;
 
     foreach (const QSerialPortInfo &info, serialPorts) {
-        qDebug() << "VID:" << info.vendorIdentifier()
-                 << "PID:" << info.productIdentifier();
-
         // Only connect to known BlinkyTapes
         if(info.vendorIdentifier() == BLINKYTAPE_BOOTLOADER_VID
            && info.productIdentifier() == BLINKYTAPE_BOOTLOADER_PID) {
@@ -69,6 +66,10 @@ BlinkyTape::BlinkyTape(QObject *parent, int ledCount_) :
     ledCount = ledCount_;
 
     serial = NULL;
+
+#if defined(Q_OS_WIN)
+    connectionScannerTimer = new QTimer(this);
+#endif
 }
 
 void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
@@ -90,6 +91,33 @@ void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
         close();
     }
 }
+
+#if defined(Q_OS_WIN)
+void BlinkyTape::handleConnectionScannerTimer() {
+    // If we are already disconnected, disregard.
+    if(serial == NULL) {
+        return;
+    }
+
+    // Check if our serial port is on the list
+    QSerialPortInfo currentInfo = QSerialPortInfo(*serial);
+
+    QList<QSerialPortInfo> tapes = findBlinkyTapes();
+    foreach (const QSerialPortInfo &info, tapes) {
+        // If we get a match, reset the timer and return.
+        // We consider it a match if the port is the same on both
+        if(info.portName() == currentInfo.portName()) {
+            connectionScannerTimer->singleShot(CONNECTION_SCANNER_INTERVAL,
+                                               this,
+                                               SLOT(handleConnectionScannerTimer()));
+            return;
+        }
+    }
+
+    // We seem to have lost our port, bail
+    close();
+}
+#endif
 
 bool BlinkyTape::open(QSerialPortInfo info) {
     if(serial == NULL) {
@@ -113,6 +141,13 @@ bool BlinkyTape::open(QSerialPortInfo info) {
     }
 
     emit(connectionStatusChanged(true));
+
+#if defined(Q_OS_WIN)
+    // Schedule the connection scanner
+    connectionScannerTimer->singleShot(CONNECTION_SCANNER_INTERVAL,
+                                       this,
+                                       SLOT(handleConnectionScannerTimer()));
+#endif
     return true;
 }
 
