@@ -152,7 +152,7 @@ void AnimationUploader::doWork() {
 
             // Wait one extra timer cycle, to give the bootloader some time to come on board
             if(waitOneMore) {
-                waitOneMore == false;
+                waitOneMore = false;
                 processTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
             }
 
