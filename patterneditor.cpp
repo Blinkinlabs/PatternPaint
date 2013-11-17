@@ -56,10 +56,8 @@ void PatternEditor::init(int width, int height)
     setMouseTracking(true);
 
     // Set the widget size
-    setMinimumHeight(pattern.height()*yScale);
-    setMaximumHeight(pattern.height()*yScale);
-    setMinimumWidth(pattern.width()*xScale);
-//    setMaximumWidth(pattern.width()*xScale);  // Disable max width until we can hook window resizing up properly
+    setFixedSize(pattern.width()*xScale,pattern.height()*yScale);
+    updateGeometry();
 
     update();
 }
