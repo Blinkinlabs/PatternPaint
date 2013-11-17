@@ -40,7 +40,7 @@ SystemInformation::SystemInformation(QWidget *parent) :
     case QSysInfo::WV_WINDOWS8:
         osName = "Windows 8";
         break;
-    default
+    default:
         osName = "Windows (Unknown Version)";
         break;
     }

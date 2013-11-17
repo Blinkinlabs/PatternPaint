@@ -4,7 +4,7 @@
 #include <qDebug>
 
 // Amount of time, in ms, to wait after resetting the device before looking for it
-#define RESET_WAIT_INTERVAL 2000
+#define RESET_WAIT_INTERVAL 5000
 
 // Longest time, in ms, that we will wait for a signal before we cancel this process.
 #define MAX_TIMER_INTERVAL 3000

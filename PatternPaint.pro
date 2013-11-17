@@ -41,8 +41,14 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     systeminformation.ui
 
-# OS X only
+# OS X icon (TODO: Try removing to make sure it has an effect)
 ICON = images/blinkytape.icns
+
+# Windows icon
+RC_FILE += app.rc
 
 RESOURCES += \
     images.qrc
+
+OTHER_FILES += \
+    app.rc

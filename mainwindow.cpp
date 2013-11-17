@@ -20,8 +20,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // TODO: should this go somewhere else?
     qSetMessagePattern("%{type} %{function}: %{message}");
 
+    // Windows only?
     // TODO: Run on windows to see if this works
-    setWindowIcon(QIcon(":/resources/images/blinkytape.jpg"));
+//    setWindowIcon(QIcon(":/resources/images/blinkytape.ico"));
 
     // TODO: Standard init in QWidget we can override instead?
     ui->patternEditor->init(DEFAULT_ANIMATION_LENGTH,BLINKYTAPE_STRIP_HEIGHT);
