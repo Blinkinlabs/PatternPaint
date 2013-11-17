@@ -22,6 +22,11 @@ struct CRGB leds[LED_COUNT];
 
 #endif
 
+#define BRIGHT_STEP_COUNT 5
+uint8_t brightnesSteps[BRIGHT_STEP_COUNT] = {5,15,40,70,93};
+uint8_t brightness = 4;
+uint8_t lastButtonState = 1;
+
 Animation pov;
 
 int frameDelay = 30; // Number of ms each frame should be displayed.
@@ -32,8 +37,10 @@ void setup()
 
   LEDS.addLeds<WS2811, LED_OUT, GRB>(leds, LED_COUNT);
   LEDS.showColor(CRGB(0, 0, 0));
-  LEDS.setBrightness(93); // Limit max current draw to 1A
+  LEDS.setBrightness(brightnesSteps[brightness]);
   LEDS.show();
+  
+  pinMode(BUTTON_IN, INPUT_PULLUP);
   
   // Read the animation data from the end of the program memory, and construct a new Animation from it.
   int frameCount;
@@ -55,7 +62,7 @@ void setup()
   frameDelay = (pgm_read_byte(FRAME_DELAY_ADDRESS    ) << 8)
              + (pgm_read_byte(FRAME_DELAY_ADDRESS + 1));
              
-    pov.init(frameCount, frameData, ENCODING_NONE, LED_COUNT);
+  pov.init(frameCount, frameData, ENCODING_NONE, LED_COUNT);
 }
 
 
@@ -109,6 +116,14 @@ void loop()
   if(Serial.available() > 0) {
     serialLoop();
   }
+  
+  // Check if the brightness should be adjusted
+  uint8_t buttonState = digitalRead(BUTTON_IN);
+  if((buttonState != lastButtonState) && (buttonState == 0)) {
+    brightness = (brightness + 1) % BRIGHT_STEP_COUNT;
+    LEDS.setBrightness(brightnesSteps[brightness]);
+  }
+  lastButtonState = buttonState;
   
   pov.draw(leds);
   // TODO: More sophisticated wait loop to get constant framerate.
