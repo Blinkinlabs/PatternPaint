@@ -79,6 +79,9 @@ private:
     QByteArray metadata;
 
     QByteArray responseData;    // Response data left over.
+
+    // TODO: Delete me?
+    bool waitOneMore; // BS variable to delay connection to bootloader by 1 timer cycle
 };
 
 #endif // ANIMATIONUPLOADER_H

@@ -115,6 +115,7 @@ void AnimationUploader::startUpload(BlinkyTape& tape, QByteArray animation, int 
     // Now, start the polling processes to detect a new bootloader
     stateStartTime = QDateTime::currentDateTime();
     state = State_WaitForBootloaderPort;
+    waitOneMore = true;
     processTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
 }
 
@@ -147,6 +148,12 @@ void AnimationUploader::doWork() {
 
             if(postResetTapes.length() > 1) {
                 qWarning() << "Too many bootloaders, something is amiss.";
+            }
+
+            // Wait one extra timer cycle, to give the bootloader some time to come on board
+            if(waitOneMore) {
+                waitOneMore == false;
+                processTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
             }
 
             qDebug() << "Bootloader waiting on: " << postResetTapes.at(0).portName();
