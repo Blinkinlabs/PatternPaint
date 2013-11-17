@@ -137,7 +137,7 @@ void MainWindow::on_animationPlayPause_clicked()
     }
 }
 
-void MainWindow::on_actionOpen_Animation_triggered()
+void MainWindow::on_actionLoad_Animation_triggered()
 {
     // TODO: Add a simple image gallery thing instead of this, and push
     // this to 'import' and 'export'
@@ -177,7 +177,7 @@ void MainWindow::on_actionExit_triggered()
     this->close();
 }
 
-void MainWindow::on_uploadButton_clicked()
+void MainWindow::on_uploadAnimation_clicked()
 {
     if(!(tape->isConnected())) {
         return;
@@ -211,11 +211,11 @@ void MainWindow::on_tapeConnectionStatusChanged(bool connected)
     qDebug() << "status changed, connected=" << connected;
     if(connected) {
         ui->tapeConnectDisconnect->setText("Disconnect");
-        ui->uploadButton->setEnabled(true);
+        ui->uploadAnimation->setEnabled(true);
     }
     else {
         ui->tapeConnectDisconnect->setText("Connect");
-        ui->uploadButton->setEnabled(false);
+        ui->uploadAnimation->setEnabled(false);
     }
 }
 
@@ -263,4 +263,15 @@ void MainWindow::on_uploaderFinished(bool result)
             tape->open(tapes[0]);
         }
     }
+}
+
+
+void MainWindow::on_saveAnimation_clicked()
+{
+    on_actionSave_Animation_triggered();
+}
+
+void MainWindow::on_loadAnimation_clicked()
+{
+    on_actionLoad_Animation_triggered();
 }

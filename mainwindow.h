@@ -25,7 +25,7 @@ private slots:
 
     void drawTimer_timeout();
 
-    void on_actionOpen_Animation_triggered();
+    void on_actionLoad_Animation_triggered();
 
     void on_actionSave_Animation_triggered();
 
@@ -39,13 +39,17 @@ private slots:
 
     void on_animationPlayPause_clicked();
 
-    void on_uploadButton_clicked();
-
     void on_tapeConnectionStatusChanged(bool connected);
 
     void on_uploaderProgressChanged(int progress);
 
     void on_uploaderFinished(bool result);
+
+    void on_uploadAnimation_clicked();
+
+    void on_saveAnimation_clicked();
+
+    void on_loadAnimation_clicked();
 
 private:
     Ui::MainWindow *ui;
