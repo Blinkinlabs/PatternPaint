@@ -68,9 +68,9 @@ signals:
 private slots:
     void handleSerialError(QSerialPort::SerialPortError error);
 
-    // TODO: Windows only
+#if defined(Q_OS_WIN)
     void handleConnectionScannerTimer();
-
+#endif
 };
 
 #endif // BLINKYTAPE_H
