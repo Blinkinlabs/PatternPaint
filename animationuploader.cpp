@@ -154,6 +154,7 @@ void AnimationUploader::doWork() {
             if(waitOneMore) {
                 waitOneMore = false;
                 processTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
+                return;
             }
 
             qDebug() << "Bootloader waiting on: " << postResetTapes.at(0).portName();
