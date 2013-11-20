@@ -43,17 +43,22 @@ void setup()
   pinMode(BUTTON_IN, INPUT_PULLUP);
   
   // Read the animation data from the end of the program memory, and construct a new Animation from it.
-  int frameCount;
+  uint8_t  encodingType;
+  uint16_t frameCount;
+  
   prog_uint8_t* frameData;
 
   // These could be whereever, but need to agree with Processing.
-  #define CONTROL_DATA_ADDRESS (0x7000 - 6)
-  #define FRAME_DATA_ADDRESS   (CONTROL_DATA_ADDRESS)
-  #define FRAME_COUNT_ADDRESS  (CONTROL_DATA_ADDRESS + 2)
-  #define FRAME_DELAY_ADDRESS  (CONTROL_DATA_ADDRESS + 4)
+  #define CONTROL_DATA_ADDRESS  (0x7000 - 7)
+  #define ENCODING_TYPE_ADDRESS (CONTROL_DATA_ADDRESS    )
+  #define FRAME_DATA_ADDRESS    (CONTROL_DATA_ADDRESS + 1)
+  #define FRAME_COUNT_ADDRESS   (CONTROL_DATA_ADDRESS + 3)
+  #define FRAME_DELAY_ADDRESS   (CONTROL_DATA_ADDRESS + 5)
+
+  encodingType = pgm_read_byte(ENCODING_TYPE_ADDRESS);
 
   frameData  =
-  (prog_uint8_t*)((pgm_read_byte(FRAME_DATA_ADDRESS    ) << 8)
+  (prog_uint8_t*)((pgm_read_byte(FRAME_DATA_ADDRESS      ) << 8)
                   + (pgm_read_byte(FRAME_DATA_ADDRESS + 1)));
                
   frameCount = (pgm_read_byte(FRAME_COUNT_ADDRESS    ) << 8)
@@ -62,7 +67,7 @@ void setup()
   frameDelay = (pgm_read_byte(FRAME_DELAY_ADDRESS    ) << 8)
              + (pgm_read_byte(FRAME_DELAY_ADDRESS + 1));
              
-  pov.init(frameCount, frameData, ENCODING_NONE, LED_COUNT);
+  pov.init(frameCount, frameData, encodingType, LED_COUNT);
 }
 
 

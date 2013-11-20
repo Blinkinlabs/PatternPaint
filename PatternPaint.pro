@@ -23,20 +23,20 @@ SOURCES += main.cpp\
     blinkytape.cpp \
     patterneditor.cpp \
     colorpicker.cpp \
-    ledwriter.cpp \
     avrprogrammer.cpp \
     animationuploader.cpp \
-    systeminformation.cpp
+    systeminformation.cpp \
+    animation.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
     patterneditor.h \
     colorpicker.h \
-    ledwriter.h \
     avrprogrammer.h \
     animationuploader.h \
     PatternPlayer_Sketch.h \
-    systeminformation.h
+    systeminformation.h \
+    animation.h
 
 FORMS    += mainwindow.ui \
     systeminformation.ui

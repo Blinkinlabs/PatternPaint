@@ -62,7 +62,7 @@ void AnimationUploader::updateProgress(int newProgress) {
     emit(progressChanged(progress));
 }
 
-void AnimationUploader::startUpload(BlinkyTape& tape, QByteArray animation, int frameRate) {
+void AnimationUploader::startUpload(BlinkyTape& tape, Animation animation) {
     updateProgress(0);
 
     // We can't reset if we weren't already connected...
@@ -79,21 +79,22 @@ void AnimationUploader::startUpload(BlinkyTape& tape, QByteArray animation, int 
 
     // Next, append the image data to it
     // TODO: Compress the animation
-    sketch += animation;
+    sketch += animation.data;
 
     // Finally, write the metadata about the animation to the end of flash
     metadata = QByteArray(FLASH_MEMORY_PAGE_SIZE, 0xFF); // TODO: Connect this to the block size
+    metadata[metadata.length()-7] = (animation.encoding) & 0xFF;
     metadata[metadata.length()-6] = (PATTERNPLAYER_LENGTH >> 8) & 0xFF;
     metadata[metadata.length()-5] = (PATTERNPLAYER_LENGTH     ) & 0xFF;
-    metadata[metadata.length()-4] = ((animation.length()/3/60) >> 8) & 0xFF;
-    metadata[metadata.length()-3] = ((animation.length()/3/60)     ) & 0xFF;
-    metadata[metadata.length()-2] = (1000/frameRate >> 8) & 0xFF;
-    metadata[metadata.length()-1] = (1000/frameRate     ) & 0xFF;
+    metadata[metadata.length()-4] = (animation.frameCount >> 8) & 0xFF;
+    metadata[metadata.length()-3] = (animation.frameCount     ) & 0xFF;
+    metadata[metadata.length()-2] = (animation.frameDelay >> 8) & 0xFF;
+    metadata[metadata.length()-1] = (animation.frameDelay     ) & 0xFF;
 
     char buff[100];
     snprintf(buff, 100, "Sketch size: %iB, animation size: %iB, metadata size: %iB",
              PATTERNPLAYER_LENGTH,
-             animation.length(),
+             animation.data.length(),
              metadata.length());
     qDebug() << buff;
 

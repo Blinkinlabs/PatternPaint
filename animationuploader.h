@@ -1,6 +1,7 @@
 #include <QObject>
 #include <QTimer>
 #include <iostream>
+#include "animation.h"
 #include "avrprogrammer.h"
 #include "blinkytape.h"
 
@@ -29,7 +30,7 @@ public:
 
     // Start an upload, using the passed blinkytape as a launching point
     // Note that the blinkytape will be disconnected during the upload process.
-    void startUpload(BlinkyTape& tape, QByteArray animation, int frameRate);
+    void startUpload(BlinkyTape& tape, Animation animation);
 
 signals:
     // Sends an update about the upload progress, from 0 to 1

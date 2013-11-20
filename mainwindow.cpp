@@ -1,4 +1,4 @@
-#include "ledwriter.h"
+#include "animation.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <systeminformation.h>
@@ -183,23 +183,28 @@ void MainWindow::on_uploadAnimation_clicked()
         return;
     }
 
-    // Convert the animation into a QByteArray
-    // The RGB encoder just stores the data as R,G,B over and over again.
-    QImage animation =  ui->patternEditor->getPattern();
+    // Convert the current pattern into an Animation
+    QImage pattern =  ui->patternEditor->getPattern();
 
-    QByteArray ledData;
-    QImage img = ui->patternEditor->getPattern();
+//        QByteArray ledData;
+//        QImage img = ui->patternEditor->getPattern();
 
-    for(int frame = 0; frame < animation.width(); frame++) {
-        for(int pixel = 0; pixel < animation.height(); pixel++) {
-            QRgb color = BlinkyTape::correctBrightness(img.pixel(frame, pixel));
-            ledData.append(qRed(color));
-            ledData.append(qGreen(color));
-            ledData.append(qBlue(color));
-        }
-    }
+//        for(int frame = 0; frame < animation.width(); frame++) {
+//            for(int pixel = 0; pixel < animation.height(); pixel++) {
+//                QRgb color = BlinkyTape::correctBrightness(img.pixel(frame, pixel));
+//                ledData.append(qRed(color));
+//                ledData.append(qGreen(color));
+//                ledData.append(qBlue(color));
+//            }
+//        }
 
-    uploader->startUpload(*tape, ledData,ui->animationSpeed->value());
+//     uploader->startUpload(*tape, ledData, ui->animationSpeed->value());
+
+    // Note: Converting frameRate to frame delay here.
+    Animation animation(pattern,
+                        1000/ui->animationSpeed->value(),
+                        Animation::Encoding_RGB565_RLE);
+    uploader->startUpload(*tape, animation);
 
     progress->setValue(progress->minimum());
     progress->show();
