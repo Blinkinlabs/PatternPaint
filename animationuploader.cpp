@@ -1,7 +1,7 @@
 #include "animationuploader.h"
 #include "PatternPlayer_Sketch.h"
 
-#include <qDebug>
+#include <QDebug>
 
 /// Interval between polling the serial port list for new devices
 #define WAIT_FOR_BOOTLOADER_POLL_INTERVAL 200
