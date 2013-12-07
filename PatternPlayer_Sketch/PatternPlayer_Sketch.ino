@@ -110,9 +110,6 @@ void serialLoop() {
   }
 }
 
-int led = 13;
-
-
 void loop()
 {
   // If'n we get some data, switch to passthrough mode

@@ -186,20 +186,6 @@ void MainWindow::on_uploadAnimation_clicked()
     // Convert the current pattern into an Animation
     QImage pattern =  ui->patternEditor->getPattern();
 
-//        QByteArray ledData;
-//        QImage img = ui->patternEditor->getPattern();
-
-//        for(int frame = 0; frame < animation.width(); frame++) {
-//            for(int pixel = 0; pixel < animation.height(); pixel++) {
-//                QRgb color = BlinkyTape::correctBrightness(img.pixel(frame, pixel));
-//                ledData.append(qRed(color));
-//                ledData.append(qGreen(color));
-//                ledData.append(qBlue(color));
-//            }
-//        }
-
-//     uploader->startUpload(*tape, ledData, ui->animationSpeed->value());
-
     // Note: Converting frameRate to frame delay here.
     Animation animation(pattern,
                         1000/ui->animationSpeed->value(),
@@ -210,6 +196,38 @@ void MainWindow::on_uploadAnimation_clicked()
     progress->show();
 
 }
+
+void MainWindow::on_actionExport_animation_for_Arduino_triggered()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,
+        tr("Save Animation for Arduino"), "animation.h", tr("Header File (*.h)"));
+
+    if(fileName.length() == 0) {
+        return;
+    }
+
+    // Convert the current pattern into an Animation
+    QImage pattern =  ui->patternEditor->getPattern();
+
+    // Note: Converting frameRate to frame delay here.
+    Animation animation(pattern,
+                        1000/ui->animationSpeed->value(),
+                        Animation::Encoding_RGB565_RLE);
+
+
+    // Attempt to open the specified file
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        QMessageBox::warning(this, tr("Error"), tr("Error, cannot write file %1.")
+                       .arg(fileName));
+        return;
+    }
+
+    QTextStream ts(&file);
+    ts << animation.header;
+    file.close();
+}
+
 
 void MainWindow::on_tapeConnectionStatusChanged(bool connected)
 {

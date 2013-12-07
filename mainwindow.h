@@ -51,6 +51,8 @@ private slots:
 
     void on_loadAnimation_clicked();
 
+    void on_actionExport_animation_for_Arduino_triggered();
+
 private:
     Ui::MainWindow *ui;
 
