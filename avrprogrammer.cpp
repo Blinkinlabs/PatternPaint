@@ -225,6 +225,12 @@ void AvrProgrammer::writeFlash(QByteArray& data, int startAddress) {
         return;
     }
 
+    // Pad the data length to an even number, since we can only write word-sized chunks
+    if(data.length() % 2 == 1) {
+        qDebug() << "Data length falls on a byte boundary, padding to a word boundary";
+        data.append(0xff);
+    }
+
     // TODO: Check that we fit into available memory.
 
     setAddress(startAddress);
@@ -238,7 +244,7 @@ void AvrProgrammer::writeFlash(QByteArray& data, int startAddress) {
         int currentChunkSize = std::min(PAGE_SIZE_BYTES, data.length() - currentChunkPosition);
 
         QByteArray command;
-        command.append('B'); // command: read memory
+        command.append('B'); // command: write memory
         command.append((currentChunkSize >> 8) & 0xFF); // read size (high)
         command.append((currentChunkSize)      & 0xFF); // read size (low)
         command.append('F'); // memory type: flash
