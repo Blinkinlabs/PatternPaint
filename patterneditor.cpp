@@ -12,13 +12,13 @@ PatternEditor::PatternEditor(QWidget *parent) :
 {
 }
 
-void PatternEditor::init(int width, int height)
+void PatternEditor::init(int frameCount, int stripLength)
 {
     xScale = 7;  // How big we want to make it
     yScale = 6;  // How big we want to make it
 
     // Make a color image as default
-    pattern = QImage(width,height,QImage::Format_RGB32);
+    pattern = QImage(frameCount,stripLength,QImage::Format_RGB32);
     pattern.fill(0);
 //    float phase = 0;
 //    for(int x = 0; x < pattern.width();x++) {
@@ -33,7 +33,7 @@ void PatternEditor::init(int width, int height)
 //    }
 
     // And make a grid pattern to superimpose over the image
-    gridPattern = QImage(width*xScale+1,height*yScale+1,QImage::Format_ARGB32);
+    gridPattern = QImage(frameCount*xScale+1,stripLength*yScale+1,QImage::Format_ARGB32);
     gridPattern.fill(QColor(0,0,0,0));
 
     QPainter painter(&gridPattern);
@@ -46,7 +46,7 @@ void PatternEditor::init(int width, int height)
         painter.drawLine(x*xScale-1,0,x*xScale-1,pattern.height()*yScale-1);
     }
 
-    toolPreview = QImage(width,height,QImage::Format_ARGB32);
+    toolPreview = QImage(frameCount,stripLength,QImage::Format_ARGB32);
     toolPreview.fill(QColor(0,0,0,0));
 
     toolColor = QColor(255,255,255);
@@ -62,25 +62,16 @@ void PatternEditor::init(int width, int height)
     update();
 }
 
-bool PatternEditor::init(QString fileName) {
-    // TODO: How to handle stuff that's not the right size?
-    // Right now we just take the top part, could resize instead.
-    QImage newPattern;
-
-    if(!newPattern.load(fileName)) {
-        return false;
-    }
+bool PatternEditor::init(QImage newPattern, bool scaled) {
+    // TODO: Implement 'save' check before overwriting?
 
     // If the pattern doesn't fit, scale it.
     // TODO: Display an import dialog to let the user decide what to do?
-    if(newPattern.height() > BLINKYTAPE_STRIP_HEIGHT) {
+    if(scaled && newPattern.height() != BLINKYTAPE_STRIP_HEIGHT) {
         newPattern = newPattern.scaledToHeight(BLINKYTAPE_STRIP_HEIGHT);
     }
 
-    // TODO: Implement 'save' check?
-
     init(newPattern.width(),BLINKYTAPE_STRIP_HEIGHT);
-    pattern.fill(QColor(0,0,0));
 
     QPainter painter(&pattern);
     painter.drawImage(0,0,newPattern);

@@ -149,8 +149,16 @@ void MainWindow::on_actionLoad_Animation_triggered()
         return;
     }
 
-    // TODO: Test if the file exists?
-    ui->patternEditor->init(fileName);
+    QImage animation;
+
+    // TODO: How to handle stuff that's not the right size?
+    // Right now we always resize, could offer to crop, center, etc instead.
+    if(!animation.load(fileName)) {
+        qDebug() << "Error loading animation file " << fileName;
+        return;
+    }
+
+    ui->patternEditor->init(animation);
 }
 
 void MainWindow::on_actionSave_Animation_triggered()
@@ -308,4 +316,18 @@ void MainWindow::on_actionVisit_the_BlinkyTape_forum_triggered()
 void MainWindow::on_actionTroubleshooting_tips_triggered()
 {
     QDesktopServices::openUrl(QUrl("http://blinkinlabs.com/blinkytape/docs/troubleshooting/", QUrl::TolerantMode));
+}
+
+void MainWindow::on_actionFlip_Horizontal_triggered()
+{
+    // TODO: This in a less hacky way?
+    QImage pattern =  ui->patternEditor->getPattern();
+    ui->patternEditor->init(pattern.mirrored(true, false));
+}
+
+void MainWindow::on_actionFlip_Vertical_triggered()
+{
+    // TODO: This in a less hacky way?
+    QImage pattern =  ui->patternEditor->getPattern();
+    ui->patternEditor->init(pattern.mirrored(false, true));
 }

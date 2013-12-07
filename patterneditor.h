@@ -9,11 +9,15 @@ class PatternEditor : public QWidget
 public:
     explicit PatternEditor(QWidget *parent = 0);
 
-    // TODO: Destructor to release pattern
+    /// Re-initialze the animation editor as a blank image with the given size
+    /// @param frameCount Number of frames in this animation
+    /// @param stripLength Number of LEDs in this strip
+    void init(int frameCount, int stripLength);
 
-    void init(int width, int height);
-
-    bool init(QString fileName);
+    /// Initialize the animation editor using a QImage as the new animation
+    /// @param newPattern New animation to load
+    /// @param scaled If true, scale the image to match the height of the tape
+    bool init(QImage newPattern, bool scaled = true);
 
     QImage getPattern() { return pattern; }
 

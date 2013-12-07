@@ -57,6 +57,10 @@ private slots:
 
     void on_actionTroubleshooting_tips_triggered();
 
+    void on_actionFlip_Horizontal_triggered();
+
+    void on_actionFlip_Vertical_triggered();
+
 private:
     Ui::MainWindow *ui;
 

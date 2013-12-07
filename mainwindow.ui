@@ -307,7 +307,15 @@
     <addaction name="actionVisit_the_BlinkyTape_forum"/>
     <addaction name="actionTroubleshooting_tips"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionFlip_Horizontal"/>
+    <addaction name="actionFlip_Vertical"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuHelp"/>
   </widget>
   <action name="actionLoad_Animation">
@@ -363,6 +371,22 @@
   <action name="actionTroubleshooting_tips">
    <property name="text">
     <string>Troubleshooting tips</string>
+   </property>
+  </action>
+  <action name="actionFlip_Horizontal">
+   <property name="text">
+    <string>Flip Horizontal</string>
+   </property>
+   <property name="toolTip">
+    <string>Flip the Animation in the horizontal direction</string>
+   </property>
+  </action>
+  <action name="actionFlip_Vertical">
+   <property name="text">
+    <string>Flip Vertical</string>
+   </property>
+   <property name="toolTip">
+    <string>Flip the Animation in the vertical direction</string>
    </property>
   </action>
  </widget>
