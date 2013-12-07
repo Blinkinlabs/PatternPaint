@@ -53,6 +53,10 @@ private slots:
 
     void on_actionExport_animation_for_Arduino_triggered();
 
+    void on_actionVisit_the_BlinkyTape_forum_triggered();
+
+    void on_actionTroubleshooting_tips_triggered();
+
 private:
     Ui::MainWindow *ui;
 

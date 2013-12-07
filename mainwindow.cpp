@@ -6,6 +6,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDebug>
+#include <QDesktopServices>
 
 // TODO: Change this when we connect to a tape, etc?
 #define BLINKYTAPE_STRIP_HEIGHT 60
@@ -297,4 +298,14 @@ void MainWindow::on_saveAnimation_clicked()
 void MainWindow::on_loadAnimation_clicked()
 {
     on_actionLoad_Animation_triggered();
+}
+
+void MainWindow::on_actionVisit_the_BlinkyTape_forum_triggered()
+{
+    QDesktopServices::openUrl(QUrl("http://forums.blinkinlabs.com/", QUrl::TolerantMode));
+}
+
+void MainWindow::on_actionTroubleshooting_tips_triggered()
+{
+    QDesktopServices::openUrl(QUrl("http://blinkinlabs.com/blinkytape/docs/troubleshooting/", QUrl::TolerantMode));
 }

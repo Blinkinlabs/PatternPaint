@@ -302,8 +302,10 @@
      <string>Help</string>
     </property>
     <addaction name="actionAbout"/>
-    <addaction name="separator"/>
     <addaction name="actionSystem_Information"/>
+    <addaction name="separator"/>
+    <addaction name="actionVisit_the_BlinkyTape_forum"/>
+    <addaction name="actionTroubleshooting_tips"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuHelp"/>
@@ -351,6 +353,16 @@
   <action name="actionExport_animation_for_Arduino">
    <property name="text">
     <string>Export animation for Arduino</string>
+   </property>
+  </action>
+  <action name="actionVisit_the_BlinkyTape_forum">
+   <property name="text">
+    <string>Visit the BlinkyTape forum</string>
+   </property>
+  </action>
+  <action name="actionTroubleshooting_tips">
+   <property name="text">
+    <string>Troubleshooting tips</string>
    </property>
   </action>
  </widget>
