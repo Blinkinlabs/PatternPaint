@@ -65,6 +65,8 @@ private slots:
 
     void on_actionSave_to_Tape_triggered();
 
+    void on_actionClear_Animation_triggered();
+
 private:
     Ui::MainWindow *ui;
 

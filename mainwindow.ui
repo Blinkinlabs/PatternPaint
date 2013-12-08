@@ -318,6 +318,8 @@
     </property>
     <addaction name="actionFlip_Horizontal"/>
     <addaction name="actionFlip_Vertical"/>
+    <addaction name="separator"/>
+    <addaction name="actionClear_Animation"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -411,6 +413,11 @@
   <action name="actionSave_to_Tape">
    <property name="text">
     <string>Save to Tape</string>
+   </property>
+  </action>
+  <action name="actionClear_Animation">
+   <property name="text">
+    <string>Clear Animation</string>
    </property>
   </action>
  </widget>

@@ -309,6 +309,7 @@ void MainWindow::on_actionTroubleshooting_tips_triggered()
 void MainWindow::on_actionFlip_Horizontal_triggered()
 {
     // TODO: This in a less hacky way?
+    // TODO: Undo/redo
     QImage pattern =  ui->animationEditor->getPattern();
     ui->animationEditor->init(pattern.mirrored(true, false));
 }
@@ -316,8 +317,18 @@ void MainWindow::on_actionFlip_Horizontal_triggered()
 void MainWindow::on_actionFlip_Vertical_triggered()
 {
     // TODO: This in a less hacky way?
+    // TODO: Undo/redo
     QImage pattern =  ui->animationEditor->getPattern();
     ui->animationEditor->init(pattern.mirrored(false, true));
+}
+
+void MainWindow::on_actionClear_Animation_triggered()
+{
+    // TODO: This in a less hacky way?
+    // TODO: Undo/redo
+    QImage pattern =  ui->animationEditor->getPattern();
+    pattern.fill(0);
+    ui->animationEditor->init(pattern);
 }
 
 void MainWindow::on_actionLoad_rainbow_sketch_triggered()
@@ -352,3 +363,4 @@ void MainWindow::on_actionSave_to_Tape_triggered()
     progress->setValue(progress->minimum());
     progress->show();
 }
+
