@@ -202,26 +202,31 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="loadAnimation">
+          <widget class="QPushButton" name="loadFile">
            <property name="text">
             <string>Load File</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="saveAnimation">
+          <widget class="QPushButton" name="saveFile">
            <property name="text">
             <string>Save File</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="uploadAnimation">
+          <widget class="QPushButton" name="saveToTape">
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="font">
+            <font>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
            <property name="text">
-            <string>Upload</string>
+            <string>Save to Tape</string>
            </property>
           </widget>
          </item>
@@ -290,8 +295,8 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionLoad_Animation"/>
-    <addaction name="actionSave_Animation"/>
+    <addaction name="actionLoad_File"/>
+    <addaction name="actionSave_File"/>
     <addaction name="separator"/>
     <addaction name="actionExport_animation_for_Arduino"/>
     <addaction name="separator"/>
@@ -318,6 +323,8 @@
     <property name="title">
      <string>Tools</string>
     </property>
+    <addaction name="actionSave_to_Tape"/>
+    <addaction name="separator"/>
     <addaction name="actionLoad_rainbow_sketch"/>
    </widget>
    <addaction name="menuFile"/>
@@ -325,9 +332,9 @@
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
   </widget>
-  <action name="actionLoad_Animation">
+  <action name="actionLoad_File">
    <property name="text">
-    <string>Load Animation</string>
+    <string>Load File</string>
    </property>
    <property name="iconText">
     <string>Open</string>
@@ -339,9 +346,9 @@
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="actionSave_Animation">
+  <action name="actionSave_File">
    <property name="text">
-    <string>Save Animation</string>
+    <string>Save File</string>
    </property>
    <property name="iconText">
     <string>Save</string>
@@ -398,7 +405,12 @@
   </action>
   <action name="actionLoad_rainbow_sketch">
    <property name="text">
-    <string>Load rainbow sketch</string>
+    <string>Restore Rainbow Sketch</string>
+   </property>
+  </action>
+  <action name="actionSave_to_Tape">
+   <property name="text">
+    <string>Save to Tape</string>
    </property>
   </action>
  </widget>
@@ -421,7 +433,7 @@
   <tabstop>penSize</tabstop>
   <tabstop>animationPlayPause</tabstop>
   <tabstop>animationSpeed</tabstop>
-  <tabstop>uploadAnimation</tabstop>
+  <tabstop>saveToTape</tabstop>
   <tabstop>tapeConnectDisconnect</tabstop>
  </tabstops>
  <resources/>

@@ -6,6 +6,7 @@
 #include <QSerialPortInfo>
 #include <QSysInfo>
 #include <QLibraryInfo>
+#include <QtWidgetsDepends>
 
 SystemInformation::SystemInformation(QWidget *parent) :
     QDialog(parent),
@@ -99,4 +100,17 @@ SystemInformation::SystemInformation(QWidget *parent) :
 SystemInformation::~SystemInformation()
 {
     delete ui;
+}
+
+void SystemInformation::on_copyToClipboard_clicked()
+{
+    QClipboard *clip = QApplication::clipboard();
+    QString input = ui->infoBrowser->toPlainText();
+    clip->setText(input);
+}
+
+void SystemInformation::on_sendToSupport_clicked()
+{
+    QString input = ui->infoBrowser->toPlainText();
+    QDesktopServices::openUrl(QUrl("http://forums.blinkinlabs.com/", QUrl::TolerantMode));
 }

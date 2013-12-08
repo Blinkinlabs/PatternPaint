@@ -70,8 +70,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Pre-set the upload progress dialog
     progress = new QProgressDialog(this);
-    progress->setWindowTitle("Uploader");
-    progress->setLabelText("Uploading animation to BlinkyTape...");
+    progress->setWindowTitle("BlinkyTape exporter");
+    progress->setLabelText("Saving animation to BlinkyTape...");
     progress->setMinimum(0);
     progress->setMaximum(150);
     progress->setWindowModality(Qt::WindowModal);
@@ -141,7 +141,7 @@ void MainWindow::on_animationPlayPause_clicked()
     }
 }
 
-void MainWindow::on_actionLoad_Animation_triggered()
+void MainWindow::on_actionLoad_File_triggered()
 {
     // TODO: Add a simple image gallery thing instead of this, and push
     // this to 'import' and 'export'
@@ -164,7 +164,7 @@ void MainWindow::on_actionLoad_Animation_triggered()
     ui->animationEditor->init(animation);
 }
 
-void MainWindow::on_actionSave_Animation_triggered()
+void MainWindow::on_actionSave_File_triggered()
 {
     //TODO: Track if we already had an open file to enable this, add save as?
 
@@ -189,24 +189,9 @@ void MainWindow::on_actionExit_triggered()
     this->close();
 }
 
-void MainWindow::on_uploadAnimation_clicked()
+void MainWindow::on_saveToTape_clicked()
 {
-    if(!(tape->isConnected())) {
-        return;
-    }
-
-    // Convert the current pattern into an Animation
-    QImage pattern =  ui->animationEditor->getPattern();
-
-    // Note: Converting frameRate to frame delay here.
-    Animation animation(pattern,
-                        1000/ui->animationSpeed->value(),
-                        Animation::Encoding_RGB565_RLE);
-    uploader->startUpload(*tape, animation);
-
-    progress->setValue(progress->minimum());
-    progress->show();
-
+    on_actionSave_to_Tape_triggered();
 }
 
 void MainWindow::on_actionExport_animation_for_Arduino_triggered()
@@ -246,11 +231,11 @@ void MainWindow::on_tapeConnectionStatusChanged(bool connected)
     qDebug() << "status changed, connected=" << connected;
     if(connected) {
         ui->tapeConnectDisconnect->setText("Disconnect");
-        ui->uploadAnimation->setEnabled(true);
+        ui->saveToTape->setEnabled(true);
     }
     else {
         ui->tapeConnectDisconnect->setText("Connect");
-        ui->uploadAnimation->setEnabled(false);
+        ui->saveToTape->setEnabled(false);
     }
 }
 
@@ -301,14 +286,14 @@ void MainWindow::on_uploaderFinished(bool result)
 }
 
 
-void MainWindow::on_saveAnimation_clicked()
+void MainWindow::on_saveFile_clicked()
 {
-    on_actionSave_Animation_triggered();
+    on_actionSave_File_triggered();
 }
 
-void MainWindow::on_loadAnimation_clicked()
+void MainWindow::on_loadFile_clicked()
 {
-    on_actionLoad_Animation_triggered();
+    on_actionLoad_File_triggered();
 }
 
 void MainWindow::on_actionVisit_the_BlinkyTape_forum_triggered()
@@ -344,6 +329,25 @@ void MainWindow::on_actionLoad_rainbow_sketch_triggered()
     // TODO: So close!
     QByteArray sketch = QByteArray(ColorSwirlSketch,COLORSWIRL_LENGTH);
     uploader->startUpload(*tape, sketch);
+
+    progress->setValue(progress->minimum());
+    progress->show();
+}
+
+void MainWindow::on_actionSave_to_Tape_triggered()
+{
+    if(!(tape->isConnected())) {
+        return;
+    }
+
+    // Convert the current pattern into an Animation
+    QImage pattern =  ui->animationEditor->getPattern();
+
+    // Note: Converting frameRate to frame delay here.
+    Animation animation(pattern,
+                        1000/ui->animationSpeed->value(),
+                        Animation::Encoding_RGB565_RLE);
+    uploader->startUpload(*tape, animation);
 
     progress->setValue(progress->minimum());
     progress->show();

@@ -15,6 +15,9 @@ public:
     explicit SystemInformation(QWidget *parent = 0);
     ~SystemInformation();
 
+private slots:
+    void on_copyToClipboard_clicked();
+
 private:
     Ui::SystemInformation *ui;
 };

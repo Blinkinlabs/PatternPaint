@@ -25,9 +25,9 @@ private slots:
 
     void drawTimer_timeout();
 
-    void on_actionLoad_Animation_triggered();
+    void on_actionLoad_File_triggered();
 
-    void on_actionSave_Animation_triggered();
+    void on_actionSave_File_triggered();
 
     void on_actionExit_triggered();
 
@@ -45,11 +45,11 @@ private slots:
 
     void on_uploaderFinished(bool result);
 
-    void on_uploadAnimation_clicked();
+    void on_saveToTape_clicked();
 
-    void on_saveAnimation_clicked();
+    void on_saveFile_clicked();
 
-    void on_loadAnimation_clicked();
+    void on_loadFile_clicked();
 
     void on_actionExport_animation_for_Arduino_triggered();
 
@@ -62,6 +62,8 @@ private slots:
     void on_actionFlip_Vertical_triggered();
 
     void on_actionLoad_rainbow_sketch_triggered();
+
+    void on_actionSave_to_Tape_triggered();
 
 private:
     Ui::MainWindow *ui;
