@@ -63,16 +63,16 @@ private slots:
 
 private:
     struct Command {
-        Command(QString name,
-                QByteArray command,
-                QByteArray expectedResponse) :
-            commandName(name),
-            commandData(command),
-            expectedResponseData(expectedResponse) {}
+        Command(QString name_,
+                QByteArray command_,
+                QByteArray expectedResponse_) :
+            name(name_),
+            data(command_),
+            expectedResponse(expectedResponse_) {}
 
-        QString commandName;
-        QByteArray commandData;
-        QByteArray expectedResponseData;
+        QString name;
+        QByteArray data;
+        QByteArray expectedResponse;
     };
 
     QSerialPort* serial;  // Serial device the programmer is attached to
@@ -83,7 +83,7 @@ private:
     QTimer *commandTimeoutTimer; // Timer fires if a command has failed to complete quickly enough
 
     // Queue a new command
-    void queueCommand(QString commandName, QByteArray commandData, QByteArray expectedResponseData);
+    void queueCommand(QString name, QByteArray data, QByteArray expectedRespone);
 
     // If there is another command in the queue, start processing it.
     void processCommandQueue();

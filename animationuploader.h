@@ -9,6 +9,15 @@
 #define ANIMATIONUPLOADER_H
 
 
+struct FlashSection {
+    FlashSection(int address_,
+                 QByteArray data_) :
+        address(address_),
+        data(data_) {}
+    int address;
+    QByteArray data;
+};
+
 // This is an re-entreant version of an animation uploader.
 // Each task in the upload process is broken into a single state, and the state
 // machine is driven forward by receiving events from the connected serial port,
@@ -30,6 +39,7 @@ public:
 
     // Start an upload, using the passed blinkytape as a launching point
     // Note that the blinkytape will be disconnected during the upload process.
+    //
     void startUpload(BlinkyTape& tape, Animation animation);
 
 signals:
@@ -76,8 +86,10 @@ private:
 
     AvrProgrammer programmer;
 
-    QByteArray sketch;
-    QByteArray metadata;
+    QQueue<FlashSection> flashData;
+
+//    QByteArray sketch;
+//    QByteArray metadata;
 
     QByteArray responseData;    // Response data left over.
 

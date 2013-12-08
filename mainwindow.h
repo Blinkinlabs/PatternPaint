@@ -61,6 +61,8 @@ private slots:
 
     void on_actionFlip_Vertical_triggered();
 
+    void on_actionLoad_rainbow_sketch_triggered();
+
 private:
     Ui::MainWindow *ui;
 

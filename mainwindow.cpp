@@ -331,3 +331,15 @@ void MainWindow::on_actionFlip_Vertical_triggered()
     QImage pattern =  ui->animationEditor->getPattern();
     ui->animationEditor->init(pattern.mirrored(false, true));
 }
+
+void MainWindow::on_actionLoad_rainbow_sketch_triggered()
+{
+//    if(!(tape->isConnected())) {
+//        return;
+//    }
+
+//    uploader->startUpload(*tape, animation);
+
+//    progress->setValue(progress->minimum());
+//    progress->show();
+}

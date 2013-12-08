@@ -75,14 +75,13 @@ void AnimationUploader::startUpload(BlinkyTape& tape, Animation animation) {
     // that we trash the firmware if there is a problem later
 
     // First, convert the sketch binary data into a qbytearray
-    sketch = QByteArray(PatternPlayerSketch,PATTERNPLAYER_LENGTH);
+    QByteArray sketch = QByteArray(PatternPlayerSketch,PATTERNPLAYER_LENGTH);
 
     // Next, append the image data to it
-    // TODO: Compress the animation
     sketch += animation.data;
 
     // Finally, write the metadata about the animation to the end of flash
-    metadata = QByteArray(FLASH_MEMORY_PAGE_SIZE, 0xFF); // TODO: Connect this to the block size
+    QByteArray metadata = QByteArray(FLASH_MEMORY_PAGE_SIZE, 0xFF);
     metadata[metadata.length()-7] = (animation.encoding) & 0xFF;
     metadata[metadata.length()-6] = (PATTERNPLAYER_LENGTH >> 8) & 0xFF;
     metadata[metadata.length()-5] = (PATTERNPLAYER_LENGTH     ) & 0xFF;
@@ -107,6 +106,10 @@ void AnimationUploader::startUpload(BlinkyTape& tape, Animation animation) {
         // Emit fail message?
         return;
     }
+
+    // Put the sketch, animation, and metadata into the programming queue.
+    flashData.push_back(FlashSection(0, sketch));
+    flashData.push_back(FlashSection(FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE, metadata));
 
     /// Attempt to reset the strip using the 1200 baud rate method, and identify the newly connected bootloader
     ///
@@ -172,10 +175,13 @@ void AnimationUploader::doWork() {
             // Send Check Device Signature command
             programmer.checkDeviceSignature();
 
-            // TODO: Break this into pieces so we can respond individually, or just send it all
-            // at once and fail gloriously?
-            programmer.writeFlash(sketch, 0);
-            programmer.writeFlash(metadata, FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE);
+            // Queue all of the flash sections to memory
+            while(!flashData.empty()) {
+                FlashSection f = flashData.front();
+                programmer.writeFlash(f.data, f.address);
+                flashData.pop_front();
+            }
+
             programmer.reset();
 
             // TODO: Read back

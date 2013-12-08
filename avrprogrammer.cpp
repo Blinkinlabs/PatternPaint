@@ -54,11 +54,11 @@ bool AvrProgrammer::isConnected() {
     return serial->isOpen();
 }
 
-void AvrProgrammer::queueCommand(QString commandName,
-                                 QByteArray commandData,
-                                 QByteArray expectedResponseData) {
+void AvrProgrammer::queueCommand(QString name,
+                                 QByteArray data,
+                                 QByteArray expectedRespone) {
 
-    commandQueue.push_back(Command(commandName, commandData, expectedResponseData));
+    commandQueue.push_back(Command(name, data, expectedRespone));
 
     // If this is the only command, start processing commands
     // TODO: Merge this with the implementation in handleReadData()
@@ -71,12 +71,12 @@ void AvrProgrammer::processCommandQueue() {
     // Note: don't call this if there is a command already running; perhaps add some state?
     responseData.clear();
 
-    qDebug() << "Command started:" << commandQueue.front().commandName;
+    qDebug() << "Command started:" << commandQueue.front().name;
     if(!isConnected()) {
         qCritical() << "Device disappeared, cannot run command";
         return;
     }
-    if(serial->write(commandQueue.front().commandData) != commandQueue.front().commandData.length()) {
+    if(serial->write(commandQueue.front().data) != commandQueue.front().data.length()) {
         qCritical() << "Error writing to device";
         return;
     }
@@ -96,26 +96,26 @@ void AvrProgrammer::handleReadData() {
 
     responseData.append(serial->readAll());
 
-    if(responseData.length() > commandQueue.front().expectedResponseData.length()) {
+    if(responseData.length() > commandQueue.front().expectedResponse.length()) {
         // TODO: error, we got unexpected data.
         qCritical() << "Got more data than we expected";
         return;
     }
 
-    if(responseData.length() < commandQueue.front().expectedResponseData.length()) {
+    if(responseData.length() < commandQueue.front().expectedResponse.length()) {
         qDebug() << "Didn't get enough data yet, so just waiting";
         return;
     }
 
     // If the command was to read from flash, short-circuit the response data check.
-    if(commandQueue.front().commandName == "readFlash") {
+    if(commandQueue.front().name == "readFlash") {
         // TODO: Test me?
         if(responseData.at(responseData.length()-1) != '\r') {
             qCritical() << "readFlash response didn't end with a \\r";
             return;
         }
     }
-    else if(responseData != commandQueue.front().expectedResponseData) {
+    else if(responseData != commandQueue.front().expectedResponse) {
         qCritical() << "Got unexpected data back";
         return;
     }
@@ -124,13 +124,13 @@ void AvrProgrammer::handleReadData() {
     commandTimeoutTimer->stop();
 
     // If the command was reset, disconnect from the programmer
-    if(commandQueue.front().commandName == "reset") {
+    if(commandQueue.front().name == "reset") {
         qDebug() << "Disconnecting from programmer";
         closeSerial();
     }
 
-    qDebug() << "Command completed successfully: " << commandQueue.front().commandName;
-    emit(commandFinished(commandQueue.front().commandName,responseData));
+    qDebug() << "Command completed successfully: " << commandQueue.front().name;
+    emit(commandFinished(commandQueue.front().name,responseData));
     commandQueue.pop_front();
 
     // Start another command, if there is one.
