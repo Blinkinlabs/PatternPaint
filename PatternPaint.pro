@@ -17,6 +17,17 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 TARGET = PatternPaint
 TEMPLATE = app
 
+#Application version
+VERSION_MAJOR = 0
+VERSION_MINOR = 2
+VERSION_BUILD = 0
+
+DEFINES += "VERSION_MAJOR=$${VERSION_MAJOR}" \
+       "VERSION_MINOR=$${VERSION_MINOR}" \
+       "VERSION_BUILD=$${VERSION_BUILD}"
+
+#Target version
+VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
 
 SOURCES += main.cpp\
         mainwindow.cpp \

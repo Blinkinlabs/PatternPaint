@@ -16,7 +16,9 @@ SystemInformation::SystemInformation(QWidget *parent) :
 
     QString osName;
 
-    report.append("Pattern Paint (Unknown version)\r");
+    report.append("Pattern Paint ");
+    report.append(QString("%1.%2.%3").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_BUILD));
+    report.append("\r");
     report.append("  Build Date: ");
     report.append(__DATE__);
     report.append(" ");
@@ -69,30 +71,21 @@ SystemInformation::SystemInformation(QWidget *parent) :
     report.append("Operating system: " + osName + "\r");
 
     report.append("QT information:\r");
-    report.append("  buildDate: " + QLibraryInfo::buildDate().toString() + "\r");
-    report.append("  licensee: " + QLibraryInfo::licensee() + "\r");
-    report.append("  path: " + QLibraryInfo::location(QLibraryInfo::LibrariesPath) + "\r");
-
-    report.append("Detected Serial Ports: \r");
-    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
-        report.append("  " + info.portName() + "\r");
-        report.append("    Manufacturer: " + info.manufacturer() + "\r");
-        report.append("    Description: " + info.description() + "\r");
-        report.append("    VID: 0x" + QString::number(info.vendorIdentifier(),16) + "\r");
-        report.append("    PID: 0x" + QString::number(info.productIdentifier(),16) + "\r");
-    }
+    report.append("  Build Date: " + QLibraryInfo::buildDate().toString() + "\r");
+    report.append("  Path: " + QLibraryInfo::location(QLibraryInfo::LibrariesPath) + "\r");
 
     report.append("Detected BlinkyTapes: \r");
     foreach (const QSerialPortInfo &info, BlinkyTape::findBlinkyTapes()) {
         report.append("  " + info.portName() + "\r");
-        report.append("    Manufacturer: " + info.manufacturer() + "\r");
-        report.append("    Description: " + info.description() + "\r");
-        report.append("    VID: 0x" + QString::number(info.vendorIdentifier(),16) + "\r");
-        report.append("    PID: 0x" + QString::number(info.productIdentifier(),16) + "\r");
     }
 
     report.append("Detected BlinkyTape Bootloaders: \r");
     foreach (const QSerialPortInfo &info, BlinkyTape::findBlinkyTapeBootloaders()) {
+        report.append("  " + info.portName() + "\r");
+    }
+
+    report.append("Detected Serial Ports: \r");
+    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
         report.append("  " + info.portName() + "\r");
         report.append("    Manufacturer: " + info.manufacturer() + "\r");
         report.append("    Description: " + info.description() + "\r");
