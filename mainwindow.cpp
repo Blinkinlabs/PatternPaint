@@ -26,14 +26,14 @@ MainWindow::MainWindow(QWidget *parent) :
 //    setWindowIcon(QIcon(":/resources/images/blinkytape.ico"));
 
     // TODO: Standard init in QWidget we can override instead?
-    ui->patternEditor->init(DEFAULT_ANIMATION_LENGTH,BLINKYTAPE_STRIP_HEIGHT);
+    ui->animationEditor->init(DEFAULT_ANIMATION_LENGTH,BLINKYTAPE_STRIP_HEIGHT);
     ui->colorPicker->init();
 
     // Our pattern editor wants to get some notifications
     connect(ui->colorPicker, SIGNAL(colorChanged(QColor)),
-            ui->patternEditor, SLOT(setToolColor(QColor)));
+            ui->animationEditor, SLOT(setToolColor(QColor)));
     connect(ui->penSize, SIGNAL(valueChanged(int)),
-            ui->patternEditor, SLOT(setToolSize(int)));
+            ui->animationEditor, SLOT(setToolSize(int)));
 
     // Now that our window is drawn, fix the vertical height so it can't be changed by the user
     // TODO: some sort of scaling instead of fixing this? A non-hack way of doing it?
@@ -82,13 +82,13 @@ MainWindow::~MainWindow()
 
 
 void MainWindow::drawTimer_timeout() {
-    // TODO: move this state to somewhere; the patterneditor class maybe?
+    // TODO: move this state to somewhere; the animationEditor class maybe?
     static int n = 0;
 
     if(tape->isConnected()) {
         QByteArray ledData;
 
-        QImage img = ui->patternEditor->getPattern();
+        QImage img = ui->animationEditor->getPattern();
         for(int i = 0; i < BLINKYTAPE_STRIP_HEIGHT; i++) {
             QRgb color = BlinkyTape::correctBrightness(img.pixel(n, i));
             ledData.append(qRed(color));
@@ -98,7 +98,7 @@ void MainWindow::drawTimer_timeout() {
         tape->sendUpdate(ledData);
 
         n = (n+1)%img.width();
-        ui->patternEditor->setPlaybackRow(n);
+        ui->animationEditor->setPlaybackRow(n);
     }
 }
 
@@ -158,7 +158,7 @@ void MainWindow::on_actionLoad_Animation_triggered()
         return;
     }
 
-    ui->patternEditor->init(animation);
+    ui->animationEditor->init(animation);
 }
 
 void MainWindow::on_actionSave_Animation_triggered()
@@ -175,7 +175,7 @@ void MainWindow::on_actionSave_Animation_triggered()
     }
 
     // TODO: Alert the user if this failed.
-    if(!ui->patternEditor->getPattern().save(fileName)) {
+    if(!ui->animationEditor->getPattern().save(fileName)) {
         QMessageBox::warning(this, tr("Error"), tr("Error, cannot write file %1.")
                        .arg(fileName));
     }
@@ -193,7 +193,7 @@ void MainWindow::on_uploadAnimation_clicked()
     }
 
     // Convert the current pattern into an Animation
-    QImage pattern =  ui->patternEditor->getPattern();
+    QImage pattern =  ui->animationEditor->getPattern();
 
     // Note: Converting frameRate to frame delay here.
     Animation animation(pattern,
@@ -216,7 +216,7 @@ void MainWindow::on_actionExport_animation_for_Arduino_triggered()
     }
 
     // Convert the current pattern into an Animation
-    QImage pattern =  ui->patternEditor->getPattern();
+    QImage pattern =  ui->animationEditor->getPattern();
 
     // Note: Converting frameRate to frame delay here.
     Animation animation(pattern,
@@ -321,13 +321,13 @@ void MainWindow::on_actionTroubleshooting_tips_triggered()
 void MainWindow::on_actionFlip_Horizontal_triggered()
 {
     // TODO: This in a less hacky way?
-    QImage pattern =  ui->patternEditor->getPattern();
-    ui->patternEditor->init(pattern.mirrored(true, false));
+    QImage pattern =  ui->animationEditor->getPattern();
+    ui->animationEditor->init(pattern.mirrored(true, false));
 }
 
 void MainWindow::on_actionFlip_Vertical_triggered()
 {
     // TODO: This in a less hacky way?
-    QImage pattern =  ui->patternEditor->getPattern();
-    ui->patternEditor->init(pattern.mirrored(false, true));
+    QImage pattern =  ui->animationEditor->getPattern();
+    ui->animationEditor->init(pattern.mirrored(false, true));
 }

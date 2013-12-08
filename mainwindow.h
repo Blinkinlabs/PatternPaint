@@ -6,7 +6,7 @@
 
 #include "blinkytape.h"
 #include "animationuploader.h"
-#include "patterneditor.h"
+#include "animationeditor.h"
 
 namespace Ui {
 class MainWindow;

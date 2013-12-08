@@ -21,22 +21,22 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     blinkytape.cpp \
-    patterneditor.cpp \
     colorpicker.cpp \
     avrprogrammer.cpp \
     animationuploader.cpp \
     systeminformation.cpp \
-    animation.cpp
+    animation.cpp \
+    animationeditor.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
-    patterneditor.h \
     colorpicker.h \
     avrprogrammer.h \
     animationuploader.h \
     PatternPlayer_Sketch.h \
     systeminformation.h \
-    animation.h
+    animation.h \
+    animationeditor.h
 
 FORMS    += mainwindow.ui \
     systeminformation.ui

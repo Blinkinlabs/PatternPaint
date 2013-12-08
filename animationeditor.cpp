@@ -1,4 +1,4 @@
-#include "patterneditor.h"
+#include "animationeditor.h"
 
 #include <iostream>
 #include <cmath>
@@ -7,12 +7,12 @@
 // TODO: Change this when we connect to a tape, etc?
 #define BLINKYTAPE_STRIP_HEIGHT 60
 
-PatternEditor::PatternEditor(QWidget *parent) :
+AnimationEditor::AnimationEditor(QWidget *parent) :
     QWidget(parent)
 {
 }
 
-void PatternEditor::init(int frameCount, int stripLength)
+void AnimationEditor::init(int frameCount, int stripLength)
 {
     xScale = 7;  // How big we want to make it
     yScale = 6;  // How big we want to make it
@@ -62,7 +62,7 @@ void PatternEditor::init(int frameCount, int stripLength)
     update();
 }
 
-bool PatternEditor::init(QImage newPattern, bool scaled) {
+bool AnimationEditor::init(QImage newPattern, bool scaled) {
     // TODO: Implement 'save' check before overwriting?
 
     // If the pattern doesn't fit, scale it.
@@ -80,7 +80,7 @@ bool PatternEditor::init(QImage newPattern, bool scaled) {
     return true;
 }
 
-void PatternEditor::mousePressEvent(QMouseEvent *event){
+void AnimationEditor::mousePressEvent(QMouseEvent *event){
     int x = event->x()/xScale;
     int y = event->y()/yScale;
 
@@ -100,14 +100,14 @@ void PatternEditor::mousePressEvent(QMouseEvent *event){
     update();
 }
 
-void PatternEditor::leaveEvent(QEvent * event) {
+void AnimationEditor::leaveEvent(QEvent * event) {
     QPainter painter(&toolPreview);
     toolPreview.fill(QColor(0,0,0,0));
 
     update();
 }
 
-void PatternEditor::mouseMoveEvent(QMouseEvent *event){
+void AnimationEditor::mouseMoveEvent(QMouseEvent *event){
     int x = event->x()/xScale;
     int y = event->y()/yScale;
 
@@ -146,20 +146,20 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
     update();
 }
 
-void PatternEditor::setToolColor(QColor color) {
+void AnimationEditor::setToolColor(QColor color) {
     toolColor = color;
 }
 
-void PatternEditor::setToolSize(int size) {
+void AnimationEditor::setToolSize(int size) {
     toolSize = size;
 }
 
-void PatternEditor::setPlaybackRow(int row) {
+void AnimationEditor::setPlaybackRow(int row) {
     playbackRow = row;
     update();
 }
 
-void PatternEditor::paintEvent(QPaintEvent * /* event */)
+void AnimationEditor::paintEvent(QPaintEvent * /* event */)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);

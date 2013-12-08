@@ -1,13 +1,13 @@
-#ifndef PATTERNEDITOR_H
-#define PATTERNEDITOR_H
+#ifndef ANIMATIONEDITOR_H
+#define ANIMATIONEDITOR_H
 
 #include <QWidget>
 
-class PatternEditor : public QWidget
+class AnimationEditor : public QWidget
 {
     Q_OBJECT
 public:
-    explicit PatternEditor(QWidget *parent = 0);
+    explicit AnimationEditor(QWidget *parent = 0);
 
     /// Re-initialze the animation editor as a blank image with the given size
     /// @param frameCount Number of frames in this animation
@@ -49,4 +49,4 @@ public slots:
     void setPlaybackRow(int row);
 };
 
-#endif // PATTERNEDITOR_H
+#endif // ANIMATIONEDITOR_H
