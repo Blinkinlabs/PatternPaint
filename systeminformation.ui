@@ -48,7 +48,7 @@
      <item>
       <widget class="QPushButton" name="sendToSupport">
        <property name="text">
-        <string>Send to support team</string>
+        <string>Submit a problem report</string>
        </property>
       </widget>
      </item>
