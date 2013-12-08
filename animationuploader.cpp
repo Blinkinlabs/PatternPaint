@@ -111,8 +111,46 @@ void AnimationUploader::startUpload(BlinkyTape& tape, Animation animation) {
     flashData.push_back(FlashSection(0, sketch));
     flashData.push_back(FlashSection(FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE, metadata));
 
-    /// Attempt to reset the strip using the 1200 baud rate method, and identify the newly connected bootloader
-    ///
+/// Attempt to reset the strip using the 1200 baud rate method, and identify the newly connected bootloader
+    // Next, tell the tape to reset.
+    tape.reset();
+
+    // Now, start the polling processes to detect a new bootloader
+    stateStartTime = QDateTime::currentDateTime();
+    state = State_WaitForBootloaderPort;
+    waitOneMore = true;
+    processTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
+}
+
+
+void AnimationUploader::startUpload(BlinkyTape& tape, QByteArray sketch) {
+    // TODO: Reconcile this with the other startUpload function.
+    updateProgress(0);
+
+    // We can't reset if we weren't already connected...
+    if(!tape.isConnected()) {
+        return;
+    }
+
+    char buff[100];
+    snprintf(buff, 100, "Sketch size: %iB",
+             sketch.length()),
+    qDebug() << buff;
+
+    // The entire sketch must fit into the available memory, minus a single page
+    // at the end of flash for the configuration header
+    // TODO: Could save ~100 bytes if we let the sketch spill into the unused portion
+    // of the header.
+    if(sketch.length() > FLASH_MEMORY_AVAILABLE) {
+        qCritical() << "sketch can't fit into memory!";
+        // Emit fail message?
+        return;
+    }
+
+    // Put the sketch, animation, and metadata into the programming queue.
+    flashData.push_back(FlashSection(0, sketch));
+
+/// Attempt to reset the strip using the 1200 baud rate method, and identify the newly connected bootloader
     // Next, tell the tape to reset.
     tape.reset();
 

@@ -8,6 +8,9 @@
 #include <QDebug>
 #include <QDesktopServices>
 
+// TODO: Move this to animation uploader or something?
+#include "ColorSwirl_Sketch.h"
+
 // TODO: Change this when we connect to a tape, etc?
 #define BLINKYTAPE_STRIP_HEIGHT 60
 #define DEFAULT_ANIMATION_LENGTH 60
@@ -334,12 +337,14 @@ void MainWindow::on_actionFlip_Vertical_triggered()
 
 void MainWindow::on_actionLoad_rainbow_sketch_triggered()
 {
-//    if(!(tape->isConnected())) {
-//        return;
-//    }
+    if(!(tape->isConnected())) {
+        return;
+    }
 
-//    uploader->startUpload(*tape, animation);
+    // TODO: So close!
+    QByteArray sketch = QByteArray(ColorSwirlSketch,COLORSWIRL_LENGTH);
+    uploader->startUpload(*tape, sketch);
 
-//    progress->setValue(progress->minimum());
-//    progress->show();
+    progress->setValue(progress->minimum());
+    progress->show();
 }

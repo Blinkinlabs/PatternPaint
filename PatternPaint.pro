@@ -36,7 +36,8 @@ HEADERS  += mainwindow.h \
     PatternPlayer_Sketch.h \
     systeminformation.h \
     animation.h \
-    animationeditor.h
+    animationeditor.h \
+    ColorSwirl_Sketch.h
 
 FORMS    += mainwindow.ui \
     systeminformation.ui

@@ -35,12 +35,19 @@ class AnimationUploader : public QObject
 public:
     AnimationUploader(QObject *parent=0);
 
-    // TODO: Destructor that gets rid of stuff
-
-    // Start an upload, using the passed blinkytape as a launching point
-    // Note that the blinkytape will be disconnected during the upload process.
-    //
+    /// Start an upload, using the passed blinkytape as a launching point
+    /// Note that the blinkytape will be disconnected during the upload process,
+    /// and will need to be reconnected manually afterwards.
+    /// @param tape BlinkyTape to upload to (must already be connected)
+    /// @param animation Animation to upload to the BlinkyTape
     void startUpload(BlinkyTape& tape, Animation animation);
+
+    /// Start an upload, using the passed blinkytape as a launching point
+    /// Note that the blinkytape will be disconnected during the upload process,
+    /// and will need to be reconnected manually afterwards.
+    /// @param tape BlinkyTape to upload to (must already be connected)
+    /// @param sketch Sketch to upload to the BlinkyTape
+    void startUpload(BlinkyTape& tape, QByteArray sketch);
 
 signals:
     // Sends an update about the upload progress, from 0 to 1
@@ -86,10 +93,7 @@ private:
 
     AvrProgrammer programmer;
 
-    QQueue<FlashSection> flashData;
-
-//    QByteArray sketch;
-//    QByteArray metadata;
+    QQueue<FlashSection> flashData; // Queue of memory sections to write
 
     QByteArray responseData;    // Response data left over.
 
