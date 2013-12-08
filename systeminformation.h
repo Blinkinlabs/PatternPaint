@@ -18,6 +18,8 @@ public:
 private slots:
     void on_copyToClipboard_clicked();
 
+    void on_sendToSupport_clicked();
+
 private:
     Ui::SystemInformation *ui;
 };
