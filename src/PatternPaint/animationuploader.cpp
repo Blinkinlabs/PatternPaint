@@ -62,12 +62,12 @@ void AnimationUploader::updateProgress(int newProgress) {
     emit(progressChanged(progress));
 }
 
-void AnimationUploader::startUpload(BlinkyTape& tape, Animation animation) {
+bool AnimationUploader::startUpload(BlinkyTape& tape, Animation animation) {
     updateProgress(0);
 
     // We can't reset if we weren't already connected...
     if(!tape.isConnected()) {
-        return;
+        return false;
     }
 
 /// Create the compressed image and check if it will fit into the device memory
@@ -104,7 +104,7 @@ void AnimationUploader::startUpload(BlinkyTape& tape, Animation animation) {
     if(sketch.length() + metadata.length() > FLASH_MEMORY_AVAILABLE) {
         qCritical() << "sketch can't fit into memory!";
         // Emit fail message?
-        return;
+        return false;
     }
 
     // Put the sketch, animation, and metadata into the programming queue.
@@ -120,16 +120,17 @@ void AnimationUploader::startUpload(BlinkyTape& tape, Animation animation) {
     state = State_WaitForBootloaderPort;
     waitOneMore = true;
     processTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
+    return true;
 }
 
 
-void AnimationUploader::startUpload(BlinkyTape& tape, QByteArray sketch) {
+bool AnimationUploader::startUpload(BlinkyTape& tape, QByteArray sketch) {
     // TODO: Reconcile this with the other startUpload function.
     updateProgress(0);
 
     // We can't reset if we weren't already connected...
     if(!tape.isConnected()) {
-        return;
+        return false;
     }
 
     char buff[100];
@@ -144,7 +145,7 @@ void AnimationUploader::startUpload(BlinkyTape& tape, QByteArray sketch) {
     if(sketch.length() > FLASH_MEMORY_AVAILABLE) {
         qCritical() << "sketch can't fit into memory!";
         // Emit fail message?
-        return;
+        return false;
     }
 
     // Put the sketch, animation, and metadata into the programming queue.
@@ -159,6 +160,7 @@ void AnimationUploader::startUpload(BlinkyTape& tape, QByteArray sketch) {
     state = State_WaitForBootloaderPort;
     waitOneMore = true;
     processTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
+    return true;
 }
 
 

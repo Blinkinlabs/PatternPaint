@@ -1,5 +1,5 @@
 #include "animation.h"
-#include "blinkytape.h"
+#include "colormodel.h"
 
 Animation::Animation(QImage image_, int frameDelay_, Encoding encoding_) :
     image(image_),
@@ -36,7 +36,7 @@ void Animation::encodeImageRGB16_RLE() {
         int runCount = 0;
 
         for(int pixel = 0; pixel < image.height(); pixel++) {
-            QRgb color = BlinkyTape::correctBrightness(image.pixel(frame, pixel));
+            QRgb color = ColorModel::correctBrightness(image.pixel(frame, pixel));
 
             int decimatedColor = QRgbTo565(color);
 
@@ -95,7 +95,7 @@ void Animation::encodeImageRGB24() {
 
     for(int frame = 0; frame < image.width(); frame++) {
         for(int pixel = 0; pixel < image.height(); pixel++) {
-            QRgb color = BlinkyTape::correctBrightness(image.pixel(frame, pixel));
+            QRgb color = ColorModel::correctBrightness(image.pixel(frame, pixel));
             data.append(qRed(color));
             data.append(qGreen(color));
             data.append(qBlue(color));

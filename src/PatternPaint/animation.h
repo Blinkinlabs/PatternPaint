@@ -16,7 +16,7 @@ public:
     };
 
     // Create an animation from a QImage
-    Animation(QImage image_, int frameDelay_, Encoding encoding_ = Encoding_RGB24);
+    Animation(QImage image_, int frameDelay_, Encoding encoding_);
 
     // TODO: create an animation from byte array
 

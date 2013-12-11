@@ -5,8 +5,6 @@
 #include <QList>
 #include <QtSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
-#include <QColor>
-
 
 /// Some defines that should go into a processor-specific class
 #define FLASH_MEMORY_AVAILABLE 0x7000  // Amount of application space in the flash
@@ -29,7 +27,6 @@ class BlinkyTape : public QObject
 public:
     static QList<QSerialPortInfo> findBlinkyTapes();
     static QList<QSerialPortInfo> findBlinkyTapeBootloaders();
-    static QRgb correctBrightness(QRgb uncorrected);
 
     BlinkyTape(QObject *parent = 0, int ledCount = 60);
 

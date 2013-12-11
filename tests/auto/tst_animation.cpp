@@ -19,18 +19,24 @@ AnimationTest::AnimationTest()
 {
 }
 
+// Really just to see if the test framework works
 void AnimationTest::testInitializesMembers()
 {
-//    int expectedFrameDelay = 123;
-//    int expectedFrameCount = 34;
-//    int expectedLedCount = 12;
-//    Animation::Encoding expectedEncoding = Animation::Encoding_RGB24;
+    int expectedFrameDelay = 123;
+    int expectedFrameCount = 34;
+    int expectedLedCount = 12;
+    Animation::Encoding expectedEncoding = Animation::Encoding_RGB24;
 
-//    QImage image = QImage(expectedLedCount,expectedFrameCount,QImage::Format_RGB32);
+    QImage image = QImage(expectedFrameCount,expectedLedCount,QImage::Format_RGB32);
 
-//    Animation animation = Animation(image, expectedFrameDelay, expectedEncoding);
+    Animation animation = Animation(image, expectedFrameDelay, expectedEncoding);
 
-    QVERIFY2(false, "Failure");
+    QVERIFY(animation.frameDelay == expectedFrameDelay);
+    QVERIFY(animation.frameCount == expectedFrameCount);
+    QVERIFY(animation.ledCount == expectedLedCount);
+    QVERIFY(animation.encoding == expectedEncoding);
+
+
 }
 
 QTEST_APPLESS_MAIN(AnimationTest)

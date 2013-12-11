@@ -2,8 +2,6 @@
 #include "blinkytape.h"
 #include <QDebug>
 
-#include <cmath>
-
 /// Interval between scans to see if the device is still connected
 #define CONNECTION_SCANNER_INTERVAL 100
 
@@ -51,14 +49,6 @@ QList<QSerialPortInfo> BlinkyTape::findBlinkyTapeBootloaders()
     return tapes;
 }
 
-QRgb BlinkyTape::correctBrightness(QRgb uncorrected)
-{
-    return qRgb(
-        int(255*pow(qRed(  uncorrected)/255.0, 1.8)),
-        int(255*pow(qGreen(uncorrected)/255.0, 1.8)),
-        int(255*pow(qBlue( uncorrected)/255.0, 2.1))
-        );
-}
 
 BlinkyTape::BlinkyTape(QObject *parent, int ledCount_) :
     QObject(parent)

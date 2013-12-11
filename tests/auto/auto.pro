@@ -19,4 +19,5 @@ SOURCES += \
 # Include the PatternPaint project
 INCLUDEPATH += ../../src .
 
-#SOURCES += ../../src/PatternPaint/animation.cpp
+SOURCES += ../../src/PatternPaint/animation.cpp \
+            ../../src/PatternPaint/colormodel.cpp \

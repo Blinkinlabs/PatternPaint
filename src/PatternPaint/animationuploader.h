@@ -40,14 +40,14 @@ public:
     /// and will need to be reconnected manually afterwards.
     /// @param tape BlinkyTape to upload to (must already be connected)
     /// @param animation Animation to upload to the BlinkyTape
-    void startUpload(BlinkyTape& tape, Animation animation);
+    bool startUpload(BlinkyTape& tape, Animation animation);
 
     /// Start an upload, using the passed blinkytape as a launching point
     /// Note that the blinkytape will be disconnected during the upload process,
     /// and will need to be reconnected manually afterwards.
     /// @param tape BlinkyTape to upload to (must already be connected)
     /// @param sketch Sketch to upload to the BlinkyTape
-    void startUpload(BlinkyTape& tape, QByteArray sketch);
+    bool startUpload(BlinkyTape& tape, QByteArray sketch);
 
 signals:
     // Sends an update about the upload progress, from 0 to 1
