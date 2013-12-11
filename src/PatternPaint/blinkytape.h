@@ -7,6 +7,7 @@
 #include <QtSerialPort/QSerialPortInfo>
 #include <QColor>
 
+
 /// Some defines that should go into a processor-specific class
 #define FLASH_MEMORY_AVAILABLE 0x7000  // Amount of application space in the flash
 #define FLASH_MEMORY_PAGE_SIZE 0x80    // Size of a page of memory in our flash

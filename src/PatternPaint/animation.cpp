@@ -1,14 +1,13 @@
 #include "animation.h"
 #include "blinkytape.h"
 
-Animation::Animation(QImage image_, int frameDelay_, Encoding encoding_)
+Animation::Animation(QImage image_, int frameDelay_, Encoding encoding_) :
+    image(image_),
+    frameDelay(frameDelay_),
+    encoding(encoding_)
 {
-    image = image_;
-    frameDelay = frameDelay_;
-    encoding = encoding_;
     frameCount = image.width();
     ledCount = image.height();
-
 
     // Create a new encoder
     switch(encoding) {
