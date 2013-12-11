@@ -1,7 +1,9 @@
 #include "animation.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <systeminformation.h>
+#include "colormodel.h"
+#include "systeminformation.h"
+#include "aboutpatternpaint.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -93,7 +95,7 @@ void MainWindow::drawTimer_timeout() {
 
         QImage img = ui->animationEditor->getPattern();
         for(int i = 0; i < BLINKYTAPE_STRIP_HEIGHT; i++) {
-            QRgb color = BlinkyTape::correctBrightness(img.pixel(n, i));
+            QRgb color = ColorModel::correctBrightness(img.pixel(n, i));
             ledData.append(qRed(color));
             ledData.append(qGreen(color));
             ledData.append(qBlue(color));
@@ -241,11 +243,9 @@ void MainWindow::on_tapeConnectionStatusChanged(bool connected)
 
 void MainWindow::on_actionAbout_triggered()
 {
-    QMessageBox::about(this, "Pattern Paint",
-                       "<b>PatternPaint</b> is companion software for the BlinkyTape. "
-                       "It allows you to create animations for your BlinkyTape in "
-                       "real-time, and save your designs to the BlinkyTape for "
-                       "playback on-the-go.");
+    // TODO: store this somewhere, for later disposal.
+    AboutPatternPaint* info = new AboutPatternPaint(this);
+    info->show();
 }
 
 void MainWindow::on_actionSystem_Information_triggered()
@@ -337,7 +337,6 @@ void MainWindow::on_actionLoad_rainbow_sketch_triggered()
         return;
     }
 
-    // TODO: So close!
     QByteArray sketch = QByteArray(ColorSwirlSketch,COLORSWIRL_LENGTH);
     uploader->startUpload(*tape, sketch);
 
@@ -358,7 +357,10 @@ void MainWindow::on_actionSave_to_Tape_triggered()
     Animation animation(pattern,
                         1000/ui->animationSpeed->value(),
                         Animation::Encoding_RGB565_RLE);
-    uploader->startUpload(*tape, animation);
+
+    if(!uploader->startUpload(*tape, animation)) {
+        return;
+    }
 
     progress->setValue(progress->minimum());
     progress->show();
