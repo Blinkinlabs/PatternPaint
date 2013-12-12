@@ -68,6 +68,8 @@ private slots:
 
     void on_actionClear_Animation_triggered();
 
+    void on_actionResize_Animation_triggered();
+
 private:
     Ui::MainWindow *ui;
 

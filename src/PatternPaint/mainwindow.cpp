@@ -4,11 +4,13 @@
 #include "colormodel.h"
 #include "systeminformation.h"
 #include "aboutpatternpaint.h"
+#include "resizeanimation.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDebug>
 #include <QDesktopServices>
+#include <QtWidgets>
 
 // TODO: Move this to animation uploader or something?
 #include "ColorSwirl_Sketch.h"
@@ -376,3 +378,33 @@ void MainWindow::on_actionSave_to_Tape_triggered()
     progressDialog->show();
 }
 
+
+void MainWindow::on_actionResize_Animation_triggered()
+{
+    int animationLength = ui->animationEditor->getPattern().width();
+
+    // TODO: Dispose of this?
+    ResizeAnimation* resizer = new ResizeAnimation(this);
+    resizer->setWindowModality(Qt::WindowModal);
+    resizer->setLength(animationLength);
+    resizer->exec();
+
+    if(resizer->result() != QDialog::Accepted) {
+        return;
+    }
+
+    int newLength = resizer->length();
+    if(newLength > 0) {
+        qDebug() << "Resizing Animation to length: " << resizer->length();
+        // TODO: This in a non-hacky way
+        QImage originalAnimation = ui->animationEditor->getPattern();
+        QImage newAnimation(newLength, originalAnimation.height(),QImage::Format_RGB32);
+
+        newAnimation.fill(QColor(0,0,0,0));
+
+        QPainter painter(&newAnimation);
+        painter.drawImage(0,0,originalAnimation);
+
+        ui->animationEditor->init(newAnimation);
+    }
+}
