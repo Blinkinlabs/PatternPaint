@@ -71,13 +71,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     // Pre-set the upload progress dialog
-    progress = new QProgressDialog(this);
-    progress->setWindowTitle("BlinkyTape exporter");
-    progress->setLabelText("Saving animation to BlinkyTape...");
-    progress->setMinimum(0);
-    progress->setMaximum(150);
-    progress->setWindowModality(Qt::WindowModal);
-    progress->setAutoClose(false);
+    progressDialog = new QProgressDialog(this);
+    progressDialog->setWindowTitle("BlinkyTape exporter");
+    progressDialog->setLabelText("Saving animation to BlinkyTape...");
+    progressDialog->setMinimum(0);
+    progressDialog->setMaximum(150);
+    progressDialog->setWindowModality(Qt::WindowModal);
+    progressDialog->setAutoClose(false);
+
+    errorMessageDialog = new QMessageBox(this);
+    errorMessageDialog->setWindowModality(Qt::WindowModal);
 }
 
 MainWindow::~MainWindow()
@@ -257,19 +260,24 @@ void MainWindow::on_actionSystem_Information_triggered()
 
 void MainWindow::on_uploaderProgressChanged(int progressValue)
 {
-    // Clip the progress to maximum, until we work out a better way to estimate it.
-    if(progressValue >= progress->maximum()) {
-        progressValue = progress->maximum() - 1;
+    if(progressDialog->isHidden()) {
+        qDebug() << "Got a progress event while the progress dialog is hidden, event order problem?";
+        return;
     }
 
-    progress->setValue(progressValue);
+    // Clip the progress to maximum, until we work out a better way to estimate it.
+    if(progressValue >= progressDialog->maximum()) {
+        progressValue = progressDialog->maximum() - 1;
+    }
+
+    progressDialog->setValue(progressValue);
 }
 
 void MainWindow::on_uploaderFinished(bool result)
 {
     qDebug() << "Uploader finished! Result:" << result;
 
-    progress->hide();
+    progressDialog->hide();
 
     // Reconnect to the BlinkyTape
     if(!tape->isConnected()) {
@@ -340,8 +348,8 @@ void MainWindow::on_actionLoad_rainbow_sketch_triggered()
     QByteArray sketch = QByteArray(ColorSwirlSketch,COLORSWIRL_LENGTH);
     uploader->startUpload(*tape, sketch);
 
-    progress->setValue(progress->minimum());
-    progress->show();
+    progressDialog->setValue(progressDialog->minimum());
+    progressDialog->show();
 }
 
 void MainWindow::on_actionSave_to_Tape_triggered()
@@ -359,10 +367,12 @@ void MainWindow::on_actionSave_to_Tape_triggered()
                         Animation::Encoding_RGB565_RLE);
 
     if(!uploader->startUpload(*tape, animation)) {
+        errorMessageDialog->setText(uploader->getErrorString());
+        errorMessageDialog->show();
         return;
     }
 
-    progress->setValue(progress->minimum());
-    progress->show();
+    progressDialog->setValue(progressDialog->minimum());
+    progressDialog->show();
 }
 

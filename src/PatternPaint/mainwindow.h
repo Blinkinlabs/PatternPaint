@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QProgressDialog>
+#include <QMessageBox>
 
 #include "blinkytape.h"
 #include "animationuploader.h"
@@ -41,7 +42,7 @@ private slots:
 
     void on_tapeConnectionStatusChanged(bool connected);
 
-    void on_uploaderProgressChanged(int progress);
+    void on_uploaderProgressChanged(int progressDialog);
 
     void on_uploaderFinished(bool result);
 
@@ -71,9 +72,11 @@ private:
     Ui::MainWindow *ui;
 
     QTimer *drawTimer;
-    QProgressDialog* progress;
     BlinkyTape* tape;
     AnimationUploader* uploader;
+
+    QProgressDialog* progressDialog;
+    QMessageBox* errorMessageDialog;
 };
 
 #endif // MAINWINDOW_H

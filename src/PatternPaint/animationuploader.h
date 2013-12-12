@@ -10,10 +10,11 @@
 
 
 struct FlashSection {
-    FlashSection(int address_,
-                 QByteArray data_) :
-        address(address_),
-        data(data_) {}
+    FlashSection(int address,
+                 QByteArray data) :
+        address(address),
+        data(data) {}
+
     int address;
     QByteArray data;
 };
@@ -32,6 +33,7 @@ struct FlashSection {
 class AnimationUploader : public QObject
 {
     Q_OBJECT
+
 public:
     AnimationUploader(QObject *parent=0);
 
@@ -48,6 +50,9 @@ public:
     /// @param tape BlinkyTape to upload to (must already be connected)
     /// @param sketch Sketch to upload to the BlinkyTape
     bool startUpload(BlinkyTape& tape, QByteArray sketch);
+
+    /// Get a string describing the last error, if any.
+    QString getErrorString() const;
 
 signals:
     // Sends an update about the upload progress, from 0 to 1
@@ -82,6 +87,8 @@ private:
 
     float progress;        // TODO: deleteme?
 
+    QString errorString;
+
     /// Time that we transitioned into the current state
     QDateTime stateStartTime;
 
@@ -94,8 +101,6 @@ private:
     AvrProgrammer programmer;
 
     QQueue<FlashSection> flashData; // Queue of memory sections to write
-
-    QByteArray responseData;    // Response data left over.
 
     // TODO: Delete me?
     bool waitOneMore; // BS variable to delay connection to bootloader by 1 timer cycle

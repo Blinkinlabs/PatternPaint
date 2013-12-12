@@ -7,6 +7,7 @@ namespace Ui {
 class AboutPatternPaint;
 }
 
+/// Simple dialog box to explain what PatternPaint is.
 class AboutPatternPaint : public QDialog
 {
     Q_OBJECT

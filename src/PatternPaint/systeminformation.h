@@ -7,6 +7,7 @@ namespace Ui {
 class SystemInformation;
 }
 
+/// Give some information about the user's system, possible helpful when debugging an issue.
 class SystemInformation : public QDialog
 {
     Q_OBJECT

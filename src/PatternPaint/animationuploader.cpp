@@ -67,6 +67,7 @@ bool AnimationUploader::startUpload(BlinkyTape& tape, Animation animation) {
 
     // We can't reset if we weren't already connected...
     if(!tape.isConnected()) {
+        errorString = "Not connected to a tape, cannot upload again";
         return false;
     }
 
@@ -102,8 +103,11 @@ bool AnimationUploader::startUpload(BlinkyTape& tape, Animation animation) {
     // TODO: Could save ~100 bytes if we let the sketch spill into the unused portion
     // of the header.
     if(sketch.length() + metadata.length() > FLASH_MEMORY_AVAILABLE) {
-        qCritical() << "sketch can't fit into memory!";
-        // Emit fail message?
+        qDebug() << "sketch can't fit into memory!";
+
+        errorString = QString("Sorry! The Animation is a bit too big to fit in BlinkyTape memory right now. We're working on improving this! Avaiable space=%1, Animation size=%2")
+                              .arg(FLASH_MEMORY_AVAILABLE)
+                              .arg(sketch.length() + metadata.length());
         return false;
     }
 
@@ -130,6 +134,7 @@ bool AnimationUploader::startUpload(BlinkyTape& tape, QByteArray sketch) {
 
     // We can't reset if we weren't already connected...
     if(!tape.isConnected()) {
+        errorString = "Not connected to a tape, cannot upload again";
         return false;
     }
 
@@ -143,8 +148,11 @@ bool AnimationUploader::startUpload(BlinkyTape& tape, QByteArray sketch) {
     // TODO: Could save ~100 bytes if we let the sketch spill into the unused portion
     // of the header.
     if(sketch.length() > FLASH_MEMORY_AVAILABLE) {
-        qCritical() << "sketch can't fit into memory!";
-        // Emit fail message?
+        qDebug() << "sketch can't fit into memory!";
+
+        errorString = QString("Sorry! The Animation is a bit too big to fit in BlinkyTape memory right now. We're working on improving this! Avaiable space=%1, Animation size=%2")
+                .arg(FLASH_MEMORY_AVAILABLE)
+                .arg(sketch.length());
         return false;
     }
 
@@ -161,6 +169,11 @@ bool AnimationUploader::startUpload(BlinkyTape& tape, QByteArray sketch) {
     waitOneMore = true;
     processTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
     return true;
+}
+
+QString AnimationUploader::getErrorString() const
+{
+    return errorString;
 }
 
 
