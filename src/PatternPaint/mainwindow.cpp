@@ -216,7 +216,7 @@ void MainWindow::on_actionExport_animation_for_Arduino_triggered()
     // Note: Converting frameRate to frame delay here.
     Animation animation(pattern,
                         1000/ui->animationSpeed->value(),
-                        Animation::INDEXED);
+                        Animation::INDEXED_RLE);
 
 
     // Attempt to open the specified file
@@ -366,7 +366,9 @@ void MainWindow::on_actionSave_to_Tape_triggered()
     // Note: Converting frameRate to frame delay here.
     Animation animation(pattern,
                         1000/ui->animationSpeed->value(),
-                        Animation::INDEXED);
+                        Animation::INDEXED_RLE);
+
+    // TODO: Attempt different compressions till one works.
 
     qDebug() << "Color count: " << animation.colorCount();
 

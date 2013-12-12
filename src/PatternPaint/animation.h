@@ -14,6 +14,7 @@ public:
         RGB24       = 0,     /// RGB24 mode (uncompressed 24 bit)
         RGB565_RLE  = 1,     /// RGB 565 + RLE mode (compressed 16 bit)
         INDEXED     = 2,     /// 8-bit indexed mode (pallated 8 bit)
+        INDEXED_RLE = 3,
     };
 
     // Create an animation from a QImage
@@ -38,10 +39,10 @@ private:
     // decimation.
     int QRgbTo565(QRgb color);
 
-    // Encode the image using the RGB24 format
     void encodeImageRGB24();
     void encodeImageRGB16_RLE();
     void encodeImageIndexed();
+    void encodeImageIndexed_RLE();
 };
 
 

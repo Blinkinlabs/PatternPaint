@@ -22,6 +22,9 @@ Animation::Animation(QImage image, int frameDelay, Encoding encoding) :
     case INDEXED:
         encodeImageIndexed();
         break;
+    case INDEXED_RLE:
+        encodeImageIndexed_RLE();
+        break;
     }
 }
 
@@ -188,3 +191,92 @@ void Animation::encodeImageIndexed() {
 
     qDebug() << "Animation size:" << data.length();
 }
+
+void Animation::encodeImageIndexed_RLE() {
+    header.clear();
+    data.clear();
+
+    // First, convert to an indexed format. This should be non-destructive
+    // if the image had fewer than 256 colors.
+    QImage indexed = image.convertToFormat(
+                QImage::Format_Indexed8,
+                Qt::AutoColor & Qt::AvoidDither);
+    qDebug() << "Original color count:" << colorCount();
+    qDebug() << "Indexed color count: " << indexed.colorCount();
+
+    header.append("const PROGMEM prog_uint8_t animationData[]  = {\n");
+
+    // Record the length of the color table
+    header.append("// Length of the color table - 1, in bytes. length: 1 byte\n");
+    header.append(QString(" %1,\n")
+                  .arg(indexed.colorCount() - 1, 3));
+
+    data.append(indexed.colorCount() - 1);
+
+    // Build the color table
+    header.append(QString("// Color table section. Each entry is 3 bytes. length: %1 bytes\n")
+                  .arg(indexed.colorCount()*3));
+
+    for (int index = 0; index < indexed.colorCount(); index++) {
+        // TODO: Brightness correction before pallete reduction?
+        QRgb color = ColorModel::correctBrightness(indexed.color(index));
+
+        header.append(QString(" %1, %2, %3,\n")
+                          .arg(qRed(color),   3)
+                          .arg(qGreen(color), 3)
+                          .arg(qBlue(color),  3));
+
+        /// Colors in the color table are stored in RGB24 format
+        data.append(qRed(color));
+        data.append(qGreen(color));
+        data.append(qBlue(color));
+    }
+
+
+    // Build the pixel table
+    header.append(QString("// Pixel runs section. Each pixel run is 2 bytes. length: %1 bytes\n")
+                  .arg(-1));
+
+    for(int frame = 0; frame < image.width(); frame++) {
+        int currentColor;
+        int runCount = 0;
+
+        for(int pixel = 0; pixel < image.height(); pixel++) {
+            int newColor = indexed.pixelIndex(frame, pixel);
+
+            if(runCount == 0) {
+                currentColor = newColor;
+            }
+
+            if(currentColor != newColor) {
+                header.append(QString(" %1, %2,\n")
+                              .arg(runCount, 3)
+                              .arg(currentColor, 3));
+
+                data.append(runCount);
+                data.append(currentColor);
+
+                runCount = 1;
+                currentColor = newColor;
+            }
+            else {
+                runCount++;
+            }
+        }
+
+        header.append(QString(" %1, %2,\n")
+                      .arg(runCount, 3)
+                      .arg(currentColor, 3));
+
+        data.append(runCount);
+        data.append(currentColor);
+    }
+
+    header.append("\n};\n\n");
+    header.append(QString("Animation animation(%1, animationData, ENCODING_INDEXED_RLE, %2);\n")
+                  .arg(image.width())
+                  .arg(image.height()));
+
+    qDebug() << "Animation size:" << data.length();
+}
+
