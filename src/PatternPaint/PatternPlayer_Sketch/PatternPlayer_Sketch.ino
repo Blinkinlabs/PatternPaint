@@ -5,22 +5,11 @@
 #define LED_COUNT 60
 struct CRGB leds[LED_COUNT];
 
-#ifdef REVB // RevB boards have a slightly different pinout.
-
-#define LED_OUT      5
-#define BUTTON_IN    13
-#define ANALOG_INPUT A11
-#define IO_A         15
-
-#else
-
 #define LED_OUT      13 
 #define BUTTON_IN    10
 #define ANALOG_INPUT A9
 #define IO_A         7
 #define IO_B         11
-
-#endif
 
 #define BRIGHT_STEP_COUNT 5
 uint8_t brightnesSteps[BRIGHT_STEP_COUNT] = {5,15,40,70,93};
@@ -96,6 +85,7 @@ void serialLoop() {
         }
 
         if (x == 2) {   // If we received three serial bytes
+          if(pixelIndex == LED_COUNT) break; // Prevent overflow by ignoring the pixel data beyond LED_COUNT
           leds[pixelIndex] = CRGB(buffer[0], buffer[1], buffer[2]);
           pixelIndex++;
         }

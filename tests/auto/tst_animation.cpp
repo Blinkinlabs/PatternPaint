@@ -25,7 +25,7 @@ void AnimationTest::testInitializesMembers()
     int expectedFrameDelay = 123;
     int expectedFrameCount = 34;
     int expectedLedCount = 12;
-    Animation::Encoding expectedEncoding = Animation::Encoding_RGB24;
+    Animation::Encoding expectedEncoding = Animation::RGB24;
 
     QImage image = QImage(expectedFrameCount,expectedLedCount,QImage::Format_RGB32);
 

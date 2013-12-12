@@ -216,7 +216,7 @@ void MainWindow::on_actionExport_animation_for_Arduino_triggered()
     // Note: Converting frameRate to frame delay here.
     Animation animation(pattern,
                         1000/ui->animationSpeed->value(),
-                        Animation::Encoding_RGB565_RLE);
+                        Animation::INDEXED);
 
 
     // Attempt to open the specified file
@@ -366,7 +366,9 @@ void MainWindow::on_actionSave_to_Tape_triggered()
     // Note: Converting frameRate to frame delay here.
     Animation animation(pattern,
                         1000/ui->animationSpeed->value(),
-                        Animation::Encoding_RGB565_RLE);
+                        Animation::INDEXED);
+
+    qDebug() << "Color count: " << animation.colorCount();
 
     if(!uploader->startUpload(*tape, animation)) {
         errorMessageDialog->setText(uploader->getErrorString());

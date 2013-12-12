@@ -11,12 +11,13 @@ class Animation
 {
 public:
     enum Encoding {
-        Encoding_RGB24      = 0,
-        Encoding_RGB565_RLE = 1,
+        RGB24       = 0,     /// RGB24 mode (uncompressed 24 bit)
+        RGB565_RLE  = 1,     /// RGB 565 + RLE mode (compressed 16 bit)
+        INDEXED     = 2,     /// 8-bit indexed mode (pallated 8 bit)
     };
 
     // Create an animation from a QImage
-    Animation(QImage image_, int frameDelay_, Encoding encoding_);
+    Animation(QImage image, int frameDelay, Encoding encoding);
 
     // TODO: create an animation from byte array
 
@@ -29,6 +30,8 @@ public:
     int ledCount;       /// Number of LEDs in this tape
     int frameDelay;     /// Length of time between frames of data, in ms
 
+    int colorCount() const;  /// Number of unique colors in the original image
+
 private:
     // Compress an RGB color to the 565 color space
     // TODO: Improve this conversion using a lookup table, instead of
@@ -38,6 +41,7 @@ private:
     // Encode the image using the RGB24 format
     void encodeImageRGB24();
     void encodeImageRGB16_RLE();
+    void encodeImageIndexed();
 };
 
 
