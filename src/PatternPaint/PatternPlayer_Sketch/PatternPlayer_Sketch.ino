@@ -1,4 +1,4 @@
-#include <FastSPI_LED2.h>
+#include <FastLED.h>
 #include <avr/pgmspace.h>
 #include <Animation.h>
 
