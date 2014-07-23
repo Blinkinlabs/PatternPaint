@@ -18,8 +18,8 @@ TARGET = PatternPaint
 TEMPLATE = app
 
 #Application version
-VERSION_MAJOR = 0
-VERSION_MINOR = 2
+VERSION_MAJOR = 1
+VERSION_MINOR = 0
 VERSION_BUILD = 0
 
 DEFINES += "VERSION_MAJOR=$${VERSION_MAJOR}" \
@@ -64,6 +64,9 @@ FORMS    += mainwindow.ui \
 # OS X icon (TODO: Try removing to make sure it has an effect)
 ICON = images/blinkytape.icns
 
+# Custom plist file for OS X (disable app nap)
+QMAKE_INFO_PLIST = Info.plist
+
 # Windows icon
 RC_FILE += app.rc
 
@@ -71,4 +74,6 @@ RESOURCES += \
     images.qrc
 
 OTHER_FILES += \
-    app.rc
+    app.rc \
+    Info.plist \
+    README.md
