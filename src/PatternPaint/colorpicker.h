@@ -13,7 +13,6 @@ public:
     explicit ColorPicker(QWidget *parent = 0);
 
     // Initialize the color picker
-    // TODO: Do we actually need to do this?
     void init();
 
 protected:

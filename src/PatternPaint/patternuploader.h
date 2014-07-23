@@ -84,7 +84,7 @@ private:
     /// Timer that fires
     QTimer *processTimer;
 
-    float progress;        // TODO: deleteme?
+    float progress;
 
     QString errorString;
 

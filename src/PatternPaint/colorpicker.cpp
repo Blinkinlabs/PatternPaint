@@ -38,7 +38,6 @@ void ColorPicker::init() {
     drawRect( cw, h/2, 5, h/2-1, QColor(0,0,0) );
 
     // draw grey scale.
-    // TODO: Why the -1 hint here?
     for( int j=0; j<h-2; j++ )
     {
         int g = 255 - (int)(j/(float)(h-1) * 255 );

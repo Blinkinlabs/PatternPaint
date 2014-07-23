@@ -31,7 +31,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // TODO: Run on windows to see if this works
 //    setWindowIcon(QIcon(":/resources/images/blinkytape.ico"));
 
-    // TODO: Standard init in QWidget we can override instead?
     ui->patternEditor->init(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
     ui->colorPicker->init();
 
@@ -41,9 +40,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->penSize, SIGNAL(valueChanged(int)),
             ui->patternEditor, SLOT(setToolSize(int)));
 
-    // Now that our window is drawn, fix the vertical height so it can't be changed by the user
-    // TODO: some sort of scaling instead of fixing this? A non-hack way of doing it?
-    setFixedHeight(height());
+//     Now that our window is drawn, fix the vertical height so it can't be changed by the user
+//    // TODO: some sort of scaling instead of fixing this? A non-hack way of doing it?
+//    setFixedHeight(height());
 
     // The draw timer tells the pattern to advance
     drawTimer = new QTimer(this);

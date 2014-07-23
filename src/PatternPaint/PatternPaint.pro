@@ -61,13 +61,13 @@ FORMS    += mainwindow.ui \
     aboutpatternpaint.ui \
     resizepattern.ui
 
-# OS X icon (TODO: Try removing to make sure it has an effect)
+# OS X: Specify icon resource to use
 ICON = images/blinkytape.icns
 
-# Custom plist file for OS X (disable app nap)
+# OS X: Disable app nap using custom plist file
 QMAKE_INFO_PLIST = Info.plist
 
-# Windows icon
+# Windows: Specify icon in custom rc file
 RC_FILE += app.rc
 
 RESOURCES += \

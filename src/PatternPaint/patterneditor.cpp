@@ -22,6 +22,8 @@ void PatternEditor::init(int frameCount, int stripLength)
                      stripLength,
                      QImage::Format_RGB32);
     pattern.fill(0);
+
+//    // Rainbow swirl color
 //    float phase = 0;
 //    for(int x = 0; x < pattern.width();x++) {
 //        for(int y = 0; y < pattern.height(); y++) {
