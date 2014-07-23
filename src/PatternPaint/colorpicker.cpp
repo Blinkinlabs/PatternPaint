@@ -44,6 +44,7 @@ void ColorPicker::init() {
         drawRect( w-5, j, 5, 1, QColor( g,g,g) );
     }
 
+    // Choose white by default
     setNewColor(QColor(255,255,255));
 
     update();

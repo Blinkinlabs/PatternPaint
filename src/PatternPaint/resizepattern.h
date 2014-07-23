@@ -7,6 +7,7 @@ namespace Ui {
 class ResizePattern;
 }
 
+/// Dialog to allow the user to specify a new width/height for the animation
 class ResizePattern : public QDialog
 {
     Q_OBJECT

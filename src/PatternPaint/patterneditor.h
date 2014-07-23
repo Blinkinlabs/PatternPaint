@@ -33,8 +33,8 @@ private:
     QImage pattern;        // The actual image
     QImage gridPattern;    // Holds the pre-rendered grid overlay
     QImage toolPreview;    // Holds a preview of the current tool
-    int xScale;
-    int yScale;
+    float xScale;          //
+    float yScale;
 
     QColor toolColor;
     int toolSize;

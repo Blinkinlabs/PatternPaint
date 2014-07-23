@@ -16,7 +16,7 @@
 #include "ColorSwirl_Sketch.h"
 
 #define DEFAULT_PATTERN_HEIGHT 60
-#define DEFAULT_PATTERN_LENGTH 60
+#define DEFAULT_PATTERN_LENGTH 100
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -93,10 +93,13 @@ void MainWindow::drawTimer_timeout() {
     // TODO: move this state to somewhere; the patternEditor class maybe?
     static int n = 0;
 
+    // TODO: Get the width from elsewhere, so we don't need to load the image every frame
+    QImage image = ui->patternEditor->getPatternAsImage();
+
     if(tape->isConnected()) {
         QByteArray ledData;
 
-        QImage image = ui->patternEditor->getPatternAsImage();
+
         for(int i = 0; i < image.height(); i++) {
             QRgb color = ColorModel::correctBrightness(image.pixel(n, i));
             ledData.append(qRed(color));
@@ -104,10 +107,10 @@ void MainWindow::drawTimer_timeout() {
             ledData.append(qBlue(color));
         }
         tape->sendUpdate(ledData);
-
-        n = (n+1)%image.width();
-        ui->patternEditor->setPlaybackRow(n);
     }
+
+    n = (n+1)%image.width();
+    ui->patternEditor->setPlaybackRow(n);
 }
 
 

@@ -12,7 +12,7 @@ class ColorPicker : public QWidget
 public:
     explicit ColorPicker(QWidget *parent = 0);
 
-    // Initialize the color picker
+    /// Initialize the color picker
     void init();
 
 protected:
