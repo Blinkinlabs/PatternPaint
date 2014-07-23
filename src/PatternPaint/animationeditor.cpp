@@ -4,9 +4,6 @@
 #include <cmath>
 #include <QtWidgets>
 
-// TODO: Change this when we connect to a tape, etc?
-#define BLINKYTAPE_STRIP_HEIGHT 60
-
 AnimationEditor::AnimationEditor(QWidget *parent) :
     QWidget(parent)
 {
@@ -14,11 +11,16 @@ AnimationEditor::AnimationEditor(QWidget *parent) :
 
 void AnimationEditor::init(int frameCount, int stripLength)
 {
-    xScale = 7;  // How big we want to make it
-    yScale = 6;  // How big we want to make it
+//    xScale = 7;  // How big we want to make it
+//    yScale = 6;  // How big we want to make it
+
+    xScale = 13;  // How big we want to make it
+    yScale = 11;  // How big we want to make it
 
     // Make a color image as default
-    pattern = QImage(frameCount,stripLength,QImage::Format_RGB32);
+    pattern = QImage(frameCount,
+                     stripLength,
+                     QImage::Format_RGB32);
     pattern.fill(0);
 //    float phase = 0;
 //    for(int x = 0; x < pattern.width();x++) {
@@ -33,7 +35,9 @@ void AnimationEditor::init(int frameCount, int stripLength)
 //    }
 
     // And make a grid pattern to superimpose over the image
-    gridPattern = QImage(frameCount*xScale+1,stripLength*yScale+1,QImage::Format_ARGB32);
+    gridPattern = QImage(frameCount*xScale+1,
+                         stripLength*yScale+1,
+                         QImage::Format_ARGB32);
     gridPattern.fill(QColor(0,0,0,0));
 
     QPainter painter(&gridPattern);
@@ -42,8 +46,14 @@ void AnimationEditor::init(int frameCount, int stripLength)
 
     painter.setPen(QColor(40,40,40));
     for(int x = 0; x <= pattern.width(); x++) {
-        painter.drawLine(x*xScale,0,x*xScale,pattern.height()*yScale-1);
-        painter.drawLine(x*xScale-1,0,x*xScale-1,pattern.height()*yScale-1);
+        painter.drawLine(x*xScale,
+                         0,
+                         x*xScale,
+                         pattern.height()*yScale-1);
+        painter.drawLine(x*xScale-1,
+                         0,
+                         x*xScale-1,
+                         pattern.height()*yScale-1);
     }
 
     toolPreview = QImage(frameCount,stripLength,QImage::Format_ARGB32);
@@ -67,16 +77,20 @@ bool AnimationEditor::init(QImage newPattern, bool scaled) {
 
     // If the pattern doesn't fit, scale it.
     // TODO: Display an import dialog to let the user decide what to do?
-    if(scaled && newPattern.height() != BLINKYTAPE_STRIP_HEIGHT) {
-        newPattern = newPattern.scaledToHeight(BLINKYTAPE_STRIP_HEIGHT);
+    if(scaled && newPattern.height() != pattern.height()) {
+        newPattern = newPattern.scaledToHeight(pattern.height());
     }
 
-    init(newPattern.width(),BLINKYTAPE_STRIP_HEIGHT);
+    // Re-init the display using the new geometry
+    init(newPattern.width(), newPattern.height());
 
+    // Draw the new pattern to the display
     QPainter painter(&pattern);
     painter.drawImage(0,0,newPattern);
 
+    // and force a screen update
     update();
+
     return true;
 }
 

@@ -2,15 +2,20 @@
 #include <avr/pgmspace.h>
 #include <Animation.h>
 
-#define LED_COUNT 60
-struct CRGB leds[LED_COUNT];
+// Output pins
+#define LED_OUT      13      // LED output signal
+#define BUTTON_IN    10      // Pin that the button is connected to
+#define ANALOG_INPUT A9      // Analog input on the bottom of the board
+#define IO_A         7       // Extra digital input on the bottom of the board
+#define IO_B         11      // Extra digital input on the bottom of the board
 
-#define LED_OUT      13 
-#define BUTTON_IN    10
-#define ANALOG_INPUT A9
-#define IO_A         7
-#define IO_B         11
 
+// LED data array
+#define MAX_LEDS 255          // Maximum number of LEDs supported
+struct CRGB leds[MAX_LEDS];   // Space to hold the pattern
+uint8_t ledCount;             // Actual number of LEDs present
+
+// Brightness selection
 #define BRIGHT_STEP_COUNT 5
 uint8_t brightnesSteps[BRIGHT_STEP_COUNT] = {5,15,40,70,93};
 uint8_t brightness = 4;
@@ -23,11 +28,6 @@ int frameDelay = 30; // Number of ms each frame should be displayed.
 void setup()
 {  
   Serial.begin(57600);
-
-  LEDS.addLeds<WS2811, LED_OUT, GRB>(leds, LED_COUNT);
-  LEDS.showColor(CRGB(0, 0, 0));
-  LEDS.setBrightness(brightnesSteps[brightness]);
-  LEDS.show();
   
   pinMode(BUTTON_IN, INPUT_PULLUP);
   
@@ -38,12 +38,16 @@ void setup()
   prog_uint8_t* frameData;
 
   // These could be whereever, but need to agree with Processing.
-  #define CONTROL_DATA_ADDRESS  (0x7000 - 7)
-  #define ENCODING_TYPE_ADDRESS (CONTROL_DATA_ADDRESS    )
-  #define FRAME_DATA_ADDRESS    (CONTROL_DATA_ADDRESS + 1)
-  #define FRAME_COUNT_ADDRESS   (CONTROL_DATA_ADDRESS + 3)
-  #define FRAME_DELAY_ADDRESS   (CONTROL_DATA_ADDRESS + 5)
+  #define CONTROL_DATA_ADDRESS  (0x7000 - 8)
+  #define LED_COUNT_ADDRESS     (CONTROL_DATA_ADDRESS    )
+  #define ENCODING_TYPE_ADDRESS (CONTROL_DATA_ADDRESS + 1)
+  #define FRAME_DATA_ADDRESS    (CONTROL_DATA_ADDRESS + 2)
+  #define FRAME_COUNT_ADDRESS   (CONTROL_DATA_ADDRESS + 4)
+  #define FRAME_DELAY_ADDRESS   (CONTROL_DATA_ADDRESS + 6)
 
+
+  ledCount = pgm_read_byte(LED_COUNT_ADDRESS);
+  
   encodingType = pgm_read_byte(ENCODING_TYPE_ADDRESS);
 
   frameData  =
@@ -56,7 +60,13 @@ void setup()
   frameDelay = (pgm_read_byte(FRAME_DELAY_ADDRESS    ) << 8)
              + (pgm_read_byte(FRAME_DELAY_ADDRESS + 1));
              
-  pov.init(frameCount, frameData, encodingType, LED_COUNT);
+  LEDS.addLeds<WS2811, LED_OUT, GRB>(leds, ledCount);
+  LEDS.showColor(CRGB(0, 0, 0));
+  LEDS.setBrightness(brightnesSteps[brightness]);
+  LEDS.show();
+  
+             
+  pov.init(frameCount, frameData, encodingType, ledCount);
 }
 
 
@@ -85,7 +95,7 @@ void serialLoop() {
         }
 
         if (x == 2) {   // If we received three serial bytes
-          if(pixelIndex == LED_COUNT) break; // Prevent overflow by ignoring the pixel data beyond LED_COUNT
+          if(pixelIndex == ledCount) break; // Prevent overflow by ignoring the pixel data beyond LED_COUNT
           leds[pixelIndex] = CRGB(buffer[0], buffer[1], buffer[2]);
           pixelIndex++;
         }

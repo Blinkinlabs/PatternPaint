@@ -15,8 +15,7 @@
 // TODO: Move this to animation uploader or something?
 #include "ColorSwirl_Sketch.h"
 
-// TODO: Change this when we connect to a tape, etc?
-#define BLINKYTAPE_STRIP_HEIGHT 60
+#define DEFAULT_STRIP_HEIGHT 60
 #define DEFAULT_ANIMATION_LENGTH 60
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -33,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
 //    setWindowIcon(QIcon(":/resources/images/blinkytape.ico"));
 
     // TODO: Standard init in QWidget we can override instead?
-    ui->animationEditor->init(DEFAULT_ANIMATION_LENGTH,BLINKYTAPE_STRIP_HEIGHT);
+    ui->animationEditor->init(DEFAULT_ANIMATION_LENGTH, DEFAULT_STRIP_HEIGHT);
     ui->colorPicker->init();
 
     // Our pattern editor wants to get some notifications
@@ -51,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
     drawTimer->start(33);
 
-    tape = new BlinkyTape(this);
+    tape = new BlinkyTape(this, DEFAULT_STRIP_HEIGHT);
 
     // Modify our UI when the tape connection status changes
     connect(tape, SIGNAL(connectionStatusChanged(bool)),
@@ -99,7 +98,7 @@ void MainWindow::drawTimer_timeout() {
         QByteArray ledData;
 
         QImage img = ui->animationEditor->getPattern();
-        for(int i = 0; i < BLINKYTAPE_STRIP_HEIGHT; i++) {
+        for(int i = 0; i < img.height(); i++) {
             QRgb color = ColorModel::correctBrightness(img.pixel(n, i));
             ledData.append(qRed(color));
             ledData.append(qGreen(color));
@@ -386,29 +385,37 @@ void MainWindow::on_actionSave_to_Tape_triggered()
 void MainWindow::on_actionResize_Animation_triggered()
 {
     int animationLength = ui->animationEditor->getPattern().width();
+    int ledCount = ui->animationEditor->getPattern().height();
 
     // TODO: Dispose of this?
     ResizeAnimation* resizer = new ResizeAnimation(this);
     resizer->setWindowModality(Qt::WindowModal);
     resizer->setLength(animationLength);
+    resizer->setLedCount(ledCount);
     resizer->exec();
 
     if(resizer->result() != QDialog::Accepted) {
         return;
     }
 
-    int newLength = resizer->length();
-    if(newLength > 0) {
-        qDebug() << "Resizing Animation to length: " << resizer->length();
-        // TODO: This in a non-hacky way
-        QImage originalAnimation = ui->animationEditor->getPattern();
-        QImage newAnimation(newLength, originalAnimation.height(),QImage::Format_RGB32);
+    // TODO: Data validation
+    if(resizer->length() > 0) {
+        qDebug() << "Resizing animation, length:"
+                 << resizer->length()
+                 << "height:"
+                 << resizer->ledCount();
 
+        // Create a new animation, filled with a black color
+        QImage newAnimation(resizer->length(),
+                            resizer->ledCount(),
+                            QImage::Format_RGB32);
         newAnimation.fill(QColor(0,0,0,0));
 
+        // Copy over whatever portion of the original animation will fit
         QPainter painter(&newAnimation);
+        QImage originalAnimation = ui->animationEditor->getPattern();
         painter.drawImage(0,0,originalAnimation);
 
-        ui->animationEditor->init(newAnimation);
+        ui->animationEditor->init(newAnimation, false);
     }
 }

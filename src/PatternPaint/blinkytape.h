@@ -28,7 +28,7 @@ public:
     static QList<QSerialPortInfo> findBlinkyTapes();
     static QList<QSerialPortInfo> findBlinkyTapeBootloaders();
 
-    BlinkyTape(QObject *parent = 0, int ledCount = 60);
+    BlinkyTape(QObject *parent, int ledCount);
 
     // TODO: Destructor!
 

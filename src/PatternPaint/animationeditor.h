@@ -16,7 +16,7 @@ public:
 
     /// Initialize the animation editor using a QImage as the new animation
     /// @param newPattern New animation to load
-    /// @param scaled If true, scale the image to match the height of the tape
+    /// @param scaled If true, scale the image to match the height of the previous animation
     bool init(QImage newPattern, bool scaled = true);
 
     QImage getPattern() { return pattern; }

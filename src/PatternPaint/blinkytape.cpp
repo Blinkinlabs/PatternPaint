@@ -123,6 +123,8 @@ bool BlinkyTape::open(QSerialPortInfo info) {
 
     qDebug() << "Connecting to BlinkyTape on " << info.portName();
     serial->setPort(info);
+    serial->setBaudRate(QSerialPort::Baud19200);
+
     serial->open(QIODevice::ReadWrite);
 
     if(!isConnected()) {

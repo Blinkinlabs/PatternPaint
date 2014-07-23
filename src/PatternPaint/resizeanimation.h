@@ -18,6 +18,9 @@ public:
     void setLength(int length);
     int length();
 
+    void setLedCount(int ledCount);
+    int ledCount();
+
 private:
     Ui::ResizeAnimation *ui;
 };

@@ -83,6 +83,7 @@ bool AnimationUploader::startUpload(BlinkyTape& tape, Animation animation) {
 
     // Finally, write the metadata about the animation to the end of flash
     QByteArray metadata = QByteArray(FLASH_MEMORY_PAGE_SIZE, 0xFF);
+    metadata[metadata.length()-8] = (animation.ledCount) & 0xFF;
     metadata[metadata.length()-7] = (animation.encoding) & 0xFF;
     metadata[metadata.length()-6] = (PATTERNPLAYER_LENGTH >> 8) & 0xFF;
     metadata[metadata.length()-5] = (PATTERNPLAYER_LENGTH     ) & 0xFF;

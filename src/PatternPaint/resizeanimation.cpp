@@ -23,3 +23,12 @@ int ResizeAnimation::length()
 {
     return ui->animationLength->text().toInt();
 }
+
+void ResizeAnimation::setLedCount(int ledCount) {
+    ui->ledCount->setText(QString::number(ledCount));
+}
+
+int ResizeAnimation::ledCount()
+{
+    return ui->ledCount->text().toInt();
+}
