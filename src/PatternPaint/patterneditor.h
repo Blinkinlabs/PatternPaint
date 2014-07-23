@@ -35,16 +35,19 @@ protected:
     void paintEvent(QPaintEvent *event);
 
 private:
-    QImage pattern;        // The actual image
-    QImage gridPattern;    // Holds the pre-rendered grid overlay
-    QImage toolPreview;    // Holds a preview of the current tool
-    float xScale;          //
-    float yScale;
+    QImage pattern;        ///< The actual image
+    QImage gridPattern;    ///< Holds the pre-rendered grid overlay
+    QImage toolPreview;    ///< Holds a preview of the current tool
+    float xScale;          ///< Number of pixels in the grid pattern per pattern pixel.
+    float yScale;          ///< Number of pixels in the grid pattern per pattern pixel.
 
-    QColor toolColor;
-    int toolSize;
+    QColor toolColor;      ///< Color of the current drawing tool (TODO: This should be a pointer to a tool)
+    int toolSize;          ///< Size of the current drawing tool (TODO: This should be a pointer to a tool)
 
-    int playbackRow;
+    int playbackRow;       ///< Row being played back
+
+    /// Redraw the gridPattern to fit the current widget size.
+    void updateGridSize();
 
 signals:
 

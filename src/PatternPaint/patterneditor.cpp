@@ -22,6 +22,56 @@ PatternEditor::PatternEditor(QWidget *parent) :
 
 void PatternEditor::resizeEvent(QResizeEvent * event)
 {
+    updateGridSize();
+}
+
+void PatternEditor::init(int frameCount, int stripLength)
+{
+    // Initialize the pattern to a blank canvass
+    pattern = QImage(frameCount,
+                     stripLength,
+                     QImage::Format_RGB32);
+    pattern.fill(COLOR_CANVAS_DEFAULT);
+
+    toolPreview = QImage(frameCount,
+                         stripLength,
+                         QImage::Format_ARGB32);
+    toolPreview.fill(COLOR_CLEAR);
+
+    // TODO: Don't reset these here, they need to come from main...
+    toolColor = COLOR_TOOL_DEFAULT;
+    toolSize = 2;
+
+    // Turn on mouse tracking so we can draw a preview
+    setMouseTracking(true);
+
+    updateGridSize();
+    update();
+}
+
+bool PatternEditor::init(QImage newPattern, bool scaled) {
+    // TODO: Implement 'save' check before overwriting?
+
+    // If the pattern doesn't fit, scale it.
+    // TODO: Display an import dialog to let the user decide what to do?
+    if(scaled && newPattern.height() != pattern.height()) {
+        newPattern = newPattern.scaledToHeight(pattern.height());
+    }
+
+    // Re-init the display using the new geometry
+    init(newPattern.width(), newPattern.height());
+
+    // Draw the new pattern to the display
+    QPainter painter(&pattern);
+    painter.drawImage(0,0,newPattern);
+
+    // and force a screen update
+    update();
+
+    return true;
+}
+
+void PatternEditor::updateGridSize() {
     // Set the x and y scale based on the widget size
     // TODO: resize more intelligently (maybe minimum of both, or add scroll bars?)
     xScale = float(size().height() - 1)/pattern.height();
@@ -64,51 +114,6 @@ void PatternEditor::resizeEvent(QResizeEvent * event)
             painter.drawPoint(QPoint((x+1)*xScale -1,    (y+1)*yScale   -1));
         }
     }
-}
-
-void PatternEditor::init(int frameCount, int stripLength)
-{
-    // Initialize the pattern to a blank canvass
-    pattern = QImage(frameCount,
-                     stripLength,
-                     QImage::Format_RGB32);
-    pattern.fill(COLOR_CANVAS_DEFAULT);
-
-    toolPreview = QImage(frameCount,
-                         stripLength,
-                         QImage::Format_ARGB32);
-    toolPreview.fill(COLOR_CLEAR);
-
-    // TODO: Don't reset these here, they need to come from main...
-    toolColor = COLOR_TOOL_DEFAULT;
-    toolSize = 2;
-
-    // Turn on mouse tracking so we can draw a preview
-    setMouseTracking(true);
-
-    update();
-}
-
-bool PatternEditor::init(QImage newPattern, bool scaled) {
-    // TODO: Implement 'save' check before overwriting?
-
-    // If the pattern doesn't fit, scale it.
-    // TODO: Display an import dialog to let the user decide what to do?
-    if(scaled && newPattern.height() != pattern.height()) {
-        newPattern = newPattern.scaledToHeight(pattern.height());
-    }
-
-    // Re-init the display using the new geometry
-    init(newPattern.width(), newPattern.height());
-
-    // Draw the new pattern to the display
-    QPainter painter(&pattern);
-    painter.drawImage(0,0,newPattern);
-
-    // and force a screen update
-    update();
-
-    return true;
 }
 
 void PatternEditor::mousePressEvent(QMouseEvent *event){
