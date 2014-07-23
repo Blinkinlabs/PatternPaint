@@ -1,25 +1,25 @@
-#ifndef ANIMATIONEDITOR_H
-#define ANIMATIONEDITOR_H
+#ifndef PATTERNDITOR_H
+#define PATTERNDITOR_H
 
 #include <QWidget>
 
-class AnimationEditor : public QWidget
+class PatternEditor : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AnimationEditor(QWidget *parent = 0);
+    explicit PatternEditor(QWidget *parent = 0);
 
-    /// Re-initialze the animation editor as a blank image with the given size
-    /// @param frameCount Number of frames in this animation
+    /// Re-initialze the pattern editor as a blank image with the given size
+    /// @param frameCount Number of frames in this pattern
     /// @param stripLength Number of LEDs in this strip
     void init(int frameCount, int stripLength);
 
-    /// Initialize the animation editor using a QImage as the new animation
-    /// @param newPattern New animation to load
-    /// @param scaled If true, scale the image to match the height of the previous animation
+    /// Initialize the pattern editor using a QImage as the new pattern
+    /// @param newPattern New pattern to load
+    /// @param scaled If true, scale the image to match the height of the previous pattern
     bool init(QImage newPattern, bool scaled = true);
 
-    QImage getPattern() { return pattern; }
+    QImage getPatternAsImage() { return pattern; }
 
     void mousePressEvent(QMouseEvent * event);
     void mouseMoveEvent(QMouseEvent * event);
@@ -49,4 +49,4 @@ public slots:
     void setPlaybackRow(int row);
 };
 
-#endif // ANIMATIONEDITOR_H
+#endif // PATTERNDITOR_H

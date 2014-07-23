@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ResizeAnimation</class>
- <widget class="QDialog" name="ResizeAnimation">
+ <class>ResizePattern</class>
+ <widget class="QDialog" name="ResizePattern">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Resize Animation</string>
+   <string>Resize Pattern</string>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
@@ -32,17 +32,17 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>40</x>
      <y>30</y>
-     <width>121</width>
-     <height>19</height>
+     <width>101</width>
+     <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Animation Length:</string>
+    <string>Pattern Length:</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="animationLength">
+  <widget class="QLineEdit" name="patternLength">
    <property name="geometry">
     <rect>
      <x>140</x>
@@ -74,14 +74,14 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>40</x>
      <y>60</y>
-     <width>71</width>
-     <height>19</height>
+     <width>101</width>
+     <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>LED count:</string>
+    <string>Pattern Height:</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="ledCount">
@@ -100,13 +100,26 @@
     <number>10</number>
    </property>
   </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>60</y>
+     <width>51</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>LEDs</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>ResizeAnimation</receiver>
+   <receiver>ResizePattern</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -122,7 +135,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>ResizeAnimation</receiver>
+   <receiver>ResizePattern</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

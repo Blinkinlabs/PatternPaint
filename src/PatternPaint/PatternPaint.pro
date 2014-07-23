@@ -34,32 +34,32 @@ SOURCES += main.cpp\
     blinkytape.cpp \
     colorpicker.cpp \
     avrprogrammer.cpp \
-    animationuploader.cpp \
     systeminformation.cpp \
-    animation.cpp \
-    animationeditor.cpp \
     colormodel.cpp \
     aboutpatternpaint.cpp \
-    resizeanimation.cpp
+    pattern.cpp \
+    patterneditor.cpp \
+    resizepattern.cpp \
+    patternuploader.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
     colorpicker.h \
     avrprogrammer.h \
-    animationuploader.h \
     PatternPlayer_Sketch.h \
     systeminformation.h \
-    animation.h \
-    animationeditor.h \
     ColorSwirl_Sketch.h \
     colormodel.h \
     aboutpatternpaint.h \
-    resizeanimation.h
+    pattern.h \
+    patterneditor.h \
+    resizepattern.h \
+    patternuploader.h
 
 FORMS    += mainwindow.ui \
     systeminformation.ui \
     aboutpatternpaint.ui \
-    resizeanimation.ui
+    resizepattern.ui
 
 # OS X icon (TODO: Try removing to make sure it has an effect)
 ICON = images/blinkytape.icns

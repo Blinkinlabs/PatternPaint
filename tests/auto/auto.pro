@@ -14,10 +14,10 @@ TEMPLATE = app
 
 
 SOURCES += \
-    tst_animation.cpp
+    tst_pattern.cpp
 
 # Include the PatternPaint project
 INCLUDEPATH += ../../src .
 
-SOURCES += ../../src/PatternPaint/animation.cpp \
+SOURCES += ../../src/PatternPaint/pattern.cpp \
             ../../src/PatternPaint/colormodel.cpp \

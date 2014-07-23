@@ -1,13 +1,12 @@
 #include <QObject>
 #include <QTimer>
 #include <iostream>
-#include "animation.h"
+#include "pattern.h"
 #include "avrprogrammer.h"
 #include "blinkytape.h"
 
-#ifndef ANIMATIONUPLOADER_H
-#define ANIMATIONUPLOADER_H
-
+#ifndef PATTERNUPLOADER_H
+#define PATTERNUPLOADER_H
 
 struct FlashSection {
     FlashSection(int address,
@@ -19,7 +18,7 @@ struct FlashSection {
     QByteArray data;
 };
 
-// This is an re-entreant version of an animation uploader.
+// This is an re-entreant version of an pattern uploader.
 // Each task in the upload process is broken into a single state, and the state
 // machine is driven forward by receiving events from the connected serial port,
 // or in the case of a timeout, from the timeout timer.
@@ -30,19 +29,19 @@ struct FlashSection {
 //
 // While the upload process is underway, it will send periodic progress updates
 // via the progressUpdate() signal.
-class AnimationUploader : public QObject
+class PatternUploader : public QObject
 {
     Q_OBJECT
 
 public:
-    AnimationUploader(QObject *parent=0);
+    PatternUploader(QObject *parent=0);
 
     /// Start an upload, using the passed blinkytape as a launching point
     /// Note that the blinkytape will be disconnected during the upload process,
     /// and will need to be reconnected manually afterwards.
     /// @param tape BlinkyTape to upload to (must already be connected)
-    /// @param animation Animation to upload to the BlinkyTape
-    bool startUpload(BlinkyTape& tape, Animation animation);
+    /// @param pattern Pattern to upload to the BlinkyTape
+    bool startUpload(BlinkyTape& tape, Pattern pattern);
 
     /// Start an upload, using the passed blinkytape as a launching point
     /// Note that the blinkytape will be disconnected during the upload process,
@@ -106,4 +105,4 @@ private:
     bool waitOneMore; // BS variable to delay connection to bootloader by 1 timer cycle
 };
 
-#endif // ANIMATIONUPLOADER_H
+#endif // PATTERNUPLOADER_H

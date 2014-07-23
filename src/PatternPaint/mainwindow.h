@@ -6,8 +6,8 @@
 #include <QMessageBox>
 
 #include "blinkytape.h"
-#include "animationuploader.h"
-#include "animationeditor.h"
+#include "patternuploader.h"
+#include "patterneditor.h"
 
 namespace Ui {
 class MainWindow;
@@ -36,9 +36,9 @@ private slots:
 
     void on_actionSystem_Information_triggered();
 
-    void on_animationSpeed_valueChanged(int value);
+    void on_patternSpeed_valueChanged(int value);
 
-    void on_animationPlayPause_clicked();
+    void on_patternPlayPause_clicked();
 
     void on_tapeConnectionStatusChanged(bool connected);
 
@@ -52,7 +52,7 @@ private slots:
 
     void on_loadFile_clicked();
 
-    void on_actionExport_animation_for_Arduino_triggered();
+    void on_actionExport_pattern_for_Arduino_triggered();
 
     void on_actionVisit_the_BlinkyTape_forum_triggered();
 
@@ -66,16 +66,16 @@ private slots:
 
     void on_actionSave_to_Tape_triggered();
 
-    void on_actionClear_Animation_triggered();
+    void on_actionClear_Pattern_triggered();
 
-    void on_actionResize_Animation_triggered();
+    void on_actionResize_Pattern_triggered();
 
 private:
     Ui::MainWindow *ui;
 
     QTimer *drawTimer;
     BlinkyTape* tape;
-    AnimationUploader* uploader;
+    PatternUploader* uploader;
 
     QProgressDialog* progressDialog;
     QMessageBox* errorMessageDialog;

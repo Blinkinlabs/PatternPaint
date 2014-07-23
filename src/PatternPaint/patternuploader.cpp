@@ -1,4 +1,4 @@
-#include "animationuploader.h"
+#include "patternuploader.h"
 #include "PatternPlayer_Sketch.h"
 
 #include <QDebug>
@@ -14,7 +14,7 @@
 /// reset, and notifying the caller that we are finished
 #define PROGRAMMER_RESET_DELAY 1000
 
-AnimationUploader::AnimationUploader(QObject *parent) :
+PatternUploader::PatternUploader(QObject *parent) :
     QObject(parent)
 {
     processTimer = new QTimer(this);
@@ -27,7 +27,7 @@ AnimationUploader::AnimationUploader(QObject *parent) :
             this,SLOT(handleProgrammerCommandFinished(QString,QByteArray)));
 }
 
-void AnimationUploader::handleProgrammerError(QString error) {
+void PatternUploader::handleProgrammerError(QString error) {
     qCritical() << error;
 
     // TODO: not sure if we should do this, or let the programmer handle it?
@@ -38,7 +38,7 @@ void AnimationUploader::handleProgrammerError(QString error) {
     emit(finished(false));
 }
 
-void AnimationUploader::handleProgrammerCommandFinished(QString command, QByteArray returnData) {
+void PatternUploader::handleProgrammerCommandFinished(QString command, QByteArray returnData) {
     // TODO: Update our progress somehow? But how to tell how far we've gotten?
     qDebug() << "Command finished:" << command;
     updateProgress(progress + 1);
@@ -51,18 +51,18 @@ void AnimationUploader::handleProgrammerCommandFinished(QString command, QByteAr
     }
 }
 
-void AnimationUploader::handleResetTimer()
+void PatternUploader::handleResetTimer()
 {
     emit(finished(true));
 }
 
 
-void AnimationUploader::updateProgress(int newProgress) {
+void PatternUploader::updateProgress(int newProgress) {
     progress = newProgress;
     emit(progressChanged(progress));
 }
 
-bool AnimationUploader::startUpload(BlinkyTape& tape, Animation animation) {
+bool PatternUploader::startUpload(BlinkyTape& tape, Pattern pattern) {
     updateProgress(0);
 
     // We can't reset if we weren't already connected...
@@ -79,23 +79,23 @@ bool AnimationUploader::startUpload(BlinkyTape& tape, Animation animation) {
     QByteArray sketch = QByteArray(PatternPlayerSketch,PATTERNPLAYER_LENGTH);
 
     // Next, append the image data to it
-    sketch += animation.data;
+    sketch += pattern.data;
 
-    // Finally, write the metadata about the animation to the end of flash
+    // Finally, write the metadata about the pattern to the end of flash
     QByteArray metadata = QByteArray(FLASH_MEMORY_PAGE_SIZE, 0xFF);
-    metadata[metadata.length()-8] = (animation.ledCount) & 0xFF;
-    metadata[metadata.length()-7] = (animation.encoding) & 0xFF;
+    metadata[metadata.length()-8] = (pattern.ledCount) & 0xFF;
+    metadata[metadata.length()-7] = (pattern.encoding) & 0xFF;
     metadata[metadata.length()-6] = (PATTERNPLAYER_LENGTH >> 8) & 0xFF;
     metadata[metadata.length()-5] = (PATTERNPLAYER_LENGTH     ) & 0xFF;
-    metadata[metadata.length()-4] = (animation.frameCount >> 8) & 0xFF;
-    metadata[metadata.length()-3] = (animation.frameCount     ) & 0xFF;
-    metadata[metadata.length()-2] = (animation.frameDelay >> 8) & 0xFF;
-    metadata[metadata.length()-1] = (animation.frameDelay     ) & 0xFF;
+    metadata[metadata.length()-4] = (pattern.frameCount >> 8) & 0xFF;
+    metadata[metadata.length()-3] = (pattern.frameCount     ) & 0xFF;
+    metadata[metadata.length()-2] = (pattern.frameDelay >> 8) & 0xFF;
+    metadata[metadata.length()-1] = (pattern.frameDelay     ) & 0xFF;
 
     char buff[100];
-    snprintf(buff, 100, "Sketch size: %iB, animation size: %iB, metadata size: %iB",
+    snprintf(buff, 100, "Sketch size: %iB, pattern size: %iB, metadata size: %iB",
              PATTERNPLAYER_LENGTH,
-             animation.data.length(),
+             pattern.data.length(),
              metadata.length());
     qDebug() << buff;
 
@@ -106,13 +106,13 @@ bool AnimationUploader::startUpload(BlinkyTape& tape, Animation animation) {
     if(sketch.length() + metadata.length() > FLASH_MEMORY_AVAILABLE) {
         qDebug() << "sketch can't fit into memory!";
 
-        errorString = QString("Sorry! The Animation is a bit too big to fit in BlinkyTape memory right now. We're working on improving this! Avaiable space=%1, Animation size=%2")
+        errorString = QString("Sorry! The Pattern is a bit too big to fit in BlinkyTape memory right now. We're working on improving this! Avaiable space=%1, Pattern size=%2")
                               .arg(FLASH_MEMORY_AVAILABLE)
                               .arg(sketch.length() + metadata.length());
         return false;
     }
 
-    // Put the sketch, animation, and metadata into the programming queue.
+    // Put the sketch, pattern, and metadata into the programming queue.
     flashData.push_back(FlashSection(0, sketch));
     flashData.push_back(FlashSection(FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE, metadata));
 
@@ -129,7 +129,7 @@ bool AnimationUploader::startUpload(BlinkyTape& tape, Animation animation) {
 }
 
 
-bool AnimationUploader::startUpload(BlinkyTape& tape, QByteArray sketch) {
+bool PatternUploader::startUpload(BlinkyTape& tape, QByteArray sketch) {
     // TODO: Reconcile this with the other startUpload function.
     updateProgress(0);
 
@@ -151,13 +151,13 @@ bool AnimationUploader::startUpload(BlinkyTape& tape, QByteArray sketch) {
     if(sketch.length() > FLASH_MEMORY_AVAILABLE) {
         qDebug() << "sketch can't fit into memory!";
 
-        errorString = QString("Sorry! The Animation is a bit too big to fit in BlinkyTape memory right now. We're working on improving this! Avaiable space=%1, Animation size=%2")
+        errorString = QString("Sorry! The Pattern is a bit too big to fit in BlinkyTape memory right now. We're working on improving this! Avaiable space=%1, Pattern size=%2")
                 .arg(FLASH_MEMORY_AVAILABLE)
                 .arg(sketch.length());
         return false;
     }
 
-    // Put the sketch, animation, and metadata into the programming queue.
+    // Put the sketch, pattern, and metadata into the programming queue.
     flashData.push_back(FlashSection(0, sketch));
 
 /// Attempt to reset the strip using the 1200 baud rate method, and identify the newly connected bootloader
@@ -172,13 +172,13 @@ bool AnimationUploader::startUpload(BlinkyTape& tape, QByteArray sketch) {
     return true;
 }
 
-QString AnimationUploader::getErrorString() const
+QString PatternUploader::getErrorString() const
 {
     return errorString;
 }
 
 
-void AnimationUploader::doWork() {
+void PatternUploader::doWork() {
     // TODO: This flow is really ungainly
 
     qDebug() << "In doWork state=" << state;

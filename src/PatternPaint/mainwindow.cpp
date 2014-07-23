@@ -1,10 +1,10 @@
-#include "animation.h"
+#include "pattern.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "colormodel.h"
 #include "systeminformation.h"
 #include "aboutpatternpaint.h"
-#include "resizeanimation.h"
+#include "resizepattern.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -12,11 +12,11 @@
 #include <QDesktopServices>
 #include <QtWidgets>
 
-// TODO: Move this to animation uploader or something?
+// TODO: Move this to pattern uploader or something?
 #include "ColorSwirl_Sketch.h"
 
-#define DEFAULT_STRIP_HEIGHT 60
-#define DEFAULT_ANIMATION_LENGTH 60
+#define DEFAULT_PATTERN_HEIGHT 60
+#define DEFAULT_PATTERN_LENGTH 60
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -32,32 +32,32 @@ MainWindow::MainWindow(QWidget *parent) :
 //    setWindowIcon(QIcon(":/resources/images/blinkytape.ico"));
 
     // TODO: Standard init in QWidget we can override instead?
-    ui->animationEditor->init(DEFAULT_ANIMATION_LENGTH, DEFAULT_STRIP_HEIGHT);
+    ui->patternEditor->init(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
     ui->colorPicker->init();
 
     // Our pattern editor wants to get some notifications
     connect(ui->colorPicker, SIGNAL(colorChanged(QColor)),
-            ui->animationEditor, SLOT(setToolColor(QColor)));
+            ui->patternEditor, SLOT(setToolColor(QColor)));
     connect(ui->penSize, SIGNAL(valueChanged(int)),
-            ui->animationEditor, SLOT(setToolSize(int)));
+            ui->patternEditor, SLOT(setToolSize(int)));
 
     // Now that our window is drawn, fix the vertical height so it can't be changed by the user
     // TODO: some sort of scaling instead of fixing this? A non-hack way of doing it?
     setFixedHeight(height());
 
-    // The draw timer tells the animation to advance
+    // The draw timer tells the pattern to advance
     drawTimer = new QTimer(this);
     connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
     drawTimer->start(33);
 
-    tape = new BlinkyTape(this, DEFAULT_STRIP_HEIGHT);
+    tape = new BlinkyTape(this, DEFAULT_PATTERN_HEIGHT);
 
     // Modify our UI when the tape connection status changes
     connect(tape, SIGNAL(connectionStatusChanged(bool)),
             this,SLOT(on_tapeConnectionStatusChanged(bool)));
 
 
-    uploader = new AnimationUploader(this);
+    uploader = new PatternUploader(this);
 
     // TODO: Should this be a separate view? it seems weird to have it chillin
     // all static like.
@@ -68,13 +68,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Set some default values for the painting interface
     ui->penSize->setSliderPosition(2);
-    ui->animationSpeed->setSliderPosition(30);
+    ui->patternSpeed->setSliderPosition(30);
 
 
     // Pre-set the upload progress dialog
     progressDialog = new QProgressDialog(this);
     progressDialog->setWindowTitle("BlinkyTape exporter");
-    progressDialog->setLabelText("Saving animation to BlinkyTape...");
+    progressDialog->setLabelText("Saving pattern to BlinkyTape...");
     progressDialog->setMinimum(0);
     progressDialog->setMaximum(150);
     progressDialog->setWindowModality(Qt::WindowModal);
@@ -91,23 +91,23 @@ MainWindow::~MainWindow()
 
 
 void MainWindow::drawTimer_timeout() {
-    // TODO: move this state to somewhere; the animationEditor class maybe?
+    // TODO: move this state to somewhere; the patternEditor class maybe?
     static int n = 0;
 
     if(tape->isConnected()) {
         QByteArray ledData;
 
-        QImage img = ui->animationEditor->getPattern();
-        for(int i = 0; i < img.height(); i++) {
-            QRgb color = ColorModel::correctBrightness(img.pixel(n, i));
+        QImage image = ui->patternEditor->getPatternAsImage();
+        for(int i = 0; i < image.height(); i++) {
+            QRgb color = ColorModel::correctBrightness(image.pixel(n, i));
             ledData.append(qRed(color));
             ledData.append(qGreen(color));
             ledData.append(qBlue(color));
         }
         tape->sendUpdate(ledData);
 
-        n = (n+1)%img.width();
-        ui->animationEditor->setPlaybackRow(n);
+        n = (n+1)%image.width();
+        ui->patternEditor->setPlaybackRow(n);
     }
 }
 
@@ -130,20 +130,20 @@ void MainWindow::on_tapeConnectDisconnect_clicked()
     }
 }
 
-void MainWindow::on_animationSpeed_valueChanged(int value)
+void MainWindow::on_patternSpeed_valueChanged(int value)
 {
     drawTimer->setInterval(1000/value);
 }
 
-void MainWindow::on_animationPlayPause_clicked()
+void MainWindow::on_patternPlayPause_clicked()
 {
     if(drawTimer->isActive()) {
         drawTimer->stop();
-        ui->animationPlayPause->setText("Play");
+        ui->patternPlayPause->setText("Play");
     }
     else {
         drawTimer->start();
-        ui->animationPlayPause->setText("Pause");
+        ui->patternPlayPause->setText("Pause");
     }
 }
 
@@ -152,22 +152,22 @@ void MainWindow::on_actionLoad_File_triggered()
     // TODO: Add a simple image gallery thing instead of this, and push
     // this to 'import' and 'export'
     QString fileName = QFileDialog::getOpenFileName(this,
-        tr("Open Animation"), "", tr("Animation Files (*.png *.jpg *.bmp)"));
+        tr("Open Pattern"), "", tr("Pattern Files (*.png *.jpg *.bmp)"));
 
     if(fileName.length() == 0) {
         return;
     }
 
-    QImage animation;
+    QImage pattern;
 
     // TODO: How to handle stuff that's not the right size?
     // Right now we always resize, could offer to crop, center, etc instead.
-    if(!animation.load(fileName)) {
-        qDebug() << "Error loading animation file " << fileName;
+    if(!pattern.load(fileName)) {
+        qDebug() << "Error loading pattern file " << fileName;
         return;
     }
 
-    ui->animationEditor->init(animation);
+    ui->patternEditor->init(pattern);
 }
 
 void MainWindow::on_actionSave_File_triggered()
@@ -177,14 +177,14 @@ void MainWindow::on_actionSave_File_triggered()
     // TODO: Add a simple image gallery thing instead of this, and push
     // this to 'import' and 'export'
     QString fileName = QFileDialog::getSaveFileName(this,
-        tr("Save Animation"), "", tr("Animation Files (*.png *.jpg *.bmp)"));
+        tr("Save Pattern"), "", tr("Pattern Files (*.png *.jpg *.bmp)"));
 
     if(fileName.length() == 0) {
         return;
     }
 
     // TODO: Alert the user if this failed.
-    if(!ui->animationEditor->getPattern().save(fileName)) {
+    if(!ui->patternEditor->getPatternAsImage().save(fileName)) {
         QMessageBox::warning(this, tr("Error"), tr("Error, cannot write file %1.")
                        .arg(fileName));
     }
@@ -200,22 +200,22 @@ void MainWindow::on_saveToTape_clicked()
     on_actionSave_to_Tape_triggered();
 }
 
-void MainWindow::on_actionExport_animation_for_Arduino_triggered()
+void MainWindow::on_actionExport_pattern_for_Arduino_triggered()
 {
     QString fileName = QFileDialog::getSaveFileName(this,
-        tr("Save Animation for Arduino"), "animation.h", tr("Header File (*.h)"));
+        tr("Save Pattern for Arduino"), "pattern.h", tr("Header File (*.h)"));
 
     if(fileName.length() == 0) {
         return;
     }
 
-    // Convert the current pattern into an Animation
-    QImage pattern =  ui->animationEditor->getPattern();
+    // Convert the current pattern into a Pattern
+    QImage image =  ui->patternEditor->getPatternAsImage();
 
     // Note: Converting frameRate to frame delay here.
-    Animation animation(pattern,
-                        1000/ui->animationSpeed->value(),
-                        Animation::INDEXED_RLE);
+    Pattern pattern(image,
+                        1000/ui->patternSpeed->value(),
+                        Pattern::INDEXED_RLE);
 
 
     // Attempt to open the specified file
@@ -227,7 +227,7 @@ void MainWindow::on_actionExport_animation_for_Arduino_triggered()
     }
 
     QTextStream ts(&file);
-    ts << animation.header;
+    ts << pattern.header;
     file.close();
 }
 
@@ -319,25 +319,25 @@ void MainWindow::on_actionFlip_Horizontal_triggered()
 {
     // TODO: This in a less hacky way?
     // TODO: Undo/redo
-    QImage pattern =  ui->animationEditor->getPattern();
-    ui->animationEditor->init(pattern.mirrored(true, false));
+    QImage image =  ui->patternEditor->getPatternAsImage();
+    ui->patternEditor->init(image.mirrored(true, false));
 }
 
 void MainWindow::on_actionFlip_Vertical_triggered()
 {
     // TODO: This in a less hacky way?
     // TODO: Undo/redo
-    QImage pattern =  ui->animationEditor->getPattern();
-    ui->animationEditor->init(pattern.mirrored(false, true));
+    QImage image =  ui->patternEditor->getPatternAsImage();
+    ui->patternEditor->init(image.mirrored(false, true));
 }
 
-void MainWindow::on_actionClear_Animation_triggered()
+void MainWindow::on_actionClear_Pattern_triggered()
 {
     // TODO: This in a less hacky way?
     // TODO: Undo/redo
-    QImage pattern =  ui->animationEditor->getPattern();
-    pattern.fill(0);
-    ui->animationEditor->init(pattern);
+    QImage image =  ui->patternEditor->getPatternAsImage();
+    image.fill(0);
+    ui->patternEditor->init(image);
 }
 
 void MainWindow::on_actionLoad_rainbow_sketch_triggered()
@@ -359,19 +359,19 @@ void MainWindow::on_actionSave_to_Tape_triggered()
         return;
     }
 
-    // Convert the current pattern into an Animation
-    QImage pattern =  ui->animationEditor->getPattern();
+    // Convert the current pattern into a Pattern
+    QImage image =  ui->patternEditor->getPatternAsImage();
 
     // Note: Converting frameRate to frame delay here.
-    Animation animation(pattern,
-                        1000/ui->animationSpeed->value(),
-                        Animation::INDEXED_RLE);
+    Pattern pattern(image,
+                        1000/ui->patternSpeed->value(),
+                        Pattern::INDEXED_RLE);
 
     // TODO: Attempt different compressions till one works.
 
-    qDebug() << "Color count: " << animation.colorCount();
+    qDebug() << "Color count: " << pattern.colorCount();
 
-    if(!uploader->startUpload(*tape, animation)) {
+    if(!uploader->startUpload(*tape, pattern)) {
         errorMessageDialog->setText(uploader->getErrorString());
         errorMessageDialog->show();
         return;
@@ -382,15 +382,15 @@ void MainWindow::on_actionSave_to_Tape_triggered()
 }
 
 
-void MainWindow::on_actionResize_Animation_triggered()
+void MainWindow::on_actionResize_Pattern_triggered()
 {
-    int animationLength = ui->animationEditor->getPattern().width();
-    int ledCount = ui->animationEditor->getPattern().height();
+    int patternLength = ui->patternEditor->getPatternAsImage().width();
+    int ledCount = ui->patternEditor->getPatternAsImage().height();
 
     // TODO: Dispose of this?
-    ResizeAnimation* resizer = new ResizeAnimation(this);
+    ResizePattern* resizer = new ResizePattern(this);
     resizer->setWindowModality(Qt::WindowModal);
-    resizer->setLength(animationLength);
+    resizer->setLength(patternLength);
     resizer->setLedCount(ledCount);
     resizer->exec();
 
@@ -400,22 +400,22 @@ void MainWindow::on_actionResize_Animation_triggered()
 
     // TODO: Data validation
     if(resizer->length() > 0) {
-        qDebug() << "Resizing animation, length:"
+        qDebug() << "Resizing pattern, length:"
                  << resizer->length()
                  << "height:"
                  << resizer->ledCount();
 
-        // Create a new animation, filled with a black color
-        QImage newAnimation(resizer->length(),
+        // Create a new pattern, filled with a black color
+        QImage newImage(resizer->length(),
                             resizer->ledCount(),
                             QImage::Format_RGB32);
-        newAnimation.fill(QColor(0,0,0,0));
+        newImage.fill(QColor(0,0,0,0));
 
-        // Copy over whatever portion of the original animation will fit
-        QPainter painter(&newAnimation);
-        QImage originalAnimation = ui->animationEditor->getPattern();
-        painter.drawImage(0,0,originalAnimation);
+        // Copy over whatever portion of the original pattern will fit
+        QPainter painter(&newImage);
+        QImage originalImage = ui->patternEditor->getPatternAsImage();
+        painter.drawImage(0,0,originalImage);
 
-        ui->animationEditor->init(newAnimation, false);
+        ui->patternEditor->init(newImage, false);
     }
 }

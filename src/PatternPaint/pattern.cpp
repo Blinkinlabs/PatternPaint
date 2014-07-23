@@ -1,9 +1,9 @@
-#include "animation.h"
+#include "pattern.h"
 #include "colormodel.h"
 
 #include <QDebug>
 
-Animation::Animation(QImage image, int frameDelay, Encoding encoding) :
+Pattern::Pattern(QImage image, int frameDelay, Encoding encoding) :
     encoding(encoding),
     image(image),
     frameDelay(frameDelay)
@@ -28,7 +28,7 @@ Animation::Animation(QImage image, int frameDelay, Encoding encoding) :
     }
 }
 
-int Animation::colorCount() const
+int Pattern::colorCount() const
 {
     // Brute force method for counting the number of unique colors in the image
     QList<QRgb> colors;
@@ -45,17 +45,17 @@ int Animation::colorCount() const
     return colors.length();
 }
 
-int Animation::QRgbTo565(QRgb color) {
+int Pattern::QRgbTo565(QRgb color) {
     return (((qRed(color)   >> 3) & 0x1F)   << 11)
            | (((qGreen(color) >> 2) & 0x3F) <<  5)
            | (((qBlue(color)  >> 3) & 0x1F)      );
 }
 
-void Animation::encodeImageRGB16_RLE() {
+void Pattern::encodeImageRGB16_RLE() {
     data.clear();
     header.clear(); // TODO: Move the header builder somewhere else?
 
-    header.append("const PROGMEM prog_uint8_t animationData[]  = {\n");
+    header.append("const PROGMEM prog_uint8_t patternData[]  = {\n");
 
     for(int frame = 0; frame < image.width(); frame++) {
         int currentColor;
@@ -105,13 +105,13 @@ void Animation::encodeImageRGB16_RLE() {
     }
 
     header.append("};\n\n");
-    header.append(QString("Animation animation(%1, animationData, ENCODING_RGB565_RLE, %2);\n")
+    header.append(QString("Pattern pattern(%1, patternData, ENCODING_RGB565_RLE, %2);\n")
                   .arg(image.width())
                   .arg(image.height()));
 }
 
 
-void Animation::encodeImageRGB24() {
+void Pattern::encodeImageRGB24() {
     // TODO: build c++ header as well
 
     data.clear();
@@ -126,7 +126,7 @@ void Animation::encodeImageRGB24() {
     }
 }
 
-void Animation::encodeImageIndexed() {
+void Pattern::encodeImageIndexed() {
     header.clear();
     data.clear();
 
@@ -138,7 +138,7 @@ void Animation::encodeImageIndexed() {
     qDebug() << "Original color count:" << colorCount();
     qDebug() << "Indexed color count: " << indexed.colorCount();
 
-    header.append("const PROGMEM prog_uint8_t animationData[]  = {\n");
+    header.append("const PROGMEM prog_uint8_t patternData[]  = {\n");
 
     // Record the length of the color table
     header.append("// Length of the color table - 1, in bytes. length: 1 byte\n");
@@ -185,14 +185,14 @@ void Animation::encodeImageIndexed() {
     }
 
     header.append("\n};\n\n");
-    header.append(QString("Animation animation(%1, animationData, ENCODING_INDEXED, %2);\n")
+    header.append(QString("Pattern pattern(%1, patternData, ENCODING_INDEXED, %2);\n")
                   .arg(image.width())
                   .arg(image.height()));
 
-    qDebug() << "Animation size:" << data.length();
+    qDebug() << "Pattern size:" << data.length();
 }
 
-void Animation::encodeImageIndexed_RLE() {
+void Pattern::encodeImageIndexed_RLE() {
     header.clear();
     data.clear();
 
@@ -204,7 +204,7 @@ void Animation::encodeImageIndexed_RLE() {
     qDebug() << "Original color count:" << colorCount();
     qDebug() << "Indexed color count: " << indexed.colorCount();
 
-    header.append("const PROGMEM prog_uint8_t animationData[]  = {\n");
+    header.append("const PROGMEM prog_uint8_t patternData[]  = {\n");
 
     // Record the length of the color table
     header.append("// Length of the color table - 1, in bytes. length: 1 byte\n");
@@ -273,10 +273,10 @@ void Animation::encodeImageIndexed_RLE() {
     }
 
     header.append("\n};\n\n");
-    header.append(QString("Animation animation(%1, animationData, ENCODING_INDEXED_RLE, %2);\n")
+    header.append(QString("Pattern pattern(%1, patternData, ENCODING_INDEXED_RLE, %2);\n")
                   .arg(image.width())
                   .arg(image.height()));
 
-    qDebug() << "Animation size:" << data.length();
+    qDebug() << "Pattern size:" << data.length();
 }
 

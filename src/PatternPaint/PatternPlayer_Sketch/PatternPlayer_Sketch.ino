@@ -1,6 +1,6 @@
 #include <FastLED.h>
 #include <avr/pgmspace.h>
-#include <Animation.h>
+#include <Pattern.h>
 
 // Output pins
 #define LED_OUT      13      // LED output signal
@@ -21,7 +21,7 @@ uint8_t brightnesSteps[BRIGHT_STEP_COUNT] = {5,15,40,70,93};
 uint8_t brightness = 4;
 uint8_t lastButtonState = 1;
 
-Animation pov;
+Pattern pov;
 
 int frameDelay = 30; // Number of ms each frame should be displayed.
 
@@ -31,7 +31,7 @@ void setup()
   
   pinMode(BUTTON_IN, INPUT_PULLUP);
   
-  // Read the animation data from the end of the program memory, and construct a new Animation from it.
+  // Read the pattern data from the end of the program memory, and construct a new Pattern from it.
   uint8_t  encodingType;
   uint16_t frameCount;
   
@@ -102,7 +102,7 @@ void serialLoop() {
       }
     }
     
-    // If we haven't received data in 4 seconds, return to playing back our animation
+    // If we haven't received data in 4 seconds, return to playing back our pattern
     if(millis() > lastReceiveTime + 4000) {
       // TODO: Somehow the serial port gets trashed here, how to reset it?
       return;

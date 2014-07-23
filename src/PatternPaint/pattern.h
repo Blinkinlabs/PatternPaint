@@ -1,13 +1,13 @@
 #include <QImage>
 #include <QString>
 
-#ifndef ANIMATION_H
-#define ANIMATION_H
+#ifndef PATTERN_H
+#define PATTERN_H
 
 
-/// Container for a compressed animation
+/// Container for a compressed pattern
 /// This class performs a 1-shot compression of an image from a QIMage.
-class Animation
+class Pattern
 {
 public:
     enum Encoding {
@@ -17,17 +17,17 @@ public:
         INDEXED_RLE = 3,
     };
 
-    // Create an animation from a QImage
-    Animation(QImage image, int frameDelay, Encoding encoding);
+    // Create an pattern from a QImage
+    Pattern(QImage image, int frameDelay, Encoding encoding);
 
-    // TODO: create an animation from byte array
+    // TODO: create an pattern from byte array
 
-    Encoding encoding;  /// Encoding used to compress the animation
-    QImage image;       /// QImage representation of the animation
-    QByteArray data;    /// Byte array representation of the animation
-    QString header;     /// C++ header representation of the animation
+    Encoding encoding;  /// Encoding used to compress the pattern
+    QImage image;       /// QImage representation of the pattern
+    QByteArray data;    /// Byte array representation of the pattern
+    QString header;     /// C++ header representation of the pattern
 
-    int frameCount;     /// Number of animation frames in this animation
+    int frameCount;     /// Number of frames in this pattern
     int ledCount;       /// Number of LEDs in this tape
     int frameDelay;     /// Length of time between frames of data, in ms
 
@@ -46,4 +46,4 @@ private:
 };
 
 
-#endif // ANIMATION_H
+#endif // PATTERN_H

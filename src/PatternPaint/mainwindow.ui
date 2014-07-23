@@ -179,16 +179,16 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="animationPlayPause">
+          <widget class="QPushButton" name="patternPlayPause">
            <property name="text">
             <string>Pause</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QSlider" name="animationSpeed">
+          <widget class="QSlider" name="patternSpeed">
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Adjust the playback speed of the animation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Adjust the playback speed of the pattern.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="minimum">
             <number>1</number>
@@ -243,7 +243,7 @@
      </widget>
     </item>
     <item>
-     <widget class="AnimationEditor" name="animationEditor" native="true">
+     <widget class="PatternEditor" name="patternEditor" native="true">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -298,7 +298,7 @@
     <addaction name="actionLoad_File"/>
     <addaction name="actionSave_File"/>
     <addaction name="separator"/>
-    <addaction name="actionExport_animation_for_Arduino"/>
+    <addaction name="actionExport_pattern_for_Arduino"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -316,12 +316,12 @@
     <property name="title">
      <string>Edit</string>
     </property>
-    <addaction name="actionResize_Animation"/>
+    <addaction name="actionResize_Pattern"/>
     <addaction name="separator"/>
     <addaction name="actionFlip_Horizontal"/>
     <addaction name="actionFlip_Vertical"/>
     <addaction name="separator"/>
-    <addaction name="actionClear_Animation"/>
+    <addaction name="actionClear_Pattern"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -344,7 +344,7 @@
     <string>Open</string>
    </property>
    <property name="toolTip">
-    <string>Load Animation</string>
+    <string>Load Pattern</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -376,9 +376,9 @@
     <string>System Information</string>
    </property>
   </action>
-  <action name="actionExport_animation_for_Arduino">
+  <action name="actionExport_pattern_for_Arduino">
    <property name="text">
-    <string>Export animation for Arduino</string>
+    <string>Export pattern for Arduino</string>
    </property>
   </action>
   <action name="actionVisit_the_BlinkyTape_forum">
@@ -396,7 +396,7 @@
     <string>Flip Horizontal</string>
    </property>
    <property name="toolTip">
-    <string>Flip the Animation in the horizontal direction</string>
+    <string>Flip the Pattern in the horizontal direction</string>
    </property>
   </action>
   <action name="actionFlip_Vertical">
@@ -404,7 +404,7 @@
     <string>Flip Vertical</string>
    </property>
    <property name="toolTip">
-    <string>Flip the Animation in the vertical direction</string>
+    <string>Flip the Pattern in the vertical direction</string>
    </property>
   </action>
   <action name="actionLoad_rainbow_sketch">
@@ -417,14 +417,14 @@
     <string>Save to Tape</string>
    </property>
   </action>
-  <action name="actionClear_Animation">
+  <action name="actionClear_Pattern">
    <property name="text">
-    <string>Clear Animation</string>
+    <string>Clear Pattern</string>
    </property>
   </action>
-  <action name="actionResize_Animation">
+  <action name="actionResize_Pattern">
    <property name="text">
-    <string>Resize Animation</string>
+    <string>Resize Pattern</string>
    </property>
   </action>
  </widget>
@@ -437,16 +437,16 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>AnimationEditor</class>
+   <class>PatternEditor</class>
    <extends>QWidget</extends>
-   <header>animationeditor.h</header>
+   <header>patterneditor.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>penSize</tabstop>
-  <tabstop>animationPlayPause</tabstop>
-  <tabstop>animationSpeed</tabstop>
+  <tabstop>patternPlayPause</tabstop>
+  <tabstop>patternSpeed</tabstop>
   <tabstop>saveToTape</tabstop>
   <tabstop>tapeConnectDisconnect</tabstop>
  </tabstops>
