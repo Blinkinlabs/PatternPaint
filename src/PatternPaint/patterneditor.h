@@ -19,7 +19,12 @@ public:
     /// @param scaled If true, scale the image to match the height of the previous pattern
     bool init(QImage newPattern, bool scaled = true);
 
+    /// Get the image data for the current pattern
+    /// @return QImage containing the current pattern
     QImage getPatternAsImage() { return pattern; }
+
+    /// Re-size the display grid and selector based on new widget geometery
+    void resizeEvent(QResizeEvent * event);
 
     void mousePressEvent(QMouseEvent * event);
     void mouseMoveEvent(QMouseEvent * event);

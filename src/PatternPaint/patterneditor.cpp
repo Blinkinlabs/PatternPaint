@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cmath>
 #include <QtWidgets>
+#include <QDebug>
 
 #define COLOR_CLEAR             QColor(0,0,0,0)
 #define COLOR_CANVAS_DEFAULT    QColor(0,0,0,0)
@@ -14,42 +15,21 @@
 #define COLOR_PLAYBACK_EDGE     QColor(255,255,255,255)
 #define COLOR_PLAYBACK_TOP      QColor(255,255,255,100)
 
-
-#define XSCALE_DEFAULT          10.4
-#define YSCALE_DEFAULT          10.4
-
 PatternEditor::PatternEditor(QWidget *parent) :
     QWidget(parent)
 {
 }
 
-void PatternEditor::init(int frameCount, int stripLength)
+void PatternEditor::resizeEvent(QResizeEvent * event)
 {
-    xScale = XSCALE_DEFAULT;  // How big we want to make it
-    yScale = YSCALE_DEFAULT;  // How big we want to make it
-
-    // Initialize the pattern to a
-    pattern = QImage(frameCount,
-                     stripLength,
-                     QImage::Format_RGB32);
-    pattern.fill(COLOR_CANVAS_DEFAULT);
-
-    // Rainbow swirl color
-//    float phase = 0;
-//    for(int x = 0; x < pattern.width();x++) {
-//        for(int y = 0; y < pattern.height(); y++) {
-
-//            int color = (((int)((std::sin(phase        + y/12.0) + 1)*127)) << 16)
-//                      + (((int)((std::sin(phase + 2.09 + y/12.0) + 1)*127)) << 8)
-//                      + (((int)((std::sin(phase + 4.18 + y/12.0) + 1)*127))     );
-//            pattern.setPixel(x,y,color);
-//        }
-//        phase += .105;
-//    }
+    // Set the x and y scale based on the widget size
+    // TODO: resize more intelligently (maybe minimum of both, or add scroll bars?)
+    xScale = float(size().height() - 1)/pattern.height();
+    yScale = float(size().height() - 1)/pattern.height();
 
     // And make a grid pattern to superimpose over the image
-    gridPattern = QImage(frameCount*xScale+1,
-                         stripLength*yScale+1,
+    gridPattern = QImage(pattern.width()*xScale  + 1,
+                         pattern.height()*yScale + 1,
                          QImage::Format_ARGB32);
     gridPattern.fill(COLOR_CLEAR);
 
@@ -84,22 +64,27 @@ void PatternEditor::init(int frameCount, int stripLength)
             painter.drawPoint(QPoint((x+1)*xScale -1,    (y+1)*yScale   -1));
         }
     }
+}
+
+void PatternEditor::init(int frameCount, int stripLength)
+{
+    // Initialize the pattern to a blank canvass
+    pattern = QImage(frameCount,
+                     stripLength,
+                     QImage::Format_RGB32);
+    pattern.fill(COLOR_CANVAS_DEFAULT);
 
     toolPreview = QImage(frameCount,
                          stripLength,
                          QImage::Format_ARGB32);
     toolPreview.fill(COLOR_CLEAR);
 
+    // TODO: Don't reset these here, they need to come from main...
     toolColor = COLOR_TOOL_DEFAULT;
     toolSize = 2;
 
     // Turn on mouse tracking so we can draw a preview
     setMouseTracking(true);
-
-    // Set the widget size
-    setFixedSize(pattern.width()*xScale+1,
-                 pattern.height()*yScale+1);
-    updateGeometry();
 
     update();
 }
