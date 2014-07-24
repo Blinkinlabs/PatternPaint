@@ -78,8 +78,9 @@ void PatternEditor::updateGridSize() {
     yScale = float(size().height() - 1)/pattern.height();
 
     // And make a grid pattern to superimpose over the image
-    gridPattern = QImage(pattern.width()*xScale  + 1,
-                         pattern.height()*yScale + 1,
+    //
+    gridPattern = QImage(pattern.width()*xScale  +.5 + 1,
+                         pattern.height()*yScale +.5 + 1,
                          QImage::Format_ARGB32);
     gridPattern.fill(COLOR_CLEAR);
 
@@ -90,28 +91,28 @@ void PatternEditor::updateGridSize() {
     // Draw vertical lines
     painter.setPen(COLOR_GRID_LINES);
     for(int x = 0; x <= pattern.width(); x++) {
-        painter.drawLine(std::min(int(x*xScale+.5), gridPattern.width()-1),
+        painter.drawLine(x*xScale+.5,
                          0,
-                         std::min(int(x*xScale+.5), gridPattern.width()-1),
+                         x*xScale+.5,
                          gridPattern.height());
     }
 
     // Draw horizontal lines
     for(int y = 0; y <= pattern.height(); y++) {
         painter.drawLine(0,
-                         std::min(int(y*yScale+.5), gridPattern.height()-1),
+                         y*yScale+.5,
                          gridPattern.width(),
-                         std::min(int(y*yScale+.5), gridPattern.height()-1));
+                         y*yScale+.5);
     }
 
     // Draw corners
     painter.setPen(COLOR_GRID_EDGES);
     for(int x = 0; x <= pattern.width(); x++) {
         for(int y = 0; y <= pattern.height(); y++) {
-            painter.drawPoint(QPoint(x*xScale     +.5 +1,    y*yScale       +.5 +1));
-            painter.drawPoint(QPoint((x+1)*xScale +.5 -1,    y*yScale       +.5 +1));
-            painter.drawPoint(QPoint(x*xScale     +.5 +1,    (y+1)*yScale   +.5 -1));
-            painter.drawPoint(QPoint((x+1)*xScale +.5 -1,    (y+1)*yScale   +.5 -1));
+            painter.drawPoint(QPoint(x*xScale     +.5 +1,    y*yScale     +.5 +1));
+            painter.drawPoint(QPoint((x+1)*xScale +.5 -1,    y*yScale     +.5 +1));
+            painter.drawPoint(QPoint(x*xScale     +.5 +1,    (y+1)*yScale +.5 -1));
+            painter.drawPoint(QPoint((x+1)*xScale +.5 -1,    (y+1)*yScale +.5 -1));
         }
     }
 }
@@ -203,14 +204,23 @@ void PatternEditor::paintEvent(QPaintEvent * /* event */)
     painter.drawRect(0,0,width()-1, height()-1);
 
     // Draw the image and tool preview
-    painter.drawImage(QRect(0,0,pattern.width()*xScale+1,pattern.height()*yScale+1), pattern);
-    painter.drawImage(QRect(0,0,pattern.width()*xScale+1,pattern.height()*yScale+1), toolPreview);
+    painter.drawImage(QRect(0,0,pattern.width()*xScale+.5,pattern.height()*yScale), pattern);
+    painter.drawImage(QRect(0,0,pattern.width()*xScale+.5,pattern.height()*yScale), toolPreview);
     painter.drawImage(0,0,gridPattern);
 
     // Draw the playback indicator
+    // Note that we need to compute the correct width based on the rounding error of
+    // the current cell, otherwise it won't line up correctly with the actual image.
     painter.setPen(COLOR_PLAYBACK_EDGE);
-    painter.drawRect(playbackRow*xScale,0,xScale, pattern.height()*yScale);
-    painter.fillRect(playbackRow*xScale,0,xScale, pattern.height()*yScale,COLOR_PLAYBACK_TOP);
+    painter.drawRect(playbackRow*xScale +.5,
+                     0,
+                     int((playbackRow+1)*xScale +.5) - int(playbackRow*xScale +.5),
+                     pattern.height()*yScale);
+    painter.fillRect(playbackRow*xScale +.5,
+                     0,
+                     int((playbackRow+1)*xScale +.5) - int(playbackRow*xScale +.5),
+                     pattern.height()*yScale,
+                     COLOR_PLAYBACK_TOP);
 
 //    // And a scrubber
 //    painter.setPen(COLOR_PLAYBACK_EDGE);
