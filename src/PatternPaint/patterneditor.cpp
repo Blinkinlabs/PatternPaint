@@ -90,28 +90,28 @@ void PatternEditor::updateGridSize() {
     // Draw vertical lines
     painter.setPen(COLOR_GRID_LINES);
     for(int x = 0; x <= pattern.width(); x++) {
-        painter.drawLine(x*xScale,
+        painter.drawLine(std::min(int(x*xScale+.5), gridPattern.width()-1),
                          0,
-                         x*xScale,
-                         pattern.height()*yScale-1);
+                         std::min(int(x*xScale+.5), gridPattern.width()-1),
+                         gridPattern.height());
     }
 
     // Draw horizontal lines
     for(int y = 0; y <= pattern.height(); y++) {
         painter.drawLine(0,
-                         y*yScale,
-                         pattern.width()*xScale-1,
-                         y*yScale);
+                         std::min(int(y*yScale+.5), gridPattern.height()-1),
+                         gridPattern.width(),
+                         std::min(int(y*yScale+.5), gridPattern.height()-1));
     }
 
     // Draw corners
     painter.setPen(COLOR_GRID_EDGES);
     for(int x = 0; x <= pattern.width(); x++) {
         for(int y = 0; y <= pattern.height(); y++) {
-            painter.drawPoint(QPoint(x*xScale     +1,    y*yScale       +1));
-            painter.drawPoint(QPoint((x+1)*xScale -1,    y*yScale       +1));
-            painter.drawPoint(QPoint(x*xScale     +1,    (y+1)*yScale   -1));
-            painter.drawPoint(QPoint((x+1)*xScale -1,    (y+1)*yScale   -1));
+            painter.drawPoint(QPoint(x*xScale     +.5 +1,    y*yScale       +.5 +1));
+            painter.drawPoint(QPoint((x+1)*xScale +.5 -1,    y*yScale       +.5 +1));
+            painter.drawPoint(QPoint(x*xScale     +.5 +1,    (y+1)*yScale   +.5 -1));
+            painter.drawPoint(QPoint((x+1)*xScale +.5 -1,    (y+1)*yScale   +.5 -1));
         }
     }
 }
@@ -212,7 +212,7 @@ void PatternEditor::paintEvent(QPaintEvent * /* event */)
     painter.drawRect(playbackRow*xScale,0,xScale, pattern.height()*yScale);
     painter.fillRect(playbackRow*xScale,0,xScale, pattern.height()*yScale,COLOR_PLAYBACK_TOP);
 
-//    // And the scrubber
+//    // And a scrubber
 //    painter.setPen(COLOR_PLAYBACK_EDGE);
 //    painter.drawPolygon();
 }

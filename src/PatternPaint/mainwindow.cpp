@@ -93,6 +93,8 @@ void MainWindow::drawTimer_timeout() {
     // TODO: move this state to somewhere; the patternEditor class maybe?
     static int n = 0;
 
+    // TODO: drop timeouts that come too quickly after a previous one (maybe 10ms dead time)
+
     // TODO: Get the width from elsewhere, so we don't need to load the image every frame
     QImage image = ui->patternEditor->getPatternAsImage();
 
