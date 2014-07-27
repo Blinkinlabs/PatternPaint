@@ -10,24 +10,21 @@ AvrProgrammer::AvrProgrammer(QObject *parent) :
     commandTimeoutTimer = new QTimer(this);
     commandTimeoutTimer->setSingleShot(true);
 
-    serial = NULL;
+    serial = new QSerialPort(this);
+    connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
+            this, SLOT(handleSerialError(QSerialPort::SerialPortError)));
+    connect(serial,SIGNAL(readyRead()),this,SLOT(handleReadData()));
 }
 
 bool AvrProgrammer::openSerial(QSerialPortInfo info) {
-    if(serial == NULL) {
-        serial = new QSerialPort(this);
-        connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
-                this, SLOT(handleSerialError(QSerialPort::SerialPortError)));
-        connect(serial,SIGNAL(readyRead()),this,SLOT(handleReadData()));
-    }
-
     if(isConnected()) {
         qCritical("Already connected to a programmer");
         return false;
     }
 
     qDebug() << "connecting to " << info.portName();
-    serial->setPort(info);
+    serial->setPortName(info.portName());
+    serial->setBaudRate(QSerialPort::Baud19200);
     serial->open(QIODevice::ReadWrite);
 
     if(!isConnected()) {
@@ -38,19 +35,10 @@ bool AvrProgrammer::openSerial(QSerialPortInfo info) {
 }
 
 void AvrProgrammer::closeSerial() {
-    if(serial == NULL) {
-        return;
-    }
-
     serial->close();
-    serial->deleteLater();
-    serial = NULL;
 }
 
 bool AvrProgrammer::isConnected() {
-    if(serial == NULL) {
-        return false;
-    }
     return serial->isOpen();
 }
 
@@ -144,12 +132,6 @@ void AvrProgrammer::handleSerialError(QSerialPort::SerialPortError serialError)
     if(serialError == QSerialPort::NoError) {
         // The serial library appears to emit an extraneous SerialPortError
         // when open() is called. Just ignore it.
-        return;
-    }
-
-    if(serial == NULL) {
-        qCritical() << "Got error after serial device was deleted!";
-        emit(error("serial error"));
         return;
     }
 

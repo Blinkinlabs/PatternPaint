@@ -72,11 +72,6 @@ void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
         return;
     }
 
-    if(serial == NULL) {
-        qCritical() << "Got error after serial device was deleted!";
-        return;
-    }
-
     // TODO: handle other error types?
     if (error == QSerialPort::ResourceError) {
         qCritical() << serial->errorString();
@@ -87,7 +82,7 @@ void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
 #if defined(Q_OS_WIN)
 void BlinkyTape::handleConnectionScannerTimer() {
     // If we are already disconnected, disregard.
-    if(serial == NULL) {
+    if(!isConnected()) {
         return;
     }
 
@@ -112,11 +107,6 @@ void BlinkyTape::handleConnectionScannerTimer() {
 #endif
 
 bool BlinkyTape::open(QSerialPortInfo info) {
-    if(serial == NULL) {
-        qCritical() << "NULL Serial port";
-        return false;
-    }
-
     if(isConnected()) {
         qCritical() << "Already connected to a BlinkyTape";
         return false;
@@ -155,20 +145,12 @@ bool BlinkyTape::open(QSerialPortInfo info) {
 }
 
 void BlinkyTape::close() {
-    if(serial == NULL) {
-        return;
-    }
-
     serial->close();
 
     emit(connectionStatusChanged(isConnected()));
 }
 
 bool BlinkyTape::isConnected() {
-    if(serial == NULL) {
-        return false;
-    }
-
     return serial->isOpen();
 }
 

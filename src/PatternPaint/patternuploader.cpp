@@ -54,6 +54,7 @@ void PatternUploader::handleProgrammerCommandFinished(QString command, QByteArra
 void PatternUploader::handleResetTimer()
 {
     emit(finished(true));
+    programmer.closeSerial();  // TODO: Is this the correct place?
 }
 
 
