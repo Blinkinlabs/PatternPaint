@@ -144,8 +144,20 @@ void PatternEditor::leaveEvent(QEvent * event) {
 }
 
 void PatternEditor::mouseMoveEvent(QMouseEvent *event){
+    static int oldX = -1;
+    static int oldY = -1;
+
     int x = event->x()/xScale;
     int y = event->y()/yScale;
+
+    // If the position hasn't changed, don't do anything.
+    // This is to improve responsiveness on slower computers.
+    if(x == oldX && y == oldY) {
+        return;
+    }
+
+    oldX = x;
+    oldY = y;
 
     // If we aren't pressed down, just draw a preview
     QPainter painter(&toolPreview);
