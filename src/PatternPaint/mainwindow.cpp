@@ -89,9 +89,21 @@ MainWindow::~MainWindow()
 }
 
 
+#define MIN_INTERVAL 10  // minimum interval to wait before firing a drawtimer update
+
 void MainWindow::drawTimer_timeout() {
     // TODO: move this state to somewhere; the patternEditor class maybe?
     static int n = 0;
+
+    static qint64 lastTime = 0;
+
+    qint64 newTime = QDateTime::currentMSecsSinceEpoch();
+    if (newTime - lastTime < MIN_INTERVAL) {
+        qDebug() << "Too short time, last interval:" << lastTime << "Now:" << newTime;
+        return;
+    }
+
+    lastTime = newTime;
 
     // TODO: drop timeouts that come too quickly after a previous one (maybe 10ms dead time)
 
@@ -101,7 +113,6 @@ void MainWindow::drawTimer_timeout() {
     if(tape->isConnected()) {
         QByteArray ledData;
 
-
         for(int i = 0; i < image.height(); i++) {
             QRgb color = ColorModel::correctBrightness(image.pixel(n, i));
             ledData.append(qRed(color));
@@ -109,10 +120,10 @@ void MainWindow::drawTimer_timeout() {
             ledData.append(qBlue(color));
         }
         tape->sendUpdate(ledData);
-    }
 
-    n = (n+1)%image.width();
-    ui->patternEditor->setPlaybackRow(n);
+        n = (n+1)%image.width();
+        ui->patternEditor->setPlaybackRow(n);
+    }
 }
 
 

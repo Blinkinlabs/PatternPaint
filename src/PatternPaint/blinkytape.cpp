@@ -53,9 +53,11 @@ QList<QSerialPortInfo> BlinkyTape::findBlinkyTapeBootloaders()
 BlinkyTape::BlinkyTape(QObject *parent, int ledCount_) :
     QObject(parent)
 {
-    ledCount = ledCount_;
+    serial = new QSerialPort(this);
+    connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
+            this, SLOT(handleSerialError(QSerialPort::SerialPortError)));
 
-    serial = NULL;
+    ledCount = ledCount_;
 
 #if defined(Q_OS_WIN)
     connectionScannerTimer = new QTimer(this);
@@ -111,9 +113,8 @@ void BlinkyTape::handleConnectionScannerTimer() {
 
 bool BlinkyTape::open(QSerialPortInfo info) {
     if(serial == NULL) {
-        serial = new QSerialPort(this);
-        connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
-                this, SLOT(handleSerialError(QSerialPort::SerialPortError)));
+        qCritical() << "NULL Serial port";
+        return false;
     }
 
     if(isConnected()) {
@@ -122,11 +123,16 @@ bool BlinkyTape::open(QSerialPortInfo info) {
     }
 
     qDebug() << "Connecting to BlinkyTape on " << info.portName();
-    serial->setPort(info);
-    serial->setBaudRate(QSerialPort::Baud19200);
+    //serial->setPort(info);
 
-    bool response = serial->open(QIODevice::WriteOnly);
-    if(!response) {
+    serial->setPortName(info.portName());
+    serial->setBaudRate(QSerialPort::Baud19200);
+//    serial->setDataBits(QSerialPort::Data8);
+//    serial->setParity(QSerialPort::NoParity);
+//    serial->setStopBits(QSerialPort::OneStop);
+//    serial->setFlowControl(QSerialPort::NoFlowControl);
+
+    if( !serial->open(QIODevice::ReadWrite) ) {
         qDebug() << "error: " << serial->error() << serial->errorString();
         qDebug() << "Could not connect to BlinkyTape";
         return false;
@@ -154,8 +160,6 @@ void BlinkyTape::close() {
     }
 
     serial->close();
-    serial->deleteLater();
-    serial = NULL;
 
     emit(connectionStatusChanged(isConnected()));
 }
@@ -174,6 +178,11 @@ void BlinkyTape::sendUpdate(QByteArray LedData)
         // TODO: Signal error?
         qCritical() << "Strip not connected, not sending update!";
         return;
+    }
+
+    // Try to read anything that's available
+    if(serial->bytesAvailable() > 0) {
+        serial->readAll();
     }
 
     // TODO: Check if we can write to the device?
