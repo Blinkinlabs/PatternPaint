@@ -49,6 +49,8 @@ private:
     /// Redraw the gridPattern to fit the current widget size.
     void updateGridSize();
 
+    /// Update the screen, but only if we haven't done so in a while
+    void lazyUpdate();
 signals:
 
 public slots:

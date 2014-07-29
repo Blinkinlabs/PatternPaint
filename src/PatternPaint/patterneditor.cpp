@@ -134,7 +134,7 @@ void PatternEditor::mousePressEvent(QMouseEvent *event){
     painter.drawPoint(x,y);
     painter.drawEllipse ( QPoint(x,y), toolSize/2, toolSize/2 );
 
-    update();
+    lazyUpdate();
 }
 
 void PatternEditor::leaveEvent(QEvent * event) {
@@ -143,7 +143,19 @@ void PatternEditor::leaveEvent(QEvent * event) {
     update();
 }
 
+#define MIN_MOUSE_INTERVAL 5
+
 void PatternEditor::mouseMoveEvent(QMouseEvent *event){
+    // Ignore the update request if it came too quickly
+    static qint64 lastTime = 0;
+    qint64 newTime = QDateTime::currentMSecsSinceEpoch();
+    if (newTime - lastTime < MIN_MOUSE_INTERVAL) {
+        qDebug() << "Too short time, last interval:" << lastTime << "Now:" << newTime;
+        return;
+    }
+
+    lastTime = newTime;
+
     static int oldX = -1;
     static int oldY = -1;
 
@@ -191,7 +203,7 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
         painter.drawEllipse ( QPoint(x,y), toolSize/2, toolSize/2 );
     }
 
-    update();
+    lazyUpdate();
 }
 
 void PatternEditor::setToolColor(QColor color) {
@@ -204,6 +216,23 @@ void PatternEditor::setToolSize(int size) {
 
 void PatternEditor::setPlaybackRow(int row) {
     playbackRow = row;
+    lazyUpdate();
+}
+
+
+#define MIN_INTERVAL 5  // minimum interval to wait before firing an update
+
+void PatternEditor::lazyUpdate() {
+    // Ignore the update request if it came too quickly
+    static qint64 lastTime = 0;
+    qint64 newTime = QDateTime::currentMSecsSinceEpoch();
+    if (newTime - lastTime < MIN_INTERVAL) {
+        qDebug() << "Too short time, last interval:" << lastTime << "Now:" << newTime;
+        return;
+    }
+
+    lastTime = newTime;
+
     update();
 }
 
