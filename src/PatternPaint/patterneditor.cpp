@@ -16,6 +16,7 @@
 #define COLOR_PLAYBACK_TOP      QColor(255,255,255,100)
 
 #define MIN_UPDATE_INTERVAL     15  // minimum interval between screen updates, in ms
+#define MIN_MOUSE_INTERVAL      5   // minimum interval between mouse inputs, in ms
 
 PatternEditor::PatternEditor(QWidget *parent) :
     QWidget(parent)
@@ -32,12 +33,12 @@ void PatternEditor::init(int frameCount, int stripLength)
     // Initialize the pattern to a blank canvass
     pattern = QImage(frameCount,
                      stripLength,
-                     QImage::Format_RGB32);
+                     QImage::Format_ARGB32_Premultiplied);
     pattern.fill(COLOR_CANVAS_DEFAULT);
 
     toolPreview = QImage(frameCount,
                          stripLength,
-                         QImage::Format_ARGB32);
+                         QImage::Format_ARGB32_Premultiplied);
     toolPreview.fill(COLOR_CLEAR);
 
     // TODO: Don't reset these here, they need to come from main...
@@ -83,7 +84,7 @@ void PatternEditor::updateGridSize() {
     //
     gridPattern = QImage(pattern.width()*xScale  +.5 + 1,
                          pattern.height()*yScale +.5 + 1,
-                         QImage::Format_ARGB32);
+                         QImage::Format_ARGB32_Premultiplied);
     gridPattern.fill(COLOR_CLEAR);
 
     QPainter painter(&gridPattern);
@@ -119,14 +120,12 @@ void PatternEditor::updateGridSize() {
     }
 }
 
-void PatternEditor::mousePressEvent(QMouseEvent *event){
-    int x = event->x()/xScale;
-    int y = event->y()/yScale;
-
+void PatternEditor::applyTool(int x, int y) {
     QPainter painter(&pattern);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter.setRenderHint(QPainter::Antialiasing, false);
     painter.setPen(toolColor);
+
 
     QBrush brush = painter.brush();
     brush.setStyle(Qt::SolidPattern);
@@ -135,45 +134,9 @@ void PatternEditor::mousePressEvent(QMouseEvent *event){
 
     painter.drawPoint(x,y);
     painter.drawEllipse ( QPoint(x,y), toolSize/2, toolSize/2 );
-
-    lazyUpdate();
 }
 
-void PatternEditor::leaveEvent(QEvent * event) {
-    toolPreview.fill(COLOR_CLEAR);
-
-    update();
-}
-
-#define MIN_MOUSE_INTERVAL 5
-
-void PatternEditor::mouseMoveEvent(QMouseEvent *event){
-    // Ignore the update request if it came too quickly
-    static qint64 lastTime = 0;
-    qint64 newTime = QDateTime::currentMSecsSinceEpoch();
-    if (newTime - lastTime < MIN_MOUSE_INTERVAL) {
-        qDebug() << "Too short time, last interval:" << lastTime << "Now:" << newTime;
-        return;
-    }
-
-    lastTime = newTime;
-
-    static int oldX = -1;
-    static int oldY = -1;
-
-    int x = event->x()/xScale;
-    int y = event->y()/yScale;
-
-    // If the position hasn't changed, don't do anything.
-    // This is to improve responsiveness on slower computers.
-    if(x == oldX && y == oldY) {
-        return;
-    }
-
-    oldX = x;
-    oldY = y;
-
-    // If we aren't pressed down, just draw a preview
+void PatternEditor::updateToolPreview(int x, int y) {
     QPainter painter(&toolPreview);
     toolPreview.fill(COLOR_CLEAR);
 
@@ -188,21 +151,55 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
 
     painter.drawPoint(x,y);
     painter.drawEllipse ( QPoint(x,y), toolSize/2, toolSize/2 );
+}
 
+void PatternEditor::mousePressEvent(QMouseEvent *event){
+    int x = event->x()/xScale;
+    int y = event->y()/yScale;
+
+    applyTool(x,y);
+
+    lazyUpdate();
+}
+
+void PatternEditor::leaveEvent(QEvent * event) {
+    toolPreview.fill(COLOR_CLEAR);
+
+    update();
+}
+
+void PatternEditor::mouseMoveEvent(QMouseEvent *event){
+    // Ignore the update request if it came too quickly
+    static qint64 lastTime = 0;
+    qint64 newTime = QDateTime::currentMSecsSinceEpoch();
+    if (newTime - lastTime < MIN_MOUSE_INTERVAL) {
+        qDebug() << "Ignoring mouse event due to rate limiting. Last update " << newTime - lastTime << "ms ago";
+        return;
+    }
+
+    lastTime = newTime;
+
+    static int oldX = -1;
+    static int oldY = -1;
+
+    int x = event->x()/xScale;
+    int y = event->y()/yScale;
+
+    // If the position hasn't changed, don't do anything.
+    // This is to avoid expensive reprocessing of the tool preview window.
+    if(x == oldX && y == oldY) {
+        return;
+    }
+
+    oldX = x;
+    oldY = y;
+
+    // Update the preview layer
+    updateToolPreview(x,y);
+
+    // If the left button is pressed, also apply the tool
     if( event->buttons() &  Qt::LeftButton ) {
-        QPainter painter(&pattern);
-        painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
-        painter.setRenderHint(QPainter::Antialiasing, false);
-        painter.setPen(toolColor);
-
-
-        QBrush brush = painter.brush();
-        brush.setStyle(Qt::SolidPattern);
-        brush.setColor(toolColor);
-        painter.setBrush(brush);
-
-        painter.drawPoint(x,y);
-        painter.drawEllipse ( QPoint(x,y), toolSize/2, toolSize/2 );
+        applyTool(x,y);
     }
 
     lazyUpdate();
@@ -226,7 +223,7 @@ void PatternEditor::lazyUpdate() {
     static qint64 lastTime = 0;
     qint64 newTime = QDateTime::currentMSecsSinceEpoch();
     if (newTime - lastTime < MIN_UPDATE_INTERVAL) {
-        qDebug() << "Dropping update due to rate limiting. Last update:" << lastTime << "Now:" << newTime;
+        qDebug() << "Dropping update due to rate limiting. Last update " << newTime - lastTime << "ms ago";
         return;
     }
 
@@ -240,8 +237,6 @@ void PatternEditor::paintEvent(QPaintEvent * /* event */)
     QPainter painter(this);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter.setRenderHint(QPainter::Antialiasing, false);
-
-    painter.drawRect(0,0,width()-1, height()-1);
 
     // Draw the image and tool preview
     painter.drawImage(QRect(0,0,pattern.width()*xScale+.5,pattern.height()*yScale), pattern);

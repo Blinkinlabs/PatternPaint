@@ -38,6 +38,7 @@ private:
     QImage pattern;        ///< The actual image
     QImage gridPattern;    ///< Holds the pre-rendered grid overlay
     QImage toolPreview;    ///< Holds a preview of the current tool
+
     float xScale;          ///< Number of pixels in the grid pattern per pattern pixel.
     float yScale;          ///< Number of pixels in the grid pattern per pattern pixel.
 
@@ -51,6 +52,8 @@ private:
 
     /// Update the screen, but only if we haven't done so in a while
     void lazyUpdate();
+    void applyTool(int x, int y);
+    void updateToolPreview(int x, int y);
 signals:
 
 public slots:
