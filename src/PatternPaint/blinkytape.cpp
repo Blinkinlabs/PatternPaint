@@ -50,14 +50,12 @@ QList<QSerialPortInfo> BlinkyTape::findBlinkyTapeBootloaders()
 }
 
 
-BlinkyTape::BlinkyTape(QObject *parent, int ledCount_) :
+BlinkyTape::BlinkyTape(QObject *parent) :
     QObject(parent)
 {
     serial = new QSerialPort(this);
     connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
             this, SLOT(handleSerialError(QSerialPort::SerialPortError)));
-
-    ledCount = ledCount_;
 
 #if defined(Q_OS_WIN)
     connectionScannerTimer = new QTimer(this);
@@ -179,10 +177,10 @@ void BlinkyTape::sendUpdate(QByteArray LedData)
         return;
     }
 
-    if(LedData.length() != ledCount*3) {
-        qCritical() << "Length not correct, not sending update!";
-        return;
-    }
+//    if(LedData.length() != ledCount*3) {
+//        qCritical() << "Length not correct, not sending update!";
+//        return;
+//    }
 
     // Trim anything that's 0xff
     for(int i = 0; i < LedData.length(); i++) {
@@ -218,8 +216,12 @@ void BlinkyTape::reset()
     }
 
     qDebug() << "Attempting to reset BlinkyTape";
-    serial->setSettingsRestoredOnClose(false);
-    serial->setBaudRate(QSerialPort::Baud1200);
 
+    serial->setSettingsRestoredOnClose(true);
+    if(!serial->setBaudRate(QSerialPort::Baud1200)) {
+        qDebug() << "Error setting baud rate: " << serial->error() << serial->errorString();
+    }
+
+    // How to delay here???
     close();
 }

@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
     drawTimer->start(33);
 
-    tape = new BlinkyTape(this, DEFAULT_PATTERN_HEIGHT);
+    tape = new BlinkyTape(this);
 
     // Modify our UI when the tape connection status changes
     connect(tape, SIGNAL(connectionStatusChanged(bool)),
@@ -95,8 +95,8 @@ void MainWindow::drawTimer_timeout() {
     // TODO: move this state to somewhere; the patternEditor class maybe?
     static int n = 0;
 
+    // Ignore the timeout if it came to quickly, so that we don't overload the tape
     static qint64 lastTime = 0;
-
     qint64 newTime = QDateTime::currentMSecsSinceEpoch();
     if (newTime - lastTime < MIN_INTERVAL) {
         qDebug() << "Too short time, last interval:" << lastTime << "Now:" << newTime;
@@ -105,7 +105,6 @@ void MainWindow::drawTimer_timeout() {
 
     lastTime = newTime;
 
-    // TODO: drop timeouts that come too quickly after a previous one (maybe 10ms dead time)
 
     // TODO: Get the width from elsewhere, so we don't need to load the image every frame
     QImage image = ui->patternEditor->getPatternAsImage();

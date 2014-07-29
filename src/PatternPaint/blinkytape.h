@@ -28,7 +28,7 @@ public:
     static QList<QSerialPortInfo> findBlinkyTapes();
     static QList<QSerialPortInfo> findBlinkyTapeBootloaders();
 
-    BlinkyTape(QObject *parent, int ledCount);
+    BlinkyTape(QObject *parent);
 
     // TODO: Destructor!
 
@@ -47,9 +47,6 @@ public:
 private:
     /// Serial port the BlinkyTape is connected to
     QSerialPort* serial;
-
-    // Number of LEDs on the BlinkyTape
-    int ledCount;
 
 #if defined(Q_OS_WIN)
     // Windows only: Timer that periodically checks if the serial device is
