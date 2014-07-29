@@ -72,10 +72,14 @@ void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
         return;
     }
 
+    // Handle a spurious disconnect, like when the user unplugs the BlinkyTape
     // TODO: handle other error types?
     if (error == QSerialPort::ResourceError) {
-        qCritical() << serial->errorString();
+        qCritical() << "Serial resource error, BlinkyTape unplugged?" << serial->errorString();
         close();
+    }
+    else {
+        qCritical() << "Unrecognized serial error:" << serial->error() << serial->errorString();
     }
 }
 
@@ -113,18 +117,12 @@ bool BlinkyTape::open(QSerialPortInfo info) {
     }
 
     qDebug() << "Connecting to BlinkyTape on " << info.portName();
-    //serial->setPort(info);
 
     serial->setPortName(info.portName());
-    serial->setBaudRate(QSerialPort::Baud19200);
-//    serial->setDataBits(QSerialPort::Data8);
-//    serial->setParity(QSerialPort::NoParity);
-//    serial->setStopBits(QSerialPort::OneStop);
-//    serial->setFlowControl(QSerialPort::NoFlowControl);
+    serial->setBaudRate(QSerialPort::Baud115200);
 
     if( !serial->open(QIODevice::ReadWrite) ) {
-        qDebug() << "error: " << serial->error() << serial->errorString();
-        qDebug() << "Could not connect to BlinkyTape";
+        qDebug() << "Could not connect to BlinkyTape. Error: " << serial->error() << serial->errorString();
         return false;
     }
 
@@ -132,6 +130,10 @@ bool BlinkyTape::open(QSerialPortInfo info) {
         qDebug() << "Could not connect to BlinkyTape";
         return false;
     }
+
+    // TODO: Create a new serial port object, instead of clearing the current one?
+    serial->clear(QSerialPort::AllDirections);
+    serial->clearError();
 
     emit(connectionStatusChanged(true));
 
@@ -162,12 +164,20 @@ void BlinkyTape::sendUpdate(QByteArray LedData)
         return;
     }
 
-    // Try to read anything that's available
+    // Read out any data the strip might have sent, to avoid overflowing the
+    // read buffer. BlinkyTapes with stock firmware might send a single byte
+    // back after every update.
     if(serial->bytesAvailable() > 0) {
-        serial->readAll();
+        serial->clear(QSerialPort::Input);
     }
 
-    // TODO: Check if we can write to the device?
+    // If there is data pending to send, skip this update to prevent overflowing
+    // the buffer.
+    // TODO: Tested on OS X. Does this work on Windows, Linux?
+    if(serial->bytesToWrite() >0) {
+        qDebug() << "Output data still in buffer, dropping this update frame";
+        return;
+    }
 
     if(LedData.length() != ledCount*3) {
         qCritical() << "Length not correct, not sending update!";
