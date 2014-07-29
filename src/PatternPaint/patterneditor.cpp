@@ -15,6 +15,8 @@
 #define COLOR_PLAYBACK_EDGE     QColor(255,255,255,255)
 #define COLOR_PLAYBACK_TOP      QColor(255,255,255,100)
 
+#define MIN_UPDATE_INTERVAL     15  // minimum interval between screen updates, in ms
+
 PatternEditor::PatternEditor(QWidget *parent) :
     QWidget(parent)
 {
@@ -219,15 +221,12 @@ void PatternEditor::setPlaybackRow(int row) {
     lazyUpdate();
 }
 
-
-#define MIN_INTERVAL 5  // minimum interval to wait before firing an update
-
 void PatternEditor::lazyUpdate() {
     // Ignore the update request if it came too quickly
     static qint64 lastTime = 0;
     qint64 newTime = QDateTime::currentMSecsSinceEpoch();
-    if (newTime - lastTime < MIN_INTERVAL) {
-        qDebug() << "Too short time, last interval:" << lastTime << "Now:" << newTime;
+    if (newTime - lastTime < MIN_UPDATE_INTERVAL) {
+        qDebug() << "Dropping update due to rate limiting. Last update:" << lastTime << "Now:" << newTime;
         return;
     }
 
