@@ -19,4 +19,7 @@ Developing
 
 PatternPaint is written in C++ with QT (5.1.1) libraries. The easiest way to get started is to download QT Creator
 (2.8.1 at time of writing), and open the project file:
+http://download.qt-project.org/archive/qt/5.1/5.1.1/
+
+The most recent version of QT is available here, but may have issues.
 http://qt-project.org/downloads
