@@ -18,6 +18,8 @@
 #define DEFAULT_PATTERN_HEIGHT 60
 #define DEFAULT_PATTERN_LENGTH 100
 
+#define MIN_TIMER_INTERVAL 10  // minimum interval to wait before firing a drawtimer update
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -88,9 +90,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
-#define MIN_INTERVAL 10  // minimum interval to wait before firing a drawtimer update
-
 void MainWindow::drawTimer_timeout() {
     // TODO: move this state to somewhere; the patternEditor class maybe?
     static int n = 0;
@@ -98,8 +97,8 @@ void MainWindow::drawTimer_timeout() {
     // Ignore the timeout if it came to quickly, so that we don't overload the tape
     static qint64 lastTime = 0;
     qint64 newTime = QDateTime::currentMSecsSinceEpoch();
-    if (newTime - lastTime < MIN_INTERVAL) {
-        qDebug() << "Too short time, last interval:" << lastTime << "Now:" << newTime;
+    if (newTime - lastTime < MIN_TIMER_INTERVAL) {
+        qDebug() << "Dropping timer update due to rate limiting. Last update " << newTime - lastTime << "ms ago";
         return;
     }
 

@@ -31,6 +31,10 @@ bool AvrProgrammer::openSerial(QSerialPortInfo info) {
         return false;
     }
 
+    // TODO: Create a new serial port object, instead of clearing the current one?
+    serial->clear(QSerialPort::AllDirections);
+    serial->clearError();
+
     return true;
 }
 
