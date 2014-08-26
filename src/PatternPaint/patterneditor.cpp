@@ -23,7 +23,7 @@ PatternEditor::PatternEditor(QWidget *parent) :
 {
 }
 
-void PatternEditor::resizeEvent(QResizeEvent * event)
+void PatternEditor::resizeEvent(QResizeEvent * __attribute__((unused))event)
 {
     updateGridSize();
 }
@@ -162,7 +162,7 @@ void PatternEditor::mousePressEvent(QMouseEvent *event){
     lazyUpdate();
 }
 
-void PatternEditor::leaveEvent(QEvent * event) {
+void PatternEditor::leaveEvent(QEvent * __attribute__((unused))event) {
     toolPreview.fill(COLOR_CLEAR);
 
     update();

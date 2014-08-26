@@ -1,5 +1,5 @@
 #include "patternuploader.h"
-#include "PatternPlayer_Sketch.h"
+#include "uploaddata.h"
 
 #include <QDebug>
 
@@ -41,7 +41,7 @@ void PatternUploader::handleProgrammerError(QString error) {
     emit(finished(false));
 }
 
-void PatternUploader::handleProgrammerCommandFinished(QString command, QByteArray returnData) {
+void PatternUploader::handleProgrammerCommandFinished(QString command, QByteArray __attribute__((unused))returnData) {
     // TODO: Update our progress somehow? But how to tell how far we've gotten?
     qDebug() << "Command finished:" << command;
     updateProgress(progress + 1);
@@ -67,95 +67,9 @@ void PatternUploader::updateProgress(int newProgress) {
 }
 
 
-class uploadData {
-public:
-    bool init(std::vector<Pattern> patterns);
 
-    QByteArray sketch;
-    QByteArray patternData;
-    QByteArray patternTable;
-
-    QString errorString;
-};
-
-bool uploadData::init(std::vector<Pattern> patterns) {
-    char buff[BUFF_LENGTH];
-    QString errorString;
-
-    // We need to build two things- a memory image containing the sketch and pattern data,
-    // and a memory image containing the pattern data information table.
-
-    sketch = QByteArray();          // Program data
-    patternData = QByteArray();     // Pattern Data
-    patternTable = QByteArray();    // Pattern data header
-
-    sketch.append(PatternPlayerSketch, sizeof(PatternPlayerSketch));
-
-#define PATTERN_TABLE_HEADER_LENGTH     2
-#define PATTERN_TABLE_ENTRY_LENGTH      7
-
-    // Test for the minimum/maximum patterns size
-    if(patterns.size() == 0) {
-        errorString = QString("No Patterns detected!");
-        return false;
-    }
-    if(patterns.size() >= ((FLASH_MEMORY_PAGE_SIZE - PATTERN_TABLE_HEADER_LENGTH) / PATTERN_TABLE_ENTRY_LENGTH)) {
-        errorString = QString("Too many patterns, cannot fit in pattern table.");
-        return false;
-    }
-
-    snprintf(buff, BUFF_LENGTH, "Building pattern array. Pattern Count: %i, led count: %i",
-             patterns.size(),
-             patterns[0].ledCount);
-    qDebug() << buff;
-
-    patternTable.append(static_cast<char>(patterns.size()));       // First byte of the metadata is how many patterns there are
-    patternTable.append(static_cast<char>(patterns[0].ledCount));  // Second byte is the length of the LED strip
-    // TODO: make the LED count to a separate, explicit parameter?
-
-    int dataOffset = sketch.length();
-
-    // Now, for each pattern, append the image data to the sketch
-    for(std::vector<Pattern>::iterator pattern = patterns.begin(); pattern != patterns.end(); ++pattern) {
-        snprintf(buff, BUFF_LENGTH, "Adding pattern. Encoding: %x, framecount: %i, frameDelay: %i, size: %iB, offset: %iB",
-                 pattern->encoding,
-                 pattern->frameCount,
-                 pattern->frameDelay,
-                 pattern->data.length(),
-                 dataOffset);
-        qDebug() << buff;
-
-        // Build the table entry for this pattern
-        patternTable.append(static_cast<char>((pattern->encoding) & 0xFF));             // Offset 0: encoding (1 byte)
-        patternTable.append(static_cast<char>((dataOffset >> 8) & 0xFF));               // Offset 1: memory location (2 bytes)
-        patternTable.append(static_cast<char>((dataOffset     ) & 0xFF));
-        patternTable.append(static_cast<char>((pattern->frameCount >> 8  ) & 0xFF));    // Offset 3: frame count (2 bytes)
-        patternTable.append(static_cast<char>((pattern->frameCount       ) & 0xFF));
-        patternTable.append(static_cast<char>((pattern->frameDelay >> 8  ) & 0xFF));    // Offset 5: frame delay (2 bytes)
-        patternTable.append(static_cast<char>((pattern->frameDelay       ) & 0xFF));
-
-        // and append the image data
-        patternData += pattern->data;
-        dataOffset += pattern->data.length();
-    }
-
-    // Pad pattern table to FLASH_MEMORY_PAGE_SIZE bytes.
-    while(patternTable.length() < FLASH_MEMORY_PAGE_SIZE) {
-        patternTable.append(static_cast<char>(0xFF));
-    }
-
-    snprintf(buff, BUFF_LENGTH, "Sketch size: %iB, pattern data size: %iB, pattern table size: %iB",
-             sketch.length(),
-             patternData.length(),
-             patternTable.length());
-    qDebug() << buff;
-
-    return true;
-}
 
 bool PatternUploader::startUpload(BlinkyTape& tape, std::vector<Pattern> patterns) {
-    char buff[BUFF_LENGTH];
-
     updateProgress(0);
 
     // We can't reset if we weren't already connected...
@@ -164,9 +78,7 @@ bool PatternUploader::startUpload(BlinkyTape& tape, std::vector<Pattern> pattern
         return false;
     }
 
-/// Create the compressed image and check if it will fit into the device memory
-
-
+    /// Create the compressed image and check if it will fit into the device memory
     uploadData data;
     if(!data.init(patterns)) {
         errorString = data.errorString;
@@ -178,26 +90,22 @@ bool PatternUploader::startUpload(BlinkyTape& tape, std::vector<Pattern> pattern
 
     // The entire sketch must fit into the available memory, minus a single page
     // at the end of flash for the configuration header
-    // TODO: Could save ~100 bytes if we let the sketch spill into the unused portion
-    // of the header.
-    if(data.sketch.length() + data.patternTable.length() > FLASH_MEMORY_AVAILABLE) {
+    if(data.sketch.length() + data.patternData.length() + data.patternTable.length() > FLASH_MEMORY_AVAILABLE) {
         qDebug() << "sketch can't fit into memory!";
 
-        errorString = QString("Sorry! The Pattern is a bit too big to fit in BlinkyTape memory right now. We're working on improving this! Avaiable space=%1, Pattern size=%2")
+        errorString = QString("Sorry! The Pattern is a bit too big to fit in BlinkyTape memory! Avaiable space=%1, Pattern size=%2")
                               .arg(FLASH_MEMORY_AVAILABLE)
                               .arg(data.sketch.length() + data.patternData.length() + data.patternTable.length());
         return false;
     }
 
     // Put the sketch, pattern, and metadata into the programming queue.
-    flashData.push_back(FlashSection(0, data.sketch));
-    flashData.push_back(FlashSection(0, data.patternData));
-    flashData.push_back(FlashSection(FLASH_MEMORY_PATTERN_TABLE_ADDRESS, data.patternTable));
+    flashData.push_back(FlashSection(data.sketchAddess,        data.sketch));
+    flashData.push_back(FlashSection(data.patternDataAddress,  data.patternData));
+    flashData.push_back(FlashSection(data.patternTableAddress, data.patternTable));
 
-/// Attempt to reset the strip using the 1200 baud rate method, and identify the newly connected bootloader
     // Next, tell the tape to reset.
     tape.reset();
-
 
     // Now, start the polling processes to detect a new bootloader
     stateStartTime = QDateTime::currentDateTime();

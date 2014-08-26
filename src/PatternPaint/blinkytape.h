@@ -7,19 +7,20 @@
 #include <QtSerialPort/QSerialPortInfo>
 
 /// Some defines that should go into a processor-specific class
-#define FLASH_MEMORY_AVAILABLE 0x7000  // Amount of application space in the flash
-#define FLASH_MEMORY_PAGE_SIZE 0x80    // Size of a page of memory in our flash
+#define FLASH_MEMORY_AVAILABLE          0x7000  // Amount of application space in the flash
+#define FLASH_MEMORY_PAGE_SIZE          0x80    // Size of a page of memory in our flash
+#define FLASH_MEMORY_SKETCH_ADDRESS     0x0000  // Location of sketch
 #define FLASH_MEMORY_PATTERN_TABLE_ADDRESS (FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE) // Location of pattern table
 
-#define BLINKYTAPE_SKETCH_VID 0x1D50
-#define BLINKYTAPE_SKETCH_PID 0x605E
-#define BLINKYTAPE_BOOTLOADER_VID 0x1D50
-#define BLINKYTAPE_BOOTLOADER_PID 0x606C
+#define BLINKYTAPE_SKETCH_VID           0x1D50
+#define BLINKYTAPE_SKETCH_PID           0x605E
+#define BLINKYTAPE_BOOTLOADER_VID       0x1D50
+#define BLINKYTAPE_BOOTLOADER_PID       0x606C
 
-#define LEONARDO_SKETCH_VID 0x2341
-#define LEONARDO_SKETCH_PID 0x8036
-#define LEONARDO_BOOTLOADER_VID 0x2341
-#define LEONARDO_BOOTLOADER_PID 0x0036
+#define LEONARDO_SKETCH_VID             0x2341
+#define LEONARDO_SKETCH_PID             0x8036
+#define LEONARDO_BOOTLOADER_VID         0x2341
+#define LEONARDO_BOOTLOADER_PID         0x0036
 
 /// Connect to a BlinkyTape over a serial port, and manage sending data to it.
 class BlinkyTape : public QObject

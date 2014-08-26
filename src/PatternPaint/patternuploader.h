@@ -1,12 +1,12 @@
+#ifndef PATTERNUPLOADER_H
+#define PATTERNUPLOADER_H
+
 #include <QObject>
 #include <QTimer>
 #include <iostream>
 #include "pattern.h"
 #include "avrprogrammer.h"
 #include "blinkytape.h"
-
-#ifndef PATTERNUPLOADER_H
-#define PATTERNUPLOADER_H
 
 struct FlashSection {
     FlashSection(int address,

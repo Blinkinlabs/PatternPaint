@@ -1,9 +1,8 @@
-#include <QImage>
-#include <QString>
-
 #ifndef PATTERN_H
 #define PATTERN_H
 
+#include <QImage>
+#include <QString>
 
 /// Container for a compressed pattern
 /// This class performs a 1-shot compression of an image from a QIMage.

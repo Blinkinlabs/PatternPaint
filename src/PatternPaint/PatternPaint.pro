@@ -40,7 +40,8 @@ SOURCES += main.cpp\
     pattern.cpp \
     patterneditor.cpp \
     resizepattern.cpp \
-    patternuploader.cpp
+    patternuploader.cpp \
+    uploaddata.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
@@ -54,7 +55,8 @@ HEADERS  += mainwindow.h \
     pattern.h \
     patterneditor.h \
     resizepattern.h \
-    patternuploader.h
+    patternuploader.h \
+    uploaddata.h
 
 FORMS    += mainwindow.ui \
     systeminformation.ui \
