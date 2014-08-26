@@ -21,7 +21,11 @@ bool uploadData::init(std::vector<Pattern> patterns) {
 
     sketch.append(PatternPlayerSketch, sizeof(PatternPlayerSketch));
 
-    // TODO: expand sketch size to FLASH_MEMORY_PAGE_SIZE boundary
+    // Expand sketch size to FLASH_MEMORY_PAGE_SIZE boundary
+    while(sketch.length() % FLASH_MEMORY_PAGE_SIZE != 0) {
+        sketch.append(static_cast<char>(0xFF));
+    }
+
 
     // Test for the minimum/maximum patterns size
     if(patterns.size() == 0) {
@@ -80,7 +84,7 @@ bool uploadData::init(std::vector<Pattern> patterns) {
     qDebug() << buff;
 
 
-    sketchAddess = FLASH_MEMORY_SKETCH_ADDRESS;
+    sketchAddress = FLASH_MEMORY_SKETCH_ADDRESS;
     patternDataAddress = FLASH_MEMORY_SKETCH_ADDRESS + sketch.length();
     patternTableAddress = FLASH_MEMORY_PATTERN_TABLE_ADDRESS;
 

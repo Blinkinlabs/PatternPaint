@@ -43,7 +43,7 @@ void PatternUploader::handleProgrammerError(QString error) {
 
 void PatternUploader::handleProgrammerCommandFinished(QString command, QByteArray __attribute__((unused))returnData) {
     // TODO: Update our progress somehow? But how to tell how far we've gotten?
-    qDebug() << "Command finished:" << command;
+//    qDebug() << "Command finished:" << command;
     updateProgress(progress + 1);
 
     // we know reset is the last command, so the BlinkyTape should be ready soon.
@@ -91,7 +91,7 @@ bool PatternUploader::startUpload(BlinkyTape& tape, std::vector<Pattern> pattern
     // The entire sketch must fit into the available memory, minus a single page
     // at the end of flash for the configuration header
     if(data.sketch.length() + data.patternData.length() + data.patternTable.length() > FLASH_MEMORY_AVAILABLE) {
-        qDebug() << "sketch can't fit into memory!";
+        qCritical() << "sketch can't fit into memory!";
 
         errorString = QString("Sorry! The Pattern is a bit too big to fit in BlinkyTape memory! Avaiable space=%1, Pattern size=%2")
                               .arg(FLASH_MEMORY_AVAILABLE)
@@ -100,7 +100,11 @@ bool PatternUploader::startUpload(BlinkyTape& tape, std::vector<Pattern> pattern
     }
 
     // Put the sketch, pattern, and metadata into the programming queue.
-    flashData.push_back(FlashSection(data.sketchAddess,        data.sketch));
+    qDebug() << "Sketch address: " << data.sketchAddress << ", size: " << data.sketch.length();
+    qDebug() << "pattern data address: " << data.patternDataAddress << ", size: " << data.patternData.length();
+    qDebug() << "pattern table address: " << data.patternTableAddress << ", size: " << data.patternTable.length();
+
+    flashData.push_back(FlashSection(data.sketchAddress,        data.sketch));
     flashData.push_back(FlashSection(data.patternDataAddress,  data.patternData));
     flashData.push_back(FlashSection(data.patternTableAddress, data.patternTable));
 

@@ -63,7 +63,7 @@ void AvrProgrammer::processCommandQueue() {
     // Note: don't call this if there is a command already running; perhaps add some state?
     responseData.clear();
 
-    qDebug() << "Command started:" << commandQueue.front().name;
+//    qDebug() << "Command started:" << commandQueue.front().name;
     if(!isConnected()) {
         qCritical() << "Device disappeared, cannot run command";
         return;
@@ -121,7 +121,7 @@ void AvrProgrammer::handleReadData() {
         closeSerial();
     }
 
-    qDebug() << "Command completed successfully: " << commandQueue.front().name;
+//    qDebug() << "Command completed successfully: " << commandQueue.front().name;
     emit(commandFinished(commandQueue.front().name,responseData));
     commandQueue.pop_front();
 

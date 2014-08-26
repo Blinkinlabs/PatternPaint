@@ -378,7 +378,7 @@ void MainWindow::on_actionSave_to_Tape_triggered()
     // Note: Converting frameRate to frame delay here.
     Pattern pattern(image,
                         1000/ui->patternSpeed->value(),
-                        Pattern::INDEXED_RLE);
+                        Pattern::RGB24);
 
     // TODO: Attempt different compressions till one works.
 
@@ -387,8 +387,8 @@ void MainWindow::on_actionSave_to_Tape_triggered()
     std::vector<Pattern> patterns;
     patterns.push_back(pattern);
     // TODO: Don't put the same pattern here multiple times.
-    patterns.push_back(pattern);
-    patterns.push_back(pattern);
+//    patterns.push_back(pattern);
+//    patterns.push_back(pattern);
 
     if(!uploader->startUpload(*tape, patterns)) {
         errorMessageDialog->setText(uploader->getErrorString());

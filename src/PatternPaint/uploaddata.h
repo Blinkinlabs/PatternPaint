@@ -14,7 +14,7 @@ public:
     QByteArray patternData;
     QByteArray patternTable;
 
-    int sketchAddess;
+    int sketchAddress;
     int patternDataAddress;
     int patternTableAddress;
 

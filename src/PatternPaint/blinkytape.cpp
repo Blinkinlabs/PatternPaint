@@ -53,10 +53,12 @@ QList<QSerialPortInfo> BlinkyTape::findBlinkyTapeBootloaders()
 BlinkyTape::BlinkyTape(QObject *parent) :
     QObject(parent)
 {
+
     serial = new QSerialPort(this);
     connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
             this, SLOT(handleSerialError(QSerialPort::SerialPortError)));
 
+    // TODO: Do we need to manage this better?
 #if defined(Q_OS_WIN)
     connectionScannerTimer = new QTimer(this);
 #endif
@@ -145,6 +147,7 @@ bool BlinkyTape::open(QSerialPortInfo info) {
 }
 
 void BlinkyTape::close() {
+    serial->setSettingsRestoredOnClose(false);
     serial->close();
 
     emit(connectionStatusChanged(isConnected()));
