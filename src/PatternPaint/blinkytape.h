@@ -9,6 +9,7 @@
 /// Some defines that should go into a processor-specific class
 #define FLASH_MEMORY_AVAILABLE 0x7000  // Amount of application space in the flash
 #define FLASH_MEMORY_PAGE_SIZE 0x80    // Size of a page of memory in our flash
+#define FLASH_MEMORY_PATTERN_TABLE_ADDRESS (FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE) // Location of pattern table
 
 #define BLINKYTAPE_SKETCH_VID 0x1D50
 #define BLINKYTAPE_SKETCH_PID 0x605E

@@ -14,6 +14,9 @@
 /// reset, and notifying the caller that we are finished
 #define PROGRAMMER_RESET_DELAY 1000
 
+/// Length of character buffer for debug messages
+#define BUFF_LENGTH 100
+
 PatternUploader::PatternUploader(QObject *parent) :
     QObject(parent)
 {
@@ -63,7 +66,96 @@ void PatternUploader::updateProgress(int newProgress) {
     emit(progressChanged(progress));
 }
 
-bool PatternUploader::startUpload(BlinkyTape& tape, Pattern pattern) {
+
+class uploadData {
+public:
+    bool init(std::vector<Pattern> patterns);
+
+    QByteArray sketch;
+    QByteArray patternData;
+    QByteArray patternTable;
+
+    QString errorString;
+};
+
+bool uploadData::init(std::vector<Pattern> patterns) {
+    char buff[BUFF_LENGTH];
+    QString errorString;
+
+    // We need to build two things- a memory image containing the sketch and pattern data,
+    // and a memory image containing the pattern data information table.
+
+    sketch = QByteArray();          // Program data
+    patternData = QByteArray();     // Pattern Data
+    patternTable = QByteArray();    // Pattern data header
+
+    sketch.append(PatternPlayerSketch, sizeof(PatternPlayerSketch));
+
+#define PATTERN_TABLE_HEADER_LENGTH     2
+#define PATTERN_TABLE_ENTRY_LENGTH      7
+
+    // Test for the minimum/maximum patterns size
+    if(patterns.size() == 0) {
+        errorString = QString("No Patterns detected!");
+        return false;
+    }
+    if(patterns.size() >= ((FLASH_MEMORY_PAGE_SIZE - PATTERN_TABLE_HEADER_LENGTH) / PATTERN_TABLE_ENTRY_LENGTH)) {
+        errorString = QString("Too many patterns, cannot fit in pattern table.");
+        return false;
+    }
+
+    snprintf(buff, BUFF_LENGTH, "Building pattern array. Pattern Count: %i, led count: %i",
+             patterns.size(),
+             patterns[0].ledCount);
+    qDebug() << buff;
+
+    patternTable.append(static_cast<char>(patterns.size()));       // First byte of the metadata is how many patterns there are
+    patternTable.append(static_cast<char>(patterns[0].ledCount));  // Second byte is the length of the LED strip
+    // TODO: make the LED count to a separate, explicit parameter?
+
+    int dataOffset = sketch.length();
+
+    // Now, for each pattern, append the image data to the sketch
+    for(std::vector<Pattern>::iterator pattern = patterns.begin(); pattern != patterns.end(); ++pattern) {
+        snprintf(buff, BUFF_LENGTH, "Adding pattern. Encoding: %x, framecount: %i, frameDelay: %i, size: %iB, offset: %iB",
+                 pattern->encoding,
+                 pattern->frameCount,
+                 pattern->frameDelay,
+                 pattern->data.length(),
+                 dataOffset);
+        qDebug() << buff;
+
+        // Build the table entry for this pattern
+        patternTable.append(static_cast<char>((pattern->encoding) & 0xFF));             // Offset 0: encoding (1 byte)
+        patternTable.append(static_cast<char>((dataOffset >> 8) & 0xFF));               // Offset 1: memory location (2 bytes)
+        patternTable.append(static_cast<char>((dataOffset     ) & 0xFF));
+        patternTable.append(static_cast<char>((pattern->frameCount >> 8  ) & 0xFF));    // Offset 3: frame count (2 bytes)
+        patternTable.append(static_cast<char>((pattern->frameCount       ) & 0xFF));
+        patternTable.append(static_cast<char>((pattern->frameDelay >> 8  ) & 0xFF));    // Offset 5: frame delay (2 bytes)
+        patternTable.append(static_cast<char>((pattern->frameDelay       ) & 0xFF));
+
+        // and append the image data
+        patternData += pattern->data;
+        dataOffset += pattern->data.length();
+    }
+
+    // Pad pattern table to FLASH_MEMORY_PAGE_SIZE bytes.
+    while(patternTable.length() < FLASH_MEMORY_PAGE_SIZE) {
+        patternTable.append(static_cast<char>(0xFF));
+    }
+
+    snprintf(buff, BUFF_LENGTH, "Sketch size: %iB, pattern data size: %iB, pattern table size: %iB",
+             sketch.length(),
+             patternData.length(),
+             patternTable.length());
+    qDebug() << buff;
+
+    return true;
+}
+
+bool PatternUploader::startUpload(BlinkyTape& tape, std::vector<Pattern> patterns) {
+    char buff[BUFF_LENGTH];
+
     updateProgress(0);
 
     // We can't reset if we weren't already connected...
@@ -73,53 +165,39 @@ bool PatternUploader::startUpload(BlinkyTape& tape, Pattern pattern) {
     }
 
 /// Create the compressed image and check if it will fit into the device memory
+
+
+    uploadData data;
+    if(!data.init(patterns)) {
+        errorString = data.errorString;
+        return false;
+    }
+
     // TODO: Only write the sketch portion if we absolutely have to, to lower the risk
     // that we trash the firmware if there is a problem later
-
-    // First, convert the sketch binary data into a qbytearray
-    QByteArray sketch = QByteArray(PatternPlayerSketch,PATTERNPLAYER_LENGTH);
-
-    // Next, append the image data to it
-    sketch += pattern.data;
-
-    // Finally, write the metadata about the pattern to the end of flash
-    QByteArray metadata = QByteArray(FLASH_MEMORY_PAGE_SIZE, 0xFF);
-    metadata[metadata.length()-8] = (pattern.ledCount) & 0xFF;
-    metadata[metadata.length()-7] = (pattern.encoding) & 0xFF;
-    metadata[metadata.length()-6] = (PATTERNPLAYER_LENGTH >> 8) & 0xFF;
-    metadata[metadata.length()-5] = (PATTERNPLAYER_LENGTH     ) & 0xFF;
-    metadata[metadata.length()-4] = (pattern.frameCount >> 8) & 0xFF;
-    metadata[metadata.length()-3] = (pattern.frameCount     ) & 0xFF;
-    metadata[metadata.length()-2] = (pattern.frameDelay >> 8) & 0xFF;
-    metadata[metadata.length()-1] = (pattern.frameDelay     ) & 0xFF;
-
-    char buff[100];
-    snprintf(buff, 100, "Sketch size: %iB, pattern size: %iB, metadata size: %iB",
-             PATTERNPLAYER_LENGTH,
-             pattern.data.length(),
-             metadata.length());
-    qDebug() << buff;
 
     // The entire sketch must fit into the available memory, minus a single page
     // at the end of flash for the configuration header
     // TODO: Could save ~100 bytes if we let the sketch spill into the unused portion
     // of the header.
-    if(sketch.length() + metadata.length() > FLASH_MEMORY_AVAILABLE) {
+    if(data.sketch.length() + data.patternTable.length() > FLASH_MEMORY_AVAILABLE) {
         qDebug() << "sketch can't fit into memory!";
 
         errorString = QString("Sorry! The Pattern is a bit too big to fit in BlinkyTape memory right now. We're working on improving this! Avaiable space=%1, Pattern size=%2")
                               .arg(FLASH_MEMORY_AVAILABLE)
-                              .arg(sketch.length() + metadata.length());
+                              .arg(data.sketch.length() + data.patternData.length() + data.patternTable.length());
         return false;
     }
 
     // Put the sketch, pattern, and metadata into the programming queue.
-    flashData.push_back(FlashSection(0, sketch));
-    flashData.push_back(FlashSection(FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE, metadata));
+    flashData.push_back(FlashSection(0, data.sketch));
+    flashData.push_back(FlashSection(0, data.patternData));
+    flashData.push_back(FlashSection(FLASH_MEMORY_PATTERN_TABLE_ADDRESS, data.patternTable));
 
 /// Attempt to reset the strip using the 1200 baud rate method, and identify the newly connected bootloader
     // Next, tell the tape to reset.
     tape.reset();
+
 
     // Now, start the polling processes to detect a new bootloader
     stateStartTime = QDateTime::currentDateTime();
@@ -140,8 +218,8 @@ bool PatternUploader::startUpload(BlinkyTape& tape, QByteArray sketch) {
         return false;
     }
 
-    char buff[100];
-    snprintf(buff, 100, "Sketch size: %iB",
+    char buff[BUFF_LENGTH];
+    snprintf(buff, BUFF_LENGTH, "Sketch size: %iB",
              sketch.length()),
     qDebug() << buff;
 
@@ -182,7 +260,7 @@ QString PatternUploader::getErrorString() const
 void PatternUploader::doWork() {
     // TODO: This flow is really ungainly
 
-    qDebug() << "In doWork state=" << state;
+//    qDebug() << "In doWork state=" << state;
 
     // Continue the current state
     switch(state) {

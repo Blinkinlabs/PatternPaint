@@ -14,7 +14,7 @@ public:
         RGB24       = 0,     /// RGB24 mode (uncompressed 24 bit)
         RGB565_RLE  = 1,     /// RGB 565 + RLE mode (compressed 16 bit)
         INDEXED     = 2,     /// 8-bit indexed mode (pallated 8 bit)
-        INDEXED_RLE = 3,
+        INDEXED_RLE = 3,     /// 8-bit indexed mode + RLE (pallated 8 bit)
     };
 
     // Create an pattern from a QImage

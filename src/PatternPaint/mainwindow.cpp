@@ -384,7 +384,13 @@ void MainWindow::on_actionSave_to_Tape_triggered()
 
     qDebug() << "Color count: " << pattern.colorCount();
 
-    if(!uploader->startUpload(*tape, pattern)) {
+    std::vector<Pattern> patterns;
+    patterns.push_back(pattern);
+    // TODO: Don't put the same pattern here multiple times.
+    patterns.push_back(pattern);
+    patterns.push_back(pattern);
+
+    if(!uploader->startUpload(*tape, patterns)) {
         errorMessageDialog->setText(uploader->getErrorString());
         errorMessageDialog->show();
         return;

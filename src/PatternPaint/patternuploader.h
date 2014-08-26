@@ -41,7 +41,7 @@ public:
     /// and will need to be reconnected manually afterwards.
     /// @param tape BlinkyTape to upload to (must already be connected)
     /// @param pattern Pattern to upload to the BlinkyTape
-    bool startUpload(BlinkyTape& tape, Pattern pattern);
+    bool startUpload(BlinkyTape& tape, std::vector<Pattern> patterns);
 
     /// Start an upload, using the passed blinkytape as a launching point
     /// Note that the blinkytape will be disconnected during the upload process,
