@@ -217,7 +217,7 @@ void BlinkyTape::reset()
 
     qDebug() << "Attempting to reset BlinkyTape";
 
-    serial->setSettingsRestoredOnClose(true);
+    serial->setSettingsRestoredOnClose(false);
     if(!serial->setBaudRate(QSerialPort::Baud1200)) {
         qDebug() << "Error setting baud rate: " << serial->error() << serial->errorString();
     }
