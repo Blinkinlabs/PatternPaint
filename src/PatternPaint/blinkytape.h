@@ -22,6 +22,10 @@
 #define LEONARDO_BOOTLOADER_VID         0x2341
 #define LEONARDO_BOOTLOADER_PID         0x0036
 
+#define LIGHT_BUDDY_APPLICATION_VID     0x1D50
+#define LIGHT_BUDDY_APPLICATION_PID     0x6666
+#define LIGHT_BUDDY_BOOTLOADER_PID      0x6667
+
 /// Connect to a BlinkyTape over a serial port, and manage sending data to it.
 class BlinkyTape : public QObject
 {
