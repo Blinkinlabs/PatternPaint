@@ -438,3 +438,14 @@ void MainWindow::on_actionResize_Pattern_triggered()
         ui->patternEditor->init(newImage, false);
     }
 }
+
+void MainWindow::on_actionAddress_programmer_triggered()
+{
+    int patternLength = ui->patternEditor->getPatternAsImage().width();
+    int ledCount = ui->patternEditor->getPatternAsImage().height();
+
+    // TODO: Dispose of this?
+    AddressProgrammer* programmer = new AddressProgrammer(this);
+    programmer->setWindowModality(Qt::WindowModal);
+    programmer->exec();
+}

@@ -321,6 +321,7 @@
     <addaction name="actionSave_to_Tape"/>
     <addaction name="separator"/>
     <addaction name="actionLoad_rainbow_sketch"/>
+    <addaction name="actionAddress_programmer"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -416,6 +417,11 @@
   <action name="actionResize_Pattern">
    <property name="text">
     <string>Resize Pattern</string>
+   </property>
+  </action>
+  <action name="actionAddress_programmer">
+   <property name="text">
+    <string>Address programmer</string>
    </property>
   </action>
  </widget>

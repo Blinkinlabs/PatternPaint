@@ -41,7 +41,8 @@ SOURCES += main.cpp\
     patterneditor.cpp \
     resizepattern.cpp \
     patternuploader.cpp \
-    uploaddata.cpp
+    uploaddata.cpp \
+    addressprogrammer.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
@@ -56,12 +57,14 @@ HEADERS  += mainwindow.h \
     patterneditor.h \
     resizepattern.h \
     patternuploader.h \
-    uploaddata.h
+    uploaddata.h \
+    addressprogrammer.h
 
 FORMS    += mainwindow.ui \
     systeminformation.ui \
     aboutpatternpaint.ui \
-    resizepattern.ui
+    resizepattern.ui \
+    addressprogrammer.ui
 
 # OS X: Specify icon resource to use
 ICON = images/blinkytape.icns

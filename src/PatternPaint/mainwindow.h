@@ -8,6 +8,7 @@
 #include "blinkytape.h"
 #include "patternuploader.h"
 #include "patterneditor.h"
+#include "addressprogrammer.h"
 
 namespace Ui {
 class MainWindow;
@@ -69,6 +70,8 @@ private slots:
     void on_actionClear_Pattern_triggered();
 
     void on_actionResize_Pattern_triggered();
+
+    void on_actionAddress_programmer_triggered();
 
 private:
     Ui::MainWindow *ui;
