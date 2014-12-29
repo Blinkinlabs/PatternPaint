@@ -53,7 +53,7 @@ public:
 
 private:
     /// Serial port the BlinkyTape is connected to
-    QSerialPort* serial;
+    QPointer<QSerialPort> serial;
 
 #if defined(Q_OS_WIN)
     // Windows only: Timer that periodically checks if the serial device is

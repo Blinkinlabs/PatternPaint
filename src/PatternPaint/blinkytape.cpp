@@ -58,15 +58,10 @@ QList<QSerialPortInfo> BlinkyTape::findBlinkyTapeBootloaders()
 BlinkyTape::BlinkyTape(QObject *parent) :
     QObject(parent)
 {
-
-    serial = new QSerialPort(this);
-    connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
-            this, SLOT(handleSerialError(QSerialPort::SerialPortError)));
-
     // TODO: Do we need to manage this better?
-#if defined(Q_OS_WIN)
+    #if defined(Q_OS_WIN)
     connectionScannerTimer = new QTimer(this);
-#endif
+    #endif
 }
 
 void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
@@ -77,14 +72,23 @@ void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
         return;
     }
 
+    QString errorString = "";
+    if(!serial.isNull()) {
+        errorString = serial->errorString();
+    }
+
     // Handle a spurious disconnect, like when the user unplugs the BlinkyTape
     // TODO: handle other error types?
     if (error == QSerialPort::ResourceError) {
-        qCritical() << "Serial resource error, BlinkyTape unplugged?" << serial->errorString();
-        close();
+        qCritical() << "Serial resource error, BlinkyTape unplugged?" << errorString;
+
+        if(!serial.isNull()) {
+            // TODO: Protect against crash here
+            close();
+        }
     }
     else {
-        qCritical() << "Unrecognized serial error:" << serial->error() << serial->errorString();
+        qCritical() << "Unrecognized serial error:" << errorString;
     }
 }
 
@@ -123,6 +127,12 @@ bool BlinkyTape::open(QSerialPortInfo info) {
 
     qDebug() << "Connecting to BlinkyTape on " << info.portName();
 
+    if(serial.isNull()) {
+        serial = new QSerialPort();
+        connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
+                this, SLOT(handleSerialError(QSerialPort::SerialPortError)));
+    }
+
     serial->setPortName(info.portName());
     serial->setBaudRate(QSerialPort::Baud115200);
 
@@ -152,13 +162,25 @@ bool BlinkyTape::open(QSerialPortInfo info) {
 }
 
 void BlinkyTape::close() {
+    if(serial.isNull()) {
+        return;
+    }
+
     serial->setSettingsRestoredOnClose(false);
-    serial->close();
+
+    if(serial->isOpen()) {
+        serial->close();
+    }
+    //delete serial;
 
     emit(connectionStatusChanged(isConnected()));
 }
 
 bool BlinkyTape::isConnected() {
+    if(serial.isNull()) {
+        return false;
+    }
+
     return serial->isOpen();
 }
 

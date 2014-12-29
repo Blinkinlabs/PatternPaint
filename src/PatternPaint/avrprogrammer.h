@@ -15,8 +15,8 @@ class AvrProgrammer : public QObject
 public:
     explicit AvrProgrammer(QObject *parent = 0);
 
-    bool openSerial(QSerialPortInfo info);
-    void closeSerial();
+    bool open(QSerialPortInfo info);
+    void close();
 
     bool isConnected();
 
@@ -75,7 +75,7 @@ private:
         QByteArray expectedResponse;
     };
 
-    QSerialPort* serial;  // Serial device the programmer is attached to
+    QPointer<QSerialPort> serial;  // Serial device the programmer is attached to
 
     QQueue<Command> commandQueue;
     QByteArray responseData;    // Data we actually received

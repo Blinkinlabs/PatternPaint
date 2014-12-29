@@ -35,7 +35,7 @@ void PatternUploader::handleProgrammerError(QString error) {
 
     // TODO: not sure if we should do this, or let the programmer handle it?
     if(programmer.isConnected()) {
-        programmer.closeSerial();
+        programmer.close();
     }
 
     emit(finished(false));
@@ -57,7 +57,7 @@ void PatternUploader::handleProgrammerCommandFinished(QString command, QByteArra
 void PatternUploader::handleResetTimer()
 {
     emit(finished(true));
-    programmer.closeSerial();  // TODO: Is this the correct place?
+    programmer.close();  // TODO: Is this the correct place?
 }
 
 
@@ -209,7 +209,7 @@ void PatternUploader::doWork() {
             qDebug() << "Bootloader waiting on: " << postResetTapes.at(0).portName();
 
             // Try to create a new programmer by connecting to the port
-            if(!programmer.openSerial(postResetTapes.at(0))) {
+            if(!programmer.open(postResetTapes.at(0))) {
                 handleProgrammerError("could not connect to programmer!");
                 return;
             }
