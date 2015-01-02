@@ -66,6 +66,9 @@ void PatternUploader::updateProgress(int newProgress) {
     emit(progressChanged(progress));
 }
 
+void PatternUploader::updateMaxProgress(int newMaxProgress) {
+    emit(maxProgressChanged(newMaxProgress));
+}
 
 
 
@@ -107,6 +110,9 @@ bool PatternUploader::startUpload(BlinkyTape& tape, std::vector<Pattern> pattern
     flashData.push_back(FlashSection(data.sketchAddress,        data.sketch));
     flashData.push_back(FlashSection(data.patternDataAddress,  data.patternData));
     flashData.push_back(FlashSection(data.patternTableAddress, data.patternTable));
+
+    // TODO: Calculate this based on feedback from the programmer.
+    updateMaxProgress(300);
 
     // Next, tell the tape to reset.
     tape.reset();
@@ -150,6 +156,9 @@ bool PatternUploader::startUpload(BlinkyTape& tape, QByteArray sketch) {
 
     // Put the sketch, pattern, and metadata into the programming queue.
     flashData.push_back(FlashSection(0, sketch));
+
+    // TODO: Calculate this based on feedback from the programmer.
+    updateMaxProgress(300);
 
 /// Attempt to reset the strip using the 1200 baud rate method, and identify the newly connected bootloader
     // Next, tell the tape to reset.

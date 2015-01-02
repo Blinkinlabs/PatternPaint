@@ -242,7 +242,6 @@ void AvrProgrammer::writeFlash(QByteArray& data, int startAddress) {
     setAddress(startAddress);
 
     // Write the data in page-sized chunks
-    // TODO: Do we actually need to do chunks here?
     for(int currentChunkPosition = 0;
         currentChunkPosition < data.length();
         currentChunkPosition += PAGE_SIZE_BYTES) {

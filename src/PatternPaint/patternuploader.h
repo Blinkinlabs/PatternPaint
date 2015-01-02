@@ -54,6 +54,9 @@ public:
     QString getErrorString() const;
 
 signals:
+    /// Sends an update about the maximum update progress, from 0 to 1
+    void maxProgressChanged(int progress);
+
     /// Sends an update about the upload progress, from 0 to 1
     void progressChanged(int progress);
 
@@ -93,6 +96,9 @@ private:
 
     /// Current command state
     State state;
+
+    /// Update any listeners with the maximum progress
+    void updateMaxProgress(int newProgress);
 
     /// Update any listeners with the latest progress
     void updateProgress(int newProgress);

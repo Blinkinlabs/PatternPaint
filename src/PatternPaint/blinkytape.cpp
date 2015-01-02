@@ -82,8 +82,7 @@ void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
     if (error == QSerialPort::ResourceError) {
         qCritical() << "Serial resource error, BlinkyTape unplugged?" << errorString;
 
-        if(!serial.isNull()) {
-            // TODO: Protect against crash here
+        if(serial->isOpen()) {
             close();
         }
     }
@@ -128,7 +127,7 @@ bool BlinkyTape::open(QSerialPortInfo info) {
     qDebug() << "Connecting to BlinkyTape on " << info.portName();
 
     if(serial.isNull()) {
-        serial = new QSerialPort();
+        serial = new QSerialPort(this);
         connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
                 this, SLOT(handleSerialError(QSerialPort::SerialPortError)));
     }

@@ -58,6 +58,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // TODO: Should this be a separate view? it seems weird to have it chillin
     // all static like.
+    connect(uploader, SIGNAL(maxProgressChanged(int)),
+            this, SLOT(on_uploaderMaxProgressChanged(int)));
     connect(uploader, SIGNAL(progressChanged(int)),
             this, SLOT(on_uploaderProgressChanged(int)));
     connect(uploader, SIGNAL(finished(bool)),
@@ -268,6 +270,16 @@ void MainWindow::on_actionSystem_Information_triggered()
     info->show();
 }
 
+void MainWindow::on_uploaderMaxProgressChanged(int progressValue)
+{
+    if(progressDialog->isHidden()) {
+        qDebug() << "Got a progress event while the progress dialog is hidden, event order problem?";
+        return;
+    }
+
+    progressDialog->setMaximum(progressValue);
+}
+
 void MainWindow::on_uploaderProgressChanged(int progressValue)
 {
     if(progressDialog->isHidden()) {
@@ -382,9 +394,7 @@ void MainWindow::on_actionSave_to_Tape_triggered()
 
     std::vector<Pattern> patterns;
     patterns.push_back(pattern);
-    // TODO: Don't put the same pattern here multiple times.
-//    patterns.push_back(pattern);
-//    patterns.push_back(pattern);
+    // TODO: Implement multiple pattern upload
 
     if(!uploader->startUpload(*tape, patterns)) {
         errorMessageDialog->setText(uploader->getErrorString());
