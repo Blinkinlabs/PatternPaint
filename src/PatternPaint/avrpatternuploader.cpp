@@ -1,4 +1,4 @@
-#include "patternuploader.h"
+#include "avrpatternuploader.h"
 #include "uploaddata.h"
 
 #include <QDebug>
@@ -7,7 +7,7 @@
 #define WAIT_FOR_BOOTLOADER_POLL_INTERVAL 200
 
 /// Maximum time to wait before giving up on finding a bootloader
-#define WAIT_FOR_BOOTLOADER_TIMEOUT 10000
+#define WAIT_FOR_BOOTLOADER_TIMEOUT 8000
 
 
 /// How long to wait between receiving notification that the programmer has been
@@ -17,10 +17,10 @@
 /// Length of character buffer for debug messages
 #define BUFF_LENGTH 100
 
-PatternUploader::PatternUploader(QObject *parent) :
-    QObject(parent)
+AvrPatternUploader::AvrPatternUploader(QObject *parent) :
+    PatternUploader(parent)
 {
-    processTimer = new QTimer(this);
+    bootloaderResetTimer = new QTimer(this);
 
     state = State_Ready;
 
@@ -30,7 +30,7 @@ PatternUploader::PatternUploader(QObject *parent) :
             this,SLOT(handleProgrammerCommandFinished(QString,QByteArray)));
 }
 
-void PatternUploader::handleProgrammerError(QString error) {
+void AvrPatternUploader::handleProgrammerError(QString error) {
     qCritical() << error;
 
     // TODO: not sure if we should do this, or let the programmer handle it?
@@ -41,10 +41,10 @@ void PatternUploader::handleProgrammerError(QString error) {
     emit(finished(false));
 }
 
-void PatternUploader::handleProgrammerCommandFinished(QString command, QByteArray __attribute__((unused))returnData) {
+void AvrPatternUploader::handleProgrammerCommandFinished(QString command, QByteArray __attribute__((unused))returnData) {
     // TODO: Update our progress somehow? But how to tell how far we've gotten?
 //    qDebug() << "Command finished:" << command;
-    updateProgress(progress + 1);
+    setProgress(progress + 1);
 
     // we know reset is the last command, so the BlinkyTape should be ready soon.
     // Schedule a timer to emit the message shortly.
@@ -54,33 +54,25 @@ void PatternUploader::handleProgrammerCommandFinished(QString command, QByteArra
     }
 }
 
-void PatternUploader::handleResetTimer()
+void AvrPatternUploader::handleResetTimer()
 {
     emit(finished(true));
     programmer.close();  // TODO: Is this the correct place?
 }
 
 
-void PatternUploader::updateProgress(int newProgress) {
+void AvrPatternUploader::setProgress(int newProgress) {
     progress = newProgress;
     emit(progressChanged(progress));
 }
 
-void PatternUploader::updateMaxProgress(int newMaxProgress) {
+void AvrPatternUploader::setMaxProgress(int newMaxProgress) {
     emit(maxProgressChanged(newMaxProgress));
 }
 
 
 
-bool PatternUploader::startUpload(BlinkyTape& tape, std::vector<Pattern> patterns) {
-    updateProgress(0);
-
-    // We can't reset if we weren't already connected...
-    if(!tape.isConnected()) {
-        errorString = "Not connected to a tape, cannot upload again";
-        return false;
-    }
-
+bool AvrPatternUploader::startUpload(BlinkyTape& tape, std::vector<Pattern> patterns) {
     /// Create the compressed image and check if it will fit into the device memory
     uploadData data;
     if(!data.init(patterns)) {
@@ -93,6 +85,8 @@ bool PatternUploader::startUpload(BlinkyTape& tape, std::vector<Pattern> pattern
 
     // The entire sketch must fit into the available memory, minus a single page
     // at the end of flash for the configuration header
+    // TODO: Verify this by looking at each section individually instead, making sure
+    // none of them overlap or extend outside of available memory?
     if(data.sketch.length() + data.patternData.length() + data.patternTable.length() > FLASH_MEMORY_AVAILABLE) {
         qCritical() << "sketch can't fit into memory!";
 
@@ -111,31 +105,11 @@ bool PatternUploader::startUpload(BlinkyTape& tape, std::vector<Pattern> pattern
     flashData.push_back(FlashSection(data.patternDataAddress,  data.patternData));
     flashData.push_back(FlashSection(data.patternTableAddress, data.patternTable));
 
-    // TODO: Calculate this based on feedback from the programmer.
-    updateMaxProgress(300);
-
-    // Next, tell the tape to reset.
-    tape.reset();
-
-    // Now, start the polling processes to detect a new bootloader
-    stateStartTime = QDateTime::currentDateTime();
-    state = State_WaitForBootloaderPort;
-    waitOneMore = true;
-    processTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
-    return true;
+    return startUpload(tape);
 }
 
 
-bool PatternUploader::startUpload(BlinkyTape& tape, QByteArray sketch) {
-    // TODO: Reconcile this with the other startUpload function.
-    updateProgress(0);
-
-    // We can't reset if we weren't already connected...
-    if(!tape.isConnected()) {
-        errorString = "Not connected to a tape, cannot upload again";
-        return false;
-    }
-
+bool AvrPatternUploader::startUpload(BlinkyTape& tape, QByteArray sketch) {
     char buff[BUFF_LENGTH];
     snprintf(buff, BUFF_LENGTH, "Sketch size: %iB",
              sketch.length()),
@@ -157,50 +131,59 @@ bool PatternUploader::startUpload(BlinkyTape& tape, QByteArray sketch) {
     // Put the sketch, pattern, and metadata into the programming queue.
     flashData.push_back(FlashSection(0, sketch));
 
-    // TODO: Calculate this based on feedback from the programmer.
-    updateMaxProgress(300);
+    return startUpload(tape);
+}
 
-/// Attempt to reset the strip using the 1200 baud rate method, and identify the newly connected bootloader
+bool AvrPatternUploader::startUpload(BlinkyTape& tape) {
+    setProgress(0);
+    // TODO: Calculate this based on feedback from the programmer.
+    setMaxProgress(300);
+
+    // We can't reset if we weren't already connected...
+    if(!tape.isConnected()) {
+        errorString = "Not connected to a tape, cannot upload again";
+        return false;
+    }
+
     // Next, tell the tape to reset.
     tape.reset();
 
     // Now, start the polling processes to detect a new bootloader
     stateStartTime = QDateTime::currentDateTime();
     state = State_WaitForBootloaderPort;
-    waitOneMore = true;
-    processTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
+    bootloaderResetTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
     return true;
 }
 
-QString PatternUploader::getErrorString() const
+QString AvrPatternUploader::getErrorString() const
 {
     return errorString;
 }
 
 
-void PatternUploader::doWork() {
+void AvrPatternUploader::doWork() {
     // TODO: This flow is really ungainly
 
-//    qDebug() << "In doWork state=" << state;
+    qDebug() << "In doWork state=" << state;
 
     // Continue the current state
     switch(state) {
     case State_WaitForBootloaderPort:
         {
             // Scan to see if there is a bootloader present
-            QList<QSerialPortInfo> postResetTapes;
-            postResetTapes = BlinkyTape::findBlinkyTapeBootloaders();
+            QList<QSerialPortInfo> postResetTapes
+                    = BlinkyTape::findBlinkyTapeBootloaders();
 
             // If we didn't detect a bootloader and still have time, then queue the timer and
             // wait. Otherwise, we timed out, so fail.
             if(postResetTapes.length() == 0) {
                 if(stateStartTime.msecsTo(QDateTime::currentDateTime())
                         > WAIT_FOR_BOOTLOADER_TIMEOUT) {
-                    handleProgrammerError("Didn't detect a bootloader, something went wrong!");
+                    handleProgrammerError("Timeout waiting for a bootloader device");
                     return;
                 }
 
-                processTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
+                bootloaderResetTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
                 return;
             }
 
@@ -208,14 +191,24 @@ void PatternUploader::doWork() {
                 qWarning() << "Too many bootloaders, something is amiss.";
             }
 
-            // Wait one extra timer cycle, to give the bootloader some time to come on board
-            if(waitOneMore) {
-                waitOneMore = false;
-                processTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
+            qDebug() << "Bootloader waiting on: " << postResetTapes.at(0).portName();
+
+            bootloaderResetTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
+            state = State_WaitAfterBootloaderPort;
+        }
+        break;
+
+    case State_WaitAfterBootloaderPort:
+        {
+            QList<QSerialPortInfo> postResetTapes
+                    = BlinkyTape::findBlinkyTapeBootloaders();
+
+            // If we didn't detect a bootloader and still have time, then queue the timer and
+            // wait. Otherwise, we timed out, so fail.
+            if(postResetTapes.length() == 0) {
+                handleProgrammerError("Bootloader dissappeared!");
                 return;
             }
-
-            qDebug() << "Bootloader waiting on: " << postResetTapes.at(0).portName();
 
             // Try to create a new programmer by connecting to the port
             if(!programmer.open(postResetTapes.at(0))) {
@@ -236,15 +229,12 @@ void PatternUploader::doWork() {
                 flashData.pop_front();
             }
 
+            // TODO: Add verify stage?
+
             programmer.reset();
 
-            // TODO: Read back
-            state = State_WaitForDeviceSignature;
+            state = State_Ready;
         }
-        break;
-    case State_WaitForDeviceSignature:
-        // TODO
-
         break;
 
     default:

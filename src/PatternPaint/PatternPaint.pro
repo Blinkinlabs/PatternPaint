@@ -40,9 +40,9 @@ SOURCES += main.cpp\
     pattern.cpp \
     patterneditor.cpp \
     resizepattern.cpp \
-    patternuploader.cpp \
     uploaddata.cpp \
-    addressprogrammer.cpp
+    addressprogrammer.cpp \
+    avrpatternuploader.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
@@ -56,9 +56,10 @@ HEADERS  += mainwindow.h \
     pattern.h \
     patterneditor.h \
     resizepattern.h \
-    patternuploader.h \
     uploaddata.h \
-    addressprogrammer.h
+    addressprogrammer.h \
+    avrpatternuploader.h \
+    patternuploader.h
 
 FORMS    += mainwindow.ui \
     systeminformation.ui \

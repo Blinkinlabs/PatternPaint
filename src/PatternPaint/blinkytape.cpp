@@ -81,14 +81,12 @@ void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
     // TODO: handle other error types?
     if (error == QSerialPort::ResourceError) {
         qCritical() << "Serial resource error, BlinkyTape unplugged?" << errorString;
-
-        if(serial->isOpen()) {
-            close();
-        }
     }
     else {
         qCritical() << "Unrecognized serial error:" << errorString;
     }
+
+    close();
 }
 
 #if defined(Q_OS_WIN)
@@ -170,7 +168,6 @@ void BlinkyTape::close() {
     if(serial->isOpen()) {
         serial->close();
     }
-    //delete serial;
 
     emit(connectionStatusChanged(isConnected()));
 }

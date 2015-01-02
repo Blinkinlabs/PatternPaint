@@ -9,6 +9,9 @@ AvrProgrammer::AvrProgrammer(QObject *parent) :
 {
     commandTimeoutTimer = new QTimer(this);
     commandTimeoutTimer->setSingleShot(true);
+
+    connect(commandTimeoutTimer, SIGNAL(timeout()),
+            this, SLOT(handleCommandTimeout()));
 }
 
 bool AvrProgrammer::open(QSerialPortInfo info) {
@@ -48,7 +51,6 @@ void AvrProgrammer::close() {
     if(serial->isOpen()) {
         serial->close();
     }
-    //delete serial;
 }
 
 bool AvrProgrammer::isConnected() {
@@ -65,22 +67,28 @@ void AvrProgrammer::queueCommand(QString name,
 
     commandQueue.push_back(Command(name, data, expectedRespone));
 
-    // If this is the only command, start processing commands
-    // TODO: Merge this with the implementation in handleReadData()
-    if(commandQueue.length() == 1) {
-        processCommandQueue();
-    }
+    // Try to start processing commands.
+    processCommandQueue();
 }
 
 void AvrProgrammer::processCommandQueue() {
-    // Note: don't call this if there is a command already running; perhaps add some state?
-    responseData.clear();
+    // Nothing to do if we don't have any commands...
+    if(commandQueue.length() == 0) {
+        return;
+    }
 
-//    qDebug() << "Command started:" << commandQueue.front().name;
+    // Don't start a new command if one is already in progress
+    if(commandTimeoutTimer->isActive()) {
+        return;
+    }
+
     if(!isConnected()) {
         qCritical() << "Device disappeared, cannot run command";
         return;
     }
+
+    qDebug() << "Starting Command:" << commandQueue.front().name;
+    responseData.clear();
 
     if(serial->write(commandQueue.front().data) != commandQueue.front().data.length()) {
         qCritical() << "Error writing to device";
@@ -143,9 +151,7 @@ void AvrProgrammer::handleReadData() {
     commandQueue.pop_front();
 
     // Start another command, if there is one.
-    if(commandQueue.length() > 0) {
-        processCommandQueue();
-    }
+    processCommandQueue();
 }
 
 void AvrProgrammer::handleSerialError(QSerialPort::SerialPortError serialError)
@@ -161,18 +167,19 @@ void AvrProgrammer::handleSerialError(QSerialPort::SerialPortError serialError)
         errorString = serial->errorString();
     }
 
-    // TODO: handle other error types?
-//    if (serialError == QSerialPort::ResourceError) {
-        emit(error(errorString));
-        close();
-        commandQueue.clear();
-//    }
+    emit(error(errorString));
+
+    // TODO: Better way to reset state!
+    close();
+    commandQueue.clear();
 }
 
 void AvrProgrammer::handleCommandTimeout()
 {
     qCritical() << "Command timed out, disconnecting from programmer";
     emit(error("Command timed out, disconnecting from programmer"));
+
+    // TODO: Better way to reset state!
     close();
     commandQueue.clear();
 }

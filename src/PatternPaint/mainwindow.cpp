@@ -53,8 +53,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(tape, SIGNAL(connectionStatusChanged(bool)),
             this,SLOT(on_tapeConnectionStatusChanged(bool)));
 
-
-    uploader = new PatternUploader(this);
+    // TODO: Make this on demand by calling the blinkytape object?
+    uploader = new AvrPatternUploader(this);
 
     // TODO: Should this be a separate view? it seems weird to have it chillin
     // all static like.

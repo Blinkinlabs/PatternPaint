@@ -7,6 +7,7 @@
 
 #include "blinkytape.h"
 #include "patternuploader.h"
+#include "avrpatternuploader.h"
 #include "patterneditor.h"
 #include "addressprogrammer.h"
 
