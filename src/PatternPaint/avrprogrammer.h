@@ -1,26 +1,15 @@
 #ifndef AVRPROGRAMMER_H
 #define AVRPROGRAMMER_H
 
-#include <QObject>
-#include <QtSerialPort>
-#include <QTimer>
+#include "serialcommandqueue.h"
 
 // Given a serial object that is suspected to have an AVR109-compatible booloader
 // attached to it (ie, caterina), use it to load a new user program.
-//
-// The commands are all non-blocking; they will proceed
-class AvrProgrammer : public QObject
+class AvrProgrammer : public SerialCommandQueue
 {
     Q_OBJECT
 public:
     explicit AvrProgrammer(QObject *parent = 0);
-
-    bool open(QSerialPortInfo info);
-    void close();
-
-    bool isConnected();
-
-    /// High-level interface functions
 
     /// Read the contents of the flash
     /// @param startAddress Word-aligned address to begin reading from, in bytes
@@ -44,49 +33,8 @@ public:
     // Check that we are talking to the correct device
     void checkDeviceSignature();
 
-    // Instruct the programmer to reset. This has the side effect of deleting the device.
+    // Instruct the programmer to reset.
     void reset();
-
-signals:
-    void error(QString error);
-    void commandFinished(QString command, QByteArray returnData);
-
-private slots:
-    // Handle receiving data from the serial port
-    void handleReadData();
-
-    // Handle an error from the serial port
-    void handleSerialError(QSerialPort::SerialPortError serialError);
-
-    // Self-enforced communications timeout
-    void handleCommandTimeout();
-
-private:
-    struct Command {
-        Command(QString name_,
-                QByteArray command_,
-                QByteArray expectedResponse_) :
-            name(name_),
-            data(command_),
-            expectedResponse(expectedResponse_) {}
-
-        QString name;
-        QByteArray data;
-        QByteArray expectedResponse;
-    };
-
-    QPointer<QSerialPort> serial;  // Serial device the programmer is attached to
-
-    QQueue<Command> commandQueue;
-    QByteArray responseData;    // Data we actually received
-
-    QTimer *commandTimeoutTimer; // Timer fires if a command has failed to complete quickly enough
-
-    // Queue a new command
-    void queueCommand(QString name, QByteArray data, QByteArray expectedRespone);
-
-    // If there is another command in the queue, start processing it.
-    void processCommandQueue();
 };
 
 #endif // AVRPROGRAMMER_H

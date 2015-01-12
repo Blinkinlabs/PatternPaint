@@ -40,9 +40,11 @@ SOURCES += main.cpp\
     pattern.cpp \
     patterneditor.cpp \
     resizepattern.cpp \
-    uploaddata.cpp \
     addressprogrammer.cpp \
-    avrpatternuploader.cpp
+    avrpatternuploader.cpp \
+    avruploaddata.cpp \
+    lightbuddypatternuploader.cpp \
+    serialcommandqueue.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
@@ -56,10 +58,12 @@ HEADERS  += mainwindow.h \
     pattern.h \
     patterneditor.h \
     resizepattern.h \
-    uploaddata.h \
     addressprogrammer.h \
     avrpatternuploader.h \
-    patternuploader.h
+    patternuploader.h \
+    avruploaddata.h \
+    lightbuddypatternuploader.h \
+    serialcommandqueue.h
 
 FORMS    += mainwindow.ui \
     systeminformation.ui \

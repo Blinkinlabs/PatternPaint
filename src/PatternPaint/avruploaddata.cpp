@@ -1,4 +1,4 @@
-#include "uploaddata.h"
+#include "avruploaddata.h"
 #include "PatternPlayer_Sketch.h"
 #include "blinkytape.h"
 
@@ -8,7 +8,7 @@
 #define PATTERN_TABLE_ENTRY_LENGTH      7
 
 
-bool uploadData::init(std::vector<Pattern> patterns) {
+bool avrUploadData::init(std::vector<Pattern> patterns) {
     char buff[BUFF_LENGTH];
     QString errorString;
 

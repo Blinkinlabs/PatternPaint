@@ -1,18 +1,18 @@
 #include "avrpatternuploader.h"
-#include "uploaddata.h"
+#include "avruploaddata.h"
 
 #include <QDebug>
 
 /// Interval between polling the serial port list for new devices
-#define WAIT_FOR_BOOTLOADER_POLL_INTERVAL 200
+#define BOOTLOADER_POLL_INTERVAL 200
 
 /// Maximum time to wait before giving up on finding a bootloader
-#define WAIT_FOR_BOOTLOADER_TIMEOUT 8000
+#define BOOTLOADER_POLL_TIMEOUT 8000
 
 
 /// How long to wait between receiving notification that the programmer has been
 /// reset, and notifying the caller that we are finished
-#define PROGRAMMER_RESET_DELAY 1000
+#define PROGRAMMER_RESET_DELAY 500
 
 /// Length of character buffer for debug messages
 #define BUFF_LENGTH 100
@@ -33,7 +33,6 @@ AvrPatternUploader::AvrPatternUploader(QObject *parent) :
 void AvrPatternUploader::handleProgrammerError(QString error) {
     qCritical() << error;
 
-    // TODO: not sure if we should do this, or let the programmer handle it?
     if(programmer.isConnected()) {
         programmer.close();
     }
@@ -57,9 +56,7 @@ void AvrPatternUploader::handleProgrammerCommandFinished(QString command, QByteA
 void AvrPatternUploader::handleResetTimer()
 {
     emit(finished(true));
-    programmer.close();  // TODO: Is this the correct place?
 }
-
 
 void AvrPatternUploader::setProgress(int newProgress) {
     progress = newProgress;
@@ -70,11 +67,9 @@ void AvrPatternUploader::setMaxProgress(int newMaxProgress) {
     emit(maxProgressChanged(newMaxProgress));
 }
 
-
-
 bool AvrPatternUploader::startUpload(BlinkyTape& tape, std::vector<Pattern> patterns) {
     /// Create the compressed image and check if it will fit into the device memory
-    uploadData data;
+    avrUploadData data;
     if(!data.init(patterns)) {
         errorString = data.errorString;
         return false;
@@ -139,6 +134,8 @@ bool AvrPatternUploader::startUpload(BlinkyTape& tape) {
     // TODO: Calculate this based on feedback from the programmer.
     setMaxProgress(300);
 
+
+    // Now, start the polling processes to detect a new bootloader
     // We can't reset if we weren't already connected...
     if(!tape.isConnected()) {
         errorString = "Not connected to a tape, cannot upload again";
@@ -148,10 +145,9 @@ bool AvrPatternUploader::startUpload(BlinkyTape& tape) {
     // Next, tell the tape to reset.
     tape.reset();
 
-    // Now, start the polling processes to detect a new bootloader
     stateStartTime = QDateTime::currentDateTime();
     state = State_WaitForBootloaderPort;
-    bootloaderResetTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
+    bootloaderResetTimer->singleShot(0,this,SLOT(doWork()));
     return true;
 }
 
@@ -160,11 +156,10 @@ QString AvrPatternUploader::getErrorString() const
     return errorString;
 }
 
-
 void AvrPatternUploader::doWork() {
     // TODO: This flow is really ungainly
 
-    qDebug() << "In doWork state=" << state;
+    //qDebug() << "In doWork state=" << state;
 
     // Continue the current state
     switch(state) {
@@ -178,22 +173,19 @@ void AvrPatternUploader::doWork() {
             // wait. Otherwise, we timed out, so fail.
             if(postResetTapes.length() == 0) {
                 if(stateStartTime.msecsTo(QDateTime::currentDateTime())
-                        > WAIT_FOR_BOOTLOADER_TIMEOUT) {
+                        > BOOTLOADER_POLL_TIMEOUT) {
                     handleProgrammerError("Timeout waiting for a bootloader device");
                     return;
                 }
 
-                bootloaderResetTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
+                bootloaderResetTimer->singleShot(BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
                 return;
-            }
-
-            if(postResetTapes.length() > 1) {
-                qWarning() << "Too many bootloaders, something is amiss.";
             }
 
             qDebug() << "Bootloader waiting on: " << postResetTapes.at(0).portName();
 
-            bootloaderResetTimer->singleShot(WAIT_FOR_BOOTLOADER_POLL_INTERVAL,this,SLOT(doWork()));
+            // Don't connect immediately, the device might need a short time to settle down
+            bootloaderResetTimer->singleShot(PROGRAMMER_RESET_DELAY,this,SLOT(doWork()));
             state = State_WaitAfterBootloaderPort;
         }
         break;
@@ -215,9 +207,8 @@ void AvrPatternUploader::doWork() {
                 handleProgrammerError("could not connect to programmer!");
                 return;
             }
-            else {
-                qDebug() << "Connected to programmer!";
-            }
+
+            qDebug() << "Connected to programmer!";
 
             // Send Check Device Signature command
             programmer.checkDeviceSignature();

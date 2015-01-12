@@ -5,6 +5,8 @@
 /// Interval between scans to see if the device is still connected
 #define CONNECTION_SCANNER_INTERVAL 100
 
+#define RESET_TIMER_INTERVAL 10
+
 // TODO: Support a method for loading these from preferences file
 QList<QSerialPortInfo> BlinkyTape::findBlinkyTapes()
 {
@@ -58,10 +60,18 @@ QList<QSerialPortInfo> BlinkyTape::findBlinkyTapeBootloaders()
 BlinkyTape::BlinkyTape(QObject *parent) :
     QObject(parent)
 {
+    serial = new QSerialPort(this);
+    serial->setSettingsRestoredOnClose(false);
+
+    connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
+            this, SLOT(handleSerialError(QSerialPort::SerialPortError)));
+
     // TODO: Do we need to manage this better?
     #if defined(Q_OS_WIN)
     connectionScannerTimer = new QTimer(this);
     #endif
+
+    resetTimer = new QTimer(this);
 }
 
 void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
@@ -72,10 +82,7 @@ void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
         return;
     }
 
-    QString errorString = "";
-    if(!serial.isNull()) {
-        errorString = serial->errorString();
-    }
+    QString errorString = serial->errorString();
 
     // Handle a spurious disconnect, like when the user unplugs the BlinkyTape
     // TODO: handle other error types?
@@ -89,8 +96,13 @@ void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
     close();
 }
 
+void BlinkyTape::resetTimer_timeout() {
+    qDebug() << "reset timer hit!";
+    close();
+}
+
 #if defined(Q_OS_WIN)
-void BlinkyTape::handleConnectionScannerTimer() {
+void BlinkyTape::connectionScannerTimer_timeout() {
     // If we are already disconnected, disregard.
     if(!isConnected()) {
         return;
@@ -124,12 +136,6 @@ bool BlinkyTape::open(QSerialPortInfo info) {
 
     qDebug() << "Connecting to BlinkyTape on " << info.portName();
 
-    if(serial.isNull()) {
-        serial = new QSerialPort(this);
-        connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
-                this, SLOT(handleSerialError(QSerialPort::SerialPortError)));
-    }
-
     serial->setPortName(info.portName());
     serial->setBaudRate(QSerialPort::Baud115200);
 
@@ -138,12 +144,6 @@ bool BlinkyTape::open(QSerialPortInfo info) {
         return false;
     }
 
-    if(!isConnected()) {
-        qDebug() << "Could not connect to BlinkyTape";
-        return false;
-    }
-
-    // TODO: Create a new serial port object, instead of clearing the current one?
     serial->clear(QSerialPort::AllDirections);
     serial->clearError();
 
@@ -152,31 +152,23 @@ bool BlinkyTape::open(QSerialPortInfo info) {
 #if defined(Q_OS_WIN)
     // Schedule the connection scanner
     connectionScannerTimer->singleShot(CONNECTION_SCANNER_INTERVAL,
-                                       this,
-                                       SLOT(handleConnectionScannerTimer()));
+                                             this,
+                                       SLOT(connectionScannerTimer_timeout()));
 #endif
     return true;
 }
 
 void BlinkyTape::close() {
-    if(serial.isNull()) {
+    if(!(serial->isOpen())) {
         return;
     }
 
-    serial->setSettingsRestoredOnClose(false);
-
-    if(serial->isOpen()) {
-        serial->close();
-    }
+    serial->close();
 
     emit(connectionStatusChanged(isConnected()));
 }
 
 bool BlinkyTape::isConnected() {
-    if(serial.isNull()) {
-        return false;
-    }
-
     return serial->isOpen();
 }
 
@@ -243,11 +235,12 @@ void BlinkyTape::reset()
 
     qDebug() << "Attempting to reset BlinkyTape";
 
-    serial->setSettingsRestoredOnClose(false);
     if(!serial->setBaudRate(QSerialPort::Baud1200)) {
         qDebug() << "Error setting baud rate: " << serial->error() << serial->errorString();
     }
-
-    // How to delay here???
     close();
+
+//    resetTimer->singleShot(RESET_TIMER_INTERVAL,
+//                           this,
+//                           SLOT(resetTimer_timeout()));
 }

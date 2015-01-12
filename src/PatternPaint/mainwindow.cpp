@@ -20,6 +20,8 @@
 
 #define MIN_TIMER_INTERVAL 10  // minimum interval to wait before firing a drawtimer update
 
+#define CONNECTION_SCANNER_INTERVAL 100
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -49,6 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     tape = new BlinkyTape(this);
 
+
     // Modify our UI when the tape connection status changes
     connect(tape, SIGNAL(connectionStatusChanged(bool)),
             this,SLOT(on_tapeConnectionStatusChanged(bool)));
@@ -69,7 +72,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->penSize->setSliderPosition(2);
     ui->patternSpeed->setSliderPosition(30);
 
-
     // Pre-set the upload progress dialog
     progressDialog = new QProgressDialog(this);
     progressDialog->setWindowTitle("BlinkyTape exporter");
@@ -81,6 +83,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     errorMessageDialog = new QMessageBox(this);
     errorMessageDialog->setWindowModality(Qt::WindowModal);
+
+    // Start a scanner to connect to a BlinkyTape automatically
+    connectionScannerTimer = new QTimer(this);
+    connectionScannerTimer->singleShot(CONNECTION_SCANNER_INTERVAL,
+                                       this,
+                                       SLOT(connectionScannerTimer_timeout()));
 }
 
 MainWindow::~MainWindow()
@@ -120,6 +128,26 @@ void MainWindow::drawTimer_timeout() {
         n = (n+1)%image.width();
         ui->patternEditor->setPlaybackRow(n);
     }
+}
+
+
+void MainWindow::connectionScannerTimer_timeout() {
+    // If we are already connected, disregard.
+    if(tape->isConnected()) {
+        return;
+    }
+
+    // Check if our serial port is on the list
+    QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
+
+    if(tapes.length() > 0) {
+        on_tapeConnectDisconnect_clicked();
+        return;
+    }
+
+    connectionScannerTimer->singleShot(CONNECTION_SCANNER_INTERVAL,
+                                       this,
+                                       SLOT(connectionScannerTimer_timeout()));
 }
 
 
@@ -253,6 +281,11 @@ void MainWindow::on_tapeConnectionStatusChanged(bool connected)
     else {
         ui->tapeConnectDisconnect->setText("Connect");
         ui->saveToTape->setEnabled(false);
+
+        // TODO: Don't do this if we disconnected intentionally.
+        connectionScannerTimer->singleShot(CONNECTION_SCANNER_INTERVAL,
+                                           this,
+                                           SLOT(connectionScannerTimer_timeout()));
     }
 }
 
@@ -300,19 +333,6 @@ void MainWindow::on_uploaderFinished(bool result)
     qDebug() << "Uploader finished! Result:" << result;
 
     progressDialog->hide();
-
-    // Reconnect to the BlinkyTape
-    if(!tape->isConnected()) {
-        // TODO: Make connect() function that does this automagically?
-        QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
-        qDebug() << "Tapes found:" << tapes.length();
-
-        if(tapes.length() > 0) {
-            // TODO: Try another one if this one fails?
-            qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
-            tape->open(tapes[0]);
-        }
-    }
 }
 
 
@@ -394,7 +414,6 @@ void MainWindow::on_actionSave_to_Tape_triggered()
 
     std::vector<Pattern> patterns;
     patterns.push_back(pattern);
-    // TODO: Implement multiple pattern upload
 
     if(!uploader->startUpload(*tape, patterns)) {
         errorMessageDialog->setText(uploader->getErrorString());
@@ -447,8 +466,8 @@ void MainWindow::on_actionResize_Pattern_triggered()
 
 void MainWindow::on_actionAddress_programmer_triggered()
 {
-    int patternLength = ui->patternEditor->getPatternAsImage().width();
-    int ledCount = ui->patternEditor->getPatternAsImage().height();
+//    int patternLength = ui->patternEditor->getPatternAsImage().width();
+//    int ledCount = ui->patternEditor->getPatternAsImage().height();
 
     // TODO: Dispose of this?
     AddressProgrammer* programmer = new AddressProgrammer(this);

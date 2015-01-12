@@ -28,6 +28,8 @@ private slots:
 
     void drawTimer_timeout();
 
+    void connectionScannerTimer_timeout();
+
     void on_actionLoad_File_triggered();
 
     void on_actionSave_File_triggered();
@@ -79,9 +81,12 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    QTimer *drawTimer;
-    BlinkyTape* tape;
-    PatternUploader* uploader;
+    QTimer* drawTimer;
+
+    QPointer<BlinkyTape> tape;
+    QPointer<PatternUploader> uploader;
+
+    QTimer *connectionScannerTimer;
 
     QProgressDialog* progressDialog;
     QMessageBox* errorMessageDialog;

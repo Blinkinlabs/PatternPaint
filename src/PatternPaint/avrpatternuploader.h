@@ -88,7 +88,7 @@ private:
     bool startUpload(BlinkyTape& tape);
 
     /// Timer used to poll for the bootloader device to show up
-    QTimer *bootloaderResetTimer;
+    QPointer<QTimer> bootloaderResetTimer;
 
     /// Current upload progress, in command counts
     float progress;

@@ -1,12 +1,12 @@
-#ifndef UPLOADDATA_H
-#define UPLOADDATA_H
+#ifndef AVRUPLOADDATA_H
+#define AVRUPLOADDATA_H
 
 #include <QByteArray>
 #include <vector>
 #include "pattern.h"
 
 /// Memory class to
-class uploadData {
+class avrUploadData {
 public:
     bool init(std::vector<Pattern> patterns);
 
@@ -22,4 +22,4 @@ public:
 };
 
 
-#endif // UPLOADDATA_H
+#endif // AVRUPLOADDATA_H

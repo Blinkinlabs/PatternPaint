@@ -42,7 +42,6 @@ public:
     bool isConnected();
 
     bool open(QSerialPortInfo info);
-    void close();
 
     void sendUpdate(QByteArray colors);
 
@@ -51,9 +50,17 @@ public:
     // Atempt to reset the strip by setting it's baud rate to 1200 and closing it.
     void reset();
 
+public slots:
+
+    void close();
+
 private:
     /// Serial port the BlinkyTape is connected to
     QPointer<QSerialPort> serial;
+
+    /// Timer to call the close() method, to allow a short delay
+    /// after changing the baud rate.
+    QTimer* resetTimer;
 
 #if defined(Q_OS_WIN)
     // Windows only: Timer that periodically checks if the serial device is
@@ -70,8 +77,10 @@ signals:
 private slots:
     void handleSerialError(QSerialPort::SerialPortError error);
 
+    void resetTimer_timeout();
+
 #if defined(Q_OS_WIN)
-    void handleConnectionScannerTimer();
+    void connectionScannerTimer_timeout();
 #endif
 };
 
