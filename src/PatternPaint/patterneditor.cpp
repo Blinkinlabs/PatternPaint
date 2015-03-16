@@ -30,6 +30,9 @@ void PatternEditor::resizeEvent(QResizeEvent * __attribute__((unused))event)
 
 void PatternEditor::init(int frameCount, int stripLength)
 {
+    // Store the width and height, so that letterboxscrollarea can resize this widget properly
+    this->setBaseSize(frameCount, stripLength);
+
     // Initialize the pattern to a blank canvass
     pattern = QImage(frameCount,
                      stripLength,
@@ -49,6 +52,7 @@ void PatternEditor::init(int frameCount, int stripLength)
     setMouseTracking(true);
 
     updateGridSize();
+
     update();
 }
 
@@ -75,13 +79,15 @@ bool PatternEditor::init(QImage newPattern, bool scaled) {
 }
 
 void PatternEditor::updateGridSize() {
-    // Set the x and y scale based on the widget size
-    // TODO: resize more intelligently (maybe minimum of both, or add scroll bars?)
-    xScale = float(size().height() - 1)/pattern.height();
-    yScale = float(size().height() - 1)/pattern.height();
+    // Base the widget size on the window height
+    float scale = float(size().height() - 1)/pattern.height();
+
+    // Use a square aspect to display the grid
+    xScale = scale;
+    yScale = scale;
+
 
     // And make a grid pattern to superimpose over the image
-    //
     gridPattern = QImage(pattern.width()*xScale  +.5 + 1,
                          pattern.height()*yScale +.5 + 1,
                          QImage::Format_ARGB32_Premultiplied);

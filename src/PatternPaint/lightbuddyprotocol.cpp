@@ -1,8 +1,31 @@
-#include "serialcommandqueue.h"
+#include "lightbuddyprotocol.h"
 
 #define COMMAND_TIMEOUT_TIME 1000
 
-SerialCommandQueue::SerialCommandQueue(QObject *parent) : QObject(parent)
+// TODO: move to utility library
+QByteArray arrayFromInt32(int val)
+{
+    QByteArray array;
+    array.append((val >> 24) & 0xFF);
+    array.append((val >> 16) & 0xFF);
+    array.append((val >>  8) & 0xFF);
+    array.append((val >>  0) & 0xFF);
+
+    return array;
+}
+
+// TODO: move to utility library
+int int32FromArray(QByteArray array)
+{
+    return  (array[0] << 24)
+          + (array[1] << 16)
+          + (array[2] <<  8)
+          + (array[3] <<  0);
+}
+
+
+LightbuddyProtocol::LightbuddyProtocol(QObject *parent) :
+    QObject(parent)
 {
     serial = new QSerialPort(this);
     serial->setSettingsRestoredOnClose(false);
@@ -19,7 +42,7 @@ SerialCommandQueue::SerialCommandQueue(QObject *parent) : QObject(parent)
 }
 
 
-bool SerialCommandQueue::open(QSerialPortInfo info) {
+bool LightbuddyProtocol::open(QSerialPortInfo info) {
     if(isConnected()) {
         qCritical("Already connected to serial device");
         return false;
@@ -41,7 +64,7 @@ bool SerialCommandQueue::open(QSerialPortInfo info) {
     return true;
 }
 
-void SerialCommandQueue::close() {
+void LightbuddyProtocol::close() {
     if(!(serial->isOpen())) {
         return;
     }
@@ -49,21 +72,21 @@ void SerialCommandQueue::close() {
     serial->close();
 }
 
-bool SerialCommandQueue::isConnected() {
+bool LightbuddyProtocol::isConnected() {
     return serial->isOpen();
 }
 
-void SerialCommandQueue::queueCommand(QString name,
+void LightbuddyProtocol::queueCommand(QString name,
                                  QByteArray data,
-                                 QByteArray expectedRespone) {
+                                 QByteArray expectedResponse) {
 
-    commandQueue.push_back(Command(name, data, expectedRespone));
+    commandQueue.push_back(Command(name, data, expectedResponse));
 
     // Try to start processing commands.
     processCommandQueue();
 }
 
-void SerialCommandQueue::processCommandQueue() {
+void LightbuddyProtocol::processCommandQueue() {
     // Nothing to do if we don't have any commands...
     if(commandQueue.length() == 0) {
         return;
@@ -93,7 +116,7 @@ void SerialCommandQueue::processCommandQueue() {
     commandTimeoutTimer->start(COMMAND_TIMEOUT_TIME);
 }
 
-void SerialCommandQueue::handleReadData() {
+void LightbuddyProtocol::handleReadData() {
     if(commandQueue.length() == 0) {
         // TODO: error, we got unexpected data.
         qCritical() << "Got data when we didn't expect it!";
@@ -133,26 +156,13 @@ void SerialCommandQueue::handleReadData() {
 //    qDebug() << "Command completed successfully: " << commandQueue.front().name;
     emit(commandFinished(commandQueue.front().name,responseData));
 
-
-    // If the command was reset, disconnect from the programmer and cancel
-    // any further commands
-    if(commandQueue.front().name == "reset") {
-        qDebug() << "Disconnecting from programmer";
-
-        // TODO: Better way to reset state!
-        close();
-        commandQueue.clear();
-        responseData.clear();
-        return;
-    }
-
     commandQueue.pop_front();
 
     // Start another command, if there is one.
     processCommandQueue();
 }
 
-void SerialCommandQueue::handleSerialError(QSerialPort::SerialPortError serialError)
+void LightbuddyProtocol::handleSerialError(QSerialPort::SerialPortError serialError)
 {
     if(serialError == QSerialPort::NoError) {
         // The serial library appears to emit an extraneous SerialPortError
@@ -168,7 +178,7 @@ void SerialCommandQueue::handleSerialError(QSerialPort::SerialPortError serialEr
     responseData.clear();
 }
 
-void SerialCommandQueue::handleCommandTimeout()
+void LightbuddyProtocol::handleCommandTimeout()
 {
     qCritical() << "Command timed out, disconnecting from programmer";
     emit(error("Command timed out, disconnecting from programmer"));
@@ -177,4 +187,10 @@ void SerialCommandQueue::handleCommandTimeout()
     close();
     commandQueue.clear();
     responseData.clear();
+}
+
+
+void LightbuddyProtocol::getLargestfile()
+{
+    queueCommand("getLargestfile",QByteArray("\0x11"), QByteArray(""));
 }

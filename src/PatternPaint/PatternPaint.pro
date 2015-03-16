@@ -44,7 +44,9 @@ SOURCES += main.cpp\
     avrpatternuploader.cpp \
     avruploaddata.cpp \
     lightbuddypatternuploader.cpp \
-    serialcommandqueue.cpp
+    serialcommandqueue.cpp \
+    lightbuddyprotocol.cpp \
+    letterboxscrollarea.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
@@ -63,7 +65,9 @@ HEADERS  += mainwindow.h \
     patternuploader.h \
     avruploaddata.h \
     lightbuddypatternuploader.h \
-    serialcommandqueue.h
+    serialcommandqueue.h \
+    lightbuddyprotocol.h \
+    letterboxscrollarea.h
 
 FORMS    += mainwindow.ui \
     systeminformation.ui \

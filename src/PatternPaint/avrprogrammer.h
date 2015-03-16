@@ -3,8 +3,8 @@
 
 #include "serialcommandqueue.h"
 
-// Given a serial object that is suspected to have an AVR109-compatible booloader
-// attached to it (ie, caterina), use it to load a new user program.
+/// Given a serial object that is suspected to have an AVR109-compatible booloader
+/// attached to it (ie, caterina), use it to load a new user program.
 class AvrProgrammer : public SerialCommandQueue
 {
     Q_OBJECT
@@ -25,15 +25,17 @@ public:
 
     /// These functions are direct implementations of the bootloader interface
 
-    // Set the current read/write address for flash/EEPROM reading/writing
-    // Note: The address needs to be divisble by 2, because it is interpreted
-    // as a word address by the bootloader.
+    /// Set the current read/write address for flash/EEPROM reading/writing
+    /// Note: The address needs to be divisble by 2, because it is interpreted
+    /// as a word address by the bootloader.
+    /// @param address Offset in the device flash space to use for the next read
+    /// or write operation
     void setAddress(int address);
 
-    // Check that we are talking to the correct device
+    /// Check that we are talking to the correct device
     void checkDeviceSignature();
 
-    // Instruct the programmer to reset.
+    /// Instruct the programmer to reset.
     void reset();
 };
 

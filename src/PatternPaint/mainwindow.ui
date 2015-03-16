@@ -112,7 +112,7 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
-    <item>
+    <item alignment="Qt::AlignTop">
      <widget class="QWidget" name="patternToolbox" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -142,7 +142,7 @@
         <number>0</number>
        </property>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0,0,0,0,0">
+        <layout class="QVBoxLayout" name="verticalLayout">
          <item>
           <widget class="ColorPicker" name="colorPicker" native="true">
            <property name="sizePolicy">
@@ -163,6 +163,7 @@
              <height>121</height>
             </size>
            </property>
+           <zorder>penSize</zorder>
           </widget>
          </item>
          <item>
@@ -246,30 +247,52 @@
      </widget>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="patternEditorLayout">
-      <item>
-       <widget class="PatternEditor" name="patternEditor" native="true">
-        <property name="enabled">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="LetterboxScrollArea" name="scrollArea">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="lineWidth">
+         <number>0</number>
+        </property>
+        <property name="widgetResizable">
          <bool>true</bool>
         </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>16777215</height>
-         </size>
-        </property>
+        <widget class="PatternEditor" name="patternEditor">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>500</width>
+           <height>430</height>
+          </rect>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>500</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>500</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="baseSize">
+          <size>
+           <width>10</width>
+           <height>10</height>
+          </size>
+         </property>
+        </widget>
        </widget>
       </item>
      </layout>
@@ -322,6 +345,8 @@
      <string>Tools</string>
     </property>
     <addaction name="actionSave_to_Tape"/>
+    <addaction name="separator"/>
+    <addaction name="actionAutomatically_connect"/>
     <addaction name="separator"/>
     <addaction name="actionLoad_rainbow_sketch"/>
     <addaction name="actionAddress_programmer"/>
@@ -427,6 +452,17 @@
     <string>Address programmer</string>
    </property>
   </action>
+  <action name="actionAutomatically_connect">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Automatically connect</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -440,6 +476,12 @@
    <class>PatternEditor</class>
    <extends>QWidget</extends>
    <header>patterneditor.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>LetterboxScrollArea</class>
+   <extends>QScrollArea</extends>
+   <header>letterboxscrollarea.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
