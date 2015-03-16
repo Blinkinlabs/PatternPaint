@@ -23,6 +23,9 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+protected:
+    void closeEvent(QCloseEvent *event);
+
 private slots:
     void on_tapeConnectDisconnect_clicked();
 
@@ -90,6 +93,9 @@ private:
 
     QProgressDialog* progressDialog;
     QMessageBox* errorMessageDialog;
+
+    void writeSettings();
+    void readSettings();
 };
 
 #endif // MAINWINDOW_H

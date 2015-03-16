@@ -89,6 +89,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connectionScannerTimer->singleShot(CONNECTION_SCANNER_INTERVAL,
                                        this,
                                        SLOT(connectionScannerTimer_timeout()));
+
+    readSettings();
 }
 
 MainWindow::~MainWindow()
@@ -188,14 +190,23 @@ void MainWindow::on_patternPlayPause_clicked()
 
 void MainWindow::on_actionLoad_File_triggered()
 {
-    // TODO: Add a simple image gallery thing instead of this, and push
-    // this to 'import' and 'export'
+    QSettings settings;
+    QString lastDirectory = settings.value("File/LoadDirectory").toString();
+
+    QDir dir(lastDirectory);
+    if(!dir.isReadable()) {
+        lastDirectory = QDir::homePath();
+    }
+
     QString fileName = QFileDialog::getOpenFileName(this,
-        tr("Open Pattern"), "", tr("Pattern Files (*.png *.jpg *.bmp)"));
+        tr("Open Pattern"), lastDirectory, tr("Pattern Files (*.png *.jpg *.bmp)"));
 
     if(fileName.length() == 0) {
         return;
     }
+
+    QFileInfo lastFile(fileName);
+    settings.setValue("File/LoadDirectory", lastFile.absoluteFilePath());
 
     QImage pattern;
 
@@ -213,14 +224,23 @@ void MainWindow::on_actionSave_File_triggered()
 {
     //TODO: Track if we already had an open file to enable this, add save as?
 
-    // TODO: Add a simple image gallery thing instead of this, and push
-    // this to 'import' and 'export'
+    QSettings settings;
+    QString lastDirectory = settings.value("File/SaveDirectory").toString();
+
+    QDir dir(lastDirectory);
+    if(!dir.isReadable()) {
+        lastDirectory = QDir::homePath();
+    }
+
     QString fileName = QFileDialog::getSaveFileName(this,
         tr("Save Pattern"), "", tr("Pattern Files (*.png *.jpg *.bmp)"));
 
     if(fileName.length() == 0) {
         return;
     }
+
+    QFileInfo lastFile(fileName);
+    settings.setValue("File/SaveDirectory", lastFile.absoluteFilePath());
 
     // TODO: Alert the user if this failed.
     if(!ui->patternEditor->getPatternAsImage().save(fileName)) {
@@ -473,4 +493,34 @@ void MainWindow::on_actionAddress_programmer_triggered()
     AddressProgrammer* programmer = new AddressProgrammer(this);
     programmer->setWindowModality(Qt::WindowModal);
     programmer->exec();
+}
+
+void MainWindow::writeSettings()
+{
+    QSettings settings;
+
+    settings.beginGroup("MainWindow");
+    settings.setValue("size", size());
+    settings.setValue("pos", pos());
+    settings.endGroup();
+}
+
+void MainWindow::readSettings()
+{
+    QSettings settings;
+
+    settings.beginGroup("MainWindow");
+    resize(settings.value("size", QSize(880, 450)).toSize());
+    move(settings.value("pos", QPoint(100, 100)).toPoint());
+    settings.endGroup();
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+//    if (userReallyWantsToQuit()) {
+    writeSettings();
+    event->accept();
+//    } else {
+//        event->ignore();
+//    }
 }

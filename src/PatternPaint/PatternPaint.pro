@@ -19,7 +19,7 @@ TEMPLATE = app
 
 #Application version
 VERSION_MAJOR = 1
-VERSION_MINOR = 1
+VERSION_MINOR = 2
 VERSION_BUILD = 0
 
 DEFINES += "VERSION_MAJOR=$${VERSION_MAJOR}" \
@@ -28,6 +28,10 @@ DEFINES += "VERSION_MAJOR=$${VERSION_MAJOR}" \
 
 #Target version
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
+
+DEFINES += APPLICATION_NAME=\\\""PatternPaint"\\\"
+DEFINES += ORGANIZATION_NAME=\\\""Blinkinlabs"\\\"
+DEFINES += ORGANIZATION_DOMAIN=\\\""blinkinlabs.com"\\\"
 
 SOURCES += main.cpp\
         mainwindow.cpp \
