@@ -40,7 +40,9 @@ void AvrPatternUploader::handleProgrammerError(QString error) {
     emit(finished(false));
 }
 
-void AvrPatternUploader::handleProgrammerCommandFinished(QString command, QByteArray __attribute__((unused))returnData) {
+void AvrPatternUploader::handleProgrammerCommandFinished(QString command, QByteArray returnData) {
+    Q_UNUSED(returnData);
+
     // TODO: Update our progress somehow? But how to tell how far we've gotten?
 //    qDebug() << "Command finished:" << command;
     setProgress(progress + 1);

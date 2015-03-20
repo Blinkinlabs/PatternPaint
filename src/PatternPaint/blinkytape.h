@@ -79,7 +79,7 @@ private slots:
 
     void handleSerialReadData();
 
-    void handleBaudRateChanged(qint32 baudRate, QSerialPort::Directions directions);
+    void handleBaudRateChanged(qint32 baudRate, QSerialPort::Directions);
 
     void resetTimer_timeout();
 

@@ -206,7 +206,7 @@ void BlinkyTape::handleSerialReadData()
     serial->readAll();
 }
 
-void BlinkyTape::handleBaudRateChanged(qint32 baudRate, QSerialPort::Directions directions)
+void BlinkyTape::handleBaudRateChanged(qint32 baudRate, QSerialPort::Directions)
 {
     if(baudRate == QSerialPort::Baud115200) {
         qDebug() << "Baud rate updated to 115200!";
