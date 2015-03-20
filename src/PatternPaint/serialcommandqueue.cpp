@@ -27,9 +27,13 @@ bool SerialCommandQueue::open(QSerialPortInfo info) {
 
     qDebug() << "connecting to " << info.portName();
 
+#if defined(Q_OS_OSX)
     // Note: This should be info.portName(). Changed here as a workaround for:
     // https://bugreports.qt.io/browse/QTBUG-45127
     serial->setPortName(info.systemLocation());
+#else
+    serial->setPortName(info.portName());
+#endif
     serial->setBaudRate(QSerialPort::Baud115200);
 
     if( !serial->open(QIODevice::ReadWrite) ) {

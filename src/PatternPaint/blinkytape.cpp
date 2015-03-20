@@ -82,6 +82,8 @@ BlinkyTape::BlinkyTape(QObject *parent) :
     // Windows doesn't notify us if the tape was disconnected, so we have to check peroidically
     #if defined(Q_OS_WIN)
     connectionScannerTimer = new QTimer(this);
+    connectionScannerTimer->setSingleShot(true);
+    connect(connectionScannerTimer, SIGNAL(timeout()), this, SLOT(connectionScannerTimer_timeout()));
     #endif
 }
 
@@ -142,9 +144,7 @@ void BlinkyTape::connectionScannerTimer_timeout() {
         // If we get a match, reset the timer and return.
         // We consider it a match if the port is the same on both
         if(info.portName() == currentInfo.portName()) {
-            connectionScannerTimer->singleShot(CONNECTION_SCANNER_INTERVAL,
-                                               this,
-                                               SLOT(handleConnectionScannerTimer()));
+            connectionScannerTimer->start(CONNECTION_SCANNER_INTERVAL);
             return;
         }
     }
@@ -162,9 +162,13 @@ bool BlinkyTape::open(QSerialPortInfo info) {
 
     qDebug() << "Connecting to BlinkyTape on " << info.portName();
 
+#if defined(Q_OS_OSX)
     // Note: This should be info.portName(). Changed here as a workaround for:
     // https://bugreports.qt.io/browse/QTBUG-45127
     serial->setPortName(info.systemLocation());
+#else
+    serial->setPortName(info.portName());
+#endif
     serial->setBaudRate(QSerialPort::Baud115200);
 
     if( !serial->open(QIODevice::ReadWrite) ) {
@@ -181,9 +185,7 @@ bool BlinkyTape::open(QSerialPortInfo info) {
 
 #if defined(Q_OS_WIN)
     // Schedule the connection scanner
-    connectionScannerTimer->singleShot(CONNECTION_SCANNER_INTERVAL,
-                                             this,
-                                       SLOT(connectionScannerTimer_timeout()));
+    connectionScannerTimer->start(CONNECTION_SCANNER_INTERVAL);
 #endif
     return true;
 }

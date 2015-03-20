@@ -86,9 +86,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Start a scanner to connect to a BlinkyTape automatically
     connectionScannerTimer = new QTimer(this);
-    connectionScannerTimer->singleShot(CONNECTION_SCANNER_INTERVAL,
-                                       this,
-                                       SLOT(connectionScannerTimer_timeout()));
+    connectionScannerTimer->setSingleShot(true);
+    connect(connectionScannerTimer, SIGNAL(timeout()), this, SLOT(connectionScannerTimer_timeout()));
 
     readSettings();
 }
@@ -147,9 +146,7 @@ void MainWindow::connectionScannerTimer_timeout() {
         return;
     }
 
-    connectionScannerTimer->singleShot(CONNECTION_SCANNER_INTERVAL,
-                                       this,
-                                       SLOT(connectionScannerTimer_timeout()));
+    connectionScannerTimer->start(CONNECTION_SCANNER_INTERVAL);
 }
 
 
@@ -303,9 +300,7 @@ void MainWindow::on_tapeConnectionStatusChanged(bool connected)
         ui->saveToTape->setEnabled(false);
 
         // TODO: Don't do this if we disconnected intentionally.
-        connectionScannerTimer->singleShot(CONNECTION_SCANNER_INTERVAL,
-                                           this,
-                                           SLOT(connectionScannerTimer_timeout()));
+        connectionScannerTimer->start(CONNECTION_SCANNER_INTERVAL);
     }
 }
 
