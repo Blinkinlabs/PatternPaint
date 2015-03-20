@@ -54,16 +54,6 @@ public:
     /// Get a string describing the last error, if any.
     QString getErrorString() const;
 
-signals:
-    /// Sends an update about the maximum update progress, from 0 to 1
-    void maxProgressChanged(int progress);
-
-    /// Sends an update about the upload progress, from 0 to 1
-    void progressChanged(int progress);
-
-    /// Sends a signal at end of upload to report the result.
-    void finished(bool result);
-
 private slots:
     void doWork();  /// Handle the next section of work, whatever it is
 
