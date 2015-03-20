@@ -58,9 +58,9 @@ private:
     /// Serial port the BlinkyTape is connected to
     QPointer<QSerialPort> serial;
 
-    /// Timer to call the close() method, to allow a short delay
-    /// after changing the baud rate.
     QTimer* resetTimer;
+
+    int resetTriesRemaining;
 
 #if defined(Q_OS_WIN)
     // Windows only: Timer that periodically checks if the serial device is
@@ -76,6 +76,10 @@ signals:
 
 private slots:
     void handleSerialError(QSerialPort::SerialPortError error);
+
+    void handleSerialReadData();
+
+    void handleBaudRateChanged(qint32 baudRate, QSerialPort::Directions directions);
 
     void resetTimer_timeout();
 

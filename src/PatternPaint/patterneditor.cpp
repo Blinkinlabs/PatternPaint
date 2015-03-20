@@ -229,7 +229,6 @@ void PatternEditor::lazyUpdate() {
     static qint64 lastTime = 0;
     qint64 newTime = QDateTime::currentMSecsSinceEpoch();
     if (newTime - lastTime < MIN_UPDATE_INTERVAL) {
-        qDebug() << "Dropping update due to rate limiting. Last update " << newTime - lastTime << "ms ago";
         return;
     }
 

@@ -50,7 +50,9 @@ bool LightbuddyProtocol::open(QSerialPortInfo info) {
 
     qDebug() << "connecting to " << info.portName();
 
-    serial->setPortName(info.portName());
+    // Note: This should be info.portName(). Changed here as a workaround for:
+    // https://bugreports.qt.io/browse/QTBUG-45127
+    serial->setPortName(info.systemLocation());
     serial->setBaudRate(QSerialPort::Baud115200);
 
     if( !serial->open(QIODevice::ReadWrite) ) {
