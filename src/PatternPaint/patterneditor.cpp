@@ -179,7 +179,6 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
     static qint64 lastTime = 0;
     qint64 newTime = QDateTime::currentMSecsSinceEpoch();
     if (newTime - lastTime < MIN_MOUSE_INTERVAL) {
-        qDebug() << "Ignoring mouse event due to rate limiting. Last update " << newTime - lastTime << "ms ago";
         return;
     }
 
@@ -261,8 +260,4 @@ void PatternEditor::paintEvent(QPaintEvent * /* event */)
                      int((playbackRow+1)*xScale +.5) - int(playbackRow*xScale +.5),
                      pattern.height()*yScale,
                      COLOR_PLAYBACK_TOP);
-
-//    // And a scrubber
-//    painter.setPen(COLOR_PLAYBACK_EDGE);
-//    painter.drawPolygon();
 }
