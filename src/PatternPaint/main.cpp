@@ -8,6 +8,8 @@ int main(int argc, char *argv[])
     a.setOrganizationDomain(ORGANIZATION_DOMAIN);
     a.setApplicationName(APPLICATION_NAME);
 
+    qSetMessagePattern("%{type} %{function}: %{message}");
+
     MainWindow w;
     w.show();
 

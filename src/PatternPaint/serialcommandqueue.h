@@ -63,6 +63,8 @@ private:
 
     // If there is another command in the queue, start processing it.
     void processCommandQueue();
+
+    void resetState();
 };
 
 #endif // SERIALCOMMANDQUEUE_H

@@ -94,6 +94,9 @@ private:
     QProgressDialog* progressDialog;
     QMessageBox* errorMessageDialog;
 
+    enum Modes { Disconnected, Connected, Uploading };
+    Modes mode;
+
     void writeSettings();
     void readSettings();
 };

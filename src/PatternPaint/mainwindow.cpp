@@ -28,12 +28,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    // TODO: should this go somewhere else?
-    qSetMessagePattern("%{type} %{function}: %{message}");
+    drawTimer = new QTimer(this);
+    connectionScannerTimer = new QTimer(this);
 
-    // Windows only?
-    // TODO: Run on windows to see if this works
-//    setWindowIcon(QIcon(":/resources/images/blinkytape.ico"));
+    mode = Disconnected;
 
     ui->patternEditor->init(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
     ui->colorPicker->init();
@@ -44,14 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->penSize, SIGNAL(valueChanged(int)),
             ui->patternEditor, SLOT(setToolSize(int)));
 
-    // The draw timer tells the pattern to advance
-    drawTimer = new QTimer(this);
-    connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
-    drawTimer->start(33);
-
     tape = new BlinkyTape(this);
-
-
     // Modify our UI when the tape connection status changes
     connect(tape, SIGNAL(connectionStatusChanged(bool)),
             this,SLOT(on_tapeConnectionStatusChanged(bool)));
@@ -84,10 +75,17 @@ MainWindow::MainWindow(QWidget *parent) :
     errorMessageDialog = new QMessageBox(this);
     errorMessageDialog->setWindowModality(Qt::WindowModal);
 
+
+    // The draw timer tells the pattern to advance
+    connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
+    drawTimer->setInterval(33);
+    drawTimer->start();
+
+
     // Start a scanner to connect to a BlinkyTape automatically
-    connectionScannerTimer = new QTimer(this);
-    connectionScannerTimer->setSingleShot(true);
     connect(connectionScannerTimer, SIGNAL(timeout()), this, SLOT(connectionScannerTimer_timeout()));
+    connectionScannerTimer->setInterval(CONNECTION_SCANNER_INTERVAL);
+    connectionScannerTimer->start();
 
     readSettings();
 }
@@ -98,6 +96,7 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::drawTimer_timeout() {
+
     // TODO: move this state to somewhere; the patternEditor class maybe?
     static int n = 0;
 
@@ -134,7 +133,7 @@ void MainWindow::drawTimer_timeout() {
 
 void MainWindow::connectionScannerTimer_timeout() {
     // If we are already connected, disregard.
-    if(tape->isConnected()) {
+    if(tape->isConnected() || mode==Uploading) {
         return;
     }
 
@@ -145,8 +144,6 @@ void MainWindow::connectionScannerTimer_timeout() {
         on_tapeConnectDisconnect_clicked();
         return;
     }
-
-    connectionScannerTimer->start(CONNECTION_SCANNER_INTERVAL);
 }
 
 
@@ -292,15 +289,19 @@ void MainWindow::on_tapeConnectionStatusChanged(bool connected)
 {
     qDebug() << "status changed, connected=" << connected;
     if(connected) {
+        mode = Connected;
+
         ui->tapeConnectDisconnect->setText("Disconnect");
         ui->saveToTape->setEnabled(true);
     }
     else {
+        mode = Disconnected;
+
         ui->tapeConnectDisconnect->setText("Connect");
         ui->saveToTape->setEnabled(false);
 
         // TODO: Don't do this if we disconnected intentionally.
-        connectionScannerTimer->start(CONNECTION_SCANNER_INTERVAL);
+        connectionScannerTimer->start();
     }
 }
 
@@ -345,8 +346,9 @@ void MainWindow::on_uploaderProgressChanged(int progressValue)
 
 void MainWindow::on_uploaderFinished(bool result)
 {
-    qDebug() << "Uploader finished! Result:" << result;
+    mode = Disconnected;
 
+    qDebug() << "Uploader finished! Result:" << result;
     progressDialog->hide();
 }
 
@@ -403,7 +405,13 @@ void MainWindow::on_actionLoad_rainbow_sketch_triggered()
     }
 
     QByteArray sketch = QByteArray(reinterpret_cast<const char*>(ColorSwirlSketch),COLORSWIRL_LENGTH);
-    uploader->startUpload(*tape, sketch);
+
+    if(!uploader->startUpload(*tape, sketch)) {
+        errorMessageDialog->setText(uploader->getErrorString());
+        errorMessageDialog->show();
+        return;
+    }
+    mode = Uploading;
 
     progressDialog->setValue(progressDialog->minimum());
     progressDialog->show();
@@ -435,6 +443,7 @@ void MainWindow::on_actionSave_to_Tape_triggered()
         errorMessageDialog->show();
         return;
     }
+    mode = Uploading;
 
     progressDialog->setValue(progressDialog->minimum());
     progressDialog->show();

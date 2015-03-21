@@ -41,9 +41,6 @@ bool SerialCommandQueue::open(QSerialPortInfo info) {
         return false;
     }
 
-    serial->clear(QSerialPort::AllDirections);
-    serial->clearError();
-
     return true;
 }
 
@@ -143,10 +140,7 @@ void SerialCommandQueue::handleReadData() {
     if(commandQueue.front().name == "reset") {
         qDebug() << "Disconnecting from programmer";
 
-        // TODO: Better way to reset state!
-        close();
-        commandQueue.clear();
-        responseData.clear();
+        resetState();
         return;
     }
 
@@ -164,12 +158,11 @@ void SerialCommandQueue::handleSerialError(QSerialPort::SerialPortError serialEr
         return;
     }
 
+    // TODO: If a reset instruction was just sent, don't emit an error if we get disconnected here
+
     emit(error(serial->errorString()));
 
-    // TODO: Better way to reset state!
-    close();
-    commandQueue.clear();
-    responseData.clear();
+    resetState();
 }
 
 void SerialCommandQueue::handleCommandTimeout()
@@ -177,7 +170,10 @@ void SerialCommandQueue::handleCommandTimeout()
     qCritical() << "Command timed out, disconnecting from programmer";
     emit(error("Command timed out, disconnecting from programmer"));
 
-    // TODO: Better way to reset state!
+    resetState();
+}
+
+void SerialCommandQueue::resetState() {
     close();
     commandQueue.clear();
     responseData.clear();

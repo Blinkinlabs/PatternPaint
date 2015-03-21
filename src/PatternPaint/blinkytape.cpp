@@ -82,7 +82,7 @@ BlinkyTape::BlinkyTape(QObject *parent) :
     // Windows doesn't notify us if the tape was disconnected, so we have to check peroidically
     #if defined(Q_OS_WIN)
     connectionScannerTimer = new QTimer(this);
-    connectionScannerTimer->setSingleShot(true);
+    connectionScannerTimer->setInterval(CONNECTION_SCANNER_INTERVAL);
     connect(connectionScannerTimer, SIGNAL(timeout()), this, SLOT(connectionScannerTimer_timeout()));
     #endif
 }
@@ -116,7 +116,7 @@ void BlinkyTape::resetTimer_timeout() {
     qDebug() << "Hit reset timer";
 
     if(resetTriesRemaining < 1) {
-        // TODO: output a failure here
+        qCritical() << "Reset timer maximum tries reached, failed to reset tape";
         return;
     }
 
@@ -133,6 +133,7 @@ void BlinkyTape::resetTimer_timeout() {
 void BlinkyTape::connectionScannerTimer_timeout() {
     // If we are already disconnected, disregard.
     if(!isConnected()) {
+        connectionScannerTimer->stop();
         return;
     }
 
@@ -144,7 +145,6 @@ void BlinkyTape::connectionScannerTimer_timeout() {
         // If we get a match, reset the timer and return.
         // We consider it a match if the port is the same on both
         if(info.portName() == currentInfo.portName()) {
-            connectionScannerTimer->start(CONNECTION_SCANNER_INTERVAL);
             return;
         }
     }
@@ -176,16 +176,13 @@ bool BlinkyTape::open(QSerialPortInfo info) {
         return false;
     }
 
-    serial->clear(QSerialPort::AllDirections);
-    serial->clearError();
-
     resetTriesRemaining = 0;
 
     emit(connectionStatusChanged(true));
 
 #if defined(Q_OS_WIN)
     // Schedule the connection scanner
-    connectionScannerTimer->start(CONNECTION_SCANNER_INTERVAL);
+    connectionScannerTimer->start();
 #endif
     return true;
 }
@@ -202,6 +199,7 @@ void BlinkyTape::close() {
 
 void BlinkyTape::handleSerialReadData()
 {
+    qDebug() << "Got data from BlinkyTape, discarding.";
     // Discard any data we get back from the BlinkyTape
     serial->readAll();
 }
@@ -213,8 +211,10 @@ void BlinkyTape::handleBaudRateChanged(qint32 baudRate, QSerialPort::Directions)
     }
     else if(baudRate == QSerialPort::Baud1200 && resetTriesRemaining > 0) {
         qDebug() << "Baud rate updated to 1200bps, closing!";
+
         resetTimer->stop();
         close();
+
     }
     else if(baudRate == QSerialPort::Baud1200) {
         qDebug() << "Baud rate updated to 1200bps spuriously";
@@ -228,16 +228,14 @@ bool BlinkyTape::isConnected() {
 void BlinkyTape::sendUpdate(QByteArray LedData)
 {
     if(!isConnected()) {
-        // TODO: Signal error?
         qCritical() << "Strip not connected, not sending update!";
         return;
     }
 
     // If there is data pending to send, skip this update to prevent overflowing
     // the buffer.
-    // TODO: Tested on OS X. Does this work on Windows, Linux?
     if(serial->bytesToWrite() >0) {
-        qDebug() << "Output data still in buffer, dropping this update frame";
+//        qDebug() << "Output data still in buffer, dropping this update frame";
         return;
     }
 
