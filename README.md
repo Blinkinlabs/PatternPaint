@@ -35,16 +35,17 @@ http://download.qt.io/archive/qt/5.4/5.4.1/qt-opensource-mac-x64-clang-5.4.1.dmg
 	rm -R build/
 	${QTDIR}/bin/qmake MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build 	DESTDIR=bin VERSION=0.3.0
 	make
+	cd ..
 
 
 3.	Use the bundler tool to make a .dmg file:
 
-	${QTDIR}/bin/macdeployqt src/PatternPaint/bin/PatternPaint.app -dmg
+	${QTDIR}/bin/macdeployqt PatternPaint/bin/PatternPaint.app -dmg
 
 
 4.	Change the dmg name to include the version, for example PatternPaint_0.1.0.dmg
 
-	mv src/PatternPaint/bin/PatternPaint.dmg ./PatternPaint_0.3.0.dmg
+	mv PatternPaint/bin/PatternPaint.dmg ./PatternPaint_0.3.0.dmg
 
 5.	Distribute!
 
