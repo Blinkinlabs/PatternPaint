@@ -1,0 +1,5 @@
+*.DS_Store
+*.swp
+PatternPaint/bin/*
+PatternPaint/build/*
+PatternPaint/Makefile
