@@ -5,6 +5,7 @@
 #include "systeminformation.h"
 #include "aboutpatternpaint.h"
 #include "resizepattern.h"
+#include "undocommand.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -484,6 +485,7 @@ void MainWindow::on_actionResize_Pattern_triggered()
 
     // TODO: Data validation
     if(resizer->length() > 0) {
+
         qDebug() << "Resizing pattern, length:"
                  << resizer->length()
                  << "height:"
@@ -498,6 +500,7 @@ void MainWindow::on_actionResize_Pattern_triggered()
         // Copy over whatever portion of the original pattern will fit
         QPainter painter(&newImage);
         QImage originalImage = ui->patternEditor->getPatternAsImage();
+        ui->patternEditor->pushUndoCommand(new UndoCommand(originalImage, *(ui->patternEditor)));
         painter.drawImage(0,0,originalImage);
 
         ui->patternEditor->init(newImage, false);
