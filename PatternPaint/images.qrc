@@ -4,4 +4,22 @@
         <file>images/blinkytapepattern.jpg</file>
         <file>images/PatternPaintAbout.png</file>
     </qresource>
+    <qresource prefix="/instruments">
+        <file>images/instruments-icons/cursor.png</file>
+        <file>images/instruments-icons/cursor_fill.png</file>
+        <file>images/instruments-icons/cursor_loupe.png</file>
+        <file>images/instruments-icons/cursor_pipette.png</file>
+        <file>images/instruments-icons/cursor_spray.png</file>
+        <file>images/instruments-icons/curve.png</file>
+        <file>images/instruments-icons/ellipse.png</file>
+        <file>images/instruments-icons/fill.png</file>
+        <file>images/instruments-icons/lastic.png</file>
+        <file>images/instruments-icons/line.png</file>
+        <file>images/instruments-icons/loupe.png</file>
+        <file>images/instruments-icons/pencil.png</file>
+        <file>images/instruments-icons/pipette.png</file>
+        <file>images/instruments-icons/rectangle.png</file>
+        <file>images/instruments-icons/spray.png</file>
+        <file>images/instruments-icons/text.png</file>
+    </qresource>
 </RCC>
