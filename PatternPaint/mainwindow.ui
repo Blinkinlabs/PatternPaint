@@ -92,6 +92,9 @@
   <property name="autoFillBackground">
    <bool>false</bool>
   </property>
+  <property name="dockOptions">
+   <set>QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks</set>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -264,7 +267,7 @@
            <x>0</x>
            <y>0</y>
            <width>500</width>
-           <height>427</height>
+           <height>434</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -304,7 +307,7 @@
      <x>0</x>
      <y>0</y>
      <width>880</width>
-     <height>25</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -360,6 +363,95 @@
    <addaction name="menuInstruments"/>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="palette">
+    <palette>
+     <active>
+      <colorrole role="Base">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>255</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Window">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </active>
+     <inactive>
+      <colorrole role="Base">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>255</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Window">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </inactive>
+     <disabled>
+      <colorrole role="Base">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Window">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </disabled>
+    </palette>
+   </property>
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QToolBar" name="toolBar_2">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>LeftToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
   </widget>
   <action name="actionLoad_File">
    <property name="text">
@@ -468,6 +560,24 @@
     <string>Automatically connect</string>
    </property>
   </action>
+  <action name="actionAct1">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/instruments/images/instruments-icons/cursor.png</normaloff>:/instruments/images/instruments-icons/cursor.png</iconset>
+   </property>
+   <property name="text">
+    <string>act1</string>
+   </property>
+  </action>
+  <action name="actionAct2">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/instruments/images/instruments-icons/cursor_fill.png</normaloff>:/instruments/images/instruments-icons/cursor_fill.png</iconset>
+   </property>
+   <property name="text">
+    <string>act2</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -497,6 +607,8 @@
   <tabstop>saveToTape</tabstop>
   <tabstop>tapeConnectDisconnect</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections/>
 </ui>

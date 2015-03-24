@@ -14,6 +14,8 @@
 #include "ui_mainwindow.h"
 
 class QUndoGroup;
+class ColorChooser;
+class QToolButton;
 
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
@@ -95,6 +97,12 @@ private:
     QAction *mCurveLineAction;
     QAction *mTextAction;
 
+    QToolButton *mCursorButton, *mEraserButton, *mPenButton, *mLineButton,
+                *mColorPickerButton, *mMagnifierButton, *mSprayButton, *mFillButton,
+                *mRectangleButton, *mEllipseButton, *mCurveButton, *mTextButton;
+    ColorChooser *mPColorChooser, *mSColorChooser;
+    QToolButton* mAnimate, *mSaveFile, *mLoadFile, *mSave, *mConnect;
+
     QTimer* drawTimer;
 
     QPointer<BlinkyTape> tape;
@@ -112,6 +120,7 @@ private:
     QAction* m_undoAction;
     QAction* m_redoAction;
 
+    QToolButton* createToolButton(QAction *act);
     void writeSettings();
     void readSettings();
 };

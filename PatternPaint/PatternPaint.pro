@@ -56,7 +56,8 @@ SOURCES += main.cpp\
     serialcommandqueue.cpp \
     lightbuddyprotocol.cpp \
     letterboxscrollarea.cpp \
-    undocommand.cpp
+    undocommand.cpp \
+    colorchooser.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
@@ -78,7 +79,8 @@ HEADERS  += mainwindow.h \
     serialcommandqueue.h \
     lightbuddyprotocol.h \
     letterboxscrollarea.h \
-    undocommand.h
+    undocommand.h \
+    colorchooser.h
 
 FORMS    += mainwindow.ui \
     systeminformation.ui \

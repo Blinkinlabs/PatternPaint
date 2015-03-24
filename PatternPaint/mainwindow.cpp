@@ -6,6 +6,7 @@
 #include "aboutpatternpaint.h"
 #include "resizepattern.h"
 #include "undocommand.h"
+#include "colorchooser.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -13,6 +14,7 @@
 #include <QDesktopServices>
 #include <QtWidgets>
 #include <QUndoGroup>
+#include <QToolButton>
 
 // TODO: Move this to pattern uploader or something?
 #include "ColorSwirl_Sketch.h"
@@ -118,6 +120,84 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     menuInstruments->addAction(mCurveLineAction);
     menuInstruments->addAction(mTextAction);
 
+    mCursorButton = createToolButton(mCursorAction);
+    mEraserButton = createToolButton(mEraserAction);
+    mColorPickerButton = createToolButton(mColorPickerAction);
+    mMagnifierButton = createToolButton(mMagnifierAction);
+    mPenButton = createToolButton(mPenAction);
+    mLineButton = createToolButton(mLineAction);
+    mSprayButton = createToolButton(mSprayAction);
+    mFillButton = createToolButton(mFillAction);
+    mRectangleButton = createToolButton(mRectangleAction);
+    mEllipseButton = createToolButton(mEllipseAction);
+    mCurveButton = createToolButton(mCurveLineAction);
+    mTextButton = createToolButton(mTextAction);
+
+    QGridLayout *bLayout = new QGridLayout();
+    bLayout->setMargin(3);
+    bLayout->addWidget(mCursorButton, 0, 0);
+    bLayout->addWidget(mEraserButton, 0, 1);
+    bLayout->addWidget(mColorPickerButton, 1, 0);
+    bLayout->addWidget(mMagnifierButton, 1, 1);
+    bLayout->addWidget(mPenButton, 2, 0);
+    bLayout->addWidget(mLineButton, 2, 1);
+    bLayout->addWidget(mSprayButton, 3, 0);
+    bLayout->addWidget(mFillButton, 3, 1);
+    bLayout->addWidget(mRectangleButton, 4, 0);
+    bLayout->addWidget(mEllipseButton, 4, 1);
+    bLayout->addWidget(mCurveButton, 5, 0);
+    bLayout->addWidget(mTextButton, 5, 1);
+
+    QWidget *bWidget = new QWidget();
+    bWidget->setLayout(bLayout);
+
+    mPColorChooser = new ColorChooser(0, 0, 0, this);
+    mPColorChooser->setStatusTip(tr("Primary color"));
+    mPColorChooser->setToolTip(tr("Primary color"));
+    //connect(mPColorChooser, SIGNAL(sendColor(QColor)), this, SLOT(primaryColorChanged(QColor)));
+
+    mSColorChooser = new ColorChooser(255, 255, 255, this);
+    mSColorChooser->setStatusTip(tr("Secondary color"));
+    mSColorChooser->setToolTip(tr("Secondary color"));
+    //connect(mSColorChooser, SIGNAL(sendColor(QColor)), this, SLOT(secondaryColorChanged(QColor)));
+
+    QSpinBox *penSizeSpin = new QSpinBox();
+    penSizeSpin->setRange(1, 20);
+    penSizeSpin->setValue(1);
+    penSizeSpin->setStatusTip(tr("Pen size"));
+    penSizeSpin->setToolTip(tr("Pen size"));
+    connect(penSizeSpin, SIGNAL(valueChanged(int)), this, SLOT(penValueChanged(int)));
+
+    QGridLayout *tLayout = new QGridLayout();
+    tLayout->setMargin(3);
+    tLayout->addWidget(mPColorChooser, 0, 0);
+    tLayout->addWidget(mSColorChooser, 0, 1);
+    tLayout->addWidget(penSizeSpin, 1, 0, 1, 2);
+
+    QWidget *tWidget = new QWidget();
+    tWidget->setLayout(tLayout);
+
+    QVBoxLayout* vLayout = new QVBoxLayout;
+    vLayout->setMargin(3);
+
+    //mAnimate = createToolButton()
+    mSaveFile = createToolButton(actionSave_File);
+    mLoadFile = createToolButton(actionLoad_File);
+    mSave = createToolButton(actionSave_to_Tape);
+    mConnect = createToolButton(actionAutomatically_connect);
+    //vLayout->addWidget(
+    vLayout->addWidget(mSaveFile);
+    vLayout->addWidget(mLoadFile);
+    vLayout->addWidget(mConnect);
+    QWidget *vWidget = new QWidget();
+    vWidget->setLayout(vLayout);
+
+    toolBar->addWidget(bWidget);
+    toolBar->addSeparator();
+    toolBar->addWidget(tWidget);
+    toolBar->addSeparator();
+    toolBar_2->addWidget(vWidget);
+
     drawTimer = new QTimer(this);
     connectionScannerTimer = new QTimer(this);
 
@@ -181,6 +261,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 }
 
 MainWindow::~MainWindow(){}
+
+QToolButton* MainWindow::createToolButton(QAction *act) {
+    QToolButton *toolButton = new QToolButton();
+    toolButton->setMinimumSize(QSize(30, 30));
+    toolButton->setMaximumSize(QSize(30, 30));
+    toolButton->setDefaultAction(act);
+    toolButton->setStatusTip(act->text());
+    return toolButton;
+}
 
 void MainWindow::drawTimer_timeout() {
 
