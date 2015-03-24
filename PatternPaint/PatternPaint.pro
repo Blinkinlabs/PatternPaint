@@ -14,6 +14,11 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     include($$QTSERIALPORT_PROJECT_ROOT/src/serialport/qt4support/serialport.prf)
 }
 
+OBJECTS_DIR = tmp
+MOC_DIR = $$OBJECTS_DIR/moc
+RCC_DIR = $$OBJECTS_DIR/rcc
+UI_DIR = $$OBJECTS_DIR/uic
+
 TARGET = PatternPaint
 TEMPLATE = app
 
