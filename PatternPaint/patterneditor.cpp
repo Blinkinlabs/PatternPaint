@@ -1,9 +1,11 @@
 #include "patterneditor.h"
+#include "undocommand.h"
 
 #include <iostream>
 #include <cmath>
 #include <QtWidgets>
 #include <QDebug>
+#include <QUndoStack>
 
 #define COLOR_CLEAR             QColor(0,0,0,0)
 #define COLOR_CANVAS_DEFAULT    QColor(0,0,0,0)
@@ -21,6 +23,8 @@
 PatternEditor::PatternEditor(QWidget *parent) :
     QWidget(parent)
 {
+    m_undoStack = new QUndoStack(this);
+    m_undoStack->setUndoLimit(10);  // TODO - use preferences here
 }
 
 void PatternEditor::resizeEvent(QResizeEvent * event)
@@ -162,6 +166,8 @@ void PatternEditor::updateToolPreview(int x, int y) {
 }
 
 void PatternEditor::mousePressEvent(QMouseEvent *event){
+
+    pushUndoCommand(new UndoCommand(getPatternAsImage(), *this));
     int x = event->x()/xScale;
     int y = event->y()/yScale;
 
@@ -264,4 +270,9 @@ void PatternEditor::paintEvent(QPaintEvent * /* event */)
                      int((playbackRow+1)*xScale +.5) - int(playbackRow*xScale +.5),
                      pattern.height()*yScale,
                      COLOR_PLAYBACK_TOP);
+}
+
+void PatternEditor::pushUndoCommand(UndoCommand *command)
+{
+    if (command) m_undoStack->push(command);
 }

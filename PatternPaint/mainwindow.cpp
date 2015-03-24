@@ -11,6 +11,7 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QtWidgets>
+#include <QUndoGroup>
 
 // TODO: Move this to pattern uploader or something?
 #include "ColorSwirl_Sketch.h"
@@ -27,6 +28,21 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    ui->menuEdit->addSeparator();
+    m_undoStackGroup = new QUndoGroup(this);
+    m_undoAction = m_undoStackGroup->createUndoAction(this, tr("&Undo"));
+    m_undoAction->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Z")));
+    m_undoAction->setEnabled(false);
+    ui->menuEdit->addAction(m_undoAction);
+
+    m_redoAction = m_undoStackGroup->createRedoAction(this, tr("&Redo"));
+    m_redoAction->setEnabled(false);
+    m_redoAction->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Y")));
+    ui->menuEdit->addAction(m_redoAction);
+
+    m_undoStackGroup->addStack(ui->patternEditor->getUndoStack());
+    m_undoStackGroup->setActiveStack(ui->patternEditor->getUndoStack());
 
     drawTimer = new QTimer(this);
     connectionScannerTimer = new QTimer(this);

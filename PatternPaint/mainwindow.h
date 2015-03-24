@@ -11,6 +11,8 @@
 #include "patterneditor.h"
 #include "addressprogrammer.h"
 
+class QUndoGroup;
+
 namespace Ui {
 class MainWindow;
 }
@@ -96,6 +98,10 @@ private:
 
     enum Modes { Disconnected, Connected, Uploading };
     Modes mode;
+
+    QUndoGroup *m_undoStackGroup;
+    QAction* m_undoAction;
+    QAction* m_redoAction;
 
     void writeSettings();
     void readSettings();

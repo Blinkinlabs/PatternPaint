@@ -3,6 +3,9 @@
 
 #include <QWidget>
 
+class QUndoStack;
+class UndoCommand;
+
 class PatternEditor : public QWidget
 {
     Q_OBJECT
@@ -19,6 +22,10 @@ public:
     /// @param scaled If true, scale the image to match the height of the previous pattern
     bool init(QImage newPattern, bool scaled = true);
 
+    // TODO - replace to pointers?
+    void setImage(const QImage& img) { pattern = img; }
+    inline QUndoStack* getUndoStack() { return m_undoStack; }
+
     /// Get the image data for the current pattern
     /// @return QImage containing the current pattern
     QImage getPatternAsImage() { return pattern; }
@@ -31,6 +38,7 @@ public:
 
     void leaveEvent(QEvent * event);
 
+    void pushUndoCommand(UndoCommand *command);
 protected:
     void paintEvent(QPaintEvent *event);
 
@@ -46,6 +54,7 @@ private:
     int toolSize;          ///< Size of the current drawing tool (TODO: This should be a pointer to a tool)
 
     int playbackRow;       ///< Row being played back
+    QUndoStack* m_undoStack;
 
     /// Redraw the gridPattern to fit the current widget size.
     void updateGridSize();
