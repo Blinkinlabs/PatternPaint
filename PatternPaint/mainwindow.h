@@ -11,13 +11,11 @@
 #include "patterneditor.h"
 #include "addressprogrammer.h"
 
+#include "ui_mainwindow.h"
+
 class QUndoGroup;
 
-namespace Ui {
-class MainWindow;
-}
-
-class MainWindow : public QMainWindow
+class MainWindow : public QMainWindow, private Ui::MainWindow
 {
     Q_OBJECT
 
@@ -84,7 +82,18 @@ private slots:
     void on_actionAddress_programmer_triggered();
 
 private:
-    Ui::MainWindow *ui;
+    QAction* mCursorAction;
+    QAction* mEraserAction;
+    QAction *mColorPickerAction;
+    QAction *mMagnifierAction;
+    QAction *mPenAction;
+    QAction *mLineAction;
+    QAction *mSprayAction;
+    QAction *mFillAction;
+    QAction *mRectangleAction;
+    QAction *mEllipseAction;
+    QAction *mCurveLineAction;
+    QAction *mTextAction;
 
     QTimer* drawTimer;
 

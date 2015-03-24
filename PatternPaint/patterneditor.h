@@ -15,12 +15,15 @@ public:
     /// Re-initialze the pattern editor as a blank image with the given size
     /// @param frameCount Number of frames in this pattern
     /// @param stripLength Number of LEDs in this strip
-    void init(int frameCount, int stripLength);
+    /// @param initTools - temporary parameter - set tools parameters like size and color to default
+    void init(int frameCount, int stripLength, bool initTools = true);
 
     /// Initialize the pattern editor using a QImage as the new pattern
     /// @param newPattern New pattern to load
     /// @param scaled If true, scale the image to match the height of the previous pattern
     bool init(QImage newPattern, bool scaled = true);
+
+    void resetImage(const QImage& img);
 
     inline QUndoStack* getUndoStack() { return m_undoStack; }
 

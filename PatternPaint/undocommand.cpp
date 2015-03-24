@@ -36,11 +36,11 @@ void UndoCommand::undo()
 {
     // TODO - add tools restore
     mCurrImage = m_editor.getPatternAsImage();
-    m_editor.init(mPrevImage, false);
+    m_editor.resetImage(mPrevImage);
     //mImageArea.saveImageChanges();
 }
 
 void UndoCommand::redo()
 {
-    m_editor.init(mCurrImage, false);
+    m_editor.resetImage(mCurrImage);
 }
