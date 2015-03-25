@@ -1,5 +1,6 @@
 #include "patterneditor.h"
 #include "undocommand.h"
+#include "abstractinstrument.h"
 
 #include <iostream>
 #include <cmath>
@@ -25,6 +26,8 @@ PatternEditor::PatternEditor(QWidget *parent) :
 {
     m_undoStack = new QUndoStack(this);
     m_undoStack->setUndoLimit(10);  // TODO - use preferences here
+    m_isPaint = false;
+    m_pi = NULL;
 }
 
 void PatternEditor::resizeEvent(QResizeEvent * event)
@@ -185,6 +188,7 @@ void PatternEditor::updateToolPreview(int x, int y) {
 
 void PatternEditor::mousePressEvent(QMouseEvent *event){
 
+    /*
     pushUndoCommand(new UndoCommand(getPatternAsImage(), *this));
     int x = event->x()/xScale;
     int y = event->y()/yScale;
@@ -192,6 +196,8 @@ void PatternEditor::mousePressEvent(QMouseEvent *event){
     applyTool(x,y);
 
     lazyUpdate();
+    */
+    if (m_pi) m_pi->mousePressEvent(event, *this);
 }
 
 void PatternEditor::leaveEvent(QEvent * event) {
@@ -203,6 +209,7 @@ void PatternEditor::leaveEvent(QEvent * event) {
 }
 
 void PatternEditor::mouseMoveEvent(QMouseEvent *event){
+    /*
     // Ignore the update request if it came too quickly
     static qint64 lastTime = 0;
     qint64 newTime = QDateTime::currentMSecsSinceEpoch();
@@ -236,6 +243,12 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
     }
 
     lazyUpdate();
+    */
+    if (m_pi) m_pi->mouseMoveEvent(event, *this);
+}
+
+void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
+    if (m_pi) m_pi->mouseReleaseEvent(event, *this);
 }
 
 void PatternEditor::setToolColor(QColor color) {
@@ -251,6 +264,10 @@ void PatternEditor::setPlaybackRow(int row) {
     lazyUpdate();
 }
 
+void PatternEditor::setInstrument(AbstractInstrument* pi) {
+    m_pi = pi;
+}
+
 void PatternEditor::lazyUpdate() {
     // Ignore the update request if it came too quickly
     static qint64 lastTime = 0;
@@ -264,8 +281,26 @@ void PatternEditor::lazyUpdate() {
     update();
 }
 
-void PatternEditor::paintEvent(QPaintEvent * /* event */)
+void PatternEditor::paintEvent(QPaintEvent* event)
 {
+    /*QPainter *painter = new QPainter(this);
+    //QRect *rect = new QRect(event->rect());
+
+    //painter->setBrush(QBrush(QPixmap(":media/textures/transparent.jpg")));
+    painter->drawRect(0, 0,
+                      pattern.rect().right() - 1,
+                      pattern.rect().bottom() - 1);
+
+    painter->drawImage(event->rect(), pattern, event->rect());
+
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(QBrush(Qt::black));
+    painter->drawRect(QRect(pattern.rect().right(),
+                            pattern.rect().bottom(), 6, 6));
+
+    painter->end();
+*/
+
     QPainter painter(this);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter.setRenderHint(QPainter::Antialiasing, false);
@@ -288,6 +323,7 @@ void PatternEditor::paintEvent(QPaintEvent * /* event */)
                      int((playbackRow+1)*xScale +.5) - int(playbackRow*xScale +.5),
                      pattern.height()*yScale,
                      COLOR_PLAYBACK_TOP);
+
 }
 
 void PatternEditor::pushUndoCommand(UndoCommand *command)

@@ -7,6 +7,7 @@
 #include "resizepattern.h"
 #include "undocommand.h"
 #include "colorchooser.h"
+#include "pencilinstrument.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -206,6 +207,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connectionScannerTimer->setInterval(CONNECTION_SCANNER_INTERVAL);
     connectionScannerTimer->start();
 
+    m_pencil = new PencilInstrument(this);
+    patternEditor->setInstrument(m_pencil);
+
     readSettings();
 }
 
@@ -239,7 +243,7 @@ void MainWindow::drawTimer_timeout() {
     // TODO: Get the width from elsewhere, so we don't need to load the image every frame
     QImage image = patternEditor->getPatternAsImage();
 
-    if(tape->isConnected()) {
+    //if(tape->isConnected()) {
         QByteArray ledData;
 
         for(int i = 0; i < image.height(); i++) {
@@ -252,7 +256,7 @@ void MainWindow::drawTimer_timeout() {
 
         n = (n+1)%image.width();
         patternEditor->setPlaybackRow(n);
-    }
+    //}
 }
 
 

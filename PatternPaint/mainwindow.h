@@ -17,6 +17,7 @@ class QUndoGroup;
 class ColorChooser;
 class QToolButton;
 class QSpinBox;
+class PencilInstrument;
 
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
@@ -110,6 +111,8 @@ private:
     QUndoGroup *m_undoStackGroup;
     QAction* m_undoAction;
     QAction* m_redoAction;
+
+    PencilInstrument* m_pencil;
 
     QToolButton* createToolButton(QAction *act);
     void writeSettings();

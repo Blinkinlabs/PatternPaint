@@ -88,6 +88,8 @@ FORMS    += mainwindow.ui \
     resizepattern.ui \
     addressprogrammer.ui
 
+include(instruments/instruments.pri)
+
 # OS X: Specify icon resource to use
 ICON = images/blinkytape.icns
 
