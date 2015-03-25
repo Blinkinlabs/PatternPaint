@@ -132,86 +132,24 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     menuInstruments->addAction(mCurveLineAction);
     menuInstruments->addAction(mTextAction);
 
-    mCursorButton = createToolButton(mCursorAction);
-    mEraserButton = createToolButton(mEraserAction);
-    mColorPickerButton = createToolButton(mColorPickerAction);
-    mMagnifierButton = createToolButton(mMagnifierAction);
-    mPenButton = createToolButton(mPenAction);
-    mLineButton = createToolButton(mLineAction);
-    mSprayButton = createToolButton(mSprayAction);
-    mFillButton = createToolButton(mFillAction);
-    mRectangleButton = createToolButton(mRectangleAction);
-    mEllipseButton = createToolButton(mEllipseAction);
-    mCurveButton = createToolButton(mCurveLineAction);
-    mTextButton = createToolButton(mTextAction);
-
-    QGridLayout *bLayout = new QGridLayout();
-    bLayout->setMargin(3);
-    bLayout->addWidget(mCursorButton, 0, 0);
-    bLayout->addWidget(mEraserButton, 0, 1);
-    bLayout->addWidget(mColorPickerButton, 1, 0);
-    bLayout->addWidget(mMagnifierButton, 1, 1);
-    bLayout->addWidget(mPenButton, 2, 0);
-    bLayout->addWidget(mLineButton, 2, 1);
-    bLayout->addWidget(mSprayButton, 3, 0);
-    bLayout->addWidget(mFillButton, 3, 1);
-    bLayout->addWidget(mRectangleButton, 4, 0);
-    bLayout->addWidget(mEllipseButton, 4, 1);
-    bLayout->addWidget(mCurveButton, 5, 0);
-    bLayout->addWidget(mTextButton, 5, 1);
-
-    QWidget *bWidget = new QWidget();
-    bWidget->setLayout(bLayout);
-
-    mPColorChooser = new ColorChooser(0, 0, 0, this);
+    mPColorChooser = new ColorChooser(255, 255, 255, this);
     mPColorChooser->setStatusTip(tr("Primary color"));
     mPColorChooser->setToolTip(tr("Primary color"));
-    //connect(mPColorChooser, SIGNAL(sendColor(QColor)), this, SLOT(primaryColorChanged(QColor)));
-
-    mSColorChooser = new ColorChooser(255, 255, 255, this);
-    mSColorChooser->setStatusTip(tr("Secondary color"));
-    mSColorChooser->setToolTip(tr("Secondary color"));
-    //connect(mSColorChooser, SIGNAL(sendColor(QColor)), this, SLOT(secondaryColorChanged(QColor)));
+    instruments->addSeparator();
+    instruments->addWidget(mPColorChooser);
 
     QSpinBox *penSizeSpin = new QSpinBox();
     penSizeSpin->setRange(1, 20);
     penSizeSpin->setValue(1);
     penSizeSpin->setStatusTip(tr("Pen size"));
     penSizeSpin->setToolTip(tr("Pen size"));
-    connect(penSizeSpin, SIGNAL(valueChanged(int)), this, SLOT(penValueChanged(int)));
 
-    QGridLayout *tLayout = new QGridLayout();
-    tLayout->setMargin(3);
-    tLayout->addWidget(mPColorChooser, 0, 0);
-    tLayout->addWidget(mSColorChooser, 0, 1);
-    tLayout->addWidget(penSizeSpin, 1, 0, 1, 2);
-
-    QWidget *tWidget = new QWidget();
-    tWidget->setLayout(tLayout);
-
-    QVBoxLayout* vLayout = new QVBoxLayout;
-    vLayout->setMargin(3);
-
-    //mAnimate = createToolButton()
-    mSaveFile = createToolButton(actionSave_File);
-    mLoadFile = createToolButton(actionLoad_File);
-    mSave = createToolButton(actionSave_to_Tape);
-    mConnect = createToolButton(actionAutomatically_connect);
-    //vLayout->addWidget(
-    vLayout->addWidget(mSaveFile);
-    vLayout->addWidget(mLoadFile);
-    vLayout->addWidget(mConnect);
-    QWidget *vWidget = new QWidget();
-    vWidget->setLayout(vLayout);
-/*
-    toolBar->addWidget(bWidget);
-    toolBar->addSeparator();
-    toolBar->addWidget(tWidget);
-    toolBar->addSeparator();
-    //toolBar_2->addWidget(vWidget);
-    */
-
-    tools->addWidget(new QSpinBox(this));
+    QSpinBox* pSpeed = new QSpinBox();
+    pSpeed->setRange(1, 100);
+    pSpeed->setValue(30);
+    pSpeed->setToolTip(tr("Pattern speed"));
+    connect(pSpeed, SIGNAL(valueChanged(int)), SLOT(on_patternSpeed_valueChanged(int)));
+    tools->addWidget(pSpeed);
 
     drawTimer = new QTimer(this);
     connectionScannerTimer = new QTimer(this);
@@ -219,13 +157,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     mode = Disconnected;
 
     patternEditor->init(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
-    colorPicker->init();
+
 
     // Our pattern editor wants to get some notifications
-    connect(colorPicker, SIGNAL(colorChanged(QColor)),
+    connect(mPColorChooser, SIGNAL(sendColor(QColor)),
             patternEditor, SLOT(setToolColor(QColor)));
-    connect(penSize, SIGNAL(valueChanged(int)),
-            patternEditor, SLOT(setToolSize(int)));
 
     tape = new BlinkyTape(this);
     // Modify our UI when the tape connection status changes
@@ -244,9 +180,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(uploader, SIGNAL(finished(bool)),
             this, SLOT(on_uploaderFinished(bool)));
 
-    // Set some default values for the painting interface
-    penSize->setSliderPosition(2);
-    patternSpeed->setSliderPosition(30);
+    connect(penSizeSpin, SIGNAL(valueChanged(int)), patternEditor, SLOT(setToolSize(int)));
 
     // Pre-set the upload progress dialog
     progressDialog = new QProgressDialog(this);
@@ -264,7 +198,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // The draw timer tells the pattern to advance
     connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
     drawTimer->setInterval(33);
-    drawTimer->start();
+    //drawTimer->start();
 
 
     // Start a scanner to connect to a BlinkyTape automatically
@@ -332,27 +266,8 @@ void MainWindow::connectionScannerTimer_timeout() {
     QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
 
     if(tapes.length() > 0) {
-        on_tapeConnectDisconnect_clicked();
+        on_actionConnect_triggered();
         return;
-    }
-}
-
-
-void MainWindow::on_tapeConnectDisconnect_clicked()
-{
-    if(tape->isConnected()) {
-        qDebug() << "Disconnecting from tape";
-        tape->close();
-    }
-    else {
-        QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
-        qDebug() << "Tapes found:" << tapes.length();
-
-        if(tapes.length() > 0) {
-            // TODO: Try another one if this one fails?
-            qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
-            tape->open(tapes[0]);
-        }
     }
 }
 
@@ -361,15 +276,16 @@ void MainWindow::on_patternSpeed_valueChanged(int value)
     drawTimer->setInterval(1000/value);
 }
 
-void MainWindow::on_patternPlayPause_clicked()
+void MainWindow::on_actionPlay_triggered()
 {
-    if(drawTimer->isActive()) {
+    if (drawTimer->isActive()) {
         drawTimer->stop();
-        patternPlayPause->setText("Play");
-    }
-    else {
+        actionPlay->setText(tr("Play"));
+        actionPlay->setIcon(QIcon(":/resources/images/play.png"));
+    } else {
         drawTimer->start();
-        patternPlayPause->setText("Pause");
+        actionPlay->setText(tr("Pause"));
+        actionPlay->setIcon(QIcon(":/resources/images/pause.png"));
     }
 }
 
@@ -439,11 +355,6 @@ void MainWindow::on_actionExit_triggered()
     this->close();
 }
 
-void MainWindow::on_saveToTape_clicked()
-{
-    on_actionSave_to_Tape_triggered();
-}
-
 void MainWindow::on_actionExport_pattern_for_Arduino_triggered()
 {
     QString fileName = QFileDialog::getSaveFileName(this,
@@ -457,8 +368,7 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered()
     QImage image =  patternEditor->getPatternAsImage();
 
     // Note: Converting frameRate to frame delay here.
-    Pattern pattern(image,
-                        1000/patternSpeed->value(),
+    Pattern pattern(image, drawTimer->interval(),
                         Pattern::INDEXED_RLE);
 
 
@@ -482,17 +392,13 @@ void MainWindow::on_tapeConnectionStatusChanged(bool connected)
     actionSave_to_Tape->setEnabled(connected);
     if(connected) {
         mode = Connected;
-
-        tapeConnectDisconnect->setText("Disconnect");
-        saveToTape->setEnabled(true);
+        actionSave_to_Tape->setEnabled(true);
         actionConnect->setText(tr("Disconnect"));
         actionConnect->setIcon(QIcon(":/images/resources/disconnect.png"));
     }
     else {
         mode = Disconnected;
-
-        tapeConnectDisconnect->setText("Connect");
-        saveToTape->setEnabled(false);
+        actionSave_to_Tape->setEnabled(false);
         actionConnect->setText(tr("Connect"));
         actionConnect->setIcon(QIcon(":/images/resources/connect.png"));
 
@@ -546,17 +452,6 @@ void MainWindow::on_uploaderFinished(bool result)
 
     qDebug() << "Uploader finished! Result:" << result;
     progressDialog->hide();
-}
-
-
-void MainWindow::on_saveFile_clicked()
-{
-    on_actionSave_File_triggered();
-}
-
-void MainWindow::on_loadFile_clicked()
-{
-    on_actionLoad_File_triggered();
 }
 
 void MainWindow::on_actionVisit_the_BlinkyTape_forum_triggered()
@@ -624,7 +519,7 @@ void MainWindow::on_actionSave_to_Tape_triggered()
 
     // Note: Converting frameRate to frame delay here.
     Pattern pattern(image,
-                        1000/patternSpeed->value(),
+                        drawTimer->interval(),
                         Pattern::RGB24);
 
     // TODO: Attempt different compressions till one works.
@@ -725,4 +620,22 @@ void MainWindow::closeEvent(QCloseEvent *event)
 //    } else {
 //        event->ignore();
 //    }
+}
+
+void MainWindow::on_actionConnect_triggered()
+{
+    if(tape->isConnected()) {
+        qDebug() << "Disconnecting from tape";
+        tape->close();
+    }
+    else {
+        QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
+        qDebug() << "Tapes found:" << tapes.length();
+
+        if(tapes.length() > 0) {
+            // TODO: Try another one if this one fails?
+            qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
+            tape->open(tapes[0]);
+        }
+    }
 }
