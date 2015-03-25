@@ -52,61 +52,73 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     mCursorAction->setCheckable(true);
     mCursorAction->setIcon(QIcon(":/instruments/images/instruments-icons/cursor.png"));
     //connect(mCursorAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    instruments->addAction(mCursorAction);
 
     mEraserAction = new QAction(tr("Eraser"), this);
     mEraserAction->setCheckable(true);
     mEraserAction->setIcon(QIcon(":/instruments/images/instruments-icons/lastic.png"));
     //connect(mEraserAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    instruments->addAction(mEraserAction);
 
     mColorPickerAction = new QAction(tr("Color picker"), this);
     mColorPickerAction->setCheckable(true);
     mColorPickerAction->setIcon(QIcon(":/instruments/images/instruments-icons/pipette.png"));
     //connect(mColorPickerAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    instruments->addAction(mColorPickerAction);
 
     mMagnifierAction = new QAction(tr("Magnifier"), this);
     mMagnifierAction->setCheckable(true);
     mMagnifierAction->setIcon(QIcon(":/instruments/images/instruments-icons/loupe.png"));
     //connect(mMagnifierAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    instruments->addAction(mMagnifierAction);
 
     mPenAction = new QAction(tr("Pen"), this);
     mPenAction->setCheckable(true);
     mPenAction->setIcon(QIcon(":/instruments/images/instruments-icons/pencil.png"));
     //connect(mPenAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    instruments->addAction(mPenAction);
 
     mLineAction = new QAction(tr("Line"), this);
     mLineAction->setCheckable(true);
     mLineAction->setIcon(QIcon(":/instruments/images/instruments-icons/line.png"));
     //connect(mLineAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    instruments->addAction(mLineAction);
 
     mSprayAction = new QAction(tr("Spray"), this);
     mSprayAction->setCheckable(true);
     mSprayAction->setIcon(QIcon(":/instruments/images/instruments-icons/spray.png"));
     //connect(mSprayAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    instruments->addAction(mSprayAction);
 
     mFillAction = new QAction(tr("Fill"), this);
     mFillAction->setCheckable(true);
     mFillAction->setIcon(QIcon(":/instruments/images/instruments-icons/fill.png"));
     //connect(mFillAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    instruments->addAction(mFillAction);
 
     mRectangleAction = new QAction(tr("Rectangle"), this);
     mRectangleAction->setCheckable(true);
     mRectangleAction->setIcon(QIcon(":/instruments/images/instruments-icons/rectangle.png"));
     //connect(mRectangleAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    instruments->addAction(mRectangleAction);
 
     mEllipseAction = new QAction(tr("Ellipse"), this);
     mEllipseAction->setCheckable(true);
     mEllipseAction->setIcon(QIcon(":/instruments/images/instruments-icons/ellipse.png"));
     //connect(mEllipseAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    instruments->addAction(mEllipseAction);
 
     mCurveLineAction = new QAction(tr("Curve"), this);
     mCurveLineAction->setCheckable(true);
     mCurveLineAction->setIcon(QIcon(":/instruments/images/instruments-icons/curve.png"));
     //connect(curveLineAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    instruments->addAction(mCurveLineAction);
 
     mTextAction = new QAction(tr("Text"), this);
     mTextAction->setCheckable(true);
     mTextAction->setIcon(QIcon(":/instruments/images/instruments-icons/text.png"));
     //connect(mTextAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    instruments->addAction(mTextAction);
     menuInstruments->addAction(mCursorAction);
     menuInstruments->addAction(mEraserAction);
     menuInstruments->addAction(mColorPickerAction);
@@ -191,12 +203,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     vLayout->addWidget(mConnect);
     QWidget *vWidget = new QWidget();
     vWidget->setLayout(vLayout);
-
+/*
     toolBar->addWidget(bWidget);
     toolBar->addSeparator();
     toolBar->addWidget(tWidget);
     toolBar->addSeparator();
-    toolBar_2->addWidget(vWidget);
+    //toolBar_2->addWidget(vWidget);
+    */
+
+    tools->addWidget(new QSpinBox(this));
 
     drawTimer = new QTimer(this);
     connectionScannerTimer = new QTimer(this);
@@ -464,17 +479,22 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered()
 void MainWindow::on_tapeConnectionStatusChanged(bool connected)
 {
     qDebug() << "status changed, connected=" << connected;
+    actionSave_to_Tape->setEnabled(connected);
     if(connected) {
         mode = Connected;
 
         tapeConnectDisconnect->setText("Disconnect");
         saveToTape->setEnabled(true);
+        actionConnect->setText(tr("Disconnect"));
+        actionConnect->setIcon(QIcon(":/images/resources/disconnect.png"));
     }
     else {
         mode = Disconnected;
 
         tapeConnectDisconnect->setText("Connect");
         saveToTape->setEnabled(false);
+        actionConnect->setText(tr("Connect"));
+        actionConnect->setIcon(QIcon(":/images/resources/connect.png"));
 
         // TODO: Don't do this if we disconnected intentionally.
         connectionScannerTimer->start();

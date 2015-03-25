@@ -3,6 +3,15 @@
         <file>images/BlinkyTape.jpg</file>
         <file>images/blinkytapepattern.jpg</file>
         <file>images/PatternPaintAbout.png</file>
+        <file>images/save_to_tape.png</file>
+        <file>images/connect.png</file>
+        <file>images/open.png</file>
+        <file>images/pause.png</file>
+        <file>images/play.png</file>
+        <file>images/save.png</file>
+        <file>images/disconnect.png</file>
+        <file>images/redo.png</file>
+        <file>images/undo.png</file>
     </qresource>
     <qresource prefix="/instruments">
         <file>images/instruments-icons/cursor.png</file>
