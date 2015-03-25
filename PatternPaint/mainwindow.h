@@ -92,11 +92,7 @@ private:
     QAction *mCurveLineAction;
     QAction *mTextAction;
 
-    QToolButton *mCursorButton, *mEraserButton, *mPenButton, *mLineButton,
-                *mColorPickerButton, *mMagnifierButton, *mSprayButton, *mFillButton,
-                *mRectangleButton, *mEllipseButton, *mCurveButton, *mTextButton;
     ColorChooser *mPColorChooser, *mSColorChooser;
-    QToolButton* mAnimate, *mSaveFile, *mLoadFile, *mSave, *mConnect;
 
     QTimer* drawTimer;
 
