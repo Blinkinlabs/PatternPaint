@@ -52,73 +52,73 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     mCursorAction = new QAction(tr("Selection"), this);
     mCursorAction->setCheckable(true);
     mCursorAction->setIcon(QIcon(":/instruments/images/instruments-icons/cursor.png"));
-    //connect(mCursorAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    connect(mCursorAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mCursorAction);
 
     mEraserAction = new QAction(tr("Eraser"), this);
     mEraserAction->setCheckable(true);
     mEraserAction->setIcon(QIcon(":/instruments/images/instruments-icons/lastic.png"));
-    //connect(mEraserAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    connect(mEraserAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mEraserAction);
 
     mColorPickerAction = new QAction(tr("Color picker"), this);
     mColorPickerAction->setCheckable(true);
     mColorPickerAction->setIcon(QIcon(":/instruments/images/instruments-icons/pipette.png"));
-    //connect(mColorPickerAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    connect(mColorPickerAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mColorPickerAction);
 
     mMagnifierAction = new QAction(tr("Magnifier"), this);
     mMagnifierAction->setCheckable(true);
     mMagnifierAction->setIcon(QIcon(":/instruments/images/instruments-icons/loupe.png"));
-    //connect(mMagnifierAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    connect(mMagnifierAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mMagnifierAction);
 
     mPenAction = new QAction(tr("Pen"), this);
     mPenAction->setCheckable(true);
     mPenAction->setIcon(QIcon(":/instruments/images/instruments-icons/pencil.png"));
-    //connect(mPenAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    connect(mPenAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mPenAction);
 
     mLineAction = new QAction(tr("Line"), this);
     mLineAction->setCheckable(true);
     mLineAction->setIcon(QIcon(":/instruments/images/instruments-icons/line.png"));
-    //connect(mLineAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    connect(mLineAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mLineAction);
 
     mSprayAction = new QAction(tr("Spray"), this);
     mSprayAction->setCheckable(true);
     mSprayAction->setIcon(QIcon(":/instruments/images/instruments-icons/spray.png"));
-    //connect(mSprayAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    connect(mSprayAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mSprayAction);
 
     mFillAction = new QAction(tr("Fill"), this);
     mFillAction->setCheckable(true);
     mFillAction->setIcon(QIcon(":/instruments/images/instruments-icons/fill.png"));
-    //connect(mFillAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    connect(mFillAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mFillAction);
 
     mRectangleAction = new QAction(tr("Rectangle"), this);
     mRectangleAction->setCheckable(true);
     mRectangleAction->setIcon(QIcon(":/instruments/images/instruments-icons/rectangle.png"));
-    //connect(mRectangleAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    connect(mRectangleAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mRectangleAction);
 
     mEllipseAction = new QAction(tr("Ellipse"), this);
     mEllipseAction->setCheckable(true);
     mEllipseAction->setIcon(QIcon(":/instruments/images/instruments-icons/ellipse.png"));
-    //connect(mEllipseAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    connect(mEllipseAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mEllipseAction);
 
     mCurveLineAction = new QAction(tr("Curve"), this);
     mCurveLineAction->setCheckable(true);
     mCurveLineAction->setIcon(QIcon(":/instruments/images/instruments-icons/curve.png"));
-    //connect(curveLineAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    connect(mCurveLineAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mCurveLineAction);
 
     mTextAction = new QAction(tr("Text"), this);
     mTextAction->setCheckable(true);
     mTextAction->setIcon(QIcon(":/instruments/images/instruments-icons/text.png"));
-    //connect(mTextAction, SIGNAL(triggered(bool)), this, SLOT(instumentsAct(bool)));
+    connect(mTextAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mTextAction);
     menuInstruments->addAction(mCursorAction);
     menuInstruments->addAction(mEraserAction);
@@ -133,6 +133,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     menuInstruments->addAction(mCurveLineAction);
     menuInstruments->addAction(mTextAction);
 
+
     mPColorChooser = new ColorChooser(255, 255, 255, this);
     mPColorChooser->setStatusTip(tr("Primary color"));
     mPColorChooser->setToolTip(tr("Primary color"));
@@ -144,6 +145,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     penSizeSpin->setValue(1);
     penSizeSpin->setStatusTip(tr("Pen size"));
     penSizeSpin->setToolTip(tr("Pen size"));
+    instruments->addWidget(penSizeSpin);
+
+
 
     QSpinBox* pSpeed = new QSpinBox();
     pSpeed->setRange(1, 100);
@@ -209,6 +213,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     m_pencil = new PencilInstrument(this);
     patternEditor->setInstrument(m_pencil);
+
+    // initialization started parameters here
+    penSizeSpin->setValue(1);
+    patternEditor->setToolSize(1);
 
     readSettings();
 }
@@ -642,4 +650,13 @@ void MainWindow::on_actionConnect_triggered()
             tape->open(tapes[0]);
         }
     }
+}
+
+void MainWindow::on_instrumentAction(bool) {
+    QAction* act = dynamic_cast<QAction*>(sender());
+    Q_ASSERT(act != NULL);
+    foreach(QAction* a, instruments->actions()) {
+        a->setChecked(false);
+    }
+    act->setChecked(true);
 }

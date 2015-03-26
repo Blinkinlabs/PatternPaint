@@ -79,6 +79,8 @@ private slots:
 
     void on_actionConnect_triggered();
 
+    void on_instrumentAction(bool);
+
 private:
     QAction* mCursorAction;
     QAction* mEraserAction;
