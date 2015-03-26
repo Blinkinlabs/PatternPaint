@@ -219,12 +219,6 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
 
     lastTime = newTime;
 
-
-    // If the left button is pressed, also apply the tool
-    //if( event->buttons() &  Qt::LeftButton ) {
-    //    applyTool(x,y);
-    //}
-
     static int oldX = -1;
     static int oldY = -1;
 
@@ -271,7 +265,6 @@ void PatternEditor::setPlaybackRow(int row) {
 }
 
 void PatternEditor::setInstrument(AbstractInstrument* pi) {
-    Q_ASSERT(pi != NULL);
     m_pi = pi;
 }
 
@@ -290,23 +283,6 @@ void PatternEditor::lazyUpdate() {
 
 void PatternEditor::paintEvent(QPaintEvent* event)
 {
-    /*QPainter *painter = new QPainter(this);
-    //QRect *rect = new QRect(event->rect());
-
-    //painter->setBrush(QBrush(QPixmap(":media/textures/transparent.jpg")));
-    painter->drawRect(0, 0,
-                      pattern.rect().right() - 1,
-                      pattern.rect().bottom() - 1);
-
-    painter->drawImage(event->rect(), pattern, event->rect());
-
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(QBrush(Qt::black));
-    painter->drawRect(QRect(pattern.rect().right(),
-                            pattern.rect().bottom(), 6, 6));
-
-    painter->end();
-*/
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
@@ -314,7 +290,7 @@ void PatternEditor::paintEvent(QPaintEvent* event)
 
     // Draw the image and tool preview
     painter.drawImage(QRect(0,0,pattern.width()*xScale+.5,pattern.height()*yScale), pattern);
-    painter.drawImage(QRect(0,0,pattern.width()*xScale+.5,pattern.height()*yScale), toolPreview);
+    if (m_pi && m_pi->showPreview()) painter.drawImage(QRect(0,0,pattern.width()*xScale+.5,pattern.height()*yScale), toolPreview);
     painter.drawImage(0,0,gridPattern);
 
     // Draw the playback indicator

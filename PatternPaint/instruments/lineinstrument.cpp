@@ -109,11 +109,5 @@ void LineInstrument::paint(PatternEditor& pe, bool isSecondaryColor, bool)
         painter.drawPoint(QPoint(mStartPoint.x()/pe.scaleX(), mStartPoint.y()/pe.scaleY()));
     }
 
-    //    int rad(DataSingleton::Instance()->getPenSize() + round(sqrt((mStartPoint.x() - mEndPoint.x()) *
-    //                                                                 (mStartPoint.x() - mEndPoint.x()) +
-    //                                                                 (mStartPoint.y() - mEndPoint.y()) *
-    //                                                                 (mStartPoint.y() - mEndPoint.y()))));
-    //    mPImageArea->update(QRect(mStartPoint, mEndPoint).normalized().adjusted(-rad, -rad, +rad, +rad));
     painter.end();
-    pe.update();
 }

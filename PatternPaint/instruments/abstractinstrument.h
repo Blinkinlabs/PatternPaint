@@ -56,7 +56,12 @@ public:
      * @return cursor for this tool
      */
     virtual QCursor cursor() const = 0;
-    
+
+    /**
+     * @brief showPreview
+     * @return true if instrument claims for display track on preview plan
+     */
+    virtual bool showPreview() const { return true; }
 signals:
     
 protected:

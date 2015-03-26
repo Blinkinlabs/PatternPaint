@@ -58,6 +58,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     mCursorAction->setIcon(QIcon(":/instruments/images/instruments-icons/cursor.png"));
     connect(mCursorAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mCursorAction);
+    mCursorAction->setChecked(true);
 
     mEraserAction = new QAction(tr("Eraser"), this);
     mEraserAction->setCheckable(true);
@@ -66,6 +67,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     instruments->addAction(mEraserAction);
 
     ColorpickerInstrument* cpi = new ColorpickerInstrument(this);
+    connect(cpi, SIGNAL(pickedColor(QColor)), SLOT(on_colorPicked(QColor)));
 
     mColorPickerAction = new QAction(tr("Color picker"), this);
     mColorPickerAction->setCheckable(true);
@@ -174,8 +176,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // Our pattern editor wants to get some notifications
     connect(mPColorChooser, SIGNAL(sendColor(QColor)),
             patternEditor, SLOT(setToolColor(QColor)));
-
-    connect(cpi, SIGNAL(pickedColor(QColor)), patternEditor, SLOT(setToolColor(QColor)));
 
     tape = new BlinkyTape(this);
     // Modify our UI when the tape connection status changes
@@ -667,4 +667,10 @@ void MainWindow::on_instrumentAction(bool) {
 
     act->setChecked(true);
     patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(act->data()));
+}
+
+void MainWindow::on_colorPicked(QColor color) {
+    qDebug() << "pipette color " << color;
+    mPColorChooser->setColor(color);
+    patternEditor->setToolColor(color);
 }

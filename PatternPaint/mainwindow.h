@@ -80,6 +80,8 @@ private slots:
 
     void on_instrumentAction(bool);
 
+    void on_colorPicked(QColor);
+
 private:
     QAction* mCursorAction;
     QAction* mEraserAction;
