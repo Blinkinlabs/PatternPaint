@@ -257,7 +257,7 @@ void MainWindow::drawTimer_timeout() {
     // TODO: Get the width from elsewhere, so we don't need to load the image every frame
     QImage image = patternEditor->getPatternAsImage();
 
-    //if(tape->isConnected()) {
+    if(tape->isConnected()) {
         QByteArray ledData;
 
         for(int i = 0; i < image.height(); i++) {
@@ -270,7 +270,7 @@ void MainWindow::drawTimer_timeout() {
 
         n = (n+1)%image.width();
         patternEditor->setPlaybackRow(n);
-    //}
+    }
 }
 
 
@@ -632,12 +632,29 @@ void MainWindow::readSettings()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-//    if (userReallyWantsToQuit()) {
+    //TODO - uncomment for future usage
+    /*
+    if (patternEditor->getUndoStack()->canUndo()) {
+        int ans = QMessageBox::warning(this, tr("Exit program"),
+                                               tr("File has been modified.\nDo you want to save changes?"),
+                                               QMessageBox::Yes | QMessageBox::Default,
+                                               QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape);
+        switch(ans)
+        {
+        case QMessageBox::Yes:
+            on_actionSave_File_triggered();
+            event->ignore();
+            return;
+        case QMessageBox::Cancel:
+            event->ignore();
+            return;
+        default:
+            break;
+        }
+    }
+*/
     writeSettings();
     event->accept();
-//    } else {
-//        event->ignore();
-//    }
 }
 
 void MainWindow::on_actionConnect_triggered()
