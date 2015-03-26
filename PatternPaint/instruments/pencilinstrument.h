@@ -29,6 +29,7 @@
 #include "abstractinstrument.h"
 
 #include <QtCore/QObject>
+#include <QPixmap>
 
 /**
  * @brief Pencil instrument class.
@@ -44,10 +45,11 @@ public:
     void mousePressEvent(QMouseEvent *event, PatternEditor&);
     void mouseMoveEvent(QMouseEvent *event, PatternEditor&);
     void mouseReleaseEvent(QMouseEvent *event, PatternEditor&);
-    
+    QCursor cursor() const { return Qt::ArrowCursor; }
 protected:
     void paint(PatternEditor&, bool isSecondaryColor = false, bool additionalFlag = false);
-    
+private:
+    QPixmap mpm;
 };
 
 #endif // PENCILINSTRUMENT_H

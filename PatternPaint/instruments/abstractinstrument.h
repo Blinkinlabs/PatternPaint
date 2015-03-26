@@ -29,6 +29,7 @@
 #include <QtCore/QObject>
 #include <QMouseEvent>
 #include <QImage>
+#include <QCursor>
 
 QT_BEGIN_NAMESPACE
 class PatternEditor;
@@ -49,6 +50,12 @@ public:
     virtual void mousePressEvent(QMouseEvent *event, PatternEditor&) = 0;
     virtual void mouseMoveEvent(QMouseEvent *event, PatternEditor&) = 0;
     virtual void mouseReleaseEvent(QMouseEvent *event, PatternEditor&) = 0;
+
+    /**
+     * @brief cursor
+     * @return cursor for this tool
+     */
+    virtual QCursor cursor() const = 0;
     
 signals:
     
@@ -65,7 +72,6 @@ protected:
      * @param editor corresponse to image, which is edited
      */
     virtual void makeUndoCommand(PatternEditor&);
-    
 };
 
 #endif // ABSTRACTINSTRUMENT_H

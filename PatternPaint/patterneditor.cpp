@@ -209,7 +209,7 @@ void PatternEditor::leaveEvent(QEvent * event) {
 }
 
 void PatternEditor::mouseMoveEvent(QMouseEvent *event){
-    /*
+
     // Ignore the update request if it came too quickly
     static qint64 lastTime = 0;
     qint64 newTime = QDateTime::currentMSecsSinceEpoch();
@@ -218,6 +218,12 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
     }
 
     lastTime = newTime;
+
+
+    // If the left button is pressed, also apply the tool
+    //if( event->buttons() &  Qt::LeftButton ) {
+    //    applyTool(x,y);
+    //}
 
     static int oldX = -1;
     static int oldY = -1;
@@ -237,14 +243,14 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
     // Update the preview layer
     updateToolPreview(x,y);
 
-    // If the left button is pressed, also apply the tool
-    if( event->buttons() &  Qt::LeftButton ) {
-        applyTool(x,y);
+    if (m_pi) {
+        setCursor(m_pi->cursor());
+        m_pi->mouseMoveEvent(event, *this);
+    } else {
+        setCursor(Qt::ArrowCursor);
     }
 
     lazyUpdate();
-    */
-    if (m_pi) m_pi->mouseMoveEvent(event, *this);
 }
 
 void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
@@ -265,7 +271,7 @@ void PatternEditor::setPlaybackRow(int row) {
 }
 
 void PatternEditor::setInstrument(AbstractInstrument* pi) {
-    qDebug() << "set instrument " << pi;
+    Q_ASSERT(pi != NULL);
     m_pi = pi;
 }
 

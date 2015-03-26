@@ -8,8 +8,10 @@
 #include "undocommand.h"
 #include "colorchooser.h"
 
+
 #include "pencilinstrument.h"
 #include "lineinstrument.h"
+#include "colorpickerinstrument.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -63,9 +65,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(mEraserAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mEraserAction);
 
+    ColorpickerInstrument* cpi = new ColorpickerInstrument(this);
+
     mColorPickerAction = new QAction(tr("Color picker"), this);
     mColorPickerAction->setCheckable(true);
     mColorPickerAction->setIcon(QIcon(":/instruments/images/instruments-icons/pipette.png"));
+    mColorPickerAction->setData(QVariant::fromValue(cpi));
     connect(mColorPickerAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mColorPickerAction);
 
@@ -78,14 +83,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     mPenAction = new QAction(tr("Pen"), this);
     mPenAction->setCheckable(true);
     mPenAction->setIcon(QIcon(":/instruments/images/instruments-icons/pencil.png"));
-    mPenAction->setData(QVariant::fromValue(new PencilInstrument()));
+    mPenAction->setData(QVariant::fromValue(new PencilInstrument(this)));
     connect(mPenAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mPenAction);
 
     mLineAction = new QAction(tr("Line"), this);
     mLineAction->setCheckable(true);
     mLineAction->setIcon(QIcon(":/instruments/images/instruments-icons/line.png"));
-    mLineAction->setData(QVariant::fromValue(new LineInstrument()));
+    mLineAction->setData(QVariant::fromValue(new LineInstrument(this)));
     connect(mLineAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mLineAction);
 
@@ -152,7 +157,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     instruments->addWidget(penSizeSpin);
 
 
-
     QSpinBox* pSpeed = new QSpinBox();
     pSpeed->setRange(1, 100);
     pSpeed->setValue(30);
@@ -167,10 +171,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     patternEditor->init(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
 
-
     // Our pattern editor wants to get some notifications
     connect(mPColorChooser, SIGNAL(sendColor(QColor)),
             patternEditor, SLOT(setToolColor(QColor)));
+
+    connect(cpi, SIGNAL(pickedColor(QColor)), patternEditor, SLOT(setToolColor(QColor)));
 
     tape = new BlinkyTape(this);
     // Modify our UI when the tape connection status changes

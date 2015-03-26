@@ -95,12 +95,13 @@ void PencilInstrument::paint(PatternEditor& pe, bool isSecondaryColor, bool)
     {
         qDebug() << "pencil paint " << pe.getPrimaryColor();
         painter.setPen(QPen(pe.getPrimaryColor(),
-                            pe.getPenSize() * pe.getZoomFactor(),
+                            pe.getPenSize(),
                             Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     }
 
     if(mStartPoint != mEndPoint)
     {
+        //qDebug() << "draw line";
         painter.drawLine(QPoint(mStartPoint.x()/pe.scaleX(), mStartPoint.y()/pe.scaleY()),
                          QPoint(mEndPoint.x()/pe.scaleX(), mEndPoint.y()/pe.scaleY()));
     }
@@ -110,6 +111,7 @@ void PencilInstrument::paint(PatternEditor& pe, bool isSecondaryColor, bool)
         qDebug() << "draw point " << mStartPoint;
         painter.drawPoint(mStartPoint.x()/pe.scaleX(), mStartPoint.y()/pe.scaleY());
     }
+
     //pe.setEdited(true);
     //    int rad(DataSingleton::Instance()->getPenSize() + round(sqrt((mStartPoint.x() - mEndPoint.x()) *
     //                                                                 (mStartPoint.x() - mEndPoint.x()) +

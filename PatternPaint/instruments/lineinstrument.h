@@ -45,6 +45,7 @@ public:
     void mouseMoveEvent(QMouseEvent *event, PatternEditor&);
     void mouseReleaseEvent(QMouseEvent *event, PatternEditor&);
 
+    QCursor cursor() const { return Qt::CrossCursor; }
 protected:
     void paint(PatternEditor&, bool isSecondaryColor = false, bool additionalFlag = false);
     
