@@ -7,7 +7,9 @@
 #include "resizepattern.h"
 #include "undocommand.h"
 #include "colorchooser.h"
+
 #include "pencilinstrument.h"
+#include "lineinstrument.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -76,12 +78,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     mPenAction = new QAction(tr("Pen"), this);
     mPenAction->setCheckable(true);
     mPenAction->setIcon(QIcon(":/instruments/images/instruments-icons/pencil.png"));
+    mPenAction->setData(QVariant::fromValue(new PencilInstrument()));
     connect(mPenAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mPenAction);
 
     mLineAction = new QAction(tr("Line"), this);
     mLineAction->setCheckable(true);
     mLineAction->setIcon(QIcon(":/instruments/images/instruments-icons/line.png"));
+    mLineAction->setData(QVariant::fromValue(new LineInstrument()));
     connect(mLineAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
     instruments->addAction(mLineAction);
 
@@ -203,16 +207,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // The draw timer tells the pattern to advance
     connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
     drawTimer->setInterval(33);
-    //drawTimer->start();
+    //drawTimer->start(); // why start now?
 
 
     // Start a scanner to connect to a BlinkyTape automatically
     connect(connectionScannerTimer, SIGNAL(timeout()), this, SLOT(connectionScannerTimer_timeout()));
     connectionScannerTimer->setInterval(CONNECTION_SCANNER_INTERVAL);
     connectionScannerTimer->start();
-
-    m_pencil = new PencilInstrument(this);
-    patternEditor->setInstrument(m_pencil);
 
     // initialization started parameters here
     penSizeSpin->setValue(1);
@@ -658,5 +659,7 @@ void MainWindow::on_instrumentAction(bool) {
     foreach(QAction* a, instruments->actions()) {
         a->setChecked(false);
     }
+
     act->setChecked(true);
+    patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(act->data()));
 }

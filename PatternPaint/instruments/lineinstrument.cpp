@@ -100,12 +100,13 @@ void LineInstrument::paint(PatternEditor& pe, bool isSecondaryColor, bool)
 
     if(mStartPoint != mEndPoint)
     {
-        painter.drawLine(mStartPoint, mEndPoint);
+        painter.drawLine(QPoint(mStartPoint.x()/pe.scaleX(), mStartPoint.y()/pe.scaleY()),
+                         QPoint(mEndPoint.x()/pe.scaleX(), mEndPoint.y()/pe.scaleY()));
     }
 
     if(mStartPoint == mEndPoint)
     {
-        painter.drawPoint(mStartPoint);
+        painter.drawPoint(QPoint(mStartPoint.x()/pe.scaleX(), mStartPoint.y()/pe.scaleY()));
     }
 
     //    int rad(DataSingleton::Instance()->getPenSize() + round(sqrt((mStartPoint.x() - mEndPoint.x()) *

@@ -101,7 +101,8 @@ void PencilInstrument::paint(PatternEditor& pe, bool isSecondaryColor, bool)
 
     if(mStartPoint != mEndPoint)
     {
-        painter.drawLine(mStartPoint, mEndPoint);
+        painter.drawLine(QPoint(mStartPoint.x()/pe.scaleX(), mStartPoint.y()/pe.scaleY()),
+                         QPoint(mEndPoint.x()/pe.scaleX(), mEndPoint.y()/pe.scaleY()));
     }
 
     if(mStartPoint == mEndPoint)

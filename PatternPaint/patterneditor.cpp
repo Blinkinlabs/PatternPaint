@@ -265,6 +265,7 @@ void PatternEditor::setPlaybackRow(int row) {
 }
 
 void PatternEditor::setInstrument(AbstractInstrument* pi) {
+    qDebug() << "set instrument " << pi;
     m_pi = pi;
 }
 
