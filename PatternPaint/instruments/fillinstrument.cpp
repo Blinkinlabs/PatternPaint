@@ -34,41 +34,38 @@ FillInstrument::FillInstrument(QObject *parent) :
     CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_fill.png", parent) {
 }
 
-void FillInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe)
+void FillInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
 {
-    if(event->button() == Qt::LeftButton || event->button() == Qt::RightButton)
+    if(event->button() == Qt::LeftButton)
     {
-        mStartPoint = mEndPoint = event->pos();
+        mStartPoint = mEndPoint = pt;
         pe.setPaint(true);
         makeUndoCommand(pe);
     }
 }
 
-void FillInstrument::mouseMoveEvent(QMouseEvent *, PatternEditor&)
-{
+void FillInstrument::mouseMoveEvent(QMouseEvent *, PatternEditor&, const QPoint&) {
 }
 
-void FillInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe)
+void FillInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe, const QPoint&)
 {
     if(pe.isPaint()) {
-        if(event->button() == Qt::LeftButton)  paint(pe);
+        paint(pe);
         pe.setPaint(false);
     }
 }
 
 void FillInstrument::paint(PatternEditor& pe)
 {
-    int x = mStartPoint.x()/pe.scaleX();
-    int y = mStartPoint.y()/pe.scaleY();
     QColor switchColor = pe.getPrimaryColor();
-    QRgb pixel(pe.getDevice()->pixel(QPoint(x, y)));
+    QRgb pixel(pe.getDevice()->pixel(mStartPoint));
 
     QColor oldColor(pixel);
     qDebug() << "switch color: " << switchColor << " old color " << oldColor;
 
     if(switchColor != oldColor)
     {
-        fillRecurs(x, y,
+        fillRecurs(mStartPoint.x(), mStartPoint.y(),
                    switchColor.rgb(), pixel,
                    *pe.getDevice());
     }

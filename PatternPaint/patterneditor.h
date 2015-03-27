@@ -35,7 +35,6 @@ public:
     /// @return QImage containing the current pattern
     QImage getPatternAsImage() { return pattern; }
     QImage* getDevice() { return &pattern; }
-    QImage& getImageRef() { return pattern; }
 
     // for compatibility with EasyPaint sources
     QColor getPrimaryColor() const { return toolColor; }

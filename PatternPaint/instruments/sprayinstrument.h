@@ -40,9 +40,9 @@ class SprayInstrument : public CustomCursorInstrument
 public:
     explicit SprayInstrument(QObject *parent = 0);
     
-    void mousePressEvent(QMouseEvent *event, PatternEditor&);
-    void mouseMoveEvent(QMouseEvent *event, PatternEditor&);
-    void mouseReleaseEvent(QMouseEvent *event, PatternEditor&);
+    void mousePressEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
+    void mouseMoveEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
+    void mouseReleaseEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
 protected:
     void paint(PatternEditor&);
     

@@ -35,32 +35,31 @@ PencilInstrument::PencilInstrument(QObject *parent) :
 {
 }
 
-void PencilInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe)
+void PencilInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
 {
-    if(event->button() == Qt::LeftButton || event->button() == Qt::RightButton)
+    if(event->button() == Qt::LeftButton )
     {
-        mStartPoint = mEndPoint = event->pos();
+        mStartPoint = mEndPoint = pt;
         pe.setPaint(true);  // ?
         makeUndoCommand(pe);
     }
 }
 
-void PencilInstrument::mouseMoveEvent(QMouseEvent *event, PatternEditor& pe)
+void PencilInstrument::mouseMoveEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
 {
     if(pe.isPaint())
     {
-        mEndPoint = event->pos();
+        mEndPoint = pt;
         if(event->buttons() & Qt::LeftButton)  paint(pe);
-
-        mStartPoint = event->pos();
+        mStartPoint = pt;
     }
 }
 
-void PencilInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe)
+void PencilInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
 {
     if(pe.isPaint())
     {
-        mEndPoint = event->pos();
+        mEndPoint = pt;
         if(event->button() == Qt::LeftButton) paint(pe);
         pe.setPaint(false);
     }
@@ -73,14 +72,14 @@ void PencilInstrument::paint(PatternEditor& pe)
                             pe.getPenSize(),
                             Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
-    if(mStartPoint != mEndPoint)
-    {
-        painter.drawLine(QPoint(mStartPoint.x()/pe.scaleX(), mStartPoint.y()/pe.scaleY()),
-                         QPoint(mEndPoint.x()/pe.scaleX(), mEndPoint.y()/pe.scaleY()));
+    if(mStartPoint != mEndPoint) {
+        painter.drawLine(mStartPoint, mEndPoint);
     }
 
-    if(mStartPoint == mEndPoint)
-        painter.drawPoint(mStartPoint.x()/pe.scaleX(), mStartPoint.y()/pe.scaleY());
+    if(mStartPoint == mEndPoint)  {
+        qDebug() << "drap point " << mStartPoint;
+        painter.drawPoint(mStartPoint);
+    }
 
     painter.end();
 }

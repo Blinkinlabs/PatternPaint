@@ -197,7 +197,10 @@ void PatternEditor::mousePressEvent(QMouseEvent *event){
 
     lazyUpdate();
     */
-    if (m_pi) m_pi->mousePressEvent(event, *this);
+    if (m_pi) {
+        m_pi->mousePressEvent(event, *this, QPoint(event->x()/scaleX(), event->y()/scaleY()));
+        lazyUpdate();
+    }
 }
 
 void PatternEditor::leaveEvent(QEvent * event) {
@@ -222,6 +225,9 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
     static int oldX = -1;
     static int oldY = -1;
 
+    Q_UNUSED(oldX);
+    Q_UNUSED(oldY);
+
     int x = event->x()/xScale;
     int y = event->y()/yScale;
 
@@ -239,7 +245,7 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
 
     if (m_pi) {
         setCursor(m_pi->cursor());
-        m_pi->mouseMoveEvent(event, *this);
+        m_pi->mouseMoveEvent(event, *this, QPoint(x, y));
     } else {
         setCursor(Qt::ArrowCursor);
     }
@@ -248,7 +254,10 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
 }
 
 void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
-    if (m_pi) m_pi->mouseReleaseEvent(event, *this);
+    if (m_pi) {
+        m_pi->mouseReleaseEvent(event, *this, QPoint(event->x()/scaleX(), event->y()/scaleY()));
+        lazyUpdate();
+    }
 }
 
 void PatternEditor::setToolColor(QColor color) {

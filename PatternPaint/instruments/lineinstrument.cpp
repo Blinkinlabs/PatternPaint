@@ -35,28 +35,27 @@ LineInstrument::LineInstrument(QObject *parent) :
 {
 }
 
-void LineInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe)
+void LineInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
 {
-    if(event->button() == Qt::LeftButton || event->button() == Qt::RightButton)
+    if(event->button() == Qt::LeftButton)
     {
-        mStartPoint = mEndPoint = event->pos();
+        mStartPoint = mEndPoint = pt;
         pe.setPaint(true);
         mImageCopy = pe.getPatternAsImage();
         makeUndoCommand(pe);
     }
 }
 
-void LineInstrument::mouseMoveEvent(QMouseEvent *event, PatternEditor& pe)
+void LineInstrument::mouseMoveEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
 {
-    if(pe.isPaint())
-    {
-        mEndPoint = event->pos();
+    if(pe.isPaint()) {
+        mEndPoint = pt;
         pe.setImage(mImageCopy);
-        if(event->buttons() & Qt::LeftButton)  paint(pe);
+        paint(pe);
     }
 }
 
-void LineInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe)
+void LineInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe, const QPoint&)
 {
     if(pe.isPaint())
     {
@@ -72,15 +71,12 @@ void LineInstrument::paint(PatternEditor& pe)
     painter.setPen(QPen(pe.getPrimaryColor(), pe.getPenSize() ,
                             Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
-    if(mStartPoint != mEndPoint)
-    {
-        painter.drawLine(QPoint(mStartPoint.x()/pe.scaleX(), mStartPoint.y()/pe.scaleY()),
-                         QPoint(mEndPoint.x()/pe.scaleX(), mEndPoint.y()/pe.scaleY()));
+    if(mStartPoint != mEndPoint) {
+        painter.drawLine(mStartPoint, mEndPoint);
     }
 
-    if(mStartPoint == mEndPoint)
-    {
-        painter.drawPoint(QPoint(mStartPoint.x()/pe.scaleX(), mStartPoint.y()/pe.scaleY()));
+    if(mStartPoint == mEndPoint) {
+        painter.drawPoint(mStartPoint);
     }
 
     painter.end();

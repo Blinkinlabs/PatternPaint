@@ -49,9 +49,15 @@ public:
     explicit AbstractInstrument(QObject *parent = 0);
     virtual ~AbstractInstrument(){}
 
-    virtual void mousePressEvent(QMouseEvent *event, PatternEditor&) = 0;
-    virtual void mouseMoveEvent(QMouseEvent *event, PatternEditor&) = 0;
-    virtual void mouseReleaseEvent(QMouseEvent *event, PatternEditor&) = 0;
+    /**
+     * @brief mousePressEvent
+     * @param event - mouse event
+     * @param PatternEditor - editor
+     * @param QPoint - logical position on image
+     */
+    virtual void mousePressEvent(QMouseEvent *event, PatternEditor&, const QPoint&) = 0;
+    virtual void mouseMoveEvent(QMouseEvent *event, PatternEditor&, const QPoint& pt) = 0;
+    virtual void mouseReleaseEvent(QMouseEvent *event, PatternEditor&, const QPoint& pt) = 0;
 
     /**
      * @brief cursor

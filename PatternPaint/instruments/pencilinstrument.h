@@ -42,9 +42,9 @@ class PencilInstrument : public AbstractInstrument
 public:
     explicit PencilInstrument(QObject *parent = 0);
 
-    void mousePressEvent(QMouseEvent *event, PatternEditor&);
-    void mouseMoveEvent(QMouseEvent *event, PatternEditor&);
-    void mouseReleaseEvent(QMouseEvent *event, PatternEditor&);
+    void mousePressEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
+    void mouseMoveEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
+    void mouseReleaseEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
     QCursor cursor() const { return Qt::ArrowCursor; }
 protected:
     void paint(PatternEditor&);

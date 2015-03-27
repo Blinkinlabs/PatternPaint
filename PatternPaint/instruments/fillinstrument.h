@@ -40,9 +40,9 @@ class FillInstrument : public CustomCursorInstrument
 public:
     explicit FillInstrument(QObject *parent = 0);
     
-    void mousePressEvent(QMouseEvent *event, PatternEditor&);
-    void mouseMoveEvent(QMouseEvent *event, PatternEditor&);
-    void mouseReleaseEvent(QMouseEvent *event, PatternEditor&);
+    void mousePressEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
+    void mouseMoveEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
+    void mouseReleaseEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
     bool showPreview() const { return false; }
 protected:
     void paint(PatternEditor&);

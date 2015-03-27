@@ -34,36 +34,33 @@ SprayInstrument::SprayInstrument(QObject *parent) :
     CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_spray.png", parent) {
 }
 
-void SprayInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe)
+void SprayInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
 {
     if(event->button() == Qt::LeftButton || event->button() == Qt::RightButton)
     {
-        mStartPoint = mEndPoint = event->pos();
+        mStartPoint = mEndPoint = pt;
         pe.setPaint(true);
         makeUndoCommand(pe);
     }
 }
 
-void SprayInstrument::mouseMoveEvent(QMouseEvent *event, PatternEditor& pe)
+void SprayInstrument::mouseMoveEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
 {
     if(pe.isPaint())
     {
-        mEndPoint = event->pos();
-        if(event->buttons() & Qt::LeftButton)
-        {
+        mEndPoint = pt;
+        if(event->buttons() & Qt::LeftButton) {
             paint(pe);
         }
 
-        mStartPoint = event->pos();
+        mStartPoint = pt;
     }
 }
 
-void SprayInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe)
+void SprayInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe, const QPoint&)
 {
-    if(pe.isPaint())
-    {
-        if(event->button() == Qt::LeftButton)
-        {
+    if(pe.isPaint()) {
+        if(event->button() == Qt::LeftButton) {
             paint(pe);
         }
         pe.setPaint(false);
@@ -98,8 +95,7 @@ void SprayInstrument::paint(PatternEditor& pe)
             break;
         }
 
-        painter.drawPoint(mEndPoint.x()/pe.scaleX() + x,
-                         mEndPoint.y()/pe.scaleY() + y);
+        painter.drawPoint(mEndPoint.x() + x, mEndPoint.y() + y);
     }
 
     painter.end();
