@@ -131,22 +131,6 @@ void PatternEditor::updateGridSize() {
     }
 }
 
-void PatternEditor::applyTool(int x, int y) {
-    QPainter painter(&pattern);
-    painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
-    painter.setRenderHint(QPainter::Antialiasing, false);
-    painter.setPen(toolColor);
-
-
-    QBrush brush = painter.brush();
-    brush.setStyle(Qt::SolidPattern);
-    brush.setColor(toolColor);
-    painter.setBrush(brush);
-
-    painter.drawPoint(x,y);
-    painter.drawEllipse ( QPoint(x,y), toolSize/2, toolSize/2 );
-}
-
 void PatternEditor::updateToolPreview(int x, int y) {
     QPainter painter(&toolPreview);
     toolPreview.fill(COLOR_CLEAR);
@@ -164,19 +148,9 @@ void PatternEditor::updateToolPreview(int x, int y) {
     painter.drawEllipse ( QPoint(x,y), toolSize/2, toolSize/2 );
 }
 
-void PatternEditor::mousePressEvent(QMouseEvent *event){
-
-    /*
-    pushUndoCommand(new UndoCommand(getPatternAsImage(), *this));
-    int x = event->x()/xScale;
-    int y = event->y()/yScale;
-
-    applyTool(x,y);
-
-    lazyUpdate();
-    */
+void PatternEditor::mousePressEvent(QMouseEvent *event) {
     if (m_pi) {
-        m_pi->mousePressEvent(event, *this, QPoint(event->x()/scaleX(), event->y()/scaleY()));
+        m_pi->mousePressEvent(event, *this, QPoint(event->x()/xScale, event->y()/yScale));
         lazyUpdate();
     }
 }
@@ -233,7 +207,7 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
 
 void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
     if (m_pi) {
-        m_pi->mouseReleaseEvent(event, *this, QPoint(event->x()/scaleX(), event->y()/scaleY()));
+        m_pi->mouseReleaseEvent(event, *this, QPoint(event->x()/xScale, event->y()/yScale));
         lazyUpdate();
     }
 }

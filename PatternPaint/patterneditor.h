@@ -49,9 +49,6 @@ public:
     void pushUndoCommand(UndoCommand *command);
     bool isPaint() const { return m_isPaint; }
     void setPaint(bool paint) { m_isPaint = paint; }
-
-    float scaleX() const { return xScale; }
-    float scaleY() const { return yScale; }
 protected:
     void paintEvent(QPaintEvent *event);
 
@@ -76,7 +73,6 @@ private:
 
     /// Update the screen, but only if we haven't done so in a while
     void lazyUpdate();
-    void applyTool(int x, int y);
     void updateToolPreview(int x, int y);
 signals:
 
