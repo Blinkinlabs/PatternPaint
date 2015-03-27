@@ -256,6 +256,11 @@
     <property name="title">
      <string>Instruments</string>
     </property>
+    <addaction name="actionPen"/>
+    <addaction name="actionLine"/>
+    <addaction name="actionSpray"/>
+    <addaction name="actionPipette"/>
+    <addaction name="actionFill"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -271,7 +276,7 @@
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
    <addaction name="actionLoad_File"/>
    <addaction name="actionSave_File"/>
@@ -288,8 +293,13 @@
     <enum>LeftToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
+   <addaction name="actionPen"/>
+   <addaction name="actionLine"/>
+   <addaction name="actionSpray"/>
+   <addaction name="actionPipette"/>
+   <addaction name="actionFill"/>
   </widget>
   <action name="actionLoad_File">
    <property name="icon">
@@ -432,6 +442,72 @@
    </property>
    <property name="text">
     <string>Connect</string>
+   </property>
+  </action>
+  <action name="actionPen">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/instruments/images/instruments-icons/pencil.png</normaloff>:/instruments/images/instruments-icons/pencil.png</iconset>
+   </property>
+   <property name="text">
+    <string>Pen</string>
+   </property>
+  </action>
+  <action name="actionLine">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/instruments/images/instruments-icons/line.png</normaloff>:/instruments/images/instruments-icons/line.png</iconset>
+   </property>
+   <property name="text">
+    <string>Line</string>
+   </property>
+  </action>
+  <action name="actionPipette">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/instruments/images/instruments-icons/pipette.png</normaloff>:/instruments/images/instruments-icons/pipette.png</iconset>
+   </property>
+   <property name="text">
+    <string>Pipette</string>
+   </property>
+   <property name="toolTip">
+    <string>Color picker</string>
+   </property>
+  </action>
+  <action name="actionFill">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/instruments/images/instruments-icons/fill.png</normaloff>:/instruments/images/instruments-icons/fill.png</iconset>
+   </property>
+   <property name="text">
+    <string>Fill</string>
+   </property>
+   <property name="toolTip">
+    <string>Fill</string>
+   </property>
+  </action>
+  <action name="actionSpray">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/instruments/images/instruments-icons/spray.png</normaloff>:/instruments/images/instruments-icons/spray.png</iconset>
+   </property>
+   <property name="text">
+    <string>Spray</string>
    </property>
   </action>
  </widget>

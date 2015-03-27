@@ -52,104 +52,27 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     m_undoStackGroup->addStack(patternEditor->getUndoStack());
     m_undoStackGroup->setActiveStack(patternEditor->getUndoStack());
 
-    // instruments creation
-    mCursorAction = new QAction(tr("Selection"), this);
-    mCursorAction->setCheckable(true);
-    mCursorAction->setIcon(QIcon(":/instruments/images/instruments-icons/cursor.png"));
-    connect(mCursorAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mCursorAction);
-    mCursorAction->setChecked(true);
-
-    mEraserAction = new QAction(tr("Eraser"), this);
-    mEraserAction->setCheckable(true);
-    mEraserAction->setIcon(QIcon(":/instruments/images/instruments-icons/lastic.png"));
-    connect(mEraserAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mEraserAction);
-
+    // instruments
     ColorpickerInstrument* cpi = new ColorpickerInstrument(this);
     connect(cpi, SIGNAL(pickedColor(QColor)), SLOT(on_colorPicked(QColor)));
 
-    mColorPickerAction = new QAction(tr("Color picker"), this);
-    mColorPickerAction->setCheckable(true);
-    mColorPickerAction->setIcon(QIcon(":/instruments/images/instruments-icons/pipette.png"));
-    mColorPickerAction->setData(QVariant::fromValue(cpi));
-    connect(mColorPickerAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mColorPickerAction);
+    connect(actionPen, SIGNAL(triggered(bool)), SLOT(on_instrumentAction(bool)));
+    connect(actionLine, SIGNAL(triggered(bool)), SLOT(on_instrumentAction(bool)));
+    connect(actionSpray, SIGNAL(triggered(bool)), SLOT(on_instrumentAction(bool)));
+    connect(actionPipette, SIGNAL(triggered(bool)), SLOT(on_instrumentAction(bool)));
+    connect(actionFill, SIGNAL(triggered(bool)), SLOT(on_instrumentAction(bool)));
 
-    mMagnifierAction = new QAction(tr("Magnifier"), this);
-    mMagnifierAction->setCheckable(true);
-    mMagnifierAction->setIcon(QIcon(":/instruments/images/instruments-icons/loupe.png"));
-    connect(mMagnifierAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mMagnifierAction);
+    actionPen->setData(QVariant::fromValue(new PencilInstrument(this)));
+    actionLine->setData(QVariant::fromValue(new LineInstrument(this)));
+    actionPipette->setData(QVariant::fromValue(cpi));
+    //
+    //
 
-    mPenAction = new QAction(tr("Pen"), this);
-    mPenAction->setCheckable(true);
-    mPenAction->setIcon(QIcon(":/instruments/images/instruments-icons/pencil.png"));
-    mPenAction->setData(QVariant::fromValue(new PencilInstrument(this)));
-    connect(mPenAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mPenAction);
-
-    mLineAction = new QAction(tr("Line"), this);
-    mLineAction->setCheckable(true);
-    mLineAction->setIcon(QIcon(":/instruments/images/instruments-icons/line.png"));
-    mLineAction->setData(QVariant::fromValue(new LineInstrument(this)));
-    connect(mLineAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mLineAction);
-
-    mSprayAction = new QAction(tr("Spray"), this);
-    mSprayAction->setCheckable(true);
-    mSprayAction->setIcon(QIcon(":/instruments/images/instruments-icons/spray.png"));
-    connect(mSprayAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mSprayAction);
-
-    mFillAction = new QAction(tr("Fill"), this);
-    mFillAction->setCheckable(true);
-    mFillAction->setIcon(QIcon(":/instruments/images/instruments-icons/fill.png"));
-    connect(mFillAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mFillAction);
-
-    mRectangleAction = new QAction(tr("Rectangle"), this);
-    mRectangleAction->setCheckable(true);
-    mRectangleAction->setIcon(QIcon(":/instruments/images/instruments-icons/rectangle.png"));
-    connect(mRectangleAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mRectangleAction);
-
-    mEllipseAction = new QAction(tr("Ellipse"), this);
-    mEllipseAction->setCheckable(true);
-    mEllipseAction->setIcon(QIcon(":/instruments/images/instruments-icons/ellipse.png"));
-    connect(mEllipseAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mEllipseAction);
-
-    mCurveLineAction = new QAction(tr("Curve"), this);
-    mCurveLineAction->setCheckable(true);
-    mCurveLineAction->setIcon(QIcon(":/instruments/images/instruments-icons/curve.png"));
-    connect(mCurveLineAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mCurveLineAction);
-
-    mTextAction = new QAction(tr("Text"), this);
-    mTextAction->setCheckable(true);
-    mTextAction->setIcon(QIcon(":/instruments/images/instruments-icons/text.png"));
-    connect(mTextAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mTextAction);
-    menuInstruments->addAction(mCursorAction);
-    menuInstruments->addAction(mEraserAction);
-    menuInstruments->addAction(mColorPickerAction);
-    menuInstruments->addAction(mMagnifierAction);
-    menuInstruments->addAction(mPenAction);
-    menuInstruments->addAction(mLineAction);
-    menuInstruments->addAction(mSprayAction);
-    menuInstruments->addAction(mFillAction);
-    menuInstruments->addAction(mRectangleAction);
-    menuInstruments->addAction(mEllipseAction);
-    menuInstruments->addAction(mCurveLineAction);
-    menuInstruments->addAction(mTextAction);
-
-
-    mPColorChooser = new ColorChooser(255, 255, 255, this);
-    mPColorChooser->setStatusTip(tr("Primary color"));
-    mPColorChooser->setToolTip(tr("Primary color"));
+    m_colorChooser = new ColorChooser(255, 255, 255, this);
+    m_colorChooser->setStatusTip(tr("Pen color"));
+    m_colorChooser->setToolTip(tr("Pen color"));
     instruments->addSeparator();
-    instruments->addWidget(mPColorChooser);
+    instruments->addWidget(m_colorChooser);
 
     QSpinBox *penSizeSpin = new QSpinBox();
     penSizeSpin->setRange(1, 20);
@@ -159,6 +82,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     instruments->addWidget(penSizeSpin);
 
 
+    // tools
     QSpinBox* pSpeed = new QSpinBox();
     pSpeed->setRange(1, 100);
     pSpeed->setValue(30);
@@ -174,7 +98,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     patternEditor->init(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
 
     // Our pattern editor wants to get some notifications
-    connect(mPColorChooser, SIGNAL(sendColor(QColor)),
+    connect(m_colorChooser, SIGNAL(sendColor(QColor)),
             patternEditor, SLOT(setToolColor(QColor)));
 
     tape = new BlinkyTape(this);
@@ -223,7 +147,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // initialization started parameters here
     penSizeSpin->setValue(1);
     patternEditor->setToolSize(1);
-
+    patternEditor->setToolColor(QColor(255,255,255));
+    actionPen->setChecked(true);
+    patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(actionPen->data()));
     readSettings();
 }
 
@@ -688,6 +614,6 @@ void MainWindow::on_instrumentAction(bool) {
 
 void MainWindow::on_colorPicked(QColor color) {
     qDebug() << "pipette color " << color;
-    mPColorChooser->setColor(color);
+    m_colorChooser->setColor(color);
     patternEditor->setToolColor(color);
 }
