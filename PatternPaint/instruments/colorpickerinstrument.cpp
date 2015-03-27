@@ -67,7 +67,7 @@ void ColorpickerInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor&
     }
 }
 
-void ColorpickerInstrument::paint(PatternEditor& pe, bool isSecondaryColor, bool)
+void ColorpickerInstrument::paint(PatternEditor& pe, bool)
 {
     bool inArea(true);
     if(mStartPoint.x() < 0 || mStartPoint.y() < 0

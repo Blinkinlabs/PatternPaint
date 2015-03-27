@@ -49,7 +49,7 @@ public:
     QCursor cursor() const { return mcur; }
     bool showPreview() const { return false; }
 protected:
-    void paint(PatternEditor&, bool isSecondaryColor = false, bool additionalFlag = false);
+    void paint(PatternEditor&, bool additionalFlag = false);
 private:
     QPixmap mpm;
     QCursor mcur;

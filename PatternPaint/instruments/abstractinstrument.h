@@ -68,7 +68,7 @@ protected:
     QPoint mStartPoint, mEndPoint; /**< Point for events. */
     QImage mImageCopy; /**< Image for storing copy of current image on imageArea, needed for some instruments. */
 
-    virtual void paint(PatternEditor&, bool isSecondaryColor = false, bool additionalFlag = false) = 0;
+    virtual void paint(PatternEditor&, bool additionalFlag = false) = 0;
 
     /**
      * @brief Creates UndoCommand & pushes it to UndoStack.
