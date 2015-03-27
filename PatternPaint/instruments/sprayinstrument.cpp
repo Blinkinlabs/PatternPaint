@@ -80,21 +80,21 @@ void SprayInstrument::paint(PatternEditor& pe, bool)
         switch(i) {
         case 0: case 1: case 2: case 3:
             x = (qrand() % 5 - 2)
-                    * sqrt(pe.getPenSize() * pe.getZoomFactor());
+                    * sqrt(pe.getPenSize());
             y = (qrand() % 5 - 2)
-                    * sqrt(pe.getPenSize() * pe.getZoomFactor());
+                    * sqrt(pe.getPenSize());
             break;
         case 4: case 5: case 6: case 7:
             x = (qrand() % 10 - 4)
-                    * sqrt(pe.getPenSize() * pe.getZoomFactor());
+                    * sqrt(pe.getPenSize());
             y = (qrand() % 10 - 4)
-                    * sqrt(pe.getPenSize() * pe.getZoomFactor());
+                    * sqrt(pe.getPenSize());
             break;
         case 8: case 9: case 10: case 11:
             x = (qrand() % 15 - 7)
-                    * sqrt(pe.getPenSize() * pe.getZoomFactor());
+                    * sqrt(pe.getPenSize());
             y = (qrand() % 15 - 7)
-                    * sqrt(pe.getPenSize() * pe.getZoomFactor());
+                    * sqrt(pe.getPenSize());
             break;
         }
 

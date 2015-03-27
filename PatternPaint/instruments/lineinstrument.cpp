@@ -83,8 +83,7 @@ void LineInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe)
 void LineInstrument::paint(PatternEditor& pe, bool)
 {
     QPainter painter(pe.getDevice());
-    painter.setPen(QPen(pe.getPrimaryColor(),
-                            pe.getPenSize() * pe.getZoomFactor(),
+    painter.setPen(QPen(pe.getPrimaryColor(), pe.getPenSize() ,
                             Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
     if(mStartPoint != mEndPoint)

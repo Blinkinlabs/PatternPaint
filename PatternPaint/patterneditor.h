@@ -30,7 +30,6 @@ public:
     void setImage(const QImage& img) { pattern = img; }
 
     inline QUndoStack* getUndoStack() { return m_undoStack; }
-    inline qreal getZoomFactor() const { return 1.0; }
 
     /// Get the image data for the current pattern
     /// @return QImage containing the current pattern
