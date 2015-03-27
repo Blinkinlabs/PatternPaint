@@ -27,9 +27,7 @@
 #include "patterneditor.h"
 
 ColorpickerInstrument::ColorpickerInstrument(QObject *parent) :
-    AbstractInstrument(parent), mpm(":/instruments/images/instruments-icons/cursor_pipette.png")
-{
-    mcur = QCursor(mpm);
+    CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_pipette.png", parent) {
 }
 
 void ColorpickerInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe)

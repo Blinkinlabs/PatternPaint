@@ -48,8 +48,6 @@ public:
     QCursor cursor() const { return Qt::ArrowCursor; }
 protected:
     void paint(PatternEditor&, bool additionalFlag = false);
-private:
-    QPixmap mpm;
 };
 
 #endif // PENCILINSTRUMENT_H

@@ -23,32 +23,29 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef COLORPICKERINSTRUMENT_H
-#define COLORPICKERINSTRUMENT_H
+#ifndef SPRAYINSTRUMENT_H
+#define SPRAYINSTRUMENT_H
 
 #include "abstractinstrument.h"
 
 #include <QtCore/QObject>
 
 /**
- * @brief Colorpicker instrument class.
+ * @brief Spray instrument class.
  *
  */
-class ColorpickerInstrument : public CustomCursorInstrument
+class SprayInstrument : public CustomCursorInstrument
 {
     Q_OBJECT
-
 public:
-    explicit ColorpickerInstrument(QObject *parent = 0);
+    explicit SprayInstrument(QObject *parent = 0);
     
     void mousePressEvent(QMouseEvent *event, PatternEditor&);
     void mouseMoveEvent(QMouseEvent *event, PatternEditor&);
     void mouseReleaseEvent(QMouseEvent *event, PatternEditor&);
-    bool showPreview() const { return false; }
 protected:
     void paint(PatternEditor&, bool additionalFlag = false);
-signals:
-    void pickedColor(QColor);
+    
 };
 
-#endif // COLORPICKERINSTRUMENT_H
+#endif // SPRAYINSTRUMENT_H

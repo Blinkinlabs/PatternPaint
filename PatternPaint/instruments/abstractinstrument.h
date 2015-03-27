@@ -30,6 +30,8 @@
 #include <QMouseEvent>
 #include <QImage>
 #include <QCursor>
+#include <QPixmap>
+#include <QCursor>
 
 QT_BEGIN_NAMESPACE
 class PatternEditor;
@@ -77,6 +79,20 @@ protected:
      * @param editor corresponse to image, which is edited
      */
     virtual void makeUndoCommand(PatternEditor&);
+};
+
+/**
+ * @brief The CustomCursorInstrument class implements custom cursor support
+ */
+class CustomCursorInstrument : public AbstractInstrument {
+
+    Q_OBJECT
+public:
+    CustomCursorInstrument(const QString& resource, QObject* parent = 0);
+    virtual QCursor cursor() const;
+private:
+    QPixmap mpm;
+    QCursor mcur;
 };
 
 #endif // ABSTRACTINSTRUMENT_H

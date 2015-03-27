@@ -12,6 +12,7 @@
 #include "pencilinstrument.h"
 #include "lineinstrument.h"
 #include "colorpickerinstrument.h"
+#include "sprayinstrument.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -65,6 +66,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     actionPen->setData(QVariant::fromValue(new PencilInstrument(this)));
     actionLine->setData(QVariant::fromValue(new LineInstrument(this)));
     actionPipette->setData(QVariant::fromValue(cpi));
+    actionSpray->setData(QVariant::fromValue(new SprayInstrument(this)));
     //
     //
 
