@@ -268,7 +268,7 @@ void PatternEditor::lazyUpdate() {
     update();
 }
 
-void PatternEditor::paintEvent(QPaintEvent* event)
+void PatternEditor::paintEvent(QPaintEvent*)
 {
 
     QPainter painter(this);

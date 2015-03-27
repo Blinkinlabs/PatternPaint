@@ -40,7 +40,7 @@ void PencilInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, co
     if(event->button() == Qt::LeftButton )
     {
         mStartPoint = mEndPoint = pt;
-        pe.setPaint(true);  // ?
+        pe.setPaint(true);
         makeUndoCommand(pe);
     }
 }
@@ -67,7 +67,7 @@ void PencilInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe, 
 
 void PencilInstrument::paint(PatternEditor& pe)
 {
-    QPainter painter(pe.getDevice());
+    QPainter painter(pe.getPattern());
     painter.setPen(QPen(pe.getPrimaryColor(),
                             pe.getPenSize(),
                             Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
@@ -77,7 +77,6 @@ void PencilInstrument::paint(PatternEditor& pe)
     }
 
     if(mStartPoint == mEndPoint)  {
-        qDebug() << "drap point " << mStartPoint;
         painter.drawPoint(mStartPoint);
     }
 

@@ -69,7 +69,7 @@ void SprayInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe, c
 
 void SprayInstrument::paint(PatternEditor& pe)
 {
-    QPainter painter(pe.getDevice());
+    QPainter painter(pe.getPattern());
     painter.setPen(QPen(pe.getPrimaryColor(), pe.getPenSize(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
     int x, y;

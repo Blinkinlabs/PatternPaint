@@ -30,8 +30,8 @@ public:
 
     /// Get the image data for the current pattern
     /// @return QImage containing the current pattern
-    QImage getPatternAsImage() { return pattern; }
-    QImage* getDevice() { return &pattern; }
+    QImage getPatternAsImage() const { return pattern; }
+    QImage* getPattern() { return &pattern; }
 
     // for compatibility with EasyPaint sources
     QColor getPrimaryColor() const { return toolColor; }

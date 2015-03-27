@@ -46,7 +46,7 @@ void LineInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, cons
     }
 }
 
-void LineInstrument::mouseMoveEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
+void LineInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& pe, const QPoint& pt)
 {
     if(pe.isPaint()) {
         mEndPoint = pt;
@@ -67,7 +67,7 @@ void LineInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe, co
 
 void LineInstrument::paint(PatternEditor& pe)
 {
-    QPainter painter(pe.getDevice());
+    QPainter painter(pe.getPattern());
     painter.setPen(QPen(pe.getPrimaryColor(), pe.getPenSize() ,
                             Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 

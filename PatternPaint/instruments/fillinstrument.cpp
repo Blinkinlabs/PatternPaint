@@ -47,7 +47,7 @@ void FillInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, cons
 void FillInstrument::mouseMoveEvent(QMouseEvent *, PatternEditor&, const QPoint&) {
 }
 
-void FillInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe, const QPoint&)
+void FillInstrument::mouseReleaseEvent(QMouseEvent*, PatternEditor& pe, const QPoint&)
 {
     if(pe.isPaint()) {
         paint(pe);
@@ -58,16 +58,14 @@ void FillInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe, co
 void FillInstrument::paint(PatternEditor& pe)
 {
     QColor switchColor = pe.getPrimaryColor();
-    QRgb pixel(pe.getDevice()->pixel(mStartPoint));
+    QRgb pixel(pe.getPattern()->pixel(mStartPoint));
 
     QColor oldColor(pixel);
-    qDebug() << "switch color: " << switchColor << " old color " << oldColor;
 
-    if(switchColor != oldColor)
-    {
+    if(switchColor != oldColor) {
         fillRecurs(mStartPoint.x(), mStartPoint.y(),
                    switchColor.rgb(), pixel,
-                   *pe.getDevice());
+                   *pe.getPattern());
     }
 
     pe.update();
@@ -75,9 +73,6 @@ void FillInstrument::paint(PatternEditor& pe)
 
 void FillInstrument::fillRecurs(int x, int y, QRgb switchColor, QRgb oldColor, QImage& tempImage) {
     int temp_x(x), left_x(0);
-    qDebug() << "fill recurse " << x << " " << y << " rect " << tempImage.rect()
-             << "old color " << oldColor
-             << " color " << tempImage.pixel(QPoint(x,y));
     while(true)
     {
         if(tempImage.pixel(temp_x, y) != oldColor)
