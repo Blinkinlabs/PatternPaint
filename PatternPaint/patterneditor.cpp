@@ -25,9 +25,10 @@ PatternEditor::PatternEditor(QWidget *parent) :
     QWidget(parent)
 {
     m_undoStack = new QUndoStack(this);
-    m_undoStack->setUndoLimit(10);  // TODO - use preferences here
+    m_undoStack->setUndoLimit(40);  // TODO?
     m_isPaint = false;
     m_pi = NULL;
+    m_edited = false;
 }
 
 void PatternEditor::resizeEvent(QResizeEvent * event)
@@ -273,4 +274,5 @@ void PatternEditor::paintEvent(QPaintEvent*)
 void PatternEditor::pushUndoCommand(UndoCommand *command)
 {
     if (command) m_undoStack->push(command);
+    setEdited(true);
 }

@@ -30,18 +30,17 @@ ColorpickerInstrument::ColorpickerInstrument(QObject *parent) :
     CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_pipette.png", parent) {
 }
 
-void ColorpickerInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, const QPoint&)
+void ColorpickerInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
 {
     if(event->button() == Qt::LeftButton) {
         pe.setPaint(true);
+        mStartPoint = mEndPoint = pt;
     }
 }
 
-void ColorpickerInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& pe, const QPoint& pt)
+void ColorpickerInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor&, const QPoint&)
 {
-    QRgb pixel(pe.getPattern()->pixel(pt));
-    QColor getColor(pixel);
-    //pe.emitColor(getColor);
+    //QRgb pixel(pe.getPattern()->pixel(pt));
 }
 
 void ColorpickerInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
@@ -63,7 +62,7 @@ void ColorpickerInstrument::paint(PatternEditor& pe)
         inArea = false;
 
     if(inArea) {
-        QRgb pixel(pe.getPattern()->pixel(QPoint(mStartPoint.x(), mStartPoint.y())));
+        QRgb pixel(pe.getPattern()->pixel(mStartPoint));
         QColor getColor(pixel);
         emit pickedColor(getColor);
     }

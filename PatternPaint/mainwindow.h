@@ -95,6 +95,8 @@ private:
     QProgressDialog* progressDialog;
     QMessageBox* errorMessageDialog;
 
+    QSpinBox* pSpeed;
+
     enum Modes { Disconnected, Connected, Uploading };
     Modes mode;
 

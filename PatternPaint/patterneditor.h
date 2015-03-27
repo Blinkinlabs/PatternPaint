@@ -33,6 +33,9 @@ public:
     QImage getPatternAsImage() const { return pattern; }
     QImage* getPattern() { return &pattern; }
 
+    bool isEdited() const { return m_edited; }
+    void setEdited(bool e) { m_edited = e; }
+
     // for compatibility with EasyPaint sources
     QColor getPrimaryColor() const { return toolColor; }
     int getPenSize() const { return toolSize; }
@@ -67,6 +70,7 @@ private:
     QUndoStack* m_undoStack;
     bool m_isPaint;
     AbstractInstrument* m_pi;
+    bool m_edited;
 
     /// Redraw the gridPattern to fit the current widget size.
     void updateGridSize();

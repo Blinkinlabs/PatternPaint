@@ -25,6 +25,7 @@
 
 #include "undocommand.h"
 #include "patterneditor.h"
+#include <QDebug>
 
 UndoCommand::UndoCommand(const QImage& img, PatternEditor& editor, QUndoCommand *parent)
     : QUndoCommand(parent), mPrevImage(img), m_editor(editor)
@@ -35,6 +36,7 @@ UndoCommand::UndoCommand(const QImage& img, PatternEditor& editor, QUndoCommand 
 void UndoCommand::undo() {
     mCurrImage = m_editor.getPatternAsImage();
     m_editor.init(mPrevImage, false);
+    m_editor.setEdited(m_editor.getUndoStack()->index() != 1);
 }
 
 void UndoCommand::redo() {

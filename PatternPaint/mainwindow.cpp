@@ -85,12 +85,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
 
     // tools
-    QSpinBox* pSpeed = new QSpinBox();
+    pSpeed = new QSpinBox(this);
+    pSpeed->setEnabled(false);
     pSpeed->setRange(1, 100);
     pSpeed->setValue(30);
     pSpeed->setToolTip(tr("Pattern speed"));
-    connect(pSpeed, SIGNAL(valueChanged(int)), SLOT(on_patternSpeed_valueChanged(int)));
     tools->addWidget(pSpeed);
+    connect(pSpeed, SIGNAL(valueChanged(int)), this, SLOT(on_patternSpeed_valueChanged(int)));
 
     drawTimer = new QTimer(this);
     connectionScannerTimer = new QTimer(this);
@@ -265,6 +266,7 @@ void MainWindow::on_actionLoad_File_triggered()
     }
 
     patternEditor->init(pattern);
+    patternEditor->setEdited(false);
 }
 
 void MainWindow::on_actionSave_File_triggered()
@@ -293,6 +295,8 @@ void MainWindow::on_actionSave_File_triggered()
     if(!patternEditor->getPatternAsImage().save(fileName)) {
         QMessageBox::warning(this, tr("Error"), tr("Error, cannot write file %1.")
                        .arg(fileName));
+    } else {
+        patternEditor->setEdited(false);
     }
 }
 
@@ -336,15 +340,16 @@ void MainWindow::on_tapeConnectionStatusChanged(bool connected)
 {
     qDebug() << "status changed, connected=" << connected;
     actionSave_to_Tape->setEnabled(connected);
+    actionPlay->setEnabled(connected);
+    pSpeed->setEnabled(connected);
+
     if(connected) {
         mode = Connected;
-        actionSave_to_Tape->setEnabled(true);
         actionConnect->setText(tr("Disconnect"));
         actionConnect->setIcon(QIcon(":/images/resources/disconnect.png"));
     }
     else {
         mode = Disconnected;
-        actionSave_to_Tape->setEnabled(false);
         actionConnect->setText(tr("Connect"));
         actionConnect->setIcon(QIcon(":/images/resources/connect.png"));
 
@@ -561,26 +566,24 @@ void MainWindow::readSettings()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     //TODO - uncomment for future usage
-    /*
-    if (patternEditor->getUndoStack()->canUndo()) {
+
+    while (patternEditor->isEdited()) {
         int ans = QMessageBox::warning(this, tr("Exit program"),
                                                tr("File has been modified.\nDo you want to save changes?"),
                                                QMessageBox::Yes | QMessageBox::Default,
                                                QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape);
-        switch(ans)
-        {
-        case QMessageBox::Yes:
+        if (ans == QMessageBox::Yes) {
             on_actionSave_File_triggered();
-            event->ignore();
-            return;
-        case QMessageBox::Cancel:
-            event->ignore();
-            return;
-        default:
-            break;
         }
+
+        if (ans == QMessageBox::Cancel) {
+            event->ignore();
+            return;
+        }
+
+        if (ans == QMessageBox::No) break;
     }
-*/
+
     writeSettings();
     event->accept();
 }
@@ -615,7 +618,6 @@ void MainWindow::on_instrumentAction(bool) {
 }
 
 void MainWindow::on_colorPicked(QColor color) {
-    qDebug() << "pipette color " << color;
     m_colorChooser->setColor(color);
     patternEditor->setToolColor(color);
 }
