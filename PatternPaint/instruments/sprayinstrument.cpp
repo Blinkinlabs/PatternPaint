@@ -36,7 +36,7 @@ SprayInstrument::SprayInstrument(QObject *parent) :
 
 void SprayInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
 {
-    if(event->button() == Qt::LeftButton || event->button() == Qt::RightButton)
+    if(event->button() == Qt::LeftButton)
     {
         mStartPoint = mEndPoint = pt;
         pe.setPaint(true);
@@ -44,25 +44,19 @@ void SprayInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, con
     }
 }
 
-void SprayInstrument::mouseMoveEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
+void SprayInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& pe, const QPoint& pt)
 {
-    if(pe.isPaint())
-    {
+    if(pe.isPaint()) {
         mEndPoint = pt;
-        if(event->buttons() & Qt::LeftButton) {
-            paint(pe);
-        }
-
+        paint(pe);
         mStartPoint = pt;
     }
 }
 
-void SprayInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe, const QPoint&)
+void SprayInstrument::mouseReleaseEvent(QMouseEvent*, PatternEditor& pe, const QPoint&)
 {
     if(pe.isPaint()) {
-        if(event->button() == Qt::LeftButton) {
-            paint(pe);
-        }
+        paint(pe);
         pe.setPaint(false);
     }
 }
