@@ -17,15 +17,12 @@ public:
     /// @param frameCount Number of frames in this pattern
     /// @param stripLength Number of LEDs in this strip
     /// @param initTools - temporary parameter - set tools parameters like size and color to default
-    void init(int frameCount, int stripLength, bool initTools = true);
+    void init(int frameCount, int stripLength);
 
     /// Initialize the pattern editor using a QImage as the new pattern
     /// @param newPattern New pattern to load
     /// @param scaled If true, scale the image to match the height of the previous pattern
     bool init(QImage newPattern, bool scaled = true);
-
-    // TODO - correct this method!
-    void resetImage(const QImage& img);
 
     void setImage(const QImage& img) { pattern = img; }
 

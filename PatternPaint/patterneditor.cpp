@@ -37,7 +37,7 @@ void PatternEditor::resizeEvent(QResizeEvent * event)
     updateGridSize();
 }
 
-void PatternEditor::init(int frameCount, int stripLength, bool initTools)
+void PatternEditor::init(int frameCount, int stripLength)
 {
     // Store the width and height, so that letterboxscrollarea can resize this widget properly
     this->setBaseSize(frameCount, stripLength);
@@ -52,13 +52,6 @@ void PatternEditor::init(int frameCount, int stripLength, bool initTools)
                          stripLength,
                          QImage::Format_ARGB32_Premultiplied);
     toolPreview.fill(COLOR_CLEAR);
-
-    if (initTools)
-    {
-        // TODO: Don't reset these here, they need to come from main...
-        toolColor = COLOR_TOOL_DEFAULT;
-        toolSize = 2;
-    }
 
     // Turn on mouse tracking so we can draw a preview
     setMouseTracking(true);
@@ -88,21 +81,6 @@ bool PatternEditor::init(QImage newPattern, bool scaled) {
     update();
 
     return true;
-}
-
-void PatternEditor::resetImage(const QImage& img)
-{
-    // TODO: Implement 'save' check before overwriting?
-
-    // Re-init the display using the new geometry
-    init(img.width(), img.height(), false);
-
-    // Draw the new pattern to the display
-    QPainter painter(&pattern);
-    painter.drawImage(0,0,img);
-
-    // and force a screen update
-    update();
 }
 
 void PatternEditor::updateGridSize() {

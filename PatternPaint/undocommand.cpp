@@ -32,15 +32,11 @@ UndoCommand::UndoCommand(const QImage& img, PatternEditor& editor, QUndoCommand 
     mCurrImage = mPrevImage;
 }
 
-void UndoCommand::undo()
-{
-    // TODO - add tools restore
+void UndoCommand::undo() {
     mCurrImage = m_editor.getPatternAsImage();
-    m_editor.resetImage(mPrevImage);
-    //mImageArea.saveImageChanges();
+    m_editor.init(mPrevImage, false);
 }
 
-void UndoCommand::redo()
-{
-    m_editor.resetImage(mCurrImage);
+void UndoCommand::redo() {
+    m_editor.init(mCurrImage, false);
 }
