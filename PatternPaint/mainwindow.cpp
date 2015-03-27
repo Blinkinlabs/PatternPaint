@@ -13,6 +13,7 @@
 #include "lineinstrument.h"
 #include "colorpickerinstrument.h"
 #include "sprayinstrument.h"
+#include "fillinstrument.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -67,8 +68,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     actionLine->setData(QVariant::fromValue(new LineInstrument(this)));
     actionPipette->setData(QVariant::fromValue(cpi));
     actionSpray->setData(QVariant::fromValue(new SprayInstrument(this)));
-    //
-    //
+    actionFill->setData(QVariant::fromValue(new FillInstrument(this)));
 
     m_colorChooser = new ColorChooser(255, 255, 255, this);
     m_colorChooser->setStatusTip(tr("Pen color"));
