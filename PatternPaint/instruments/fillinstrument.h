@@ -48,8 +48,7 @@ protected:
     void paint(PatternEditor&);
 
 private:
-    void fillRecurs(int x, int y, QRgb switchColor, QRgb oldColor, QImage& tempImage);
-    
+    void fill(const QPoint&, QRgb newColor, QRgb oldColor, QImage* pattern);
 };
 
 #endif // FILLINSTRUMENT_H

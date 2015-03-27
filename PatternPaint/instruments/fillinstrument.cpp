@@ -63,57 +63,30 @@ void FillInstrument::paint(PatternEditor& pe)
     QColor oldColor(pixel);
 
     if(switchColor != oldColor) {
-        fillRecurs(mStartPoint.x(), mStartPoint.y(),
+        fill(mStartPoint, switchColor.rgb(), pixel, pe.getPattern());
+        /*fillRecurs(mStartPoint.x(), mStartPoint.y(),
                    switchColor.rgb(), pixel,
                    *pe.getPattern());
+                   */
     }
 
     pe.update();
 }
 
-void FillInstrument::fillRecurs(int x, int y, QRgb switchColor, QRgb oldColor, QImage& tempImage) {
-    int temp_x(x), left_x(0);
-    while(true)
-    {
-        if(tempImage.pixel(temp_x, y) != oldColor)
-            break;
-        tempImage.setPixel(temp_x, y, switchColor);
-        if(temp_x > 0)
-        {
-            --temp_x;
-            left_x = temp_x;
-        }
-        else
-            break;
-    }
+QList<QPoint> neighbors(const QPoint& pt, const QImage* img) {
+    QList<QPoint> res;
+    if (pt.x() > 0) res << QPoint(pt.x()-1, pt.y());
+    if (pt.y() > 0) res << QPoint(pt.x(), pt.y()-1);
+    if (pt.x() + 1 < img->width()) res << QPoint(pt.x()+1, pt.y());
+    if (pt.y() + 1 < img->height()) res << QPoint(pt.x(), pt.y() + 1);
+    return res;
+}
 
-    int right_x(0);
-    temp_x = x + 1;
-    while(true)
-    {
-        if(tempImage.pixel(temp_x, y) != oldColor)
-            break;
-        tempImage.setPixel(temp_x, y, switchColor);
-        if(temp_x < tempImage.width() - 1)
-        {
-            temp_x++;
-            right_x = temp_x;
-        }
-        else
-            break;
-    }
+void FillInstrument::fill(const QPoint& pt, QRgb newColor, QRgb oldColor, QImage* pattern) {
+    if (pattern->pixel(pt) != oldColor) return;
+    pattern->setPixel(pt, newColor);
 
-    for(int x_(left_x+1); x_ < right_x; ++x_)
-    {
-        if(y < 1 || y >= tempImage.height() - 1)
-            break;
-        if(right_x > tempImage.width())
-            break;
-        QRgb currentColor = tempImage.pixel(x_, y - 1);
-        if(currentColor == oldColor && currentColor != switchColor)
-            fillRecurs(x_, y - 1, switchColor, oldColor, tempImage);
-        currentColor = tempImage.pixel(x_, y + 1);
-        if(currentColor == oldColor && currentColor != switchColor)
-            fillRecurs(x_, y + 1, switchColor, oldColor, tempImage);
+    foreach(const QPoint& p, neighbors(pt, pattern)) {
+        if (pattern->pixel(p) == oldColor) fill(p, newColor, oldColor, pattern);
     }
 }
