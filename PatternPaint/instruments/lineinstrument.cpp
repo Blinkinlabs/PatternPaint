@@ -52,14 +52,7 @@ void LineInstrument::mouseMoveEvent(QMouseEvent *event, PatternEditor& pe)
     {
         mEndPoint = event->pos();
         pe.setImage(mImageCopy);
-        if(event->buttons() & Qt::LeftButton)
-        {
-            paint(pe, false);
-        }
-        else if(event->buttons() & Qt::RightButton)
-        {
-            paint(pe, true);
-        }
+        if(event->buttons() & Qt::LeftButton)  paint(pe);
     }
 }
 
@@ -68,19 +61,12 @@ void LineInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe)
     if(pe.isPaint())
     {
         pe.setImage(mImageCopy);
-        if(event->button() == Qt::LeftButton)
-        {
-            paint(pe, false);
-        }
-        else if(event->button() == Qt::RightButton)
-        {
-            paint(pe, true);
-        }
+        if(event->button() == Qt::LeftButton)  paint(pe);
         pe.setPaint(false);
     }
 }
 
-void LineInstrument::paint(PatternEditor& pe, bool)
+void LineInstrument::paint(PatternEditor& pe)
 {
     QPainter painter(pe.getDevice());
     painter.setPen(QPen(pe.getPrimaryColor(), pe.getPenSize() ,

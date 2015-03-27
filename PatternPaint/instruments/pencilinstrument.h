@@ -47,7 +47,7 @@ public:
     void mouseReleaseEvent(QMouseEvent *event, PatternEditor&);
     QCursor cursor() const { return Qt::ArrowCursor; }
 protected:
-    void paint(PatternEditor&, bool additionalFlag = false);
+    void paint(PatternEditor&);
 };
 
 #endif // PENCILINSTRUMENT_H

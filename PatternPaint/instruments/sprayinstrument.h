@@ -44,7 +44,7 @@ public:
     void mouseMoveEvent(QMouseEvent *event, PatternEditor&);
     void mouseReleaseEvent(QMouseEvent *event, PatternEditor&);
 protected:
-    void paint(PatternEditor&, bool additionalFlag = false);
+    void paint(PatternEditor&);
     
 };
 

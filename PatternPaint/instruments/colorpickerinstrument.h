@@ -46,7 +46,7 @@ public:
     void mouseReleaseEvent(QMouseEvent *event, PatternEditor&);
     bool showPreview() const { return false; }
 protected:
-    void paint(PatternEditor&, bool additionalFlag = false);
+    void paint(PatternEditor&);
 signals:
     void pickedColor(QColor);
 };

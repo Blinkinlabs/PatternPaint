@@ -45,7 +45,7 @@ public:
     void mouseReleaseEvent(QMouseEvent *event, PatternEditor&);
     bool showPreview() const { return false; }
 protected:
-    void paint(PatternEditor&, bool additionalFlag = false);
+    void paint(PatternEditor&);
 
 private:
     void fillRecurs(int x, int y, QRgb switchColor, QRgb oldColor, QImage& tempImage);

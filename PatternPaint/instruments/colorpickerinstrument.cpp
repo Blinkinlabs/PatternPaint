@@ -50,22 +50,13 @@ void ColorpickerInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor&
     if(pe.isPaint())
     {
         mStartPoint = mEndPoint = event->pos();
-        if(event->button() == Qt::LeftButton)
-        {
-            paint(pe, false);
-            //pe.emitPrimaryColorView();
-        }
-        else if(event->button() == Qt::RightButton)
-        {
-            paint(pe, true);
-            //PatternEditor.emitSecondaryColorView();
-        }
+        if(event->button() == Qt::LeftButton)  paint(pe);
         pe.setPaint(false);
-        //pe.emitRestorePreviousInstrument();
+
     }
 }
 
-void ColorpickerInstrument::paint(PatternEditor& pe, bool)
+void ColorpickerInstrument::paint(PatternEditor& pe)
 {
     bool inArea(true);
     if(mStartPoint.x() < 0 || mStartPoint.y() < 0

@@ -50,14 +50,8 @@ void PencilInstrument::mouseMoveEvent(QMouseEvent *event, PatternEditor& pe)
     if(pe.isPaint())
     {
         mEndPoint = event->pos();
-        if(event->buttons() & Qt::LeftButton)
-        {
-            paint(pe, false);
-        }
-        else if(event->buttons() & Qt::RightButton)
-        {
-            paint(pe, true);
-        }
+        if(event->buttons() & Qt::LeftButton)  paint(pe);
+
         mStartPoint = event->pos();
     }
 }
@@ -67,20 +61,12 @@ void PencilInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe)
     if(pe.isPaint())
     {
         mEndPoint = event->pos();
-        if(event->button() == Qt::LeftButton)
-        {
-            paint(pe, false);
-        }
-        else if(event->button() == Qt::RightButton)
-        {
-            paint(pe, true);
-        }
-
-        pe.setPaint(false); // ?
+        if(event->button() == Qt::LeftButton) paint(pe);
+        pe.setPaint(false);
     }
 }
 
-void PencilInstrument::paint(PatternEditor& pe, bool)
+void PencilInstrument::paint(PatternEditor& pe)
 {
     QPainter painter(pe.getDevice());
     painter.setPen(QPen(pe.getPrimaryColor(),

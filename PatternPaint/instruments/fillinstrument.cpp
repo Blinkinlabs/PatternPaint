@@ -56,7 +56,7 @@ void FillInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe)
     }
 }
 
-void FillInstrument::paint(PatternEditor& pe, bool)
+void FillInstrument::paint(PatternEditor& pe)
 {
     int x = mStartPoint.x()/pe.scaleX();
     int y = mStartPoint.y()/pe.scaleY();

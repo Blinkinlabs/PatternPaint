@@ -47,7 +47,7 @@ public:
 
     QCursor cursor() const { return Qt::CrossCursor; }
 protected:
-    void paint(PatternEditor&, bool additionalFlag = false);
+    void paint(PatternEditor&);
     
 };
 
