@@ -5,12 +5,21 @@
 #include "systeminformation.h"
 #include "aboutpatternpaint.h"
 #include "resizepattern.h"
+#include "undocommand.h"
+#include "colorchooser.h"
+
+
+#include "pencilinstrument.h"
+#include "lineinstrument.h"
+#include "colorpickerinstrument.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDebug>
 #include <QDesktopServices>
 #include <QtWidgets>
+#include <QUndoGroup>
+#include <QToolButton>
 
 // TODO: Move this to pattern uploader or something?
 #include "ColorSwirl_Sketch.h"
@@ -22,25 +31,151 @@
 
 #define CONNECTION_SCANNER_INTERVAL 100
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-    ui->setupUi(this);
+    setupUi(this);
+
+
+    // prepare undo/redo
+    menuEdit->addSeparator();
+    m_undoStackGroup = new QUndoGroup(this);
+    m_undoAction = m_undoStackGroup->createUndoAction(this, tr("&Undo"));
+    m_undoAction->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Z")));
+    m_undoAction->setEnabled(false);
+    menuEdit->addAction(m_undoAction);
+
+    m_redoAction = m_undoStackGroup->createRedoAction(this, tr("&Redo"));
+    m_redoAction->setEnabled(false);
+    m_redoAction->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Y")));
+    menuEdit->addAction(m_redoAction);
+
+    m_undoStackGroup->addStack(patternEditor->getUndoStack());
+    m_undoStackGroup->setActiveStack(patternEditor->getUndoStack());
+
+    // instruments creation
+    mCursorAction = new QAction(tr("Selection"), this);
+    mCursorAction->setCheckable(true);
+    mCursorAction->setIcon(QIcon(":/instruments/images/instruments-icons/cursor.png"));
+    connect(mCursorAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
+    instruments->addAction(mCursorAction);
+    mCursorAction->setChecked(true);
+
+    mEraserAction = new QAction(tr("Eraser"), this);
+    mEraserAction->setCheckable(true);
+    mEraserAction->setIcon(QIcon(":/instruments/images/instruments-icons/lastic.png"));
+    connect(mEraserAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
+    instruments->addAction(mEraserAction);
+
+    ColorpickerInstrument* cpi = new ColorpickerInstrument(this);
+    connect(cpi, SIGNAL(pickedColor(QColor)), SLOT(on_colorPicked(QColor)));
+
+    mColorPickerAction = new QAction(tr("Color picker"), this);
+    mColorPickerAction->setCheckable(true);
+    mColorPickerAction->setIcon(QIcon(":/instruments/images/instruments-icons/pipette.png"));
+    mColorPickerAction->setData(QVariant::fromValue(cpi));
+    connect(mColorPickerAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
+    instruments->addAction(mColorPickerAction);
+
+    mMagnifierAction = new QAction(tr("Magnifier"), this);
+    mMagnifierAction->setCheckable(true);
+    mMagnifierAction->setIcon(QIcon(":/instruments/images/instruments-icons/loupe.png"));
+    connect(mMagnifierAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
+    instruments->addAction(mMagnifierAction);
+
+    mPenAction = new QAction(tr("Pen"), this);
+    mPenAction->setCheckable(true);
+    mPenAction->setIcon(QIcon(":/instruments/images/instruments-icons/pencil.png"));
+    mPenAction->setData(QVariant::fromValue(new PencilInstrument(this)));
+    connect(mPenAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
+    instruments->addAction(mPenAction);
+
+    mLineAction = new QAction(tr("Line"), this);
+    mLineAction->setCheckable(true);
+    mLineAction->setIcon(QIcon(":/instruments/images/instruments-icons/line.png"));
+    mLineAction->setData(QVariant::fromValue(new LineInstrument(this)));
+    connect(mLineAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
+    instruments->addAction(mLineAction);
+
+    mSprayAction = new QAction(tr("Spray"), this);
+    mSprayAction->setCheckable(true);
+    mSprayAction->setIcon(QIcon(":/instruments/images/instruments-icons/spray.png"));
+    connect(mSprayAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
+    instruments->addAction(mSprayAction);
+
+    mFillAction = new QAction(tr("Fill"), this);
+    mFillAction->setCheckable(true);
+    mFillAction->setIcon(QIcon(":/instruments/images/instruments-icons/fill.png"));
+    connect(mFillAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
+    instruments->addAction(mFillAction);
+
+    mRectangleAction = new QAction(tr("Rectangle"), this);
+    mRectangleAction->setCheckable(true);
+    mRectangleAction->setIcon(QIcon(":/instruments/images/instruments-icons/rectangle.png"));
+    connect(mRectangleAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
+    instruments->addAction(mRectangleAction);
+
+    mEllipseAction = new QAction(tr("Ellipse"), this);
+    mEllipseAction->setCheckable(true);
+    mEllipseAction->setIcon(QIcon(":/instruments/images/instruments-icons/ellipse.png"));
+    connect(mEllipseAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
+    instruments->addAction(mEllipseAction);
+
+    mCurveLineAction = new QAction(tr("Curve"), this);
+    mCurveLineAction->setCheckable(true);
+    mCurveLineAction->setIcon(QIcon(":/instruments/images/instruments-icons/curve.png"));
+    connect(mCurveLineAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
+    instruments->addAction(mCurveLineAction);
+
+    mTextAction = new QAction(tr("Text"), this);
+    mTextAction->setCheckable(true);
+    mTextAction->setIcon(QIcon(":/instruments/images/instruments-icons/text.png"));
+    connect(mTextAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
+    instruments->addAction(mTextAction);
+    menuInstruments->addAction(mCursorAction);
+    menuInstruments->addAction(mEraserAction);
+    menuInstruments->addAction(mColorPickerAction);
+    menuInstruments->addAction(mMagnifierAction);
+    menuInstruments->addAction(mPenAction);
+    menuInstruments->addAction(mLineAction);
+    menuInstruments->addAction(mSprayAction);
+    menuInstruments->addAction(mFillAction);
+    menuInstruments->addAction(mRectangleAction);
+    menuInstruments->addAction(mEllipseAction);
+    menuInstruments->addAction(mCurveLineAction);
+    menuInstruments->addAction(mTextAction);
+
+
+    mPColorChooser = new ColorChooser(255, 255, 255, this);
+    mPColorChooser->setStatusTip(tr("Primary color"));
+    mPColorChooser->setToolTip(tr("Primary color"));
+    instruments->addSeparator();
+    instruments->addWidget(mPColorChooser);
+
+    QSpinBox *penSizeSpin = new QSpinBox();
+    penSizeSpin->setRange(1, 20);
+    penSizeSpin->setValue(1);
+    penSizeSpin->setStatusTip(tr("Pen size"));
+    penSizeSpin->setToolTip(tr("Pen size"));
+    instruments->addWidget(penSizeSpin);
+
+
+    QSpinBox* pSpeed = new QSpinBox();
+    pSpeed->setRange(1, 100);
+    pSpeed->setValue(30);
+    pSpeed->setToolTip(tr("Pattern speed"));
+    connect(pSpeed, SIGNAL(valueChanged(int)), SLOT(on_patternSpeed_valueChanged(int)));
+    tools->addWidget(pSpeed);
 
     drawTimer = new QTimer(this);
     connectionScannerTimer = new QTimer(this);
 
     mode = Disconnected;
 
-    ui->patternEditor->init(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
-    ui->colorPicker->init();
+    patternEditor->init(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
 
     // Our pattern editor wants to get some notifications
-    connect(ui->colorPicker, SIGNAL(colorChanged(QColor)),
-            ui->patternEditor, SLOT(setToolColor(QColor)));
-    connect(ui->penSize, SIGNAL(valueChanged(int)),
-            ui->patternEditor, SLOT(setToolSize(int)));
+    connect(mPColorChooser, SIGNAL(sendColor(QColor)),
+            patternEditor, SLOT(setToolColor(QColor)));
 
     tape = new BlinkyTape(this);
     // Modify our UI when the tape connection status changes
@@ -59,9 +194,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(uploader, SIGNAL(finished(bool)),
             this, SLOT(on_uploaderFinished(bool)));
 
-    // Set some default values for the painting interface
-    ui->penSize->setSliderPosition(2);
-    ui->patternSpeed->setSliderPosition(30);
+    connect(penSizeSpin, SIGNAL(valueChanged(int)), patternEditor, SLOT(setToolSize(int)));
 
     // Pre-set the upload progress dialog
     progressDialog = new QProgressDialog(this);
@@ -79,7 +212,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // The draw timer tells the pattern to advance
     connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
     drawTimer->setInterval(33);
-    drawTimer->start();
+    //drawTimer->start(); // why start now?
 
 
     // Start a scanner to connect to a BlinkyTape automatically
@@ -87,12 +220,22 @@ MainWindow::MainWindow(QWidget *parent) :
     connectionScannerTimer->setInterval(CONNECTION_SCANNER_INTERVAL);
     connectionScannerTimer->start();
 
+    // initialization started parameters here
+    penSizeSpin->setValue(1);
+    patternEditor->setToolSize(1);
+
     readSettings();
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
+MainWindow::~MainWindow(){}
+
+QToolButton* MainWindow::createToolButton(QAction *act) {
+    QToolButton *toolButton = new QToolButton();
+    toolButton->setMinimumSize(QSize(30, 30));
+    toolButton->setMaximumSize(QSize(30, 30));
+    toolButton->setDefaultAction(act);
+    toolButton->setStatusTip(act->text());
+    return toolButton;
 }
 
 void MainWindow::drawTimer_timeout() {
@@ -112,7 +255,7 @@ void MainWindow::drawTimer_timeout() {
 
 
     // TODO: Get the width from elsewhere, so we don't need to load the image every frame
-    QImage image = ui->patternEditor->getPatternAsImage();
+    QImage image = patternEditor->getPatternAsImage();
 
     if(tape->isConnected()) {
         QByteArray ledData;
@@ -126,7 +269,7 @@ void MainWindow::drawTimer_timeout() {
         tape->sendUpdate(ledData);
 
         n = (n+1)%image.width();
-        ui->patternEditor->setPlaybackRow(n);
+        patternEditor->setPlaybackRow(n);
     }
 }
 
@@ -141,27 +284,8 @@ void MainWindow::connectionScannerTimer_timeout() {
     QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
 
     if(tapes.length() > 0) {
-        on_tapeConnectDisconnect_clicked();
+        on_actionConnect_triggered();
         return;
-    }
-}
-
-
-void MainWindow::on_tapeConnectDisconnect_clicked()
-{
-    if(tape->isConnected()) {
-        qDebug() << "Disconnecting from tape";
-        tape->close();
-    }
-    else {
-        QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
-        qDebug() << "Tapes found:" << tapes.length();
-
-        if(tapes.length() > 0) {
-            // TODO: Try another one if this one fails?
-            qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
-            tape->open(tapes[0]);
-        }
     }
 }
 
@@ -170,15 +294,16 @@ void MainWindow::on_patternSpeed_valueChanged(int value)
     drawTimer->setInterval(1000/value);
 }
 
-void MainWindow::on_patternPlayPause_clicked()
+void MainWindow::on_actionPlay_triggered()
 {
-    if(drawTimer->isActive()) {
+    if (drawTimer->isActive()) {
         drawTimer->stop();
-        ui->patternPlayPause->setText("Play");
-    }
-    else {
+        actionPlay->setText(tr("Play"));
+        actionPlay->setIcon(QIcon(":/resources/images/play.png"));
+    } else {
         drawTimer->start();
-        ui->patternPlayPause->setText("Pause");
+        actionPlay->setText(tr("Pause"));
+        actionPlay->setIcon(QIcon(":/resources/images/pause.png"));
     }
 }
 
@@ -211,7 +336,7 @@ void MainWindow::on_actionLoad_File_triggered()
         return;
     }
 
-    ui->patternEditor->init(pattern);
+    patternEditor->init(pattern);
 }
 
 void MainWindow::on_actionSave_File_triggered()
@@ -237,7 +362,7 @@ void MainWindow::on_actionSave_File_triggered()
     settings.setValue("File/SaveDirectory", lastFile.absoluteFilePath());
 
     // TODO: Alert the user if this failed.
-    if(!ui->patternEditor->getPatternAsImage().save(fileName)) {
+    if(!patternEditor->getPatternAsImage().save(fileName)) {
         QMessageBox::warning(this, tr("Error"), tr("Error, cannot write file %1.")
                        .arg(fileName));
     }
@@ -246,11 +371,6 @@ void MainWindow::on_actionSave_File_triggered()
 void MainWindow::on_actionExit_triggered()
 {
     this->close();
-}
-
-void MainWindow::on_saveToTape_clicked()
-{
-    on_actionSave_to_Tape_triggered();
 }
 
 void MainWindow::on_actionExport_pattern_for_Arduino_triggered()
@@ -263,11 +383,10 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered()
     }
 
     // Convert the current pattern into a Pattern
-    QImage image =  ui->patternEditor->getPatternAsImage();
+    QImage image =  patternEditor->getPatternAsImage();
 
     // Note: Converting frameRate to frame delay here.
-    Pattern pattern(image,
-                        1000/ui->patternSpeed->value(),
+    Pattern pattern(image, drawTimer->interval(),
                         Pattern::INDEXED_RLE);
 
 
@@ -288,17 +407,18 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered()
 void MainWindow::on_tapeConnectionStatusChanged(bool connected)
 {
     qDebug() << "status changed, connected=" << connected;
+    actionSave_to_Tape->setEnabled(connected);
     if(connected) {
         mode = Connected;
-
-        ui->tapeConnectDisconnect->setText("Disconnect");
-        ui->saveToTape->setEnabled(true);
+        actionSave_to_Tape->setEnabled(true);
+        actionConnect->setText(tr("Disconnect"));
+        actionConnect->setIcon(QIcon(":/images/resources/disconnect.png"));
     }
     else {
         mode = Disconnected;
-
-        ui->tapeConnectDisconnect->setText("Connect");
-        ui->saveToTape->setEnabled(false);
+        actionSave_to_Tape->setEnabled(false);
+        actionConnect->setText(tr("Connect"));
+        actionConnect->setIcon(QIcon(":/images/resources/connect.png"));
 
         // TODO: Don't do this if we disconnected intentionally.
         connectionScannerTimer->start();
@@ -352,17 +472,6 @@ void MainWindow::on_uploaderFinished(bool result)
     progressDialog->hide();
 }
 
-
-void MainWindow::on_saveFile_clicked()
-{
-    on_actionSave_File_triggered();
-}
-
-void MainWindow::on_loadFile_clicked()
-{
-    on_actionLoad_File_triggered();
-}
-
 void MainWindow::on_actionVisit_the_BlinkyTape_forum_triggered()
 {
     QDesktopServices::openUrl(QUrl("http://forums.blinkinlabs.com/", QUrl::TolerantMode));
@@ -377,25 +486,25 @@ void MainWindow::on_actionFlip_Horizontal_triggered()
 {
     // TODO: This in a less hacky way?
     // TODO: Undo/redo
-    QImage image =  ui->patternEditor->getPatternAsImage();
-    ui->patternEditor->init(image.mirrored(true, false));
+    QImage image =  patternEditor->getPatternAsImage();
+    patternEditor->init(image.mirrored(true, false));
 }
 
 void MainWindow::on_actionFlip_Vertical_triggered()
 {
     // TODO: This in a less hacky way?
     // TODO: Undo/redo
-    QImage image =  ui->patternEditor->getPatternAsImage();
-    ui->patternEditor->init(image.mirrored(false, true));
+    QImage image =  patternEditor->getPatternAsImage();
+    patternEditor->init(image.mirrored(false, true));
 }
 
 void MainWindow::on_actionClear_Pattern_triggered()
 {
     // TODO: This in a less hacky way?
     // TODO: Undo/redo
-    QImage image =  ui->patternEditor->getPatternAsImage();
+    QImage image =  patternEditor->getPatternAsImage();
     image.fill(0);
-    ui->patternEditor->init(image);
+    patternEditor->init(image);
 }
 
 void MainWindow::on_actionLoad_rainbow_sketch_triggered()
@@ -424,11 +533,11 @@ void MainWindow::on_actionSave_to_Tape_triggered()
     }
 
     // Convert the current pattern into a Pattern
-    QImage image =  ui->patternEditor->getPatternAsImage();
+    QImage image =  patternEditor->getPatternAsImage();
 
     // Note: Converting frameRate to frame delay here.
     Pattern pattern(image,
-                        1000/ui->patternSpeed->value(),
+                        drawTimer->interval(),
                         Pattern::RGB24);
 
     // TODO: Attempt different compressions till one works.
@@ -452,8 +561,8 @@ void MainWindow::on_actionSave_to_Tape_triggered()
 
 void MainWindow::on_actionResize_Pattern_triggered()
 {
-    int patternLength = ui->patternEditor->getPatternAsImage().width();
-    int ledCount = ui->patternEditor->getPatternAsImage().height();
+    int patternLength = patternEditor->getPatternAsImage().width();
+    int ledCount = patternEditor->getPatternAsImage().height();
 
     // TODO: Dispose of this?
     ResizePattern* resizer = new ResizePattern(this);
@@ -468,6 +577,7 @@ void MainWindow::on_actionResize_Pattern_triggered()
 
     // TODO: Data validation
     if(resizer->length() > 0) {
+
         qDebug() << "Resizing pattern, length:"
                  << resizer->length()
                  << "height:"
@@ -481,17 +591,18 @@ void MainWindow::on_actionResize_Pattern_triggered()
 
         // Copy over whatever portion of the original pattern will fit
         QPainter painter(&newImage);
-        QImage originalImage = ui->patternEditor->getPatternAsImage();
+        QImage originalImage = patternEditor->getPatternAsImage();
+        patternEditor->pushUndoCommand(new UndoCommand(originalImage, *(patternEditor)));
         painter.drawImage(0,0,originalImage);
 
-        ui->patternEditor->init(newImage, false);
+        patternEditor->init(newImage, false);
     }
 }
 
 void MainWindow::on_actionAddress_programmer_triggered()
 {
-//    int patternLength = ui->patternEditor->getPatternAsImage().width();
-//    int ledCount = ui->patternEditor->getPatternAsImage().height();
+//    int patternLength = patternEditor->getPatternAsImage().width();
+//    int ledCount = patternEditor->getPatternAsImage().height();
 
     // TODO: Dispose of this?
     AddressProgrammer* programmer = new AddressProgrammer(this);
@@ -521,10 +632,62 @@ void MainWindow::readSettings()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-//    if (userReallyWantsToQuit()) {
+    //TODO - uncomment for future usage
+    /*
+    if (patternEditor->getUndoStack()->canUndo()) {
+        int ans = QMessageBox::warning(this, tr("Exit program"),
+                                               tr("File has been modified.\nDo you want to save changes?"),
+                                               QMessageBox::Yes | QMessageBox::Default,
+                                               QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape);
+        switch(ans)
+        {
+        case QMessageBox::Yes:
+            on_actionSave_File_triggered();
+            event->ignore();
+            return;
+        case QMessageBox::Cancel:
+            event->ignore();
+            return;
+        default:
+            break;
+        }
+    }
+*/
     writeSettings();
     event->accept();
-//    } else {
-//        event->ignore();
-//    }
+}
+
+void MainWindow::on_actionConnect_triggered()
+{
+    if(tape->isConnected()) {
+        qDebug() << "Disconnecting from tape";
+        tape->close();
+    }
+    else {
+        QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
+        qDebug() << "Tapes found:" << tapes.length();
+
+        if(tapes.length() > 0) {
+            // TODO: Try another one if this one fails?
+            qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
+            tape->open(tapes[0]);
+        }
+    }
+}
+
+void MainWindow::on_instrumentAction(bool) {
+    QAction* act = dynamic_cast<QAction*>(sender());
+    Q_ASSERT(act != NULL);
+    foreach(QAction* a, instruments->actions()) {
+        a->setChecked(false);
+    }
+
+    act->setChecked(true);
+    patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(act->data()));
+}
+
+void MainWindow::on_colorPicked(QColor color) {
+    qDebug() << "pipette color " << color;
+    mPColorChooser->setColor(color);
+    patternEditor->setToolColor(color);
 }

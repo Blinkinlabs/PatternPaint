@@ -14,6 +14,11 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     include($$QTSERIALPORT_PROJECT_ROOT/src/serialport/qt4support/serialport.prf)
 }
 
+OBJECTS_DIR = tmp
+MOC_DIR = $$OBJECTS_DIR/moc
+RCC_DIR = $$OBJECTS_DIR/rcc
+UI_DIR = $$OBJECTS_DIR/uic
+
 TARGET = PatternPaint
 TEMPLATE = app
 
@@ -50,7 +55,9 @@ SOURCES += main.cpp\
     lightbuddypatternuploader.cpp \
     serialcommandqueue.cpp \
     lightbuddyprotocol.cpp \
-    letterboxscrollarea.cpp
+    letterboxscrollarea.cpp \
+    undocommand.cpp \
+    colorchooser.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
@@ -71,13 +78,17 @@ HEADERS  += mainwindow.h \
     lightbuddypatternuploader.h \
     serialcommandqueue.h \
     lightbuddyprotocol.h \
-    letterboxscrollarea.h
+    letterboxscrollarea.h \
+    undocommand.h \
+    colorchooser.h
 
 FORMS    += mainwindow.ui \
     systeminformation.ui \
     aboutpatternpaint.ui \
     resizepattern.ui \
     addressprogrammer.ui
+
+include(instruments/instruments.pri)
 
 # OS X: Specify icon resource to use
 ICON = images/blinkytape.icns

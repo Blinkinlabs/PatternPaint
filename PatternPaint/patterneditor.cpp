@@ -1,9 +1,12 @@
 #include "patterneditor.h"
+#include "undocommand.h"
+#include "abstractinstrument.h"
 
 #include <iostream>
 #include <cmath>
 #include <QtWidgets>
 #include <QDebug>
+#include <QUndoStack>
 
 #define COLOR_CLEAR             QColor(0,0,0,0)
 #define COLOR_CANVAS_DEFAULT    QColor(0,0,0,0)
@@ -21,6 +24,10 @@
 PatternEditor::PatternEditor(QWidget *parent) :
     QWidget(parent)
 {
+    m_undoStack = new QUndoStack(this);
+    m_undoStack->setUndoLimit(10);  // TODO - use preferences here
+    m_isPaint = false;
+    m_pi = NULL;
 }
 
 void PatternEditor::resizeEvent(QResizeEvent * event)
@@ -30,7 +37,7 @@ void PatternEditor::resizeEvent(QResizeEvent * event)
     updateGridSize();
 }
 
-void PatternEditor::init(int frameCount, int stripLength)
+void PatternEditor::init(int frameCount, int stripLength, bool initTools)
 {
     // Store the width and height, so that letterboxscrollarea can resize this widget properly
     this->setBaseSize(frameCount, stripLength);
@@ -46,9 +53,12 @@ void PatternEditor::init(int frameCount, int stripLength)
                          QImage::Format_ARGB32_Premultiplied);
     toolPreview.fill(COLOR_CLEAR);
 
-    // TODO: Don't reset these here, they need to come from main...
-    toolColor = COLOR_TOOL_DEFAULT;
-    toolSize = 2;
+    if (initTools)
+    {
+        // TODO: Don't reset these here, they need to come from main...
+        toolColor = COLOR_TOOL_DEFAULT;
+        toolSize = 2;
+    }
 
     // Turn on mouse tracking so we can draw a preview
     setMouseTracking(true);
@@ -78,6 +88,21 @@ bool PatternEditor::init(QImage newPattern, bool scaled) {
     update();
 
     return true;
+}
+
+void PatternEditor::resetImage(const QImage& img)
+{
+    // TODO: Implement 'save' check before overwriting?
+
+    // Re-init the display using the new geometry
+    init(img.width(), img.height(), false);
+
+    // Draw the new pattern to the display
+    QPainter painter(&pattern);
+    painter.drawImage(0,0,img);
+
+    // and force a screen update
+    update();
 }
 
 void PatternEditor::updateGridSize() {
@@ -162,12 +187,17 @@ void PatternEditor::updateToolPreview(int x, int y) {
 }
 
 void PatternEditor::mousePressEvent(QMouseEvent *event){
+
+    /*
+    pushUndoCommand(new UndoCommand(getPatternAsImage(), *this));
     int x = event->x()/xScale;
     int y = event->y()/yScale;
 
     applyTool(x,y);
 
     lazyUpdate();
+    */
+    if (m_pi) m_pi->mousePressEvent(event, *this);
 }
 
 void PatternEditor::leaveEvent(QEvent * event) {
@@ -179,6 +209,7 @@ void PatternEditor::leaveEvent(QEvent * event) {
 }
 
 void PatternEditor::mouseMoveEvent(QMouseEvent *event){
+
     // Ignore the update request if it came too quickly
     static qint64 lastTime = 0;
     qint64 newTime = QDateTime::currentMSecsSinceEpoch();
@@ -206,12 +237,18 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
     // Update the preview layer
     updateToolPreview(x,y);
 
-    // If the left button is pressed, also apply the tool
-    if( event->buttons() &  Qt::LeftButton ) {
-        applyTool(x,y);
+    if (m_pi) {
+        setCursor(m_pi->cursor());
+        m_pi->mouseMoveEvent(event, *this);
+    } else {
+        setCursor(Qt::ArrowCursor);
     }
 
     lazyUpdate();
+}
+
+void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
+    if (m_pi) m_pi->mouseReleaseEvent(event, *this);
 }
 
 void PatternEditor::setToolColor(QColor color) {
@@ -227,6 +264,10 @@ void PatternEditor::setPlaybackRow(int row) {
     lazyUpdate();
 }
 
+void PatternEditor::setInstrument(AbstractInstrument* pi) {
+    m_pi = pi;
+}
+
 void PatternEditor::lazyUpdate() {
     // Ignore the update request if it came too quickly
     static qint64 lastTime = 0;
@@ -240,15 +281,16 @@ void PatternEditor::lazyUpdate() {
     update();
 }
 
-void PatternEditor::paintEvent(QPaintEvent * /* event */)
+void PatternEditor::paintEvent(QPaintEvent* event)
 {
+
     QPainter painter(this);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter.setRenderHint(QPainter::Antialiasing, false);
 
     // Draw the image and tool preview
     painter.drawImage(QRect(0,0,pattern.width()*xScale+.5,pattern.height()*yScale), pattern);
-    painter.drawImage(QRect(0,0,pattern.width()*xScale+.5,pattern.height()*yScale), toolPreview);
+    if (m_pi && m_pi->showPreview()) painter.drawImage(QRect(0,0,pattern.width()*xScale+.5,pattern.height()*yScale), toolPreview);
     painter.drawImage(0,0,gridPattern);
 
     // Draw the playback indicator
@@ -264,4 +306,10 @@ void PatternEditor::paintEvent(QPaintEvent * /* event */)
                      int((playbackRow+1)*xScale +.5) - int(playbackRow*xScale +.5),
                      pattern.height()*yScale,
                      COLOR_PLAYBACK_TOP);
+
+}
+
+void PatternEditor::pushUndoCommand(UndoCommand *command)
+{
+    if (command) m_undoStack->push(command);
 }

@@ -3,5 +3,32 @@
         <file>images/BlinkyTape.jpg</file>
         <file>images/blinkytapepattern.jpg</file>
         <file>images/PatternPaintAbout.png</file>
+        <file>images/save_to_tape.png</file>
+        <file>images/connect.png</file>
+        <file>images/open.png</file>
+        <file>images/pause.png</file>
+        <file>images/play.png</file>
+        <file>images/save.png</file>
+        <file>images/disconnect.png</file>
+        <file>images/redo.png</file>
+        <file>images/undo.png</file>
+    </qresource>
+    <qresource prefix="/instruments">
+        <file>images/instruments-icons/cursor.png</file>
+        <file>images/instruments-icons/cursor_fill.png</file>
+        <file>images/instruments-icons/cursor_loupe.png</file>
+        <file>images/instruments-icons/cursor_pipette.png</file>
+        <file>images/instruments-icons/cursor_spray.png</file>
+        <file>images/instruments-icons/curve.png</file>
+        <file>images/instruments-icons/ellipse.png</file>
+        <file>images/instruments-icons/fill.png</file>
+        <file>images/instruments-icons/lastic.png</file>
+        <file>images/instruments-icons/line.png</file>
+        <file>images/instruments-icons/loupe.png</file>
+        <file>images/instruments-icons/pencil.png</file>
+        <file>images/instruments-icons/pipette.png</file>
+        <file>images/instruments-icons/rectangle.png</file>
+        <file>images/instruments-icons/spray.png</file>
+        <file>images/instruments-icons/text.png</file>
     </qresource>
 </RCC>

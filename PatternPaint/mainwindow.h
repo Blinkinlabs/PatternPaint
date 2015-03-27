@@ -11,11 +11,14 @@
 #include "patterneditor.h"
 #include "addressprogrammer.h"
 
-namespace Ui {
-class MainWindow;
-}
+#include "ui_mainwindow.h"
 
-class MainWindow : public QMainWindow
+class QUndoGroup;
+class ColorChooser;
+class QToolButton;
+class QSpinBox;
+
+class MainWindow : public QMainWindow, private Ui::MainWindow
 {
     Q_OBJECT
 
@@ -27,8 +30,6 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 private slots:
-    void on_tapeConnectDisconnect_clicked();
-
     void drawTimer_timeout();
 
     void connectionScannerTimer_timeout();
@@ -45,7 +46,7 @@ private slots:
 
     void on_patternSpeed_valueChanged(int value);
 
-    void on_patternPlayPause_clicked();
+    void on_actionPlay_triggered();
 
     void on_tapeConnectionStatusChanged(bool connected);
 
@@ -54,12 +55,6 @@ private slots:
     void on_uploaderProgressChanged(int progressDialog);
 
     void on_uploaderFinished(bool result);
-
-    void on_saveToTape_clicked();
-
-    void on_saveFile_clicked();
-
-    void on_loadFile_clicked();
 
     void on_actionExport_pattern_for_Arduino_triggered();
 
@@ -81,8 +76,27 @@ private slots:
 
     void on_actionAddress_programmer_triggered();
 
+    void on_actionConnect_triggered();
+
+    void on_instrumentAction(bool);
+
+    void on_colorPicked(QColor);
+
 private:
-    Ui::MainWindow *ui;
+    QAction* mCursorAction;
+    QAction* mEraserAction;
+    QAction *mColorPickerAction;
+    QAction *mMagnifierAction;
+    QAction *mPenAction;
+    QAction *mLineAction;
+    QAction *mSprayAction;
+    QAction *mFillAction;
+    QAction *mRectangleAction;
+    QAction *mEllipseAction;
+    QAction *mCurveLineAction;
+    QAction *mTextAction;
+
+    ColorChooser *mPColorChooser, *mSColorChooser;
 
     QTimer* drawTimer;
 
@@ -97,6 +111,11 @@ private:
     enum Modes { Disconnected, Connected, Uploading };
     Modes mode;
 
+    QUndoGroup *m_undoStackGroup;
+    QAction* m_undoAction;
+    QAction* m_redoAction;
+
+    QToolButton* createToolButton(QAction *act);
     void writeSettings();
     void readSettings();
 };
