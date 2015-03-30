@@ -91,41 +91,32 @@ void setup()
 
 
 void serialLoop() {
-  static int pixelIndex;
   
-  unsigned long lastReceiveTime = millis();
-
+  static int pixelIndex;
+  uint8_t idx = 0;
+  uint8_t buffer[3];
+  uint8_t c;
+  
   while(true) {
-
-    if(Serial.available() > 2) {
-      lastReceiveTime = millis();
-
-      uint8_t buffer[3]; // Buffer to store three incoming bytes used to compile a single LED color
-
-      for (uint8_t x=0; x<3; x++) { // Read three incoming bytes
-        uint8_t c = Serial.read();
-        
-        if (c < 255) {
-          buffer[x] = c; // Using 255 as a latch semaphore
-        }
-        else {
-          LEDS.show();
-          pixelIndex = 0;
-          break;
-        }
-
-        if (x == 2) {   // If we received three serial bytes
-          if(pixelIndex == ledCount) break; // Prevent overflow by ignoring the pixel data beyond LED_COUNT
+    if (Serial.available() > 0) {
+      c = Serial.read();
+      if (c == 255) {
+	LEDS.show();
+	pixelIndex = 0;
+	idx = 0;   
+	// BUTTON_IN (D10):   07 - 0111
+	// EXTRA_PIN_A(D7):          11 - 1011
+	// EXTRA_PIN_B (D11):        13 - 1101
+	// ANALOG_INPUT (A9): 14 - 1110
+      } else {        
+        buffer[idx++] = c;
+        if (idx == 3) {
+          if(pixelIndex == MAX_LEDS) break; // Prevent overflow by ignoring the pixel data beyond LED_COUNT
           leds[pixelIndex] = CRGB(buffer[0], buffer[1], buffer[2]);
           pixelIndex++;
+          idx = 0;
         }
       }
-    }
-    
-    // If we haven't received data in 4 seconds, return to playing back our pattern
-    if(millis() > lastReceiveTime + 4000) {
-      // TODO: Somehow the serial port gets trashed here, how to reset it?
-      return;
     }
   }
 }

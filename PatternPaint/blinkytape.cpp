@@ -199,7 +199,7 @@ void BlinkyTape::close() {
 
 void BlinkyTape::handleSerialReadData()
 {
-    qDebug() << "Got data from BlinkyTape, discarding.";
+//    qDebug() << "Got data from BlinkyTape, discarding.";
     // Discard any data we get back from the BlinkyTape
     serial->readAll();
 }
@@ -214,7 +214,6 @@ void BlinkyTape::handleBaudRateChanged(qint32 baudRate, QSerialPort::Directions)
 
         resetTimer->stop();
         close();
-
     }
     else if(baudRate == QSerialPort::Baud1200) {
         qDebug() << "Baud rate updated to 1200bps spuriously";
