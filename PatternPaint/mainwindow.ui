@@ -52,38 +52,6 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QWidget" name="patternToolbox" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="autoFillBackground">
-       <bool>false</bool>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QWidget#patternToolbox {
-  background:qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0.9801 rgba(100,100,100, 255), stop:1 rgba(0, 0, 0, 255))
-}</string>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>5</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-      </layout>
-     </widget>
-    </item>
-    <item>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
        <widget class="LetterboxScrollArea" name="scrollArea">
