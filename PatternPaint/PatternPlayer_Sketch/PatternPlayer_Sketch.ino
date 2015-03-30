@@ -53,8 +53,8 @@ void loadPattern(uint8_t patternIndex) {
 
   uint8_t encodingType = pgm_read_byte(patternEntryAddress + ENCODING_TYPE_OFFSET);
   
-  prog_uint8_t* frameData  =
-  (prog_uint8_t*)((pgm_read_byte(patternEntryAddress + FRAME_DATA_OFFSET    ) << 8)
+  uint8_t PROGMEM *frameData  =
+  (uint8_t PROGMEM *)((pgm_read_byte(patternEntryAddress + FRAME_DATA_OFFSET    ) << 8)
                 + (pgm_read_byte(patternEntryAddress + FRAME_DATA_OFFSET + 1)));
 
   uint16_t frameCount = (pgm_read_byte(patternEntryAddress + FRAME_COUNT_OFFSET    ) << 8)

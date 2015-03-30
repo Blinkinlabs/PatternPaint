@@ -19,7 +19,7 @@ bool avrUploadData::init(std::vector<Pattern> patterns) {
     patternData = QByteArray();     // Pattern Data
     patternTable = QByteArray();    // Pattern data header
 
-    sketch.append(reinterpret_cast<const char*>(PatternPlayerSketch), sizeof(PatternPlayerSketch));
+    sketch.append(reinterpret_cast<const char*>(PATTERN_PLAYER_DATA), sizeof(PATTERN_PLAYER_DATA));
 
     // Expand sketch size to FLASH_MEMORY_PAGE_SIZE boundary
     while(sketch.length() % FLASH_MEMORY_PAGE_SIZE != 0) {

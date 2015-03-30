@@ -20,7 +20,7 @@ def ParseLine(line):
   return type, address, byteCount, data, checksum
 
 
-def HexToHeader(fileName):
+def HexToHeader(fileName, animationName):
   """ Super simple hex-to-c++-header converter. Has a single block of contiguous memory """
 
   headerData = ''
@@ -41,31 +41,31 @@ def HexToHeader(fileName):
         print "type not understood: ", type
         exit(1)
 
-  print """#ifndef PATTERNPLAYER_SKETCH_H
-#define PATTERNPLAYER_SKETCH_H
-
-// Automatically generated file...
-
-"""
-  print "#define PATTERNPLAYER_ADDRESS  0x%04X"%(0)  #TODO: fill in first address!
-  print "#define PATTERNPLAYER_LENGTH   %i"%(len(headerData)/2)
+  print "#ifndef %s_SKETCH_H"%(animationName)
+  print "#define %s_SKETCH_H"%(animationName)
+  print ""
+  print "//Automatically generated file..."
+  print ""
+  print "#include <stdint.h>"
+  print ""
+  print "#define %s_ADDRESS  0x%04X"%(animationName, 0)
+  print "#define %s_LENGTH   %i"%(animationName, len(headerData)/2)
   print ""
 
-  print "char PatternPlayerSketch[] = {"
+  print "const uint8_t %s_DATA[] = {"%(animationName)
 
   for i in range(0, len(headerData)/2):
     print "0x%02X,"%(int(headerData[i*2:i*2+2],16)),
     if(i%(16) == 15):
       print ''
 
-  print """
-};
-
-#endif // PATTERNPLAYER_SKETCH_H
-"""
+  print "};"
+  print ""
+  print "#endif // %s_SKETCH_H"%(animationName)
 
 parser = argparse.ArgumentParser('Convert an intel hex file into a c++ header')
 parser.add_argument('i', help = 'location of the hex file to read')
+parser.add_argument('n', help = 'sketch name')
 args = parser.parse_args()
 
-HexToHeader(args.i)
+HexToHeader(args.i, args.n)

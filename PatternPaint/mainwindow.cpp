@@ -513,7 +513,7 @@ void MainWindow::on_actionLoad_rainbow_sketch_triggered()
         return;
     }
 
-    QByteArray sketch = QByteArray(reinterpret_cast<const char*>(ColorSwirlSketch),COLORSWIRL_LENGTH);
+    QByteArray sketch = QByteArray(reinterpret_cast<const char*>(COLORSWIRL_DATA),COLORSWIRL_LENGTH);
 
     if(!uploader->startUpload(*tape, sketch)) {
         errorMessageDialog->setText(uploader->getErrorString());
