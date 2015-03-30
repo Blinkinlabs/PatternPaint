@@ -12,10 +12,10 @@
 !define APP_NAME "Pattern Paint"
 !define COMP_NAME "Blinkinlabs"
 !define WEB_SITE "http://blinkinlabs.com"
-!define VERSION "00.1.1.00"
-!define COPYRIGHT "Blinkinlabs © 2013"
+!define VERSION "01.4.0.00"
+!define COPYRIGHT "Blinkinlabs © 2015"
 !define DESCRIPTION "Application"
-!define INSTALLER_NAME "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaint Windows Installer.exe"
+!define INSTALLER_NAME "C:\Users\matt\My Documents\PatternPaint\PatternPaint Windows Installer.exe"
 !define MAIN_APP_EXE "PatternPaint.exe"
 !define INSTALL_TYPE "SetShellVarContext current"
 !define REG_ROOT "HKCU"
@@ -85,29 +85,42 @@ Section -MainProgram
 ${INSTALL_TYPE}
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\icudt53.dll"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\icuin53.dll"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\icuuc53.dll"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\libgcc_s_dw2-1.dll"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\libstdc++-6.dll"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\libwinpthread-1.dll"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\PatternPaint.exe"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\Qt5Core.dll"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\Qt5Gui.dll"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\Qt5SerialPort.dll"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\Qt5Widgets.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\icudt53.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\icuin53.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\icuuc53.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\libgcc_s_dw2-1.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\libstdc++-6.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\libwinpthread-1.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\PatternPaint.exe"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\Qt5Core.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\Qt5Gui.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\Qt5SerialPort.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\Qt5Widgets.dll"
 SetOutPath "$INSTDIR\platforms"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\platforms\qwindows.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\platforms\qwindows.dll"
 SetOutPath "$INSTDIR\imageformats"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\imageformats\qgif.dll"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\imageformats\qjpeg.dll"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\imageformats\qsvg.dll"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\imageformats\qtiff.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\imageformats\qgif.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\imageformats\qjpeg.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\imageformats\qsvg.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\imageformats\qtiff.dll"
 SetOutPath "$INSTDIR\driver"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\driver\blinkinlabs.cat"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\driver\blinkinlabs.inf"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\driver\dpinst32.exe"
-File "C:\Users\matt\My Documents\PatternPaint_Builder\PatternPaintWindows\driver\dpinst64.exe"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\dpinst32.exe"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\dpinst64.exe"
+SetOutPath "$INSTDIR\driver\blinkytape"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\blinkytape\blinkinlabs.cat"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\blinkytape\blinkinlabs.inf"
+SetOutPath "$INSTDIR\driver\lightbuddy"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\lightbuddy\lightbuddy_serial.inf"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\lightbuddy\lightbuddy_DFU_runtime.inf"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\lightbuddy\lightbuddy_DFU.inf"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\lightbuddy\libusb_device.cat"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\lightbuddy\blinkinlabs.cat"
+SetOutPath "$INSTDIR\driver\lightbuddy\x86"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\lightbuddy\x86\winusbcoinstaller2.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\lightbuddy\x86\WdfCoInstaller01009.dll"
+SetOutPath "$INSTDIR\driver\lightbuddy\amd64"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\lightbuddy\amd64\winusbcoinstaller2.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\lightbuddy\amd64\WdfCoInstaller01009.dll"
 SectionEnd
 
 ######################################################################
@@ -154,9 +167,11 @@ SectionEnd
 
 Section Driver
 ${If} ${RunningX64}
-       ExecWait '"$INSTDIR\driver\dpinst64.exe" /sa /sw /PATH "$INSTDIR\driver"'
+       ExecWait '"$INSTDIR\driver\dpinst64.exe" /sa /sw /PATH "$INSTDIR\driver\blinkytape"'
+       ExecWait '"$INSTDIR\driver\dpinst64.exe" /sa /sw /PATH "$INSTDIR\driver\lightbuddy"'
 	   ${Else}
-       ExecWait '"$INSTDIR\driver\dpinst32.exe" /sa /sw /PATH "$INSTDIR\driver"'
+       ExecWait '"$INSTDIR\driver\dpinst32.exe" /sa /sw /PATH "$INSTDIR\driver\blinkytape"'
+       ExecWait '"$INSTDIR\driver\dpinst32.exe" /sa /sw /PATH "$INSTDIR\driver\lightbuddy"'
 	   ${EndIf}
 SectionEnd
 	
@@ -180,11 +195,24 @@ Delete "$INSTDIR\imageformats\qgif.dll"
 Delete "$INSTDIR\imageformats\qjpeg.dll"
 Delete "$INSTDIR\imageformats\qsvg.dll"
 Delete "$INSTDIR\imageformats\qtiff.dll"
-Delete "$INSTDIR\driver\blinkinlabs.cat"
-Delete "$INSTDIR\driver\blinkinlabs.inf"
+Delete "$INSTDIR\driver\blinkytape\blinkinlabs.cat"
+Delete "$INSTDIR\driver\blinkytape\blinkinlabs.inf"
+Delete "$INSTDIR\driver\lightbuddy\x86\winusbcoinstaller2.dll"
+Delete "$INSTDIR\driver\lightbuddy\x86\WdfCoInstaller01009.dll"
+Delete "$INSTDIR\driver\lightbuddy\amd64\winusbcoinstaller2.dll"
+Delete "$INSTDIR\driver\lightbuddy\amd64\WdfCoInstaller01009.dll"
+Delete "$INSTDIR\driver\lightbuddy\lightbuddy_serial.inf"
+Delete "$INSTDIR\driver\lightbuddy\lightbuddy_DFU_runtime.inf"
+Delete "$INSTDIR\driver\lightbuddy\lightbuddy_DFU.inf"
+Delete "$INSTDIR\driver\lightbuddy\libusb_devices.cat"
+Delete "$INSTDIR\driver\lightbuddy\blinkinlabs.cat"
 Delete "$INSTDIR\driver\dpinst32.exe"
 Delete "$INSTDIR\driver\dpinst64.exe"
- 
+
+RmDir "$INSTDIR\driver\lightbuddy\x86"
+RmDir "$INSTDIR\driver\lightbuddy\amd64"
+RmDir "$INSTDIR\driver\lightbuddy" 
+RmDir "$INSTDIR\driver\blinkytape"
 RmDir "$INSTDIR\driver"
 RmDir "$INSTDIR\imageformats"
 RmDir "$INSTDIR\platforms"

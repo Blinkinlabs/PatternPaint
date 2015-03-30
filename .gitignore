@@ -2,4 +2,8 @@
 *.swp
 PatternPaint/bin/*
 PatternPaint/build/*
-PatternPaint/Makefile
+PatternPaint/tmp/*
+PatternPaint/Makefile*
+Blinkinlabs32u4_boards/*
+Blinkytile/*
+PatternPaintWindows/*

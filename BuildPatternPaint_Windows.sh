@@ -14,39 +14,54 @@ NSIS='/c/Program Files (x86)/NSIS'
 # Location of the PatternPaint repository
 PATTERNPAINT='PatternPaint'
 
-# Location of the BlinkyTape driver (installed as our repository)
+# Blinkinlabs32u4_boards repository (for the BlinkyTape driver)
 BLINKYTAPE='Blinkinlabs32u4_boards/'
 
+# BlinkyTile repository (for the LightBuddy driver)
 BLINKYTILE='Blinkytile/'
 
 # Staging directory for this release
 OUTDIR='PatternPaintWindows/'
 
 
-################## Build PatternPaint ############################
+################## Pull PatternPaint and build ###################
+git clone https://github.com/Blinkinlabs/PatternPaint.git ${PATTERNPAINT}
+
+# TODO: Detect if it's already installed?
+cd ${PATTERNPAINT}
+git pull
 
 PATH=${QT_TOOLS}:${PATH}
 
 ${QT_MINGW}bin/qmake.exe -config release MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build DESTDIR=bin VERSION=0.3.0
 mingw32-make.exe clean
-mingw32-make.exe
+mingw32-make.exe -j 4
 
 cd ..
 
 ################## Get BlinkyTape driver #########################
 git clone https://github.com/Blinkinlabs/Blinkinlabs32u4_boards.git ${BLINKYTAPE}
 
+cd ${BLINKYTAPE}
+git pull
+cd ..
+
 ################## Get BlinkyTile driver #########################
 git clone https://github.com/Blinkinlabs/BlinkyTile.git ${BLINKYTILE}
 
+cd ${BLINKYTILE}
+git pull
+cd ..
 
 ################## Package Everything ############################
 mkdir -p ${OUTDIR}
 mkdir -p ${OUTDIR}platforms
 mkdir -p ${OUTDIR}imageformats
 mkdir -p ${OUTDIR}driver
-mkdir -p ${OUTDIR}driver/x86
-mkdir -p ${OUTDIR}driver/amd64
+mkdir -p ${OUTDIR}driver/blinkytape
+mkdir -p ${OUTDIR}driver/lightbuddy
+mkdir -p ${OUTDIR}driver/lightbuddy/x86
+mkdir -p ${OUTDIR}driver/lightbuddy/amd64
 
 # Main executable
 cp ${PATTERNPAINT}/bin/PatternPaint.exe ${OUTDIR}
@@ -64,7 +79,7 @@ cp ${QT_MINGW}bin/libgcc_s_dw2-1.dll ${OUTDIR}
 cp ${QT_MINGW}bin/libstdc++-6.dll ${OUTDIR}
 cp ${QT_MINGW}bin/icuin53.dll ${OUTDIR}
 cp ${QT_MINGW}bin/icuuc53.dll ${OUTDIR}
-cp {$QT_MINGW}bin/icudt53.dll ${OUTDIR}
+cp ${QT_MINGW}bin/icudt53.dll ${OUTDIR}
 cp ${QT_MINGW}bin/libgcc_s_dw2-1.dll ${OUTDIR}
 cp ${QT_MINGW}bin/libwinpthread-1.dll ${OUTDIR}
 
@@ -76,19 +91,19 @@ cp ${QT_MINGW}/plugins/imageformats/qsvg.dll ${OUTDIR}imageformats/
 cp ${QT_MINGW}/plugins/imageformats/qtiff.dll ${OUTDIR}imageformats/
 
 # BlinkyTape Driver files
-cp ${BLINKYTAPE}driver/blinkinlabs.inf ${OUTDIR}driver/
-cp ${BLINKYTAPE}driver/blinkinlabs.cat ${OUTDIR}driver/
+cp ${BLINKYTAPE}avr/driver/blinkinlabs.inf ${OUTDIR}driver/blinkytape/
+cp ${BLINKYTAPE}avr/driver/blinkinlabs.cat ${OUTDIR}driver/blinkytape/
 
 # BlinkyTile Driver files
-cp ${BLINKYTILE}driver/lightbuddy_serial.inf ${OUTDIR}driver/
-cp ${BLINKYTILE}driver/lightbuddy_DFU_runtime.inf ${OUTDIR}driver/
-cp ${BLINKYTILE}driver/lightbuddy_DFU.inf ${OUTDIR}driver/
-cp ${BLINKYTILE}driver/libusb_device.cat ${OUTDIR}driver/
-cp ${BLINKYTILE}driver/blinkinlabs.cat ${OUTDIR}driver/
-cp ${BLINKYTILE}driver/x86/winusbcoinstaller2.dll ${OUTDIR}driver/x86/
-cp ${BLINKYTILE}driver/x86/WdfCoInstaller01009.dll ${OUTDIR}driver/x86/
-cp ${BLINKYTILE}driver/amd64/winusbcoinstaller2.dll ${OUTDIR}driver/amd64/
-cp ${BLINKYTILE}driver/amd64/WdfCoInstaller01009.dll ${OUTDIR}driver/amd64/
+cp ${BLINKYTILE}driver/lightbuddy_serial.inf ${OUTDIR}driver/lightbuddy/
+cp ${BLINKYTILE}driver/lightbuddy_DFU_runtime.inf ${OUTDIR}driver/lightbuddy/
+cp ${BLINKYTILE}driver/lightbuddy_DFU.inf ${OUTDIR}driver/lightbuddy/
+cp ${BLINKYTILE}driver/libusb_device.cat ${OUTDIR}driver/lightbuddy/
+cp ${BLINKYTILE}driver/blinkinlabs.cat ${OUTDIR}driver/lightbuddy/
+cp ${BLINKYTILE}driver/x86/winusbcoinstaller2.dll ${OUTDIR}driver/lightbuddy/x86/
+cp ${BLINKYTILE}driver/x86/WdfCoInstaller01009.dll ${OUTDIR}driver/lightbuddy/x86/
+cp ${BLINKYTILE}driver/amd64/winusbcoinstaller2.dll ${OUTDIR}driver/lightbuddy/amd64/
+cp ${BLINKYTILE}driver/amd64/WdfCoInstaller01009.dll ${OUTDIR}driver/lightbuddy/amd64/
 
 # Driver installer
 cp "${WIN_KIT}redist/DIFx/dpinst/MultiLin/x86/dpinst.exe" ${OUTDIR}driver/dpinst32.exe
