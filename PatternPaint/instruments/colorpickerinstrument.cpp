@@ -27,47 +27,33 @@
 #include "patterneditor.h"
 
 ColorpickerInstrument::ColorpickerInstrument(QObject *parent) :
-    AbstractInstrument(parent), mpm(":/instruments/images/instruments-icons/cursor_pipette.png")
-{
-    mcur = QCursor(mpm);
+    CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_pipette.png", parent) {
 }
 
-void ColorpickerInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe)
+void ColorpickerInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
 {
-    if(event->button() == Qt::LeftButton || event->button() == Qt::RightButton)
-    {
+    if(event->button() == Qt::LeftButton) {
         pe.setPaint(true);
+        mStartPoint = mEndPoint = pt;
     }
 }
 
-void ColorpickerInstrument::mouseMoveEvent(QMouseEvent *event, PatternEditor& pe)
+void ColorpickerInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor&, const QPoint&)
 {
-    QRgb pixel(pe.getDevice()->pixel(event->pos()));
-    QColor getColor(pixel);
-    //pe.emitColor(getColor);
+    //QRgb pixel(pe.getPattern()->pixel(pt));
 }
 
-void ColorpickerInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe)
+void ColorpickerInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
 {
-    if(pe.isPaint())
-    {
-        mStartPoint = mEndPoint = event->pos();
-        if(event->button() == Qt::LeftButton)
-        {
-            paint(pe, false);
-            //pe.emitPrimaryColorView();
-        }
-        else if(event->button() == Qt::RightButton)
-        {
-            paint(pe, true);
-            //PatternEditor.emitSecondaryColorView();
-        }
+    Q_UNUSED(event);
+    if(pe.isPaint()) {
+        mStartPoint = mEndPoint = pt;
+        paint(pe);
         pe.setPaint(false);
-        //pe.emitRestorePreviousInstrument();
     }
 }
 
-void ColorpickerInstrument::paint(PatternEditor& pe, bool isSecondaryColor, bool)
+void ColorpickerInstrument::paint(PatternEditor& pe)
 {
     bool inArea(true);
     if(mStartPoint.x() < 0 || mStartPoint.y() < 0
@@ -75,9 +61,8 @@ void ColorpickerInstrument::paint(PatternEditor& pe, bool isSecondaryColor, bool
             || mStartPoint.y() > pe.height())
         inArea = false;
 
-    if(inArea)
-    {
-        QRgb pixel(pe.getDevice()->pixel(QPoint(mStartPoint.x()/pe.scaleX(), mStartPoint.y()/pe.scaleY())));
+    if(inArea) {
+        QRgb pixel(pe.getPattern()->pixel(mStartPoint));
         QColor getColor(pixel);
         emit pickedColor(getColor);
     }

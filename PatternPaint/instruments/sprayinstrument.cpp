@@ -23,60 +23,73 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "lineinstrument.h"
+#include "sprayinstrument.h"
 #include "patterneditor.h"
 
 #include <QPen>
 #include <QPainter>
-#include <QImage>
+#include <math.h>
 
-LineInstrument::LineInstrument(QObject *parent) :
-    AbstractInstrument(parent)
-{
+SprayInstrument::SprayInstrument(QObject *parent) :
+    CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_spray.png", parent) {
 }
 
-void LineInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
+void SprayInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
 {
     if(event->button() == Qt::LeftButton)
     {
         mStartPoint = mEndPoint = pt;
         pe.setPaint(true);
-        mImageCopy = pe.getPatternAsImage();
         makeUndoCommand(pe);
     }
 }
 
-void LineInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& pe, const QPoint& pt)
+void SprayInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& pe, const QPoint& pt)
 {
     if(pe.isPaint()) {
         mEndPoint = pt;
-        pe.setImage(mImageCopy);
         paint(pe);
+        mStartPoint = pt;
     }
 }
 
-void LineInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe, const QPoint&)
+void SprayInstrument::mouseReleaseEvent(QMouseEvent*, PatternEditor& pe, const QPoint&)
 {
-    if(pe.isPaint())
-    {
-        pe.setImage(mImageCopy);
-        if(event->button() == Qt::LeftButton)  paint(pe);
+    if(pe.isPaint()) {
+        paint(pe);
         pe.setPaint(false);
     }
 }
 
-void LineInstrument::paint(PatternEditor& pe)
+void SprayInstrument::paint(PatternEditor& pe)
 {
     QPainter painter(pe.getPattern());
-    painter.setPen(QPen(pe.getPrimaryColor(), pe.getPenSize() ,
-                            Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    painter.setPen(QPen(pe.getPrimaryColor(), pe.getPenSize(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
-    if(mStartPoint != mEndPoint) {
-        painter.drawLine(mStartPoint, mEndPoint);
-    }
+    int x, y;
+    for(int i(0); i < 12; i++) {
+        switch(i) {
+        case 0: case 1: case 2: case 3:
+            x = (qrand() % 5 - 2)
+                    * sqrt(pe.getPenSize());
+            y = (qrand() % 5 - 2)
+                    * sqrt(pe.getPenSize());
+            break;
+        case 4: case 5: case 6: case 7:
+            x = (qrand() % 10 - 4)
+                    * sqrt(pe.getPenSize());
+            y = (qrand() % 10 - 4)
+                    * sqrt(pe.getPenSize());
+            break;
+        case 8: case 9: case 10: case 11:
+            x = (qrand() % 15 - 7)
+                    * sqrt(pe.getPenSize());
+            y = (qrand() % 15 - 7)
+                    * sqrt(pe.getPenSize());
+            break;
+        }
 
-    if(mStartPoint == mEndPoint) {
-        painter.drawPoint(mStartPoint);
+        painter.drawPoint(mEndPoint.x() + x, mEndPoint.y() + y);
     }
 
     painter.end();

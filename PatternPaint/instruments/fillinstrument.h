@@ -23,22 +23,32 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "undocommand.h"
-#include "patterneditor.h"
-#include <QDebug>
+#ifndef FILLINSTRUMENT_H
+#define FILLINSTRUMENT_H
 
-UndoCommand::UndoCommand(const QImage& img, PatternEditor& editor, QUndoCommand *parent)
-    : QUndoCommand(parent), mPrevImage(img), m_editor(editor)
+#include "abstractinstrument.h"
+
+#include <QtCore/QObject>
+
+/**
+ * @brief Fill instrument class.
+ *
+ */
+class FillInstrument : public CustomCursorInstrument
 {
-    mCurrImage = mPrevImage;
-}
+    Q_OBJECT
+public:
+    explicit FillInstrument(QObject *parent = 0);
+    
+    void mousePressEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
+    void mouseMoveEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
+    void mouseReleaseEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
+    bool showPreview() const { return false; }
+protected:
+    void paint(PatternEditor&);
 
-void UndoCommand::undo() {
-    mCurrImage = m_editor.getPatternAsImage();
-    m_editor.init(mPrevImage, false);
-    m_editor.setEdited(m_editor.getUndoStack()->index() != 1);
-}
+private:
+    void fill(const QPoint&, QRgb newColor, QRgb oldColor, QImage* pattern);
+};
 
-void UndoCommand::redo() {
-    m_editor.init(mCurrImage, false);
-}
+#endif // FILLINSTRUMENT_H

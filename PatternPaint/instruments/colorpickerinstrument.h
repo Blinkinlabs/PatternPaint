@@ -29,30 +29,24 @@
 #include "abstractinstrument.h"
 
 #include <QtCore/QObject>
-#include <QPixmap>
-#include <QCursor>
 
 /**
  * @brief Colorpicker instrument class.
  *
  */
-class ColorpickerInstrument : public AbstractInstrument
+class ColorpickerInstrument : public CustomCursorInstrument
 {
     Q_OBJECT
 
 public:
     explicit ColorpickerInstrument(QObject *parent = 0);
     
-    void mousePressEvent(QMouseEvent *event, PatternEditor&);
-    void mouseMoveEvent(QMouseEvent *event, PatternEditor&);
-    void mouseReleaseEvent(QMouseEvent *event, PatternEditor&);
-    QCursor cursor() const { return mcur; }
+    void mousePressEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
+    void mouseMoveEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
+    void mouseReleaseEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
     bool showPreview() const { return false; }
 protected:
-    void paint(PatternEditor&, bool isSecondaryColor = false, bool additionalFlag = false);
-private:
-    QPixmap mpm;
-    QCursor mcur;
+    void paint(PatternEditor&);
 signals:
     void pickedColor(QColor);
 };

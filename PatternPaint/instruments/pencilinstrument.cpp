@@ -35,81 +35,49 @@ PencilInstrument::PencilInstrument(QObject *parent) :
 {
 }
 
-void PencilInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe)
+void PencilInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
 {
-    if(event->button() == Qt::LeftButton || event->button() == Qt::RightButton)
+    if(event->button() == Qt::LeftButton )
     {
-        mStartPoint = mEndPoint = event->pos();
-        pe.setPaint(true);  // ?
+        mStartPoint = mEndPoint = pt;
+        pe.setPaint(true);
         makeUndoCommand(pe);
     }
 }
 
-void PencilInstrument::mouseMoveEvent(QMouseEvent *event, PatternEditor& pe)
+void PencilInstrument::mouseMoveEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
 {
     if(pe.isPaint())
     {
-        mEndPoint = event->pos();
-        if(event->buttons() & Qt::LeftButton)
-        {
-            paint(pe, false);
-        }
-        else if(event->buttons() & Qt::RightButton)
-        {
-            paint(pe, true);
-        }
-        mStartPoint = event->pos();
+        mEndPoint = pt;
+        if(event->buttons() & Qt::LeftButton)  paint(pe);
+        mStartPoint = pt;
     }
 }
 
-void PencilInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe)
+void PencilInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
 {
     if(pe.isPaint())
     {
-        mEndPoint = event->pos();
-        if(event->button() == Qt::LeftButton)
-        {
-            paint(pe, false);
-        }
-        else if(event->button() == Qt::RightButton)
-        {
-            paint(pe, true);
-        }
-
-        pe.setPaint(false); // ?
+        mEndPoint = pt;
+        if(event->button() == Qt::LeftButton) paint(pe);
+        pe.setPaint(false);
     }
 }
 
-void PencilInstrument::paint(PatternEditor& pe, bool isSecondaryColor, bool)
+void PencilInstrument::paint(PatternEditor& pe)
 {
-    QPainter painter(pe.getDevice());
-    if(isSecondaryColor)
-    {
-#if 0
-        painter.setPen(QPen(DataSingleton::Instance()->getSecondaryColor(),
-                            DataSingleton::Instance()->getPenSize() * pe.getZoomFactor(),
-                            Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-#endif
-    }
-    else
-    {
-        qDebug() << "pencil paint " << pe.getPrimaryColor();
-        painter.setPen(QPen(pe.getPrimaryColor(),
+    QPainter painter(pe.getPattern());
+    painter.setPen(QPen(pe.getPrimaryColor(),
                             pe.getPenSize(),
                             Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+
+    if(mStartPoint != mEndPoint) {
+        painter.drawLine(mStartPoint, mEndPoint);
     }
 
-    if(mStartPoint != mEndPoint)
-    {
-        //qDebug() << "draw line";
-        painter.drawLine(QPoint(mStartPoint.x()/pe.scaleX(), mStartPoint.y()/pe.scaleY()),
-                         QPoint(mEndPoint.x()/pe.scaleX(), mEndPoint.y()/pe.scaleY()));
-    }
-
-    if(mStartPoint == mEndPoint)
-    {
-        qDebug() << "draw point " << mStartPoint;
-        painter.drawPoint(mStartPoint.x()/pe.scaleX(), mStartPoint.y()/pe.scaleY());
+    if(mStartPoint == mEndPoint)  {
+        painter.drawPoint(mStartPoint);
     }
 
     painter.end();

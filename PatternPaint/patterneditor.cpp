@@ -25,9 +25,10 @@ PatternEditor::PatternEditor(QWidget *parent) :
     QWidget(parent)
 {
     m_undoStack = new QUndoStack(this);
-    m_undoStack->setUndoLimit(10);  // TODO - use preferences here
+    m_undoStack->setUndoLimit(40);  // TODO?
     m_isPaint = false;
     m_pi = NULL;
+    m_edited = false;
 }
 
 void PatternEditor::resizeEvent(QResizeEvent * event)
@@ -37,7 +38,7 @@ void PatternEditor::resizeEvent(QResizeEvent * event)
     updateGridSize();
 }
 
-void PatternEditor::init(int frameCount, int stripLength, bool initTools)
+void PatternEditor::init(int frameCount, int stripLength)
 {
     // Store the width and height, so that letterboxscrollarea can resize this widget properly
     this->setBaseSize(frameCount, stripLength);
@@ -52,13 +53,6 @@ void PatternEditor::init(int frameCount, int stripLength, bool initTools)
                          stripLength,
                          QImage::Format_ARGB32_Premultiplied);
     toolPreview.fill(COLOR_CLEAR);
-
-    if (initTools)
-    {
-        // TODO: Don't reset these here, they need to come from main...
-        toolColor = COLOR_TOOL_DEFAULT;
-        toolSize = 2;
-    }
 
     // Turn on mouse tracking so we can draw a preview
     setMouseTracking(true);
@@ -88,21 +82,6 @@ bool PatternEditor::init(QImage newPattern, bool scaled) {
     update();
 
     return true;
-}
-
-void PatternEditor::resetImage(const QImage& img)
-{
-    // TODO: Implement 'save' check before overwriting?
-
-    // Re-init the display using the new geometry
-    init(img.width(), img.height(), false);
-
-    // Draw the new pattern to the display
-    QPainter painter(&pattern);
-    painter.drawImage(0,0,img);
-
-    // and force a screen update
-    update();
 }
 
 void PatternEditor::updateGridSize() {
@@ -153,22 +132,6 @@ void PatternEditor::updateGridSize() {
     }
 }
 
-void PatternEditor::applyTool(int x, int y) {
-    QPainter painter(&pattern);
-    painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
-    painter.setRenderHint(QPainter::Antialiasing, false);
-    painter.setPen(toolColor);
-
-
-    QBrush brush = painter.brush();
-    brush.setStyle(Qt::SolidPattern);
-    brush.setColor(toolColor);
-    painter.setBrush(brush);
-
-    painter.drawPoint(x,y);
-    painter.drawEllipse ( QPoint(x,y), toolSize/2, toolSize/2 );
-}
-
 void PatternEditor::updateToolPreview(int x, int y) {
     QPainter painter(&toolPreview);
     toolPreview.fill(COLOR_CLEAR);
@@ -186,18 +149,11 @@ void PatternEditor::updateToolPreview(int x, int y) {
     painter.drawEllipse ( QPoint(x,y), toolSize/2, toolSize/2 );
 }
 
-void PatternEditor::mousePressEvent(QMouseEvent *event){
-
-    /*
-    pushUndoCommand(new UndoCommand(getPatternAsImage(), *this));
-    int x = event->x()/xScale;
-    int y = event->y()/yScale;
-
-    applyTool(x,y);
-
-    lazyUpdate();
-    */
-    if (m_pi) m_pi->mousePressEvent(event, *this);
+void PatternEditor::mousePressEvent(QMouseEvent *event) {
+    if (m_pi) {
+        m_pi->mousePressEvent(event, *this, QPoint(event->x()/xScale, event->y()/yScale));
+        lazyUpdate();
+    }
 }
 
 void PatternEditor::leaveEvent(QEvent * event) {
@@ -222,6 +178,9 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
     static int oldX = -1;
     static int oldY = -1;
 
+    Q_UNUSED(oldX);
+    Q_UNUSED(oldY);
+
     int x = event->x()/xScale;
     int y = event->y()/yScale;
 
@@ -239,7 +198,7 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
 
     if (m_pi) {
         setCursor(m_pi->cursor());
-        m_pi->mouseMoveEvent(event, *this);
+        m_pi->mouseMoveEvent(event, *this, QPoint(x, y));
     } else {
         setCursor(Qt::ArrowCursor);
     }
@@ -248,7 +207,10 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
 }
 
 void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
-    if (m_pi) m_pi->mouseReleaseEvent(event, *this);
+    if (m_pi) {
+        m_pi->mouseReleaseEvent(event, *this, QPoint(event->x()/xScale, event->y()/yScale));
+        lazyUpdate();
+    }
 }
 
 void PatternEditor::setToolColor(QColor color) {
@@ -281,7 +243,7 @@ void PatternEditor::lazyUpdate() {
     update();
 }
 
-void PatternEditor::paintEvent(QPaintEvent* event)
+void PatternEditor::paintEvent(QPaintEvent*)
 {
 
     QPainter painter(this);
@@ -312,4 +274,5 @@ void PatternEditor::paintEvent(QPaintEvent* event)
 void PatternEditor::pushUndoCommand(UndoCommand *command)
 {
     if (command) m_undoStack->push(command);
+    setEdited(true);
 }

@@ -30,6 +30,8 @@
 #include <QMouseEvent>
 #include <QImage>
 #include <QCursor>
+#include <QPixmap>
+#include <QCursor>
 
 QT_BEGIN_NAMESPACE
 class PatternEditor;
@@ -47,9 +49,15 @@ public:
     explicit AbstractInstrument(QObject *parent = 0);
     virtual ~AbstractInstrument(){}
 
-    virtual void mousePressEvent(QMouseEvent *event, PatternEditor&) = 0;
-    virtual void mouseMoveEvent(QMouseEvent *event, PatternEditor&) = 0;
-    virtual void mouseReleaseEvent(QMouseEvent *event, PatternEditor&) = 0;
+    /**
+     * @brief mousePressEvent
+     * @param event - mouse event
+     * @param PatternEditor - editor
+     * @param QPoint - logical position on image
+     */
+    virtual void mousePressEvent(QMouseEvent *event, PatternEditor&, const QPoint&) = 0;
+    virtual void mouseMoveEvent(QMouseEvent *event, PatternEditor&, const QPoint& pt) = 0;
+    virtual void mouseReleaseEvent(QMouseEvent *event, PatternEditor&, const QPoint& pt) = 0;
 
     /**
      * @brief cursor
@@ -68,7 +76,7 @@ protected:
     QPoint mStartPoint, mEndPoint; /**< Point for events. */
     QImage mImageCopy; /**< Image for storing copy of current image on imageArea, needed for some instruments. */
 
-    virtual void paint(PatternEditor&, bool isSecondaryColor = false, bool additionalFlag = false) = 0;
+    virtual void paint(PatternEditor&) = 0;
 
     /**
      * @brief Creates UndoCommand & pushes it to UndoStack.
@@ -77,6 +85,20 @@ protected:
      * @param editor corresponse to image, which is edited
      */
     virtual void makeUndoCommand(PatternEditor&);
+};
+
+/**
+ * @brief The CustomCursorInstrument class implements custom cursor support
+ */
+class CustomCursorInstrument : public AbstractInstrument {
+
+    Q_OBJECT
+public:
+    CustomCursorInstrument(const QString& resource, QObject* parent = 0);
+    virtual QCursor cursor() const;
+private:
+    QPixmap mpm;
+    QCursor mcur;
 };
 
 #endif // ABSTRACTINSTRUMENT_H

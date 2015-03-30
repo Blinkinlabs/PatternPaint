@@ -83,20 +83,7 @@ private slots:
     void on_colorPicked(QColor);
 
 private:
-    QAction* mCursorAction;
-    QAction* mEraserAction;
-    QAction *mColorPickerAction;
-    QAction *mMagnifierAction;
-    QAction *mPenAction;
-    QAction *mLineAction;
-    QAction *mSprayAction;
-    QAction *mFillAction;
-    QAction *mRectangleAction;
-    QAction *mEllipseAction;
-    QAction *mCurveLineAction;
-    QAction *mTextAction;
-
-    ColorChooser *mPColorChooser, *mSColorChooser;
+    ColorChooser* m_colorChooser;
 
     QTimer* drawTimer;
 
@@ -107,6 +94,8 @@ private:
 
     QProgressDialog* progressDialog;
     QMessageBox* errorMessageDialog;
+
+    QSpinBox* pSpeed;
 
     enum Modes { Disconnected, Connected, Uploading };
     Modes mode;

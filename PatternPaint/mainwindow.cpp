@@ -12,6 +12,8 @@
 #include "pencilinstrument.h"
 #include "lineinstrument.h"
 #include "colorpickerinstrument.h"
+#include "sprayinstrument.h"
+#include "fillinstrument.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -52,104 +54,27 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     m_undoStackGroup->addStack(patternEditor->getUndoStack());
     m_undoStackGroup->setActiveStack(patternEditor->getUndoStack());
 
-    // instruments creation
-    mCursorAction = new QAction(tr("Selection"), this);
-    mCursorAction->setCheckable(true);
-    mCursorAction->setIcon(QIcon(":/instruments/images/instruments-icons/cursor.png"));
-    connect(mCursorAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mCursorAction);
-    mCursorAction->setChecked(true);
-
-    mEraserAction = new QAction(tr("Eraser"), this);
-    mEraserAction->setCheckable(true);
-    mEraserAction->setIcon(QIcon(":/instruments/images/instruments-icons/lastic.png"));
-    connect(mEraserAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mEraserAction);
-
+    // instruments
     ColorpickerInstrument* cpi = new ColorpickerInstrument(this);
     connect(cpi, SIGNAL(pickedColor(QColor)), SLOT(on_colorPicked(QColor)));
 
-    mColorPickerAction = new QAction(tr("Color picker"), this);
-    mColorPickerAction->setCheckable(true);
-    mColorPickerAction->setIcon(QIcon(":/instruments/images/instruments-icons/pipette.png"));
-    mColorPickerAction->setData(QVariant::fromValue(cpi));
-    connect(mColorPickerAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mColorPickerAction);
+    connect(actionPen, SIGNAL(triggered(bool)), SLOT(on_instrumentAction(bool)));
+    connect(actionLine, SIGNAL(triggered(bool)), SLOT(on_instrumentAction(bool)));
+    connect(actionSpray, SIGNAL(triggered(bool)), SLOT(on_instrumentAction(bool)));
+    connect(actionPipette, SIGNAL(triggered(bool)), SLOT(on_instrumentAction(bool)));
+    connect(actionFill, SIGNAL(triggered(bool)), SLOT(on_instrumentAction(bool)));
 
-    mMagnifierAction = new QAction(tr("Magnifier"), this);
-    mMagnifierAction->setCheckable(true);
-    mMagnifierAction->setIcon(QIcon(":/instruments/images/instruments-icons/loupe.png"));
-    connect(mMagnifierAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mMagnifierAction);
+    actionPen->setData(QVariant::fromValue(new PencilInstrument(this)));
+    actionLine->setData(QVariant::fromValue(new LineInstrument(this)));
+    actionPipette->setData(QVariant::fromValue(cpi));
+    actionSpray->setData(QVariant::fromValue(new SprayInstrument(this)));
+    actionFill->setData(QVariant::fromValue(new FillInstrument(this)));
 
-    mPenAction = new QAction(tr("Pen"), this);
-    mPenAction->setCheckable(true);
-    mPenAction->setIcon(QIcon(":/instruments/images/instruments-icons/pencil.png"));
-    mPenAction->setData(QVariant::fromValue(new PencilInstrument(this)));
-    connect(mPenAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mPenAction);
-
-    mLineAction = new QAction(tr("Line"), this);
-    mLineAction->setCheckable(true);
-    mLineAction->setIcon(QIcon(":/instruments/images/instruments-icons/line.png"));
-    mLineAction->setData(QVariant::fromValue(new LineInstrument(this)));
-    connect(mLineAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mLineAction);
-
-    mSprayAction = new QAction(tr("Spray"), this);
-    mSprayAction->setCheckable(true);
-    mSprayAction->setIcon(QIcon(":/instruments/images/instruments-icons/spray.png"));
-    connect(mSprayAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mSprayAction);
-
-    mFillAction = new QAction(tr("Fill"), this);
-    mFillAction->setCheckable(true);
-    mFillAction->setIcon(QIcon(":/instruments/images/instruments-icons/fill.png"));
-    connect(mFillAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mFillAction);
-
-    mRectangleAction = new QAction(tr("Rectangle"), this);
-    mRectangleAction->setCheckable(true);
-    mRectangleAction->setIcon(QIcon(":/instruments/images/instruments-icons/rectangle.png"));
-    connect(mRectangleAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mRectangleAction);
-
-    mEllipseAction = new QAction(tr("Ellipse"), this);
-    mEllipseAction->setCheckable(true);
-    mEllipseAction->setIcon(QIcon(":/instruments/images/instruments-icons/ellipse.png"));
-    connect(mEllipseAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mEllipseAction);
-
-    mCurveLineAction = new QAction(tr("Curve"), this);
-    mCurveLineAction->setCheckable(true);
-    mCurveLineAction->setIcon(QIcon(":/instruments/images/instruments-icons/curve.png"));
-    connect(mCurveLineAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mCurveLineAction);
-
-    mTextAction = new QAction(tr("Text"), this);
-    mTextAction->setCheckable(true);
-    mTextAction->setIcon(QIcon(":/instruments/images/instruments-icons/text.png"));
-    connect(mTextAction, SIGNAL(triggered(bool)), this, SLOT(on_instrumentAction(bool)));
-    instruments->addAction(mTextAction);
-    menuInstruments->addAction(mCursorAction);
-    menuInstruments->addAction(mEraserAction);
-    menuInstruments->addAction(mColorPickerAction);
-    menuInstruments->addAction(mMagnifierAction);
-    menuInstruments->addAction(mPenAction);
-    menuInstruments->addAction(mLineAction);
-    menuInstruments->addAction(mSprayAction);
-    menuInstruments->addAction(mFillAction);
-    menuInstruments->addAction(mRectangleAction);
-    menuInstruments->addAction(mEllipseAction);
-    menuInstruments->addAction(mCurveLineAction);
-    menuInstruments->addAction(mTextAction);
-
-
-    mPColorChooser = new ColorChooser(255, 255, 255, this);
-    mPColorChooser->setStatusTip(tr("Primary color"));
-    mPColorChooser->setToolTip(tr("Primary color"));
+    m_colorChooser = new ColorChooser(255, 255, 255, this);
+    m_colorChooser->setStatusTip(tr("Pen color"));
+    m_colorChooser->setToolTip(tr("Pen color"));
     instruments->addSeparator();
-    instruments->addWidget(mPColorChooser);
+    instruments->addWidget(m_colorChooser);
 
     QSpinBox *penSizeSpin = new QSpinBox();
     penSizeSpin->setRange(1, 20);
@@ -159,12 +84,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     instruments->addWidget(penSizeSpin);
 
 
-    QSpinBox* pSpeed = new QSpinBox();
+    // tools
+    pSpeed = new QSpinBox(this);
+    pSpeed->setEnabled(false);
     pSpeed->setRange(1, 100);
     pSpeed->setValue(30);
     pSpeed->setToolTip(tr("Pattern speed"));
-    connect(pSpeed, SIGNAL(valueChanged(int)), SLOT(on_patternSpeed_valueChanged(int)));
     tools->addWidget(pSpeed);
+    connect(pSpeed, SIGNAL(valueChanged(int)), this, SLOT(on_patternSpeed_valueChanged(int)));
 
     drawTimer = new QTimer(this);
     connectionScannerTimer = new QTimer(this);
@@ -174,7 +101,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     patternEditor->init(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
 
     // Our pattern editor wants to get some notifications
-    connect(mPColorChooser, SIGNAL(sendColor(QColor)),
+    connect(m_colorChooser, SIGNAL(sendColor(QColor)),
             patternEditor, SLOT(setToolColor(QColor)));
 
     tape = new BlinkyTape(this);
@@ -223,7 +150,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // initialization started parameters here
     penSizeSpin->setValue(1);
     patternEditor->setToolSize(1);
-
+    patternEditor->setToolColor(QColor(255,255,255));
+    actionPen->setChecked(true);
+    patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(actionPen->data()));
     readSettings();
 }
 
@@ -337,6 +266,7 @@ void MainWindow::on_actionLoad_File_triggered()
     }
 
     patternEditor->init(pattern);
+    patternEditor->setEdited(false);
 }
 
 void MainWindow::on_actionSave_File_triggered()
@@ -365,6 +295,8 @@ void MainWindow::on_actionSave_File_triggered()
     if(!patternEditor->getPatternAsImage().save(fileName)) {
         QMessageBox::warning(this, tr("Error"), tr("Error, cannot write file %1.")
                        .arg(fileName));
+    } else {
+        patternEditor->setEdited(false);
     }
 }
 
@@ -408,15 +340,16 @@ void MainWindow::on_tapeConnectionStatusChanged(bool connected)
 {
     qDebug() << "status changed, connected=" << connected;
     actionSave_to_Tape->setEnabled(connected);
+    actionPlay->setEnabled(connected);
+    pSpeed->setEnabled(connected);
+
     if(connected) {
         mode = Connected;
-        actionSave_to_Tape->setEnabled(true);
         actionConnect->setText(tr("Disconnect"));
         actionConnect->setIcon(QIcon(":/images/resources/disconnect.png"));
     }
     else {
         mode = Disconnected;
-        actionSave_to_Tape->setEnabled(false);
         actionConnect->setText(tr("Connect"));
         actionConnect->setIcon(QIcon(":/images/resources/connect.png"));
 
@@ -633,26 +566,24 @@ void MainWindow::readSettings()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     //TODO - uncomment for future usage
-    /*
-    if (patternEditor->getUndoStack()->canUndo()) {
+
+    while (patternEditor->isEdited()) {
         int ans = QMessageBox::warning(this, tr("Exit program"),
                                                tr("File has been modified.\nDo you want to save changes?"),
                                                QMessageBox::Yes | QMessageBox::Default,
                                                QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape);
-        switch(ans)
-        {
-        case QMessageBox::Yes:
+        if (ans == QMessageBox::Yes) {
             on_actionSave_File_triggered();
-            event->ignore();
-            return;
-        case QMessageBox::Cancel:
-            event->ignore();
-            return;
-        default:
-            break;
         }
+
+        if (ans == QMessageBox::Cancel) {
+            event->ignore();
+            return;
+        }
+
+        if (ans == QMessageBox::No) break;
     }
-*/
+
     writeSettings();
     event->accept();
 }
@@ -687,7 +618,6 @@ void MainWindow::on_instrumentAction(bool) {
 }
 
 void MainWindow::on_colorPicked(QColor color) {
-    qDebug() << "pipette color " << color;
-    mPColorChooser->setColor(color);
+    m_colorChooser->setColor(color);
     patternEditor->setToolColor(color);
 }
