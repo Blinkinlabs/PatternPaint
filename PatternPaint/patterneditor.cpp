@@ -87,7 +87,8 @@ bool PatternEditor::init(QImage newPattern, bool scaled) {
 void PatternEditor::updateGridSize() {
     // Base the widget size on the window height
     // cast float to int to save rounded scale
-    float scale = static_cast<int>(float(size().height() - 1)/pattern.height());
+    float scale = static_cast<int>(float(size().height() - 1)/pattern.height()*10);
+    scale /= 10;
 
     // Use a square aspect to display the grid
     xScale = scale;
