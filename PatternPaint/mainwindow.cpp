@@ -103,6 +103,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // Our pattern editor wants to get some notifications
     connect(m_colorChooser, SIGNAL(sendColor(QColor)),
             patternEditor, SLOT(setToolColor(QColor)));
+    connect(patternEditor, SIGNAL(changed(bool)), SLOT(on_patternChanged(bool)));
 
     tape = new BlinkyTape(this);
     // Modify our UI when the tape connection status changes
@@ -157,15 +158,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 }
 
 MainWindow::~MainWindow(){}
-
-QToolButton* MainWindow::createToolButton(QAction *act) {
-    QToolButton *toolButton = new QToolButton();
-    toolButton->setMinimumSize(QSize(30, 30));
-    toolButton->setMaximumSize(QSize(30, 30));
-    toolButton->setDefaultAction(act);
-    toolButton->setStatusTip(act->text());
-    return toolButton;
-}
 
 void MainWindow::drawTimer_timeout() {
 
@@ -238,6 +230,16 @@ void MainWindow::on_actionPlay_triggered()
 
 void MainWindow::on_actionLoad_File_triggered()
 {
+    while (patternEditor->isEdited()) {
+        int ans = warnUnsavedData();
+        if (ans == QMessageBox::Yes) {
+            on_actionSave_File_as_triggered();  // save file and check again
+        }
+
+        if (ans == QMessageBox::No) break;  // continue open file
+        if (ans == QMessageBox::Cancel) return; // interrupt opening
+    }
+
     QSettings settings;
     QString lastDirectory = settings.value("File/LoadDirectory").toString();
 
@@ -269,10 +271,8 @@ void MainWindow::on_actionLoad_File_triggered()
     patternEditor->setEdited(false);
 }
 
-void MainWindow::on_actionSave_File_triggered()
-{
+void MainWindow::on_actionSave_File_as_triggered() {
     //TODO: Track if we already had an open file to enable this, add save as?
-
     QSettings settings;
     QString lastDirectory = settings.value("File/SaveDirectory").toString();
 
@@ -290,14 +290,12 @@ void MainWindow::on_actionSave_File_triggered()
 
     QFileInfo lastFile(fileName);
     settings.setValue("File/SaveDirectory", lastFile.absoluteFilePath());
+    patternEditor->setEdited(!saveFile(fileName));
+}
 
-    // TODO: Alert the user if this failed.
-    if(!patternEditor->getPatternAsImage().save(fileName)) {
-        QMessageBox::warning(this, tr("Error"), tr("Error, cannot write file %1.")
-                       .arg(fileName));
-    } else {
-        patternEditor->setEdited(false);
-    }
+void MainWindow::on_actionSave_File_triggered() {
+    Q_ASSERT(!m_lastFile.isEmpty());
+    patternEditor->setEdited(!saveFile(m_lastFile));
 }
 
 void MainWindow::on_actionExit_triggered()
@@ -565,15 +563,10 @@ void MainWindow::readSettings()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    //TODO - uncomment for future usage
-
     while (patternEditor->isEdited()) {
-        int ans = QMessageBox::warning(this, tr("Exit program"),
-                                               tr("File has been modified.\nDo you want to save changes?"),
-                                               QMessageBox::Yes | QMessageBox::Default,
-                                               QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape);
+        int ans = warnUnsavedData();
         if (ans == QMessageBox::Yes) {
-            on_actionSave_File_triggered();
+            on_actionSave_File_as_triggered();
         }
 
         if (ans == QMessageBox::Cancel) {
@@ -620,4 +613,28 @@ void MainWindow::on_instrumentAction(bool) {
 void MainWindow::on_colorPicked(QColor color) {
     m_colorChooser->setColor(color);
     patternEditor->setToolColor(color);
+}
+
+void MainWindow::on_patternChanged(bool changed) {
+    actionSave_File_as->setEnabled(actionSave_File_as->isEnabled() || changed);
+    actionSave_File->setEnabled(changed && !m_lastFile.isEmpty());
+}
+
+int MainWindow::warnUnsavedData() {
+    return QMessageBox::warning(this, tr("Exit program"),
+                                tr("File has been modified.\nDo you want to save changes?"),
+                                QMessageBox::Yes | QMessageBox::Default,
+                                QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape);
+}
+
+bool MainWindow::saveFile(const QString& filename) {
+    Q_ASSERT(!filename.isEmpty());
+    if(!patternEditor->getPatternAsImage().save(filename)) {
+        QMessageBox::warning(this, tr("Error"), tr("Error, cannot write file %1.")
+                       .arg(filename));
+        return false;
+    }
+
+    m_lastFile = filename;
+    return true;
 }

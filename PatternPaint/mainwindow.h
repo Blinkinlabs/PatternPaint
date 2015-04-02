@@ -37,6 +37,7 @@ private slots:
     void on_actionLoad_File_triggered();
 
     void on_actionSave_File_triggered();
+    void on_actionSave_File_as_triggered();
 
     void on_actionExit_triggered();
 
@@ -82,6 +83,8 @@ private slots:
 
     void on_colorPicked(QColor);
 
+    void on_patternChanged(bool);
+
 private:
     ColorChooser* m_colorChooser;
 
@@ -103,10 +106,12 @@ private:
     QUndoGroup *m_undoStackGroup;
     QAction* m_undoAction;
     QAction* m_redoAction;
+    QString  m_lastFile;
 
-    QToolButton* createToolButton(QAction *act);
     void writeSettings();
     void readSettings();
+    int warnUnsavedData();
+    bool saveFile(const QString& filename);
 };
 
 #endif // MAINWINDOW_H

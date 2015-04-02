@@ -215,6 +215,7 @@
     </property>
     <addaction name="actionLoad_File"/>
     <addaction name="actionSave_File"/>
+    <addaction name="actionSave_File_as"/>
     <addaction name="separator"/>
     <addaction name="actionExport_pattern_for_Arduino"/>
     <addaction name="separator"/>
@@ -320,6 +321,9 @@
    </property>
   </action>
   <action name="actionSave_File">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="images.qrc">
      <normaloff>:/resources/images/save.png</normaloff>:/resources/images/save.png</iconset>
@@ -511,6 +515,21 @@
    </property>
    <property name="text">
     <string>Spray</string>
+   </property>
+  </action>
+  <action name="actionSave_File_as">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/resources/images/save.png</normaloff>:/resources/images/save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save File as</string>
+   </property>
+   <property name="shortcut">
+    <string>, Ctrl+Shift+S</string>
    </property>
   </action>
  </widget>
