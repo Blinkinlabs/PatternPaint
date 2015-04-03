@@ -528,7 +528,6 @@ void MainWindow::on_actionResize_Pattern_triggered()
         QImage originalImage = patternEditor->getPatternAsImage();
         patternEditor->pushUndoCommand(new UndoCommand(originalImage, *(patternEditor)));
         painter.drawImage(0,0,originalImage);
-
         patternEditor->init(newImage, false);
     }
 }

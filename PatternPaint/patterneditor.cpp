@@ -40,6 +40,7 @@ void PatternEditor::resizeEvent(QResizeEvent * event)
 
 void PatternEditor::init(int frameCount, int stripLength)
 {
+    qDebug() << Q_FUNC_INFO;
     // Store the width and height, so that letterboxscrollarea can resize this widget properly
     this->setBaseSize(frameCount, stripLength);
 
@@ -65,6 +66,9 @@ void PatternEditor::init(int frameCount, int stripLength)
 bool PatternEditor::init(QImage newPattern, bool scaled) {
     // TODO: Implement 'save' check before overwriting?
 
+
+    if (newPattern.size() != pattern.size())
+        setMinimumWidth(500);
     // If the pattern doesn't fit, scale it.
     // TODO: Display an import dialog to let the user decide what to do?
     if(scaled && newPattern.height() != pattern.height()) {
@@ -247,7 +251,6 @@ void PatternEditor::lazyUpdate() {
 
 void PatternEditor::paintEvent(QPaintEvent*)
 {
-
     QPainter painter(this);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter.setRenderHint(QPainter::Antialiasing, false);
