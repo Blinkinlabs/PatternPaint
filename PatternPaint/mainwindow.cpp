@@ -294,8 +294,11 @@ void MainWindow::on_actionSave_File_as_triggered() {
 }
 
 void MainWindow::on_actionSave_File_triggered() {
-    Q_ASSERT(!m_lastFile.isEmpty());
-    patternEditor->setEdited(!saveFile(m_lastFile));
+    if (m_lastFile.isEmpty()) {
+        on_actionSave_File_as_triggered();
+    } else {
+        patternEditor->setEdited(!saveFile(m_lastFile));
+    }
 }
 
 void MainWindow::on_actionExit_triggered()
@@ -616,8 +619,7 @@ void MainWindow::on_colorPicked(QColor color) {
 }
 
 void MainWindow::on_patternChanged(bool changed) {
-    actionSave_File_as->setEnabled(actionSave_File_as->isEnabled() || changed);
-    actionSave_File->setEnabled(changed && !m_lastFile.isEmpty());
+    Q_UNUSED(changed);
 }
 
 int MainWindow::warnUnsavedData() {

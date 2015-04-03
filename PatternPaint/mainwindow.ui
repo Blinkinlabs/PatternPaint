@@ -166,7 +166,7 @@
            <x>0</x>
            <y>0</y>
            <width>500</width>
-           <height>384</height>
+           <height>387</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -206,7 +206,7 @@
      <x>0</x>
      <y>0</y>
      <width>880</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -322,7 +322,7 @@
   </action>
   <action name="actionSave_File">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="icon">
     <iconset resource="images.qrc">
@@ -519,7 +519,7 @@
   </action>
   <action name="actionSave_File_as">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="icon">
     <iconset resource="images.qrc">
