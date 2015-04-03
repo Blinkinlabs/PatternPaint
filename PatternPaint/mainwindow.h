@@ -85,6 +85,8 @@ private slots:
 
     void on_patternChanged(bool);
 
+    void on_patternResized();
+
 private:
     ColorChooser* m_colorChooser;
 

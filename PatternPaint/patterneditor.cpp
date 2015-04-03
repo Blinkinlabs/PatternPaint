@@ -66,9 +66,6 @@ void PatternEditor::init(int frameCount, int stripLength)
 bool PatternEditor::init(QImage newPattern, bool scaled) {
     // TODO: Implement 'save' check before overwriting?
 
-
-    if (newPattern.size() != pattern.size())
-        setMinimumWidth(500);
     // If the pattern doesn't fit, scale it.
     // TODO: Display an import dialog to let the user decide what to do?
     if(scaled && newPattern.height() != pattern.height()) {
@@ -85,6 +82,7 @@ bool PatternEditor::init(QImage newPattern, bool scaled) {
     // and force a screen update
     update();
 
+    emit resized();
     return true;
 }
 

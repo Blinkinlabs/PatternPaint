@@ -104,6 +104,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(m_colorChooser, SIGNAL(sendColor(QColor)),
             patternEditor, SLOT(setToolColor(QColor)));
     connect(patternEditor, SIGNAL(changed(bool)), SLOT(on_patternChanged(bool)));
+    connect(patternEditor, SIGNAL(resized()), SLOT(on_patternResized()));
 
     tape = new BlinkyTape(this);
     // Modify our UI when the tape connection status changes
@@ -619,6 +620,10 @@ void MainWindow::on_colorPicked(QColor color) {
 
 void MainWindow::on_patternChanged(bool changed) {
     Q_UNUSED(changed);
+}
+
+void MainWindow::on_patternResized() {
+    scrollArea->resize(scrollArea->width()+1, scrollArea->height());
 }
 
 int MainWindow::warnUnsavedData() {
