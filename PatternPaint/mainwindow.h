@@ -113,6 +113,8 @@ private:
     void writeSettings();
     void readSettings();
     bool saveFile(const QString& filename);
+
+    int promptForSave();
 };
 
 #endif // MAINWINDOW_H

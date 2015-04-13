@@ -134,7 +134,7 @@
            <x>0</x>
            <y>0</y>
            <width>500</width>
-           <height>387</height>
+           <height>386</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -174,7 +174,7 @@
      <x>0</x>
      <y>0</y>
      <width>880</width>
-     <height>25</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -287,6 +287,9 @@
    <property name="shortcut">
     <string>Ctrl+O</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionSave_File">
    <property name="enabled">
@@ -304,6 +307,9 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionExit">
@@ -368,6 +374,9 @@
    <property name="text">
     <string>Save to Tape</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionClear_Pattern">
    <property name="text">
@@ -430,6 +439,9 @@
    <property name="text">
     <string>Pen</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionLine">
    <property name="checkable">
@@ -441,6 +453,9 @@
    </property>
    <property name="text">
     <string>Line</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionPipette">
@@ -457,6 +472,9 @@
    <property name="toolTip">
     <string>Color picker</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionFill">
    <property name="checkable">
@@ -472,6 +490,9 @@
    <property name="toolTip">
     <string>Fill</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionSpray">
    <property name="checkable">
@@ -483,6 +504,9 @@
    </property>
    <property name="text">
     <string>Spray</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionSave_File_as">
@@ -498,6 +522,9 @@
    </property>
    <property name="shortcut">
     <string>, Ctrl+Shift+S</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
    </property>
   </action>
  </widget>

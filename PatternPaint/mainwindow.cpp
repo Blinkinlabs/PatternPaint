@@ -232,19 +232,13 @@ void MainWindow::on_actionPlay_triggered()
 void MainWindow::on_actionLoad_File_triggered()
 {
     while (patternEditor->isEdited()) {
-        QMessageBox msgBox(this);
-        msgBox.setIcon(QMessageBox::Question);
-        msgBox.setWindowModality(Qt::WindowModal);
-        msgBox.setText("The animation has been modified.");
-        msgBox.setInformativeText("Do you want to save your changes?");
-        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Open | QMessageBox::Cancel);
-        msgBox.setDefaultButton(QMessageBox::Save);
-        int ans = msgBox.exec();
+        int ans = promptForSave();
+
         if (ans == QMessageBox::Save) {
             on_actionSave_File_as_triggered();  // save file and check again
         }
 
-        if (ans == QMessageBox::Open) break;  // continue open file
+        if (ans == QMessageBox::Discard) break;  // continue open file
         if (ans == QMessageBox::Cancel) return; // interrupt opening
     }
 
@@ -573,14 +567,7 @@ void MainWindow::readSettings()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     while (patternEditor->isEdited()) {
-        QMessageBox msgBox(this);
-        msgBox.setIcon(QMessageBox::Question);
-        msgBox.setWindowModality(Qt::WindowModal);
-        msgBox.setText("The animation has been modified.");
-        msgBox.setInformativeText("Do you want to save your changes?");
-        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-        msgBox.setDefaultButton(QMessageBox::Save);
-        int ans = msgBox.exec();
+        int ans = promptForSave();
 
         if (ans == QMessageBox::Save) {
             on_actionSave_File_as_triggered();
@@ -650,4 +637,16 @@ bool MainWindow::saveFile(const QString& filename) {
 
     m_lastFile = filename;
     return true;
+}
+
+int MainWindow::promptForSave()
+{
+    QMessageBox msgBox(this);
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setWindowModality(Qt::WindowModal);
+    msgBox.setText("The animation has been modified.");
+    msgBox.setInformativeText("Do you want to save your changes?");
+    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Save);
+    return msgBox.exec();
 }
