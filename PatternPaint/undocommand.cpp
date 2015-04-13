@@ -40,5 +40,6 @@ void UndoCommand::undo() {
 }
 
 void UndoCommand::redo() {
-    m_editor.init(mCurrImage, false);
+    if (mCurrImage != m_editor.getPatternAsImage())
+        m_editor.init(mCurrImage, false);
 }

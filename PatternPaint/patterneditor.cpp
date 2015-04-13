@@ -40,6 +40,7 @@ void PatternEditor::resizeEvent(QResizeEvent * event)
 
 void PatternEditor::init(int frameCount, int stripLength)
 {
+    qDebug() << Q_FUNC_INFO;
     // Store the width and height, so that letterboxscrollarea can resize this widget properly
     this->setBaseSize(frameCount, stripLength);
 
@@ -81,12 +82,15 @@ bool PatternEditor::init(QImage newPattern, bool scaled) {
     // and force a screen update
     update();
 
+    emit resized();
     return true;
 }
 
 void PatternEditor::updateGridSize() {
     // Base the widget size on the window height
-    float scale = float(size().height() - 1)/pattern.height();
+    // cast float to int to save rounded scale
+    float scale = static_cast<int>(float(size().height() - 1)/pattern.height()*10);
+    scale /= 10;
 
     // Use a square aspect to display the grid
     xScale = scale;
@@ -245,7 +249,6 @@ void PatternEditor::lazyUpdate() {
 
 void PatternEditor::paintEvent(QPaintEvent*)
 {
-
     QPainter painter(this);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter.setRenderHint(QPainter::Antialiasing, false);

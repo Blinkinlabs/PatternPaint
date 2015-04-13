@@ -42,7 +42,6 @@ class UndoCommand : public QUndoCommand
 {
 public:
     UndoCommand(const QImage& img, PatternEditor& editor,  QUndoCommand *parent = 0);
-
     virtual void undo();
     virtual void redo();
 private:

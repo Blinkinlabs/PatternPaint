@@ -103,6 +103,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // Our pattern editor wants to get some notifications
     connect(m_colorChooser, SIGNAL(sendColor(QColor)),
             patternEditor, SLOT(setToolColor(QColor)));
+    connect(patternEditor, SIGNAL(changed(bool)), SLOT(on_patternChanged(bool)));
+    connect(patternEditor, SIGNAL(resized()), SLOT(on_patternResized()));
 
     tape = new BlinkyTape(this);
     // Modify our UI when the tape connection status changes
@@ -157,15 +159,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 }
 
 MainWindow::~MainWindow(){}
-
-QToolButton* MainWindow::createToolButton(QAction *act) {
-    QToolButton *toolButton = new QToolButton();
-    toolButton->setMinimumSize(QSize(30, 30));
-    toolButton->setMaximumSize(QSize(30, 30));
-    toolButton->setDefaultAction(act);
-    toolButton->setStatusTip(act->text());
-    return toolButton;
-}
 
 void MainWindow::drawTimer_timeout() {
 
@@ -238,6 +231,23 @@ void MainWindow::on_actionPlay_triggered()
 
 void MainWindow::on_actionLoad_File_triggered()
 {
+    while (patternEditor->isEdited()) {
+        QMessageBox msgBox(this);
+        msgBox.setIcon(QMessageBox::Question);
+        msgBox.setWindowModality(Qt::WindowModal);
+        msgBox.setText("The animation has been modified.");
+        msgBox.setInformativeText("Do you want to save your changes?");
+        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Open | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Save);
+        int ans = msgBox.exec();
+        if (ans == QMessageBox::Save) {
+            on_actionSave_File_as_triggered();  // save file and check again
+        }
+
+        if (ans == QMessageBox::Open) break;  // continue open file
+        if (ans == QMessageBox::Cancel) return; // interrupt opening
+    }
+
     QSettings settings;
     QString lastDirectory = settings.value("File/LoadDirectory").toString();
 
@@ -269,10 +279,8 @@ void MainWindow::on_actionLoad_File_triggered()
     patternEditor->setEdited(false);
 }
 
-void MainWindow::on_actionSave_File_triggered()
-{
+void MainWindow::on_actionSave_File_as_triggered() {
     //TODO: Track if we already had an open file to enable this, add save as?
-
     QSettings settings;
     QString lastDirectory = settings.value("File/SaveDirectory").toString();
 
@@ -290,13 +298,14 @@ void MainWindow::on_actionSave_File_triggered()
 
     QFileInfo lastFile(fileName);
     settings.setValue("File/SaveDirectory", lastFile.absoluteFilePath());
+    patternEditor->setEdited(!saveFile(fileName));
+}
 
-    // TODO: Alert the user if this failed.
-    if(!patternEditor->getPatternAsImage().save(fileName)) {
-        QMessageBox::warning(this, tr("Error"), tr("Error, cannot write file %1.")
-                       .arg(fileName));
+void MainWindow::on_actionSave_File_triggered() {
+    if (m_lastFile.isEmpty()) {
+        on_actionSave_File_as_triggered();
     } else {
-        patternEditor->setEdited(false);
+        patternEditor->setEdited(!saveFile(m_lastFile));
     }
 }
 
@@ -526,7 +535,6 @@ void MainWindow::on_actionResize_Pattern_triggered()
         QImage originalImage = patternEditor->getPatternAsImage();
         patternEditor->pushUndoCommand(new UndoCommand(originalImage, *(patternEditor)));
         painter.drawImage(0,0,originalImage);
-
         patternEditor->init(newImage, false);
     }
 }
@@ -566,6 +574,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     while (patternEditor->isEdited()) {
         QMessageBox msgBox(this);
+        msgBox.setIcon(QMessageBox::Question);
         msgBox.setWindowModality(Qt::WindowModal);
         msgBox.setText("The animation has been modified.");
         msgBox.setInformativeText("Do you want to save your changes?");
@@ -574,7 +583,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         int ans = msgBox.exec();
 
         if (ans == QMessageBox::Save) {
-            on_actionSave_File_triggered();
+            on_actionSave_File_as_triggered();
         }
 
         if (ans == QMessageBox::Cancel) {
@@ -621,4 +630,24 @@ void MainWindow::on_instrumentAction(bool) {
 void MainWindow::on_colorPicked(QColor color) {
     m_colorChooser->setColor(color);
     patternEditor->setToolColor(color);
+}
+
+void MainWindow::on_patternChanged(bool changed) {
+    Q_UNUSED(changed);
+}
+
+void MainWindow::on_patternResized() {
+    scrollArea->resize(scrollArea->width()+1, scrollArea->height());
+}
+
+bool MainWindow::saveFile(const QString& filename) {
+    Q_ASSERT(!filename.isEmpty());
+    if(!patternEditor->getPatternAsImage().save(filename)) {
+        QMessageBox::warning(this, tr("Error"), tr("Error, cannot write file %1.")
+                       .arg(filename));
+        return false;
+    }
+
+    m_lastFile = filename;
+    return true;
 }

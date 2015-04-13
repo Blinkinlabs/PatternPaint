@@ -34,7 +34,10 @@ public:
     QImage* getPattern() { return &pattern; }
 
     bool isEdited() const { return m_edited; }
-    void setEdited(bool e) { m_edited = e; }
+    void setEdited(bool e) {
+        m_edited = e;
+        emit changed(m_edited);
+    }
 
     // for compatibility with EasyPaint sources
     QColor getPrimaryColor() const { return toolColor; }
@@ -79,7 +82,8 @@ private:
     void lazyUpdate();
     void updateToolPreview(int x, int y);
 signals:
-
+    void changed(bool);
+    void resized();
 public slots:
     void setToolColor(QColor color);
     void setToolSize(int size);
