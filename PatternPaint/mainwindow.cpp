@@ -231,15 +231,8 @@ void MainWindow::on_actionPlay_triggered()
 
 void MainWindow::on_actionLoad_File_triggered()
 {
-    while (patternEditor->isEdited()) {
-        int ans = promptForSave();
-
-        if (ans == QMessageBox::Save) {
-            on_actionSave_File_as_triggered();  // save file and check again
-        }
-
-        if (ans == QMessageBox::Discard) break;  // continue open file
-        if (ans == QMessageBox::Cancel) return; // interrupt opening
+    if(!promptForSave()) {
+        return;
     }
 
     QSettings settings;
@@ -262,19 +255,19 @@ void MainWindow::on_actionLoad_File_triggered()
 
     QImage pattern;
 
-    // TODO: How to handle stuff that's not the right size?
-    // Right now we always resize, could offer to crop, center, etc instead.
     if(!pattern.load(fileName)) {
         qDebug() << "Error loading pattern file " << fileName;
         return;
     }
+
+    m_lastFile = fileName;
+    this->setWindowTitle("Pattern Paint - " + m_lastFile);
 
     patternEditor->init(pattern);
     patternEditor->setEdited(false);
 }
 
 void MainWindow::on_actionSave_File_as_triggered() {
-    //TODO: Track if we already had an open file to enable this, add save as?
     QSettings settings;
     QString lastDirectory = settings.value("File/SaveDirectory").toString();
 
@@ -284,7 +277,7 @@ void MainWindow::on_actionSave_File_as_triggered() {
     }
 
     QString fileName = QFileDialog::getSaveFileName(this,
-        tr("Save Pattern"), "", tr("Pattern Files (*.png *.jpg *.bmp)"));
+        tr("Save Pattern"), lastDirectory, tr("Pattern Files (*.png *.jpg *.bmp)"));
 
     if(fileName.length() == 0) {
         return;
@@ -566,19 +559,9 @@ void MainWindow::readSettings()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    while (patternEditor->isEdited()) {
-        int ans = promptForSave();
-
-        if (ans == QMessageBox::Save) {
-            on_actionSave_File_as_triggered();
-        }
-
-        if (ans == QMessageBox::Cancel) {
-            event->ignore();
-            return;
-        }
-
-        if (ans == QMessageBox::Discard) break;
+    if(!promptForSave()) {
+        event->ignore();
+        return;
     }
 
     writeSettings();
@@ -628,25 +611,42 @@ void MainWindow::on_patternResized() {
 }
 
 bool MainWindow::saveFile(const QString& filename) {
-    Q_ASSERT(!filename.isEmpty());
+    if(filename.isEmpty()) {
+        return false;
+    }
+
     if(!patternEditor->getPatternAsImage().save(filename)) {
-        QMessageBox::warning(this, tr("Error"), tr("Error, cannot write file %1.")
+        QMessageBox::warning(this, tr("Error"), tr("Error saving pattern %1. Try saving it somewhere else?")
                        .arg(filename));
         return false;
     }
 
     m_lastFile = filename;
+    this->setWindowTitle("Pattern Paint - " + m_lastFile);
     return true;
 }
 
-int MainWindow::promptForSave()
-{
-    QMessageBox msgBox(this);
-    msgBox.setIcon(QMessageBox::Question);
-    msgBox.setWindowModality(Qt::WindowModal);
-    msgBox.setText("The animation has been modified.");
-    msgBox.setInformativeText("Do you want to save your changes?");
-    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Save);
-    return msgBox.exec();
+int MainWindow::promptForSave() {
+    while (patternEditor->isEdited()) {
+        QMessageBox msgBox(this);
+        msgBox.setIcon(QMessageBox::Question);
+        msgBox.setWindowModality(Qt::WindowModal);
+        msgBox.setText("The pattern has been modified.");
+        msgBox.setInformativeText("Do you want to save your changes?");
+        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Save);
+        int ans = msgBox.exec();
+
+        if (ans == QMessageBox::Save) {
+            on_actionSave_File_triggered();
+        }
+
+        if (ans == QMessageBox::Cancel) {
+            return false;
+        }
+
+        if (ans == QMessageBox::Discard) {
+            return true;
+        }
+    }
 }
