@@ -258,7 +258,8 @@ void MainWindow::on_actionLoad_File_triggered()
     QImage pattern;
 
     if(!pattern.load(fileName)) {
-        qDebug() << "Error loading pattern file " << fileName;
+        errorMessageDialog->setText("Could not open file " + fileName + ". Perhaps it has a formatting problem?");
+        errorMessageDialog->show();
         return;
     }
 
