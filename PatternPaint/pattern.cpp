@@ -114,6 +114,7 @@ void Pattern::encodeImageRGB16_RLE() {
 void Pattern::encodeImageRGB24() {
     // TODO: build c++ header as well
 
+    header.clear();
     data.clear();
 
     for(int frame = 0; frame < image.width(); frame++) {
@@ -124,6 +125,26 @@ void Pattern::encodeImageRGB24() {
             data.append(qBlue(color));
         }
     }
+
+    header.append("const uint8_t hiData[]  = {\n");
+
+    for(int frame = 0; frame < image.width(); frame++) {
+        for(int pixel = 0; pixel < image.height(); pixel++) {
+            QRgb color = ColorModel::correctBrightness(image.pixel(frame, pixel));
+
+            header.append(QString("    %1, %2, %3, // %4\n")
+                          .arg(qRed(color))
+                          .arg(qGreen(color))
+                          .arg(qBlue(color))
+                          .arg(pixel));
+        }
+    }
+
+    header.append("};\n");
+    header.append("\n");
+    header.append(QString("Animation pattern(%1, hiData, ENCODING_RGB24, %2);")
+                          .arg(image.width())
+                          .arg(image.height()));
 }
 
 void Pattern::encodeImageIndexed() {
