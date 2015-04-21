@@ -7,3 +7,5 @@ PatternPaint/Makefile*
 Blinkinlabs32u4_boards/*
 Blinkytile/*
 PatternPaintWindows/*
+build-*
+PatternPaint/PatternPaint.pro.user
