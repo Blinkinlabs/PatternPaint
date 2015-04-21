@@ -83,7 +83,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     penSizeSpin->setToolTip(tr("Pen size"));
     instruments->addWidget(penSizeSpin);
 
-
     // tools
     pSpeed = new QSpinBox(this);
     pSpeed->setEnabled(false);
@@ -105,6 +104,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
             patternEditor, SLOT(setToolColor(QColor)));
     connect(patternEditor, SIGNAL(changed(bool)), SLOT(on_patternChanged(bool)));
     connect(patternEditor, SIGNAL(resized()), SLOT(on_patternResized()));
+
+    connect(patternEditor, SIGNAL(changed(bool)), this, SLOT(on_imageChanged(bool)));
 
     tape = new BlinkyTape(this);
     // Modify our UI when the tape connection status changes
@@ -141,7 +142,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     // The draw timer tells the pattern to advance
     connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
     drawTimer->setInterval(33);
-    //drawTimer->start(); // why start now?
 
 
     // Start a scanner to connect to a BlinkyTape automatically
@@ -149,13 +149,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connectionScannerTimer->setInterval(CONNECTION_SCANNER_INTERVAL);
     connectionScannerTimer->start();
 
-    // initialization started parameters here
+    // Initial values for interface
     penSizeSpin->setValue(1);
     patternEditor->setToolSize(1);
     patternEditor->setToolColor(QColor(255,255,255));
     actionPen->setChecked(true);
     patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(actionPen->data()));
     readSettings();
+
+    this->setWindowTitle("Untitled - Pattern Paint");
 }
 
 MainWindow::~MainWindow(){}
@@ -250,8 +252,8 @@ void MainWindow::on_actionLoad_File_triggered()
         return;
     }
 
-    QFileInfo lastFile(fileName);
-    settings.setValue("File/LoadDirectory", lastFile.absoluteFilePath());
+    QFileInfo fileInfo(fileName);
+    settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
 
     QImage pattern;
 
@@ -260,8 +262,7 @@ void MainWindow::on_actionLoad_File_triggered()
         return;
     }
 
-    m_lastFile = fileName;
-    this->setWindowTitle("Pattern Paint - " + m_lastFile);
+    on_patternFilenameChanged(fileInfo);
 
     patternEditor->init(pattern);
     patternEditor->setEdited(false);
@@ -283,16 +284,17 @@ void MainWindow::on_actionSave_File_as_triggered() {
         return;
     }
 
-    QFileInfo lastFile(fileName);
-    settings.setValue("File/SaveDirectory", lastFile.absoluteFilePath());
-    patternEditor->setEdited(!saveFile(fileName));
+    QFileInfo fileInfo(fileName);
+    settings.setValue("File/SaveDirectory", fileInfo.absolutePath());
+
+    patternEditor->setEdited(!saveFile(fileInfo));
 }
 
 void MainWindow::on_actionSave_File_triggered() {
-    if (m_lastFile.isEmpty()) {
+    if (m_lastFileInfo.fileName() == "") {
         on_actionSave_File_as_triggered();
     } else {
-        patternEditor->setEdited(!saveFile(m_lastFile));
+        patternEditor->setEdited(!saveFile(m_lastFileInfo));
     }
 }
 
@@ -301,14 +303,24 @@ void MainWindow::on_actionExit_triggered()
     this->close();
 }
 
-void MainWindow::on_actionExport_pattern_for_Arduino_triggered()
-{
+void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
+    QSettings settings;
+    QString lastDirectory = settings.value("File/ExportArduinoDirectory").toString();
+
+    QDir dir(lastDirectory);
+    if(!dir.isReadable()) {
+        lastDirectory = QDir::homePath();
+    }
+
     QString fileName = QFileDialog::getSaveFileName(this,
-        tr("Save Pattern for Arduino"), "pattern.h", tr("Header File (*.h)"));
+        tr("Save Pattern for Arduino"), lastDirectory, tr("Header File (*.h)"));
 
     if(fileName.length() == 0) {
         return;
     }
+
+    QFileInfo fileInfo(fileName);
+    settings.setValue("File/ExportArduinoDirectory", fileInfo.absolutePath());
 
     // Convert the current pattern into a Pattern
     QImage image =  patternEditor->getPatternAsImage();
@@ -610,43 +622,58 @@ void MainWindow::on_patternResized() {
     scrollArea->resize(scrollArea->width()+1, scrollArea->height());
 }
 
-bool MainWindow::saveFile(const QString& filename) {
-    if(filename.isEmpty()) {
+void MainWindow::on_imageChanged(bool changed)
+{
+    actionSave_File->setEnabled(changed);
+}
+
+void MainWindow::on_patternFilenameChanged(QFileInfo fileinfo)
+{
+    m_lastFileInfo = fileinfo;
+    this->setWindowTitle(m_lastFileInfo.baseName() + " - Pattern Paint");
+}
+
+bool MainWindow::saveFile(const QFileInfo fileinfo) {
+    if(fileinfo.fileName() == "") {
         return false;
     }
 
-    if(!patternEditor->getPatternAsImage().save(filename)) {
+    if(!patternEditor->getPatternAsImage().save(fileinfo.filePath())) {
         QMessageBox::warning(this, tr("Error"), tr("Error saving pattern %1. Try saving it somewhere else?")
-                       .arg(filename));
+                       .arg(fileinfo.filePath()));
         return false;
     }
 
-    m_lastFile = filename;
-    this->setWindowTitle("Pattern Paint - " + m_lastFile);
+    on_patternFilenameChanged(fileinfo);
     return true;
 }
 
 int MainWindow::promptForSave() {
-    while (patternEditor->isEdited()) {
-        QMessageBox msgBox(this);
-        msgBox.setIcon(QMessageBox::Question);
-        msgBox.setWindowModality(Qt::WindowModal);
-        msgBox.setText("The pattern has been modified.");
-        msgBox.setInformativeText("Do you want to save your changes?");
-        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-        msgBox.setDefaultButton(QMessageBox::Save);
-        int ans = msgBox.exec();
-
-        if (ans == QMessageBox::Save) {
-            on_actionSave_File_triggered();
-        }
-
-        if (ans == QMessageBox::Cancel) {
-            return false;
-        }
-
-        if (ans == QMessageBox::Discard) {
-            return true;
-        }
+    if (patternEditor->isEdited() == false) {
+        return true;
     }
+
+    QMessageBox msgBox(this);
+    msgBox.setWindowModality(Qt::WindowModal);
+    msgBox.setText("The pattern has been modified.");
+    msgBox.setInformativeText("Do you want to save your changes?");
+    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Save);
+    int ans = msgBox.exec();
+
+    if (ans == QMessageBox::Save) {
+        on_actionSave_File_triggered();
+
+        return (patternEditor->isEdited() == false);
+    }
+
+    if (ans == QMessageBox::Cancel) {
+        return false;
+    }
+
+    if (ans == QMessageBox::Discard) {
+        return true;
+    }
+
+    return false;
 }

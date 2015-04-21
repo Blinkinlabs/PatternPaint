@@ -40,7 +40,6 @@ void PatternEditor::resizeEvent(QResizeEvent * event)
 
 void PatternEditor::init(int frameCount, int stripLength)
 {
-    qDebug() << Q_FUNC_INFO;
     // Store the width and height, so that letterboxscrollarea can resize this widget properly
     this->setBaseSize(frameCount, stripLength);
 

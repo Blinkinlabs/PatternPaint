@@ -87,6 +87,10 @@ private slots:
 
     void on_patternResized();
 
+    void on_imageChanged(bool changed);
+
+    void on_patternFilenameChanged(QFileInfo fileinfo);
+
 private:
     ColorChooser* m_colorChooser;
 
@@ -108,11 +112,11 @@ private:
     QUndoGroup *m_undoStackGroup;
     QAction* m_undoAction;
     QAction* m_redoAction;
-    QString  m_lastFile;
+    QFileInfo  m_lastFileInfo;
 
     void writeSettings();
     void readSettings();
-    bool saveFile(const QString& filename);
+    bool saveFile(const QFileInfo fileinfo);
 
     int promptForSave();
 };

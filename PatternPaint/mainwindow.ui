@@ -262,7 +262,7 @@
     <enum>LeftToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>false</bool>
+    <bool>true</bool>
    </attribute>
    <addaction name="actionPen"/>
    <addaction name="actionLine"/>
@@ -293,7 +293,7 @@
   </action>
   <action name="actionSave_File">
    <property name="enabled">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="icon">
     <iconset resource="images.qrc">
