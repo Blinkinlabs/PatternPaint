@@ -87,7 +87,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     pSpeed = new QSpinBox(this);
     pSpeed->setEnabled(false);
     pSpeed->setRange(1, 100);
-    pSpeed->setValue(30);
+    pSpeed->setValue(20);
     pSpeed->setToolTip(tr("Pattern speed"));
     tools->addWidget(pSpeed);
     connect(pSpeed, SIGNAL(valueChanged(int)), this, SLOT(on_patternSpeed_valueChanged(int)));

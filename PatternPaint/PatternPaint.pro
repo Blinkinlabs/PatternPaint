@@ -24,7 +24,7 @@ TEMPLATE = app
 
 #Application version
 VERSION_MAJOR = 1
-VERSION_MINOR = 4
+VERSION_MINOR = 5
 VERSION_BUILD = 0
 
 DEFINES += "VERSION_MAJOR=$${VERSION_MAJOR}" \
@@ -91,7 +91,7 @@ FORMS    += mainwindow.ui \
 include(instruments/instruments.pri)
 
 # OS X: Specify icon resource to use
-ICON = images/blinkytape.icns
+ICON = images/patternpaint.icns
 
 # OS X: Disable app nap using custom plist file
 QMAKE_INFO_PLIST = Info.plist
