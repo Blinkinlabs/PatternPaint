@@ -55,7 +55,7 @@ void Pattern::encodeImageRGB16_RLE() {
     data.clear();
     header.clear(); // TODO: Move the header builder somewhere else?
 
-    header.append("const PROGMEM prog_uint8_t patternData[]  = {\n");
+    header.append("const uint8_t animationData[] PROGMEM = {\n");
 
     for(int frame = 0; frame < image.width(); frame++) {
         int currentColor;
@@ -105,7 +105,7 @@ void Pattern::encodeImageRGB16_RLE() {
     }
 
     header.append("};\n\n");
-    header.append(QString("Pattern pattern(%1, patternData, ENCODING_RGB565_RLE, %2);\n")
+    header.append(QString("Animation animation(%1, animationData, ENCODING_RGB565_RLE, %2);\n")
                   .arg(image.width())
                   .arg(image.height()));
 }
@@ -126,7 +126,7 @@ void Pattern::encodeImageRGB24() {
         }
     }
 
-    header.append("const uint8_t hiData[]  = {\n");
+    header.append("const uint8_t animationData[] PROGMEM = {\n");
 
     for(int frame = 0; frame < image.width(); frame++) {
         for(int pixel = 0; pixel < image.height(); pixel++) {
@@ -142,7 +142,7 @@ void Pattern::encodeImageRGB24() {
 
     header.append("};\n");
     header.append("\n");
-    header.append(QString("Animation pattern(%1, hiData, ENCODING_RGB24, %2);")
+    header.append(QString("Animation animation(%1, animationData, ENCODING_RGB24, %2);")
                           .arg(image.width())
                           .arg(image.height()));
 }

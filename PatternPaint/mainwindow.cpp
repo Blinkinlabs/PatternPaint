@@ -328,7 +328,7 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
 
     // Note: Converting frameRate to frame delay here.
     Pattern pattern(image, drawTimer->interval(),
-                        Pattern::INDEXED_RLE);
+                        Pattern::RGB24);
 
 
     // Attempt to open the specified file
