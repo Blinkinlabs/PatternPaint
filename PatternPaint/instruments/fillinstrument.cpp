@@ -62,7 +62,7 @@ void FillInstrument::paint(PatternEditor& pe)
 
     QColor oldColor(pixel);
 
-    if(switchColor != oldColor) {
+    if(switchColor.rgb() != oldColor.rgb()) {
         fill(mStartPoint, switchColor.rgb(), pixel, pe.getPattern());
         /*fillRecurs(mStartPoint.x(), mStartPoint.y(),
                    switchColor.rgb(), pixel,
@@ -75,10 +75,10 @@ void FillInstrument::paint(PatternEditor& pe)
 
 QList<QPoint> neighbors(const QPoint& pt, const QImage* img) {
     QList<QPoint> res;
-    if (pt.x() > 0) res << QPoint(pt.x()-1, pt.y());
-    if (pt.y() > 0) res << QPoint(pt.x(), pt.y()-1);
-    if (pt.x() + 1 < img->width()) res << QPoint(pt.x()+1, pt.y());
-    if (pt.y() + 1 < img->height()) res << QPoint(pt.x(), pt.y() + 1);
+    if (pt.x() > 0)                 res << QPoint(pt.x()-1, pt.y()  );
+    if (pt.y() > 0)                 res << QPoint(pt.x()  , pt.y()-1);
+    if (pt.x() < img->width() - 1)  res << QPoint(pt.x()+1, pt.y()  );
+    if (pt.y() < img->height() - 1) res << QPoint(pt.x()  , pt.y()+1);
     return res;
 }
 
