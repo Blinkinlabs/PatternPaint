@@ -427,24 +427,24 @@ void MainWindow::on_actionTroubleshooting_tips_triggered()
 void MainWindow::on_actionFlip_Horizontal_triggered()
 {
     // TODO: This in a less hacky way?
-    // TODO: Undo/redo
     QImage image =  patternEditor->getPatternAsImage();
+    patternEditor->pushUndoCommand(new UndoCommand(image, *(patternEditor)));
     patternEditor->init(image.mirrored(true, false));
 }
 
 void MainWindow::on_actionFlip_Vertical_triggered()
 {
     // TODO: This in a less hacky way?
-    // TODO: Undo/redo
     QImage image =  patternEditor->getPatternAsImage();
+    patternEditor->pushUndoCommand(new UndoCommand(image, *(patternEditor)));
     patternEditor->init(image.mirrored(false, true));
 }
 
 void MainWindow::on_actionClear_Pattern_triggered()
 {
     // TODO: This in a less hacky way?
-    // TODO: Undo/redo
     QImage image =  patternEditor->getPatternAsImage();
+    patternEditor->pushUndoCommand(new UndoCommand(image, *(patternEditor)));
     image.fill(0);
     patternEditor->init(image);
 }
