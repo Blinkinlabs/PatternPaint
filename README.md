@@ -27,13 +27,13 @@ http://download.qt.io/archive/qt/5.4/5.4.1/qt-opensource-mac-x64-clang-5.4.1.dmg
 
 1.	Set up the QT environment:
 
-	export QTDIR=/Users/matt/Qt/5.4/clang_64/
+	export QTDIR=~/Qt5.4.1/5.4/clang_64/
 
 2.	Build PatternPaint:
 
 	cd PatternPaint
 	rm -R build/
-	${QTDIR}/bin/qmake MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build 	DESTDIR=bin VERSION=0.3.0
+	${QTDIR}/bin/qmake MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build 	DESTDIR=bin VERSION=1.5.0
 	make
 	cd ..
 
@@ -45,7 +45,7 @@ http://download.qt.io/archive/qt/5.4/5.4.1/qt-opensource-mac-x64-clang-5.4.1.dmg
 
 4.	Change the dmg name to include the version, for example PatternPaint_0.1.0.dmg
 
-	mv PatternPaint/bin/PatternPaint.dmg ./PatternPaint_0.3.0.dmg
+	mv PatternPaint/bin/PatternPaint.dmg ./PatternPaint_1.5.0.dmg
 
 5.	Distribute!
 
