@@ -250,7 +250,6 @@
    <addaction name="actionLoad_File"/>
    <addaction name="actionSave_File"/>
    <addaction name="actionSave_to_Tape"/>
-   <addaction name="actionConnect"/>
    <addaction name="separator"/>
    <addaction name="actionPlay"/>
   </widget>
@@ -262,7 +261,7 @@
     <enum>LeftToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
    <addaction name="actionPen"/>
    <addaction name="actionLine"/>
@@ -389,6 +388,9 @@
    </property>
   </action>
   <action name="actionAddress_programmer">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Address programmer...</string>
    </property>
@@ -399,6 +401,9 @@
    </property>
    <property name="checked">
     <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
    </property>
    <property name="text">
     <string>Automatically connect</string>
