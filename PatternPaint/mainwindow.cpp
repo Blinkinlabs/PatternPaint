@@ -85,7 +85,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     // tools
     pSpeed = new QSpinBox(this);
-    pSpeed->setEnabled(false);
     pSpeed->setRange(1, 100);
     pSpeed->setValue(20);
     pSpeed->setToolTip(tr("Pattern speed"));
@@ -221,14 +220,22 @@ void MainWindow::on_patternSpeed_valueChanged(int value)
 void MainWindow::on_actionPlay_triggered()
 {
     if (drawTimer->isActive()) {
-        drawTimer->stop();
-        actionPlay->setText(tr("Play"));
-        actionPlay->setIcon(QIcon(":/resources/images/play.png"));
+        stopPlayback();
     } else {
-        drawTimer->start();
-        actionPlay->setText(tr("Pause"));
-        actionPlay->setIcon(QIcon(":/resources/images/pause.png"));
+        startPlayback();
     }
+}
+
+void MainWindow::startPlayback() {
+    drawTimer->start();
+    actionPlay->setText(tr("Pause"));
+    actionPlay->setIcon(QIcon(":/resources/images/pause.png"));
+}
+
+void MainWindow::stopPlayback() {
+    drawTimer->stop();
+    actionPlay->setText(tr("Play"));
+    actionPlay->setIcon(QIcon(":/resources/images/play.png"));
 }
 
 void MainWindow::on_actionLoad_File_triggered()
@@ -349,18 +356,14 @@ void MainWindow::on_tapeConnectionStatusChanged(bool connected)
 {
     qDebug() << "status changed, connected=" << connected;
     actionSave_to_Tape->setEnabled(connected);
-    actionPlay->setEnabled(connected);
-    pSpeed->setEnabled(connected);
 
     if(connected) {
         mode = Connected;
-        actionConnect->setText(tr("Disconnect"));
-        actionConnect->setIcon(QIcon(":/images/resources/disconnect.png"));
+        startPlayback();
     }
     else {
         mode = Disconnected;
-        actionConnect->setText(tr("Connect"));
-        actionConnect->setIcon(QIcon(":/images/resources/connect.png"));
+        stopPlayback();
 
         // TODO: Don't do this if we disconnected intentionally.
         connectionScannerTimer->start();

@@ -118,6 +118,9 @@ private:
     void readSettings();
     bool saveFile(const QFileInfo fileinfo);
 
+    void startPlayback();
+    void stopPlayback();
+
     int promptForSave();
 };
 
