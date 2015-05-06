@@ -42,6 +42,7 @@ void PencilInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, co
         mStartPoint = mEndPoint = pt;
         pe.setPaint(true);
         makeUndoCommand(pe);
+        paint(pe);
     }
 }
 

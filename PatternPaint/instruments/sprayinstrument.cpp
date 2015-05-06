@@ -41,6 +41,7 @@ void SprayInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, con
         mStartPoint = mEndPoint = pt;
         pe.setPaint(true);
         makeUndoCommand(pe);
+        paint(pe);
     }
 }
 
@@ -56,7 +57,6 @@ void SprayInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& pe, const QPoi
 void SprayInstrument::mouseReleaseEvent(QMouseEvent*, PatternEditor& pe, const QPoint&)
 {
     if(pe.isPaint()) {
-        paint(pe);
         pe.setPaint(false);
     }
 }

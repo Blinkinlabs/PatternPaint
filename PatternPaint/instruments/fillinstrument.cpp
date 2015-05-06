@@ -41,6 +41,7 @@ void FillInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, cons
         mStartPoint = mEndPoint = pt;
         pe.setPaint(true);
         makeUndoCommand(pe);
+        paint(pe);
     }
 }
 
@@ -50,7 +51,6 @@ void FillInstrument::mouseMoveEvent(QMouseEvent *, PatternEditor&, const QPoint&
 void FillInstrument::mouseReleaseEvent(QMouseEvent*, PatternEditor& pe, const QPoint&)
 {
     if(pe.isPaint()) {
-        paint(pe);
         pe.setPaint(false);
     }
 }

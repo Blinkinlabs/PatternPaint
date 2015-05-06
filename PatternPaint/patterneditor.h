@@ -80,7 +80,6 @@ private:
 
     /// Update the screen, but only if we haven't done so in a while
     void lazyUpdate();
-    void updateToolPreview(int x, int y);
 signals:
     void changed(bool);
     void resized();

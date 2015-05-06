@@ -43,6 +43,7 @@ void LineInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, cons
         pe.setPaint(true);
         mImageCopy = pe.getPatternAsImage();
         makeUndoCommand(pe);
+        paint(pe);
     }
 }
 

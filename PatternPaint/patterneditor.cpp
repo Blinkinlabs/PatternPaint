@@ -135,22 +135,6 @@ void PatternEditor::updateGridSize() {
     }
 }
 
-void PatternEditor::updateToolPreview(int x, int y) {
-    QPainter painter(&toolPreview);
-    toolPreview.fill(COLOR_CLEAR);
-
-    painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
-    painter.setRenderHint(QPainter::Antialiasing, false);
-    painter.setPen(toolColor);
-
-    QBrush brush = painter.brush();
-    brush.setStyle(Qt::SolidPattern);
-    brush.setColor(toolColor);
-    painter.setBrush(brush);
-
-    painter.drawPoint(x,y);
-    painter.drawEllipse ( QPoint(x,y), toolSize/2, toolSize/2 );
-}
 
 void PatternEditor::mousePressEvent(QMouseEvent *event) {
     if (m_pi) {
@@ -195,9 +179,6 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
 
     oldX = x;
     oldY = y;
-
-    // Update the preview layer
-    updateToolPreview(x,y);
 
     if (m_pi) {
         setCursor(m_pi->cursor());
