@@ -12,7 +12,7 @@
 !define APP_NAME "Pattern Paint"
 !define COMP_NAME "Blinkinlabs"
 !define WEB_SITE "http://blinkinlabs.com"
-!define VERSION "01.4.0.00"
+!define VERSION "01.5.0.00"
 !define COPYRIGHT "Blinkinlabs © 2015"
 !define DESCRIPTION "Application"
 !define INSTALLER_NAME "C:\Users\matt\My Documents\PatternPaint\PatternPaint Windows Installer.exe"
