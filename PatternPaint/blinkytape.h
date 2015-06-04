@@ -27,6 +27,11 @@
 #define LIGHT_BUDDY_BOOTLOADER_VID      0x1D50
 #define LIGHT_BUDDY_BOOTLOADER_PID      0x60A9
 
+#define BLINKYPENDANT_APPLICATION_VID     0x1209
+#define BLINKYPENDANT_APPLICATION_PID     0x8888
+#define BLINKYPENDANT_BOOTLOADER_VID      0x1209
+#define BLINKYPENDANT_BOOTLOADER_PID      0x8889
+
 /// Connect to a BlinkyTape over a serial port, and manage sending data to it.
 class BlinkyTape : public QObject
 {

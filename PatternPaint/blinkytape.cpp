@@ -32,6 +32,11 @@ QList<QSerialPortInfo> BlinkyTape::findBlinkyTapes()
                 && info.productIdentifier() == LIGHT_BUDDY_APPLICATION_PID) {
                  tapes.push_back(info);
         }
+        // And BlinkyPendants
+        else if(info.vendorIdentifier() == BLINKYPENDANT_APPLICATION_VID
+                && info.productIdentifier() == BLINKYPENDANT_APPLICATION_PID) {
+                 tapes.push_back(info);
+        }
     }
 
     return tapes;
