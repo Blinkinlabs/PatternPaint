@@ -31,12 +31,9 @@ public:
     /// @param pattern Pattern to upload to the BlinkyTape
     virtual bool startUpload(BlinkyTape& tape, std::vector<Pattern> patterns) = 0;
 
-    /// Start an upload, using the passed blinkytape as a launching point
-    /// Note that the blinkytape will be disconnected during the upload process,
-    /// and will need to be reconnected manually afterwards.
+    /// Update/restore the firmware on the specificed device
     /// @param tape BlinkyTape to upload to (must already be connected)
-    /// @param sketch Sketch to upload to the BlinkyTape
-    virtual bool startUpload(BlinkyTape& tape, QByteArray sketch) = 0;
+    virtual bool upgradeFirmware(BlinkyTape& tape) = 0;
 
     /// Get a string describing the last error, if any.
     virtual QString getErrorString() const = 0;

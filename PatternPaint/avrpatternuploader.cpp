@@ -1,6 +1,8 @@
 #include "avrpatternuploader.h"
 #include "avruploaddata.h"
 
+#include "ColorSwirl_Sketch.h"
+
 #include <QDebug>
 
 /// Interval between polling the serial port list for new devices
@@ -106,7 +108,9 @@ bool AvrPatternUploader::startUpload(BlinkyTape& tape, std::vector<Pattern> patt
 }
 
 
-bool AvrPatternUploader::startUpload(BlinkyTape& tape, QByteArray sketch) {
+bool AvrPatternUploader::upgradeFirmware(BlinkyTape& tape) {
+    QByteArray sketch = QByteArray(reinterpret_cast<const char*>(COLORSWIRL_DATA),COLORSWIRL_LENGTH);
+
     char buff[BUFF_LENGTH];
     snprintf(buff, BUFF_LENGTH, "Sketch size: %iB",
              sketch.length()),

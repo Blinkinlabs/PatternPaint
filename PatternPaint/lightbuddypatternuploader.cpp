@@ -22,15 +22,16 @@ bool LightBuddyPatternUploader::startUpload(BlinkyTape &tape, std::vector<Patter
     // 4. Create a new file to store the pattern
     // 5. Upload each sector to the lightbuddy
     // 6. Reset the lightbuddy state machine
+    errorString = "Pattern upload not currently supported for Lightbuddy!";
     return false;
 }
 
-bool LightBuddyPatternUploader::startUpload(BlinkyTape &tape, QByteArray sketch)
+bool LightBuddyPatternUploader::upgradeFirmware(BlinkyTape& tape)
 {
     Q_UNUSED(tape);
-    Q_UNUSED(sketch);
 
     // TODO: Support firmware upload for the lightbuddy
+    errorString = "Firmware update not currently supported for Lightbuddy!";
     return false;
 }
 

@@ -23,9 +23,6 @@
 #include <QUndoGroup>
 #include <QToolButton>
 
-// TODO: Move this to pattern uploader or something?
-#include "ColorSwirl_Sketch.h"
-
 #define DEFAULT_PATTERN_HEIGHT 60
 #define DEFAULT_PATTERN_LENGTH 100
 
@@ -475,9 +472,7 @@ void MainWindow::on_actionLoad_rainbow_sketch_triggered()
         return;
     }
 
-    QByteArray sketch = QByteArray(reinterpret_cast<const char*>(COLORSWIRL_DATA),COLORSWIRL_LENGTH);
-
-    if(!uploader->startUpload(*tape, sketch)) {
+    if(!uploader->upgradeFirmware(*tape)) {
         errorMessageDialog->setText(uploader->getErrorString());
         errorMessageDialog->show();
         return;
