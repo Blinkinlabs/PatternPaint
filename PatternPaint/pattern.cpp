@@ -3,10 +3,11 @@
 
 #include <QDebug>
 
-Pattern::Pattern(QImage image, int frameDelay, Encoding encoding) :
+Pattern::Pattern(QImage image, int frameDelay, Encoding encoding, ColorMode colorMode) :
     encoding(encoding),
     image(image),
-    frameDelay(frameDelay)
+    frameDelay(frameDelay),
+    colorMode(colorMode)
 {
     frameCount = image.width();
     ledCount = image.height();
@@ -46,12 +47,24 @@ int Pattern::colorCount() const
 }
 
 int Pattern::QRgbTo565(QRgb color) {
-    return (((qRed(color)   >> 3) & 0x1F)   << 11)
-           | (((qGreen(color) >> 2) & 0x3F) <<  5)
-           | (((qBlue(color)  >> 3) & 0x1F)      );
+    switch(colorMode) {
+        case GRB:
+            return (((qGreen(color)   >> 3) & 0x1F)   << 11)
+                   | (((qRed(color) >> 2) & 0x3F) <<  5)
+                   | (((qBlue(color)  >> 3) & 0x1F)      );
+            break;
+        case RGB:
+        default:
+            return (((qRed(color)   >> 3) & 0x1F)   << 11)
+                   | (((qGreen(color) >> 2) & 0x3F) <<  5)
+                   | (((qBlue(color)  >> 3) & 0x1F)      );
+            break;
+    }
 }
 
 void Pattern::encodeImageRGB16_RLE() {
+    // TODO: Do I work?
+
     data.clear();
     header.clear(); // TODO: Move the header builder somewhere else?
 
@@ -120,9 +133,20 @@ void Pattern::encodeImageRGB24() {
     for(int frame = 0; frame < image.width(); frame++) {
         for(int pixel = 0; pixel < image.height(); pixel++) {
             QRgb color = ColorModel::correctBrightness(image.pixel(frame, pixel));
-            data.append(qRed(color));
-            data.append(qGreen(color));
-            data.append(qBlue(color));
+
+            switch(colorMode) {
+                case GRB:
+                    data.append(qGreen(color));
+                    data.append(qRed(color));
+                    data.append(qBlue(color));
+                    break;
+                case RGB:
+                default:
+                    data.append(qRed(color));
+                    data.append(qGreen(color));
+                    data.append(qBlue(color));
+                    break;
+            }
         }
     }
 
@@ -132,11 +156,25 @@ void Pattern::encodeImageRGB24() {
         for(int pixel = 0; pixel < image.height(); pixel++) {
             QRgb color = ColorModel::correctBrightness(image.pixel(frame, pixel));
 
-            header.append(QString("    %1, %2, %3, // %4\n")
-                          .arg(qRed(color))
-                          .arg(qGreen(color))
-                          .arg(qBlue(color))
-                          .arg(pixel));
+            switch(colorMode) {
+                case GRB:
+                    header.append(QString("    %1, %2, %3, // %4\n")
+                                  .arg(qGreen(color))
+                                  .arg(qRed(color))
+                                  .arg(qBlue(color))
+                                  .arg(pixel));
+                    break;
+                case RGB:
+                default:
+                header.append(QString("    %1, %2, %3, // %4\n")
+                              .arg(qRed(color))
+                              .arg(qGreen(color))
+                              .arg(qBlue(color))
+                              .arg(pixel));
+                   break;
+            }
+
+
         }
     }
 
@@ -148,6 +186,8 @@ void Pattern::encodeImageRGB24() {
 }
 
 void Pattern::encodeImageIndexed() {
+    // TODO: Add color mode support
+
     header.clear();
     data.clear();
 
@@ -214,6 +254,8 @@ void Pattern::encodeImageIndexed() {
 }
 
 void Pattern::encodeImageIndexed_RLE() {
+    // TODO: Add color mode support
+
     header.clear();
     data.clear();
 

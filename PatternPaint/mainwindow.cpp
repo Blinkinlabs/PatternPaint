@@ -157,6 +157,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     readSettings();
 
     this->setWindowTitle("Untitled - Pattern Paint");
+
+    QSettings settings;
+    setColorMode(static_cast<Pattern::ColorMode>(settings.value("Options/ColorOrder", Pattern::RGB).toUInt()));
 }
 
 MainWindow::~MainWindow(){}
@@ -185,9 +188,22 @@ void MainWindow::drawTimer_timeout() {
 
         for(int i = 0; i < image.height(); i++) {
             QRgb color = ColorModel::correctBrightness(image.pixel(n, i));
-            ledData.append(qRed(color));
-            ledData.append(qGreen(color));
-            ledData.append(qBlue(color));
+
+            switch(colorMode) {
+            case Pattern::GRB:
+                ledData.append(qGreen(color));
+                ledData.append(qRed(color));
+                ledData.append(qBlue(color));
+                break;
+            case Pattern::RGB:
+            default:
+                ledData.append(qRed(color));
+                ledData.append(qGreen(color));
+                ledData.append(qBlue(color));
+                break;
+            }
+
+
         }
         tape->sendUpdate(ledData);
 
@@ -335,7 +351,8 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
 
     // Note: Converting frameRate to frame delay here.
     Pattern pattern(image, drawTimer->interval(),
-                        Pattern::RGB24);
+                        Pattern::RGB24,
+                        colorMode);
 
 
     // Attempt to open the specified file
@@ -483,7 +500,8 @@ void MainWindow::on_actionSave_to_Tape_triggered()
     // Note: Converting frameRate to frame delay here.
     Pattern pattern(image,
                         drawTimer->interval(),
-                        Pattern::RGB24);
+                        Pattern::RGB24,
+                        colorMode);
 
     // TODO: Attempt different compressions till one works.
 
@@ -680,4 +698,33 @@ int MainWindow::promptForSave() {
     }
 
     return false;
+}
+
+void MainWindow::setColorMode(Pattern::ColorMode newColorOrder)
+{
+    colorMode = newColorOrder;
+
+    QSettings settings;
+    settings.setValue("Options/ColorOrder", static_cast<uint>(colorMode));
+
+    switch(colorMode) {
+    case Pattern::RGB:
+        actionRGB->setChecked(true);
+        actionGRB->setChecked(false);
+        break;
+    case Pattern::GRB:
+        actionRGB->setChecked(false);
+        actionGRB->setChecked(true);
+        break;
+    }
+}
+
+void MainWindow::on_actionGRB_triggered()
+{
+    setColorMode(Pattern::GRB);
+}
+
+void MainWindow::on_actionRGB_triggered()
+{
+    setColorMode(Pattern::RGB);
 }

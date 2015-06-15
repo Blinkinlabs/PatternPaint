@@ -91,6 +91,10 @@ private slots:
 
     void on_patternFilenameChanged(QFileInfo fileinfo);
 
+    void on_actionGRB_triggered();
+
+    void on_actionRGB_triggered();
+
 private:
     ColorChooser* m_colorChooser;
 
@@ -122,6 +126,10 @@ private:
     void stopPlayback();
 
     int promptForSave();
+
+    void setColorMode(Pattern::ColorMode newColorOrder);
+
+    Pattern::ColorMode colorMode;
 };
 
 #endif // MAINWINDOW_H

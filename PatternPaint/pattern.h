@@ -16,8 +16,14 @@ public:
         INDEXED_RLE = 3,     /// 8-bit indexed mode + RLE (pallated 8 bit)
     };
 
+    // TODO: Move me to a converter class
+    enum ColorMode {
+        RGB = 0,
+        GRB = 1
+    };
+
     // Create an pattern from a QImage
-    Pattern(QImage image, int frameDelay, Encoding encoding);
+    Pattern(QImage image, int frameDelay, Encoding encoding, ColorMode colorMode);
 
     // TODO: create an pattern from byte array
 
@@ -29,6 +35,7 @@ public:
     int frameCount;     /// Number of frames in this pattern
     int ledCount;       /// Number of LEDs in this tape
     int frameDelay;     /// Length of time between frames of data, in ms
+    ColorMode colorMode;    /// Pattern color mode
 
     int colorCount() const;  /// Number of unique colors in the original image
 

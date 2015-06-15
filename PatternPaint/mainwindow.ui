@@ -214,9 +214,18 @@
     <property name="title">
      <string>Tools</string>
     </property>
+    <widget class="QMenu" name="menuColor_Order">
+     <property name="title">
+      <string>Color Order</string>
+     </property>
+     <addaction name="actionRGB"/>
+     <addaction name="actionGRB"/>
+    </widget>
     <addaction name="actionSave_to_Tape"/>
     <addaction name="separator"/>
     <addaction name="actionAutomatically_connect"/>
+    <addaction name="separator"/>
+    <addaction name="menuColor_Order"/>
     <addaction name="separator"/>
     <addaction name="actionLoad_rainbow_sketch"/>
     <addaction name="actionAddress_programmer"/>
@@ -530,6 +539,25 @@
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionRGB">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>RGB (BlinkyTape, BlinkyTile)</string>
+   </property>
+  </action>
+  <action name="actionGRB">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>GRB (BlinkyPixel)</string>
    </property>
   </action>
  </widget>
