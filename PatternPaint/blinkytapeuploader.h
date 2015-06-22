@@ -30,12 +30,12 @@ struct FlashSection {
 ///
 /// While the upload process is underway, it will send periodic progress updates
 /// via the progressUpdate() signal.
-class AvrPatternUploader : public PatternUploader
+class BlinkyTapeUploader : public PatternUploader
 {
     Q_OBJECT
 
 public:
-    AvrPatternUploader(QObject *parent=0);
+    BlinkyTapeUploader(QObject *parent=0);
 
     bool startUpload(BlinkyController& tape, std::vector<Pattern> patterns);
     bool upgradeFirmware(BlinkyController& tape);

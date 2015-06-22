@@ -1,4 +1,4 @@
-#include "avrpatternuploader.h"
+#include "blinkytapeuploader.h"
 #include "avruploaddata.h"
 
 #include "ColorSwirl_Sketch.h"
@@ -19,7 +19,7 @@
 /// Length of character buffer for debug messages
 #define BUFF_LENGTH 100
 
-AvrPatternUploader::AvrPatternUploader(QObject *parent) :
+BlinkyTapeUploader::BlinkyTapeUploader(QObject *parent) :
     PatternUploader(parent)
 {
     bootloaderResetTimer = new QTimer(this);
@@ -32,7 +32,7 @@ AvrPatternUploader::AvrPatternUploader(QObject *parent) :
             this,SLOT(handleProgrammerCommandFinished(QString,QByteArray)));
 }
 
-void AvrPatternUploader::handleProgrammerError(QString error) {
+void BlinkyTapeUploader::handleProgrammerError(QString error) {
     qCritical() << error;
 
     if(programmer.isConnected()) {
@@ -42,7 +42,7 @@ void AvrPatternUploader::handleProgrammerError(QString error) {
     emit(finished(false));
 }
 
-void AvrPatternUploader::handleProgrammerCommandFinished(QString command, QByteArray returnData) {
+void BlinkyTapeUploader::handleProgrammerCommandFinished(QString command, QByteArray returnData) {
     Q_UNUSED(returnData);
 
     // TODO: Update our progress somehow? But how to tell how far we've gotten?
@@ -57,21 +57,21 @@ void AvrPatternUploader::handleProgrammerCommandFinished(QString command, QByteA
     }
 }
 
-void AvrPatternUploader::handleResetTimer()
+void BlinkyTapeUploader::handleResetTimer()
 {
     emit(finished(true));
 }
 
-void AvrPatternUploader::setProgress(int newProgress) {
+void BlinkyTapeUploader::setProgress(int newProgress) {
     progress = newProgress;
     emit(progressChanged(progress));
 }
 
-void AvrPatternUploader::setMaxProgress(int newMaxProgress) {
+void BlinkyTapeUploader::setMaxProgress(int newMaxProgress) {
     emit(maxProgressChanged(newMaxProgress));
 }
 
-bool AvrPatternUploader::startUpload(BlinkyController& tape, std::vector<Pattern> patterns) {
+bool BlinkyTapeUploader::startUpload(BlinkyController& tape, std::vector<Pattern> patterns) {
     /// Create the compressed image and check if it will fit into the device memory
     avrUploadData data;
     if(!data.init(patterns)) {
@@ -108,7 +108,7 @@ bool AvrPatternUploader::startUpload(BlinkyController& tape, std::vector<Pattern
 }
 
 
-bool AvrPatternUploader::upgradeFirmware(BlinkyController& tape) {
+bool BlinkyTapeUploader::upgradeFirmware(BlinkyController& tape) {
     QByteArray sketch = QByteArray(reinterpret_cast<const char*>(COLORSWIRL_DATA),COLORSWIRL_LENGTH);
 
     char buff[BUFF_LENGTH];
@@ -135,7 +135,7 @@ bool AvrPatternUploader::upgradeFirmware(BlinkyController& tape) {
     return startUpload(tape);
 }
 
-bool AvrPatternUploader::startUpload(BlinkyController& tape) {
+bool BlinkyTapeUploader::startUpload(BlinkyController& tape) {
     setProgress(0);
     // TODO: Calculate this based on feedback from the programmer.
     setMaxProgress(300);
@@ -157,12 +157,12 @@ bool AvrPatternUploader::startUpload(BlinkyController& tape) {
     return true;
 }
 
-QString AvrPatternUploader::getErrorString() const
+QString BlinkyTapeUploader::getErrorString() const
 {
     return errorString;
 }
 
-void AvrPatternUploader::doWork() {
+void BlinkyTapeUploader::doWork() {
     // TODO: This flow is really ungainly
 
     //qDebug() << "In doWork state=" << state;

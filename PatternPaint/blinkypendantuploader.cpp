@@ -1,16 +1,12 @@
-#include "blinkypendantpatternuploader.h"
+#include "blinkypendantuploader.h"
 
-BlinkyPendantPatternUploader::BlinkyPendantPatternUploader()
+BlinkyPendantPatternUploader::BlinkyPendantPatternUploader(QObject *parent) :
+    PatternUploader(parent)
 {
 
 }
 
-BlinkyPendantPatternUploader::~BlinkyPendantPatternUploader()
-{
-
-}
-
-bool BlinkyPendantPatternUploader::startUpload(BlinkyTape& tape, std::vector<Pattern> patterns)
+bool BlinkyPendantPatternUploader::startUpload(BlinkyController& tape, std::vector<Pattern> patterns)
 {
     Q_UNUSED(tape);
     Q_UNUSED(patterns);
@@ -19,7 +15,7 @@ bool BlinkyPendantPatternUploader::startUpload(BlinkyTape& tape, std::vector<Pat
     return false;
 }
 
-bool BlinkyPendantPatternUploader::upgradeFirmware(BlinkyTape& tape)
+bool BlinkyPendantPatternUploader::upgradeFirmware(BlinkyController& tape)
 {
     Q_UNUSED(tape);
 

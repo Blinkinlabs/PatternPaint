@@ -6,9 +6,7 @@
 #include <QMessageBox>
 
 #include "blinkycontroller.h"
-#include "blinkytape.h"
 #include "patternuploader.h"
-#include "avrpatternuploader.h"
 #include "patterneditor.h"
 #include "addressprogrammer.h"
 
@@ -128,7 +126,7 @@ private:
 
     int promptForSave();
 
-    void connectController(QSerialPortInfo target);
+    void connectController();
     void connectUploader();
 
     void setColorMode(Pattern::ColorMode newColorOrder);

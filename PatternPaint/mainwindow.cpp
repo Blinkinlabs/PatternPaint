@@ -7,6 +7,8 @@
 #include "resizepattern.h"
 #include "undocommand.h"
 #include "colorchooser.h"
+#include "blinkypendant.h"
+#include "blinkytape.h"
 
 #include "pencilinstrument.h"
 #include "lineinstrument.h"
@@ -27,7 +29,7 @@
 
 #define MIN_TIMER_INTERVAL 10  // minimum interval to wait before firing a drawtimer update
 
-#define CONNECTION_SCANNER_INTERVAL 100
+#define CONNECTION_SCANNER_INTERVAL 1000
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -202,11 +204,33 @@ void MainWindow::connectionScannerTimer_timeout() {
         return;
     }
 
-    // Check if our serial port is on the list
+    // First look for BlinkyTapes
     QList<QSerialPortInfo> tapes = BlinkyTape::probe();
 
     if(tapes.length() > 0) {
-        on_actionConnect_triggered();
+        qDebug() << "BlinkyTapes found:" << tapes.length();
+
+        // TODO: Try another one if this one fails?
+        qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
+
+        controller = new BlinkyTape(this);
+        connectController();
+        controller->open(tapes[0]);
+        return;
+    }
+
+    // Next, look for BlinkyPendants
+    tapes = BlinkyPendant::probe();
+
+    if(tapes.length() > 0) {
+        qDebug() << "BlinkyPendants found:" << tapes.length();
+
+        // TODO: Try another one if this one fails?
+        qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
+
+        controller = new BlinkyPendant(this);
+        connectController();
+        controller->open(tapes[0]);
         return;
     }
 }
@@ -609,25 +633,20 @@ void MainWindow::closeEvent(QCloseEvent *event)
     event->accept();
 }
 
+
 void MainWindow::on_actionConnect_triggered()
 {
+    // If we were already connected, disconnect here
     if(!controller.isNull()) {
 //    if(controller->isConnected()) {
         qDebug() << "Disconnecting from tape";
         controller->close();
-    }
-    else {
-        QList<QSerialPortInfo> tapes = BlinkyTape::probe();
-        qDebug() << "Tapes found:" << tapes.length();
 
-        if(tapes.length() > 0) {
-            // TODO: Try another one if this one fails?
-            qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
-
-            // TODO Make new controller here!
-            connectController(tapes[0]);
-        }
+        return;
     }
+
+    // Otherwise, search for a controller.
+    connectionScannerTimer_timeout();
 }
 
 void MainWindow::on_instrumentAction(bool) {
@@ -710,18 +729,11 @@ int MainWindow::promptForSave() {
     return false;
 }
 
-void MainWindow::connectController(QSerialPortInfo target)
+void MainWindow::connectController()
 {
-    if(!controller.isNull()) {
-        return;
-    }
-
-    controller = new BlinkyTape(this);
     // Modify our UI when the tape connection status changes
     connect(controller, SIGNAL(connectionStatusChanged(bool)),
             this,SLOT(on_tapeConnectionStatusChanged(bool)));
-
-    controller->open(target);
 }
 
 void MainWindow::connectUploader()

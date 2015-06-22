@@ -1,30 +1,22 @@
-#include "blinkytapeuploader.h"
-#include "blinkytape.h"
+#include "blinkypendant.h"
+#include "blinkypendantuploader.h"
 #include <QDebug>
 
 /// Interval between scans to see if the device is still connected
 #define CONNECTION_SCANNER_INTERVAL 100
 
-#define RESET_TIMER_TIMEOUT 500
-
-#define RESET_MAX_TRIES 3
 
 // TODO: Support a method for loading these from preferences file
-QList<QSerialPortInfo> BlinkyTape::probe()
+QList<QSerialPortInfo> BlinkyPendant::probe()
 {
     QList<QSerialPortInfo> serialPorts = QSerialPortInfo::availablePorts();
     QList<QSerialPortInfo> tapes;
 
     foreach (const QSerialPortInfo &info, serialPorts) {
-        // Only connect to known BlinkyTapes
-        if(info.vendorIdentifier() == BLINKYTAPE_SKETCH_VID
-           && info.productIdentifier() == BLINKYTAPE_SKETCH_PID) {
+        // Only connect to known BlinkyPendants
+        if(info.vendorIdentifier() == BLINKYPENDANT_SKETCH_VID
+           && info.productIdentifier() == BLINKYPENDANT_SKETCH_PID) {
             tapes.push_back(info);
-        }
-        // If it's a leonardo, it /may/ be a BlinkyTape running a user sketch
-        else if(info.vendorIdentifier() == LEONARDO_SKETCH_VID
-                && info.productIdentifier() == LEONARDO_SKETCH_PID) {
-                 tapes.push_back(info);
         }
     }
 
@@ -32,21 +24,16 @@ QList<QSerialPortInfo> BlinkyTape::probe()
 }
 
 // TODO: Support a method for loading these from preferences file
-QList<QSerialPortInfo> BlinkyTape::probeBootloaders()
+QList<QSerialPortInfo> BlinkyPendant::probeBootloaders()
 {
     QList<QSerialPortInfo> serialPorts = QSerialPortInfo::availablePorts();
     QList<QSerialPortInfo> tapes;
 
     foreach (const QSerialPortInfo &info, serialPorts) {
-        // Only connect to known BlinkyTapes
-        if(info.vendorIdentifier() == BLINKYTAPE_BOOTLOADER_VID
-           && info.productIdentifier() == BLINKYTAPE_BOOTLOADER_PID) {
+        // Only connect to known BlinkyPendants
+        if(info.vendorIdentifier() == BLINKYPENDANT_BOOTLOADER_VID
+           && info.productIdentifier() == BLINKYPENDANT_BOOTLOADER_PID) {
             tapes.push_back(info);
-        }
-        // If it's a leonardo, it /may/ be a BlinkyTape running a user sketch
-        else if(info.vendorIdentifier() == LEONARDO_BOOTLOADER_VID
-                && info.productIdentifier() == LEONARDO_BOOTLOADER_PID) {
-                 tapes.push_back(info);
         }
     }
 
@@ -54,7 +41,7 @@ QList<QSerialPortInfo> BlinkyTape::probeBootloaders()
 }
 
 
-BlinkyTape::BlinkyTape(QObject *parent) :
+BlinkyPendant::BlinkyPendant(QObject *parent) :
     BlinkyController(parent)
 {
     serial = new QSerialPort(this);
@@ -65,14 +52,6 @@ BlinkyTape::BlinkyTape(QObject *parent) :
 
     connect(serial, SIGNAL(readyRead()), this, SLOT(handleSerialReadData()));
 
-    connect(serial, SIGNAL(baudRateChanged(qint32, QSerialPort::Directions)),
-            this, SLOT(handleBaudRateChanged(qint32, QSerialPort::Directions)));
-
-
-    resetTimer = new QTimer(this);
-    resetTimer->setSingleShot(true);
-    connect(resetTimer, SIGNAL(timeout()), this, SLOT(resetTimer_timeout()));
-
     // Windows doesn't notify us if the tape was disconnected, so we have to check peroidically
     #if defined(Q_OS_WIN)
     connectionScannerTimer = new QTimer(this);
@@ -81,7 +60,7 @@ BlinkyTape::BlinkyTape(QObject *parent) :
     #endif
 }
 
-void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
+void BlinkyPendant::handleSerialError(QSerialPort::SerialPortError error)
 {
     // The serial library appears to emit an extraneous SerialPortError
     // when open() is called. Just ignore it.
@@ -93,7 +72,7 @@ void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
 
 
     if (error == QSerialPort::ResourceError) {
-        qCritical() << "Serial resource error, BlinkyTape unplugged?" << errorString;
+        qCritical() << "Serial resource error, BlinkyPendant unplugged?" << errorString;
     }
     else {
         qCritical() << "Unrecognized serial error:" << errorString;
@@ -102,29 +81,8 @@ void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
     close();
 }
 
-void BlinkyTape::resetTimer_timeout() {
-    if(!isConnected()) {
-        return;
-    }
-
-    qDebug() << "Hit reset timer";
-
-    if(resetTriesRemaining < 1) {
-        qCritical() << "Reset timer maximum tries reached, failed to reset tape";
-        return;
-    }
-
-    serial->setBaudRate(QSerialPort::Baud1200);
-
-    // setBaudRate() doesn't seem to be reliable if called too quickly after the port
-    // is opened. In this case,
-    resetTimer->start(RESET_TIMER_TIMEOUT);
-
-    resetTriesRemaining--;
-}
-
 #if defined(Q_OS_WIN)
-void BlinkyTape::connectionScannerTimer_timeout() {
+void BlinkyPendant::connectionScannerTimer_timeout() {
     // If we are already disconnected, disregard.
     if(!isConnected()) {
         connectionScannerTimer->stop();
@@ -134,7 +92,7 @@ void BlinkyTape::connectionScannerTimer_timeout() {
     // Check if our serial port is on the list
     QSerialPortInfo currentInfo = QSerialPortInfo(*serial);
 
-    QList<QSerialPortInfo> tapes = findBlinkyTapes();
+    QList<QSerialPortInfo> tapes = findBlinkyPendants();
     foreach (const QSerialPortInfo &info, tapes) {
         // If we get a match, reset the timer and return.
         // We consider it a match if the port is the same on both
@@ -148,13 +106,13 @@ void BlinkyTape::connectionScannerTimer_timeout() {
 }
 #endif
 
-bool BlinkyTape::open(QSerialPortInfo info) {
+bool BlinkyPendant::open(QSerialPortInfo info) {
     if(isConnected()) {
-        qCritical() << "Already connected to a BlinkyTape";
+        qCritical() << "Already connected to a BlinkyPendant";
         return false;
     }
 
-    qDebug() << "Connecting to BlinkyTape on " << info.portName();
+    qDebug() << "Connecting to BlinkyPendant on " << info.portName();
 
 #if defined(Q_OS_OSX)
     // Note: This should be info.portName(). Changed here as a workaround for:
@@ -166,11 +124,9 @@ bool BlinkyTape::open(QSerialPortInfo info) {
     serial->setBaudRate(QSerialPort::Baud115200);
 
     if( !serial->open(QIODevice::ReadWrite) ) {
-        qDebug() << "Could not connect to BlinkyTape. Error: " << serial->error() << serial->errorString();
+        qDebug() << "Could not connect to BlinkyPendant. Error: " << serial->error() << serial->errorString();
         return false;
     }
-
-    resetTriesRemaining = 0;
 
     emit(connectionStatusChanged(true));
 
@@ -181,44 +137,27 @@ bool BlinkyTape::open(QSerialPortInfo info) {
     return true;
 }
 
-void BlinkyTape::close() {
+void BlinkyPendant::close() {
     if(serial->isOpen()) {
         serial->close();
     }
 
-    resetTriesRemaining = 0;
-
     emit(connectionStatusChanged(isConnected()));
 }
 
-void BlinkyTape::handleSerialReadData()
+void BlinkyPendant::handleSerialReadData()
 {
-//    qDebug() << "Got data from BlinkyTape, discarding.";
-    // Discard any data we get back from the BlinkyTape
+//    qDebug() << "Got data from BlinkyPendant, discarding.";
+    // Discard any data we get back from the BlinkyPendant
     serial->readAll();
 }
 
-void BlinkyTape::handleBaudRateChanged(qint32 baudRate, QSerialPort::Directions)
-{
-    if(baudRate == QSerialPort::Baud115200) {
-        qDebug() << "Baud rate updated to 115200!";
-    }
-    else if(baudRate == QSerialPort::Baud1200 && resetTriesRemaining > 0) {
-        qDebug() << "Baud rate updated to 1200bps, closing!";
 
-        resetTimer->stop();
-        close();
-    }
-    else if(baudRate == QSerialPort::Baud1200) {
-        qDebug() << "Baud rate updated to 1200bps spuriously";
-    }
-}
-
-bool BlinkyTape::isConnected() {
+bool BlinkyPendant::isConnected() {
     return serial->isOpen();
 }
 
-void BlinkyTape::sendUpdate(QByteArray LedData)
+void BlinkyPendant::sendUpdate(QByteArray LedData)
 {
     if(!isConnected()) {
         qCritical() << "Strip not connected, not sending update!";
@@ -249,7 +188,7 @@ void BlinkyTape::sendUpdate(QByteArray LedData)
     }
 }
 
-bool BlinkyTape::getPortInfo(QSerialPortInfo& info)
+bool BlinkyPendant::getPortInfo(QSerialPortInfo& info)
 {
     if(!isConnected()) {
         return false;
@@ -259,27 +198,19 @@ bool BlinkyTape::getPortInfo(QSerialPortInfo& info)
     return true;
 }
 
-void BlinkyTape::reset()
+void BlinkyPendant::reset()
 {
-    if(!isConnected()) {
-        return;
-    }
-
-    qDebug() << "Attempting to reset BlinkyTape";
-
-    resetTriesRemaining = RESET_MAX_TRIES;
-    resetTimer_timeout();
+    // Nothing to reset.
 }
 
 
-bool BlinkyTape::getUploader(QPointer<PatternUploader>& uploader)
+bool BlinkyPendant::getUploader(QPointer<PatternUploader>& uploader)
 {
     if(!isConnected()) {
         return false;
     }
 
-    // TODO: Is this the right parent?
-    uploader = new BlinkyTapeUploader(parent());
+    uploader = new BlinkyPendantPatternUploader(parent());
 
     return true;
 }

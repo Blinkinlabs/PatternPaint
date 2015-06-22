@@ -7,11 +7,11 @@
 
 
 /// Interact with the light buddy controller over serial
-class LightbuddyProtocol : public QObject
+class LightBuddyProtocol : public QObject
 {
     Q_OBJECT
 public:
-    explicit LightbuddyProtocol(QObject *parent = 0);
+    explicit LightBuddyProtocol(QObject *parent = 0);
 
 //    bool commandProgramAddress(uint8_t* buffer);
 //    bool commandReloadAnimations(uint8_t* buffer);

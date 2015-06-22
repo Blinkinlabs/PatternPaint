@@ -24,7 +24,7 @@ int int32FromArray(QByteArray array)
 }
 
 
-LightbuddyProtocol::LightbuddyProtocol(QObject *parent) :
+LightBuddyProtocol::LightBuddyProtocol(QObject *parent) :
     QObject(parent)
 {
     serial = new QSerialPort(this);
@@ -42,7 +42,7 @@ LightbuddyProtocol::LightbuddyProtocol(QObject *parent) :
 }
 
 
-bool LightbuddyProtocol::open(QSerialPortInfo info) {
+bool LightBuddyProtocol::open(QSerialPortInfo info) {
     if(isConnected()) {
         qCritical("Already connected to serial device");
         return false;
@@ -70,7 +70,7 @@ bool LightbuddyProtocol::open(QSerialPortInfo info) {
     return true;
 }
 
-void LightbuddyProtocol::close() {
+void LightBuddyProtocol::close() {
     if(!(serial->isOpen())) {
         return;
     }
@@ -78,11 +78,11 @@ void LightbuddyProtocol::close() {
     serial->close();
 }
 
-bool LightbuddyProtocol::isConnected() {
+bool LightBuddyProtocol::isConnected() {
     return serial->isOpen();
 }
 
-void LightbuddyProtocol::queueCommand(QString name,
+void LightBuddyProtocol::queueCommand(QString name,
                                  QByteArray data,
                                  QByteArray expectedResponse) {
 
@@ -92,7 +92,7 @@ void LightbuddyProtocol::queueCommand(QString name,
     processCommandQueue();
 }
 
-void LightbuddyProtocol::processCommandQueue() {
+void LightBuddyProtocol::processCommandQueue() {
     // Nothing to do if we don't have any commands...
     if(commandQueue.length() == 0) {
         return;
@@ -122,7 +122,7 @@ void LightbuddyProtocol::processCommandQueue() {
     commandTimeoutTimer->start(COMMAND_TIMEOUT_TIME);
 }
 
-void LightbuddyProtocol::handleReadData() {
+void LightBuddyProtocol::handleReadData() {
     if(commandQueue.length() == 0) {
         // TODO: error, we got unexpected data.
         qCritical() << "Got data when we didn't expect it!";
@@ -168,7 +168,7 @@ void LightbuddyProtocol::handleReadData() {
     processCommandQueue();
 }
 
-void LightbuddyProtocol::handleSerialError(QSerialPort::SerialPortError serialError)
+void LightBuddyProtocol::handleSerialError(QSerialPort::SerialPortError serialError)
 {
     if(serialError == QSerialPort::NoError) {
         // The serial library appears to emit an extraneous SerialPortError
@@ -184,7 +184,7 @@ void LightbuddyProtocol::handleSerialError(QSerialPort::SerialPortError serialEr
     responseData.clear();
 }
 
-void LightbuddyProtocol::handleCommandTimeout()
+void LightBuddyProtocol::handleCommandTimeout()
 {
     qCritical() << "Command timed out, disconnecting from programmer";
     emit(error("Command timed out, disconnecting from programmer"));
@@ -196,7 +196,7 @@ void LightbuddyProtocol::handleCommandTimeout()
 }
 
 
-void LightbuddyProtocol::getLargestfile()
+void LightBuddyProtocol::getLargestfile()
 {
     queueCommand("getLargestfile",QByteArray("\0x11"), QByteArray(""));
 }

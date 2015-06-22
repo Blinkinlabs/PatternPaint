@@ -7,11 +7,10 @@
 class BlinkyPendantPatternUploader : public PatternUploader
 {
 public:
-    BlinkyPendantPatternUploader();
-    ~BlinkyPendantPatternUploader();
+    BlinkyPendantPatternUploader(QObject *parent);
 
-    bool startUpload(BlinkyTape& tape, std::vector<Pattern> patterns);
-    bool upgradeFirmware(BlinkyTape& tape);
+    bool startUpload(BlinkyController& tape, std::vector<Pattern> patterns);
+    bool upgradeFirmware(BlinkyController& tape);
     QString getErrorString() const;
 
 private:

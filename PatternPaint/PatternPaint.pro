@@ -50,16 +50,17 @@ SOURCES += main.cpp\
     patterneditor.cpp \
     resizepattern.cpp \
     addressprogrammer.cpp \
-    avrpatternuploader.cpp \
     avruploaddata.cpp \
-    lightbuddypatternuploader.cpp \
     serialcommandqueue.cpp \
     lightbuddyprotocol.cpp \
     letterboxscrollarea.cpp \
     undocommand.cpp \
     colorchooser.cpp \
-    blinkypendantpatternuploader.cpp \
-    blinkycontroller.cpp
+    blinkycontroller.cpp \
+    blinkytapeuploader.cpp \
+    blinkypendantuploader.cpp \
+    lightbuddyuploader.cpp \
+    blinkypendant.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
@@ -74,17 +75,18 @@ HEADERS  += mainwindow.h \
     patterneditor.h \
     resizepattern.h \
     addressprogrammer.h \
-    avrpatternuploader.h \
-    patternuploader.h \
     avruploaddata.h \
-    lightbuddypatternuploader.h \
     serialcommandqueue.h \
     lightbuddyprotocol.h \
     letterboxscrollarea.h \
     undocommand.h \
     colorchooser.h \
-    blinkypendantpatternuploader.h \
-    blinkycontroller.h
+    blinkycontroller.h \
+    blinkytapeuploader.h \
+    blinkypendantuploader.h \
+    lightbuddyuploader.h \
+    patternuploader.h \
+    blinkypendant.h
 
 FORMS    += mainwindow.ui \
     systeminformation.ui \
