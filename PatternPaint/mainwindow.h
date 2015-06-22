@@ -5,6 +5,7 @@
 #include <QProgressDialog>
 #include <QMessageBox>
 
+#include "blinkycontroller.h"
 #include "blinkytape.h"
 #include "patternuploader.h"
 #include "avrpatternuploader.h"
@@ -100,7 +101,7 @@ private:
 
     QTimer* drawTimer;
 
-    QPointer<BlinkyTape> tape;
+    QPointer<BlinkyController> controller;
     QPointer<PatternUploader> uploader;
 
     QTimer *connectionScannerTimer;
@@ -127,9 +128,13 @@ private:
 
     int promptForSave();
 
+    void connectController(QSerialPortInfo target);
+    void connectUploader();
+
     void setColorMode(Pattern::ColorMode newColorOrder);
 
     Pattern::ColorMode colorMode;
+
 };
 
 #endif // MAINWINDOW_H

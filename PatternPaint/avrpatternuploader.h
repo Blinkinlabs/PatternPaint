@@ -37,9 +37,8 @@ class AvrPatternUploader : public PatternUploader
 public:
     AvrPatternUploader(QObject *parent=0);
 
-    bool startUpload(BlinkyTape& tape, std::vector<Pattern> patterns);
-    bool startUpload(BlinkyTape& tape, QByteArray sketch);
-    bool upgradeFirmware(BlinkyTape& tape);
+    bool startUpload(BlinkyController& tape, std::vector<Pattern> patterns);
+    bool upgradeFirmware(BlinkyController& tape);
     QString getErrorString() const;
 
 private slots:
@@ -63,7 +62,7 @@ private:
     /// Start an upload, using the passed blinkytape as a launching point
     /// Note that the blinkytape will be disconnected during the upload process,
     /// and will need to be reconnected manually afterwards.
-    bool startUpload(BlinkyTape& tape);
+    bool startUpload(BlinkyController& tape);
 
     /// Timer used to poll for the bootloader device to show up
     QPointer<QTimer> bootloaderResetTimer;

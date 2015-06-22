@@ -1,17 +1,16 @@
-#include "avrprogrammer.h"
+#include "avrpatternuploader.h"
 #include "blinkytape.h"
 #include <QDebug>
 
 /// Interval between scans to see if the device is still connected
 #define CONNECTION_SCANNER_INTERVAL 100
 
-
 #define RESET_TIMER_TIMEOUT 500
 
 #define RESET_MAX_TRIES 3
 
 // TODO: Support a method for loading these from preferences file
-QList<QSerialPortInfo> BlinkyTape::findBlinkyTapes()
+QList<QSerialPortInfo> BlinkyTape::probe()
 {
     QList<QSerialPortInfo> serialPorts = QSerialPortInfo::availablePorts();
     QList<QSerialPortInfo> tapes;
@@ -27,23 +26,13 @@ QList<QSerialPortInfo> BlinkyTape::findBlinkyTapes()
                 && info.productIdentifier() == LEONARDO_SKETCH_PID) {
                  tapes.push_back(info);
         }
-        // We're also ok with Light Buddies...
-        else if(info.vendorIdentifier() == LIGHT_BUDDY_APPLICATION_VID
-                && info.productIdentifier() == LIGHT_BUDDY_APPLICATION_PID) {
-                 tapes.push_back(info);
-        }
-        // And BlinkyPendants
-        else if(info.vendorIdentifier() == BLINKYPENDANT_APPLICATION_VID
-                && info.productIdentifier() == BLINKYPENDANT_APPLICATION_PID) {
-                 tapes.push_back(info);
-        }
     }
 
     return tapes;
 }
 
 // TODO: Support a method for loading these from preferences file
-QList<QSerialPortInfo> BlinkyTape::findBlinkyTapeBootloaders()
+QList<QSerialPortInfo> BlinkyTape::probeBootloaders()
 {
     QList<QSerialPortInfo> serialPorts = QSerialPortInfo::availablePorts();
     QList<QSerialPortInfo> tapes;
@@ -66,7 +55,7 @@ QList<QSerialPortInfo> BlinkyTape::findBlinkyTapeBootloaders()
 
 
 BlinkyTape::BlinkyTape(QObject *parent) :
-    QObject(parent)
+    BlinkyController(parent)
 {
     serial = new QSerialPort(this);
     serial->setSettingsRestoredOnClose(false);
@@ -280,4 +269,17 @@ void BlinkyTape::reset()
 
     resetTriesRemaining = RESET_MAX_TRIES;
     resetTimer_timeout();
+}
+
+
+bool BlinkyTape::getUploader(QPointer<PatternUploader>& uploader)
+{
+    if(!isConnected()) {
+        return false;
+    }
+
+    // TODO: Is this the right parent?
+    uploader = new AvrPatternUploader(parent());
+
+    return true;
 }

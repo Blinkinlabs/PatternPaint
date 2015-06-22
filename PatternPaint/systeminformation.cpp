@@ -75,14 +75,12 @@ SystemInformation::SystemInformation(QWidget *parent) :
     report.append("  Build Date: " + QLibraryInfo::buildDate().toString() + "\r");
     report.append("  Path: " + QLibraryInfo::location(QLibraryInfo::LibrariesPath) + "\r");
 
-    report.append("Detected BlinkyTapes: \r");
-    foreach (const QSerialPortInfo &info, BlinkyTape::findBlinkyTapes()) {
-        report.append("  " + info.portName() + "\r");
+    report.append("Detected devices: \r");
+    foreach (const QSerialPortInfo &info, BlinkyTape::probe()) {
+        report.append("  BlinkyTape:" + info.portName() + "\r");
     }
-
-    report.append("Detected BlinkyTape Bootloaders: \r");
-    foreach (const QSerialPortInfo &info, BlinkyTape::findBlinkyTapeBootloaders()) {
-        report.append("  " + info.portName() + "\r");
+    foreach (const QSerialPortInfo &info, BlinkyTape::probeBootloaders()) {
+        report.append("  BlinkyTape:" + info.portName() + " (bootloader)\r");
     }
 
     report.append("Detected Serial Ports: \r");

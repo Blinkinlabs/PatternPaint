@@ -71,7 +71,7 @@ void AvrPatternUploader::setMaxProgress(int newMaxProgress) {
     emit(maxProgressChanged(newMaxProgress));
 }
 
-bool AvrPatternUploader::startUpload(BlinkyTape& tape, std::vector<Pattern> patterns) {
+bool AvrPatternUploader::startUpload(BlinkyController& tape, std::vector<Pattern> patterns) {
     /// Create the compressed image and check if it will fit into the device memory
     avrUploadData data;
     if(!data.init(patterns)) {
@@ -108,7 +108,7 @@ bool AvrPatternUploader::startUpload(BlinkyTape& tape, std::vector<Pattern> patt
 }
 
 
-bool AvrPatternUploader::upgradeFirmware(BlinkyTape& tape) {
+bool AvrPatternUploader::upgradeFirmware(BlinkyController& tape) {
     QByteArray sketch = QByteArray(reinterpret_cast<const char*>(COLORSWIRL_DATA),COLORSWIRL_LENGTH);
 
     char buff[BUFF_LENGTH];
@@ -135,7 +135,7 @@ bool AvrPatternUploader::upgradeFirmware(BlinkyTape& tape) {
     return startUpload(tape);
 }
 
-bool AvrPatternUploader::startUpload(BlinkyTape& tape) {
+bool AvrPatternUploader::startUpload(BlinkyController& tape) {
     setProgress(0);
     // TODO: Calculate this based on feedback from the programmer.
     setMaxProgress(300);
@@ -173,7 +173,7 @@ void AvrPatternUploader::doWork() {
         {
             // Scan to see if there is a bootloader present
             QList<QSerialPortInfo> postResetTapes
-                    = BlinkyTape::findBlinkyTapeBootloaders();
+                    = BlinkyTape::probeBootloaders();
 
             // If we didn't detect a bootloader and still have time, then queue the timer and
             // wait. Otherwise, we timed out, so fail.
@@ -199,7 +199,7 @@ void AvrPatternUploader::doWork() {
     case State_WaitAfterBootloaderPort:
         {
             QList<QSerialPortInfo> postResetTapes
-                    = BlinkyTape::findBlinkyTapeBootloaders();
+                    = BlinkyTape::probeBootloaders();
 
             // If we didn't detect a bootloader and still have time, then queue the timer and
             // wait. Otherwise, we timed out, so fail.

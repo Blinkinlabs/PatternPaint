@@ -58,7 +58,8 @@ SOURCES += main.cpp\
     letterboxscrollarea.cpp \
     undocommand.cpp \
     colorchooser.cpp \
-    blinkypendantpatternuploader.cpp
+    blinkypendantpatternuploader.cpp \
+    blinkycontroller.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
@@ -82,7 +83,8 @@ HEADERS  += mainwindow.h \
     letterboxscrollarea.h \
     undocommand.h \
     colorchooser.h \
-    blinkypendantpatternuploader.h
+    blinkypendantpatternuploader.h \
+    blinkycontroller.h
 
 FORMS    += mainwindow.ui \
     systeminformation.ui \

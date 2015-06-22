@@ -8,7 +8,6 @@
 #include "undocommand.h"
 #include "colorchooser.h"
 
-
 #include "pencilinstrument.h"
 #include "lineinstrument.h"
 #include "colorpickerinstrument.h"
@@ -103,23 +102,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     connect(patternEditor, SIGNAL(changed(bool)), this, SLOT(on_imageChanged(bool)));
 
-    tape = new BlinkyTape(this);
-    // Modify our UI when the tape connection status changes
-    connect(tape, SIGNAL(connectionStatusChanged(bool)),
-            this,SLOT(on_tapeConnectionStatusChanged(bool)));
-
-    // TODO: Make this on demand by calling the blinkytape object?
-    uploader = new AvrPatternUploader(this);
-
-    // TODO: Should this be a separate view? it seems weird to have it chillin
-    // all static like.
-    connect(uploader, SIGNAL(maxProgressChanged(int)),
-            this, SLOT(on_uploaderMaxProgressChanged(int)));
-    connect(uploader, SIGNAL(progressChanged(int)),
-            this, SLOT(on_uploaderProgressChanged(int)));
-    connect(uploader, SIGNAL(finished(bool)),
-            this, SLOT(on_uploaderFinished(bool)));
-
     connect(penSizeSpin, SIGNAL(valueChanged(int)), patternEditor, SLOT(setToolSize(int)));
 
     // Pre-set the upload progress dialog
@@ -180,44 +162,48 @@ void MainWindow::drawTimer_timeout() {
     // TODO: Get the width from elsewhere, so we don't need to load the image every frame
     QImage image = patternEditor->getPatternAsImage();
 
-    if(tape->isConnected()) {
-        QByteArray ledData;
-
-        for(int i = 0; i < image.height(); i++) {
-            QRgb color = ColorModel::correctBrightness(image.pixel(n, i));
-
-            switch(colorMode) {
-            case Pattern::GRB:
-                ledData.append(qGreen(color));
-                ledData.append(qRed(color));
-                ledData.append(qBlue(color));
-                break;
-            case Pattern::RGB:
-            default:
-                ledData.append(qRed(color));
-                ledData.append(qGreen(color));
-                ledData.append(qBlue(color));
-                break;
-            }
-
-
-        }
-        tape->sendUpdate(ledData);
-
-        n = (n+1)%image.width();
-        patternEditor->setPlaybackRow(n);
+    if(controller.isNull()) {
+//    if(!controller->isConnected()) {
+        return;
     }
+
+    QByteArray ledData;
+
+    for(int i = 0; i < image.height(); i++) {
+        QRgb color = ColorModel::correctBrightness(image.pixel(n, i));
+
+        switch(colorMode) {
+        case Pattern::GRB:
+            ledData.append(qGreen(color));
+            ledData.append(qRed(color));
+            ledData.append(qBlue(color));
+            break;
+        case Pattern::RGB:
+        default:
+            ledData.append(qRed(color));
+            ledData.append(qGreen(color));
+            ledData.append(qBlue(color));
+            break;
+        }
+
+
+    }
+    controller->sendUpdate(ledData);
+
+    n = (n+1)%image.width();
+    patternEditor->setPlaybackRow(n);
 }
 
 
 void MainWindow::connectionScannerTimer_timeout() {
     // If we are already connected, disregard.
-    if(tape->isConnected() || mode==Uploading) {
+    if((!controller.isNull()) || mode==Uploading) {
+//    if(controller->isConnected() || mode==Uploading) {
         return;
     }
 
     // Check if our serial port is on the list
-    QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
+    QList<QSerialPortInfo> tapes = BlinkyTape::probe();
 
     if(tapes.length() > 0) {
         on_actionConnect_triggered();
@@ -379,6 +365,9 @@ void MainWindow::on_tapeConnectionStatusChanged(bool connected)
         mode = Disconnected;
         stopPlayback();
 
+        // TODO: Does this delete the serial object reliably?
+        controller.clear();
+
         // TODO: Don't do this if we disconnected intentionally.
         connectionScannerTimer->start();
     }
@@ -426,6 +415,7 @@ void MainWindow::on_uploaderProgressChanged(int progressValue)
 void MainWindow::on_uploaderFinished(bool result)
 {
     mode = Disconnected;
+    uploader.clear();
 
     qDebug() << "Uploader finished! Result:" << result;
     progressDialog->hide();
@@ -468,11 +458,22 @@ void MainWindow::on_actionClear_Pattern_triggered()
 
 void MainWindow::on_actionLoad_rainbow_sketch_triggered()
 {
-    if(!(tape->isConnected())) {
+    if(controller.isNull()) {
+//    if(!(controller->isConnected())) {
         return;
     }
 
-    if(!uploader->upgradeFirmware(*tape)) {
+    if(!controller->getUploader(uploader)) {
+        return;
+    }
+
+    if(uploader.isNull()) {
+        return;
+    }
+
+    connectUploader();
+
+    if(!uploader->upgradeFirmware(*controller)) {
         errorMessageDialog->setText(uploader->getErrorString());
         errorMessageDialog->show();
         return;
@@ -485,7 +486,8 @@ void MainWindow::on_actionLoad_rainbow_sketch_triggered()
 
 void MainWindow::on_actionSave_to_Tape_triggered()
 {
-    if(!(tape->isConnected())) {
+    if(controller.isNull()) {
+//    if(!(controller->isConnected())) {
         return;
     }
 
@@ -505,7 +507,17 @@ void MainWindow::on_actionSave_to_Tape_triggered()
     std::vector<Pattern> patterns;
     patterns.push_back(pattern);
 
-    if(!uploader->startUpload(*tape, patterns)) {
+    if(!controller->getUploader(uploader)) {
+        return;
+    }
+
+    if(uploader.isNull()) {
+        return;
+    }
+
+    connectUploader();
+
+    if(!uploader->startUpload(*controller, patterns)) {
         errorMessageDialog->setText(uploader->getErrorString());
         errorMessageDialog->show();
         return;
@@ -599,18 +611,21 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::on_actionConnect_triggered()
 {
-    if(tape->isConnected()) {
+    if(!controller.isNull()) {
+//    if(controller->isConnected()) {
         qDebug() << "Disconnecting from tape";
-        tape->close();
+        controller->close();
     }
     else {
-        QList<QSerialPortInfo> tapes = BlinkyTape::findBlinkyTapes();
+        QList<QSerialPortInfo> tapes = BlinkyTape::probe();
         qDebug() << "Tapes found:" << tapes.length();
 
         if(tapes.length() > 0) {
             // TODO: Try another one if this one fails?
             qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
-            tape->open(tapes[0]);
+
+            // TODO Make new controller here!
+            connectController(tapes[0]);
         }
     }
 }
@@ -693,6 +708,41 @@ int MainWindow::promptForSave() {
     }
 
     return false;
+}
+
+void MainWindow::connectController(QSerialPortInfo target)
+{
+    if(!controller.isNull()) {
+        return;
+    }
+
+    controller = new BlinkyTape(this);
+    // Modify our UI when the tape connection status changes
+    connect(controller, SIGNAL(connectionStatusChanged(bool)),
+            this,SLOT(on_tapeConnectionStatusChanged(bool)));
+
+    controller->open(target);
+}
+
+void MainWindow::connectUploader()
+{
+//    if(!uploader.isNull()) {
+//        return;
+//    }
+
+//    // TODO: Make this on demand by calling the blinkytape object?
+//    uploader = new AvrPatternUploader(this);
+
+    // TODO: Should this be a separate view? it seems weird to have it chillin
+    // all static like.
+    connect(uploader, SIGNAL(maxProgressChanged(int)),
+            this, SLOT(on_uploaderMaxProgressChanged(int)));
+    connect(uploader, SIGNAL(progressChanged(int)),
+            this, SLOT(on_uploaderProgressChanged(int)));
+    connect(uploader, SIGNAL(finished(bool)),
+            this, SLOT(on_uploaderFinished(bool)));
+
+//    uploader->open(target);
 }
 
 void MainWindow::setColorMode(Pattern::ColorMode newColorOrder)

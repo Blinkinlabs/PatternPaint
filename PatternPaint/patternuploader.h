@@ -29,11 +29,11 @@ public:
     /// and will need to be reconnected manually afterwards.
     /// @param tape BlinkyTape to upload to (must already be connected)
     /// @param pattern Pattern to upload to the BlinkyTape
-    virtual bool startUpload(BlinkyTape& tape, std::vector<Pattern> patterns) = 0;
+    virtual bool startUpload(BlinkyController& controller, std::vector<Pattern> patterns) = 0;
 
     /// Update/restore the firmware on the specificed device
     /// @param tape BlinkyTape to upload to (must already be connected)
-    virtual bool upgradeFirmware(BlinkyTape& tape) = 0;
+    virtual bool upgradeFirmware(BlinkyController& controller) = 0;
 
     /// Get a string describing the last error, if any.
     virtual QString getErrorString() const = 0;
