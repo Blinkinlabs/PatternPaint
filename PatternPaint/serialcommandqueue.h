@@ -23,7 +23,14 @@ public:
     bool isConnected();
 
     // Queue a new command
-    void queueCommand(QString name, QByteArray data, QByteArray expectedRespone);
+    void queueCommand(QString name,
+                      QByteArray data,
+                      QByteArray expectedRespone);
+
+    void queueCommand(QString name,
+                      QByteArray data,
+                      QByteArray expectedRespone,
+                      QByteArray expectedResponseMask);
 
 signals:
     void error(QString error);
@@ -48,9 +55,19 @@ private:
             commandData(command_),
             expectedResponse(expectedResponse_) {}
 
+        Command(QString name_,
+                QByteArray command_,
+                QByteArray expectedResponse_,
+                QByteArray expectedResponseMask_) :
+            name(name_),
+            commandData(command_),
+            expectedResponse(expectedResponse_),
+            expectedResponseMask(expectedResponseMask_) {}
+
         QString name;                   ///< Human-readable description of the command
         QByteArray commandData;         ///< Data to send to the bootloader
         QByteArray expectedResponse;    ///< Expected response from the bootloader
+        QByteArray expectedResponseMask;///< Mask for interpreting expected response
     };
 
     QPointer<QSerialPort> serial;   ///< Serial device the programmer is attached to

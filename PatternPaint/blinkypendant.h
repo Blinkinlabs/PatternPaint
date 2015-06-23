@@ -46,6 +46,9 @@ private:
     /// Serial port the BlinkyPendant is connected to
     QPointer<QSerialPort> serial;
 
+    // TODO: Delete me, pass the serial object directly instead.
+    QSerialPortInfo serialInfo;
+
 #if defined(Q_OS_WIN)
     // Windows only: Timer that periodically checks if the serial device is
     // still present (it seems to disappear without sending an error?)

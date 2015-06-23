@@ -24,7 +24,7 @@ TEMPLATE = app
 
 #Application version
 VERSION_MAJOR = 1
-VERSION_MINOR = 5
+VERSION_MINOR = 6
 VERSION_BUILD = 0
 
 DEFINES += "VERSION_MAJOR=$${VERSION_MAJOR}" \
@@ -60,7 +60,8 @@ SOURCES += main.cpp\
     blinkytapeuploader.cpp \
     blinkypendantuploader.cpp \
     lightbuddyuploader.cpp \
-    blinkypendant.cpp
+    blinkypendant.cpp \
+    blinkypendantprogrammer.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
@@ -86,7 +87,8 @@ HEADERS  += mainwindow.h \
     blinkypendantuploader.h \
     lightbuddyuploader.h \
     patternuploader.h \
-    blinkypendant.h
+    blinkypendant.h \
+    blinkypendantprogrammer.h
 
 FORMS    += mainwindow.ui \
     systeminformation.ui \

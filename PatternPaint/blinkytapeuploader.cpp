@@ -45,7 +45,6 @@ void BlinkyTapeUploader::handleProgrammerError(QString error) {
 void BlinkyTapeUploader::handleProgrammerCommandFinished(QString command, QByteArray returnData) {
     Q_UNUSED(returnData);
 
-    // TODO: Update our progress somehow? But how to tell how far we've gotten?
 //    qDebug() << "Command finished:" << command;
     setProgress(progress + 1);
 

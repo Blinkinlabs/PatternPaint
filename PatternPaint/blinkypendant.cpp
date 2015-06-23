@@ -5,6 +5,8 @@
 /// Interval between scans to see if the device is still connected
 #define CONNECTION_SCANNER_INTERVAL 100
 
+#define PENDANT_MAX_PIXELS 10
+
 
 // TODO: Support a method for loading these from preferences file
 QList<QSerialPortInfo> BlinkyPendant::probe()
@@ -128,6 +130,8 @@ bool BlinkyPendant::open(QSerialPortInfo info) {
         return false;
     }
 
+    serialInfo = info;
+
     emit(connectionStatusChanged(true));
 
 #if defined(Q_OS_WIN)
@@ -171,6 +175,9 @@ void BlinkyPendant::sendUpdate(QByteArray LedData)
         return;
     }
 
+    // Fit the data to the output device
+    LedData = LedData.leftJustified(PENDANT_MAX_PIXELS*3, (char)0x00, true);
+
     // Trim anything that's 0xff
     for(int i = 0; i < LedData.length(); i++) {
         if(LedData[i] == (char)255) {
@@ -194,7 +201,7 @@ bool BlinkyPendant::getPortInfo(QSerialPortInfo& info)
         return false;
     }
 
-    info = QSerialPortInfo(*serial);
+    info = serialInfo;
     return true;
 }
 
@@ -210,7 +217,7 @@ bool BlinkyPendant::getUploader(QPointer<PatternUploader>& uploader)
         return false;
     }
 
-    uploader = new BlinkyPendantPatternUploader(parent());
+    uploader = new BlinkyPendantUploader(parent());
 
     return true;
 }

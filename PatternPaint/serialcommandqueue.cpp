@@ -64,6 +64,17 @@ void SerialCommandQueue::queueCommand(QString name,
     processCommandQueue();
 }
 
+void SerialCommandQueue::queueCommand(QString name,
+                                 QByteArray data,
+                                 QByteArray expectedRespone,
+                                 QByteArray expectedResponseMask) {
+
+    commandQueue.push_back(Command(name, data, expectedRespone, expectedResponseMask));
+
+    // Try to start processing commands.
+    processCommandQueue();
+}
+
 void SerialCommandQueue::processCommandQueue() {
     // Nothing to do if we don't have any commands...
     if(commandQueue.length() == 0) {
@@ -112,7 +123,9 @@ void SerialCommandQueue::handleReadData() {
     }
 
     if(responseData.length() < commandQueue.front().expectedResponse.length()) {
-        qDebug() << "Didn't get enough data yet, so just waiting";
+        qDebug() << "Didn't get enough data yet. Expecting:"
+                 << commandQueue.front().expectedResponse.length()
+                 << " received: " << responseData.length();
         return;
     }
 
@@ -123,6 +136,26 @@ void SerialCommandQueue::handleReadData() {
             return;
         }
     }
+    // If the expected data should be masked, do a chracter by character match
+    else if(commandQueue.front().expectedResponseMask.length() > 0) {
+        if(commandQueue.front().expectedResponseMask.length() !=
+            commandQueue.front().expectedResponse.length()) {
+            qCritical() << "Expected response mask length incorrect!";
+            return;
+        }
+        for(int i = 0; i < responseData.length(); i++) {
+            if(commandQueue.front().expectedResponseMask.at(i) != 0
+                && responseData[i] != commandQueue.front().expectedResponse.at(i)) {
+                qCritical() << "Got unexpected data back"
+                            << " position=" << i
+                            << " expected=" << (int)responseData[i]
+                            << " received=" << (int)commandQueue.front().expectedResponse.at(i)
+                            << " mask=" << (int)commandQueue.front().expectedResponseMask.at(i);
+                return;
+            }
+        }
+    }
+    // Otherwise just check if the strings match
     else if(responseData != commandQueue.front().expectedResponse) {
         qCritical() << "Got unexpected data back";
         return;
