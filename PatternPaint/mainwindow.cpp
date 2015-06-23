@@ -7,7 +7,7 @@
 #include "resizepattern.h"
 #include "undocommand.h"
 #include "colorchooser.h"
-#include "blinkypendant.h"
+//#include "blinkypendant.h"
 #include "blinkytape.h"
 
 #include "pencilinstrument.h"
@@ -219,20 +219,35 @@ void MainWindow::connectionScannerTimer_timeout() {
         return;
     }
 
-    // Next, look for BlinkyPendants
-    tapes = BlinkyPendant::probe();
+//    // Next, look for BlinkyPendants
+//    tapes = BlinkyPendant::probe();
 
-    if(tapes.length() > 0) {
-        qDebug() << "BlinkyPendants found:" << tapes.length();
+//    if(tapes.length() > 0) {
+//        qDebug() << "BlinkyPendants found:" << tapes.length();
 
-        // TODO: Try another one if this one fails?
-        qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
+//        // TODO: Try another one if this one fails?
+//        qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
 
-        controller = new BlinkyPendant(this);
-        connectController();
-        controller->open(tapes[0]);
-        return;
-    }
+//        controller = new BlinkyPendant(this);
+//        connectController();
+//        controller->open(tapes[0]);
+//        return;
+//    }
+
+//    // Finally, look for Light Buddys
+//    tapes = BlinkyPendant::probe();
+
+//    if(tapes.length() > 0) {
+//        qDebug() << "BlinkyPendants found:" << tapes.length();
+
+//        // TODO: Try another one if this one fails?
+//        qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
+
+//        controller = new BlinkyPendant(this);
+//        connectController();
+//        controller->open(tapes[0]);
+//        return;
+//    }
 }
 
 void MainWindow::on_patternSpeed_valueChanged(int value)

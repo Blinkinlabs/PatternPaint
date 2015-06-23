@@ -5,6 +5,9 @@
 
 #include <QDebug>
 
+// TODO: Combine this with the definitions in avruploaddata.cpp
+#define FLASH_MEMORY_AVAILABLE          0x7000  // Amount of application space in the flash
+
 /// Interval between polling the serial port list for new devices
 #define BOOTLOADER_POLL_INTERVAL 200
 

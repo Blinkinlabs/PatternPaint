@@ -1,9 +1,14 @@
 #include "blinkytapeuploader.h"
+#include "blinkypendantuploader.h"
+#include "lightbuddyuploader.h"
 #include "blinkytape.h"
 #include <QDebug>
 
 /// Interval between scans to see if the device is still connected
 #define CONNECTION_SCANNER_INTERVAL 100
+
+// TODO: Put this somewhere better?
+#define PENDANT_MAX_PIXELS 10
 
 #define RESET_TIMER_TIMEOUT 500
 
@@ -24,6 +29,16 @@ QList<QSerialPortInfo> BlinkyTape::probe()
         // If it's a leonardo, it /may/ be a BlinkyTape running a user sketch
         else if(info.vendorIdentifier() == LEONARDO_SKETCH_VID
                 && info.productIdentifier() == LEONARDO_SKETCH_PID) {
+                 tapes.push_back(info);
+        }
+        // Also BlinkyPendants!
+        else if(info.vendorIdentifier() == BLINKYPENDANT_SKETCH_VID
+                && info.productIdentifier() == BLINKYPENDANT_SKETCH_PID) {
+                 tapes.push_back(info);
+        }
+        // And Lightbuddies!
+        else if(info.vendorIdentifier() == LIGHTBUDDY_SKETCH_VID
+                && info.productIdentifier() == LIGHTBUDDY_SKETCH_PID) {
                  tapes.push_back(info);
         }
     }
@@ -170,6 +185,8 @@ bool BlinkyTape::open(QSerialPortInfo info) {
         return false;
     }
 
+    serialInfo = info;
+
     resetTriesRemaining = 0;
 
     emit(connectionStatusChanged(true));
@@ -232,6 +249,12 @@ void BlinkyTape::sendUpdate(QByteArray LedData)
         return;
     }
 
+    // If we have a blinkyPendant, fit the data to the output device
+    if(serialInfo.vendorIdentifier() == BLINKYPENDANT_SKETCH_VID
+        && serialInfo.productIdentifier() == BLINKYPENDANT_SKETCH_PID) {
+        LedData = LedData.leftJustified(PENDANT_MAX_PIXELS*3, (char)0x00, true);
+    }
+
     // Trim anything that's 0xff
     for(int i = 0; i < LedData.length(); i++) {
         if(LedData[i] == (char)255) {
@@ -255,7 +278,7 @@ bool BlinkyTape::getPortInfo(QSerialPortInfo& info)
         return false;
     }
 
-    info = QSerialPortInfo(*serial);
+    info = serialInfo;
     return true;
 }
 
@@ -278,8 +301,25 @@ bool BlinkyTape::getUploader(QPointer<PatternUploader>& uploader)
         return false;
     }
 
-    // TODO: Is this the right parent?
-    uploader = new BlinkyTapeUploader(parent());
+    if(serialInfo.vendorIdentifier() == BLINKYTAPE_SKETCH_VID
+        && serialInfo.productIdentifier() == BLINKYTAPE_SKETCH_PID) {
+        uploader = new BlinkyTapeUploader(parent());
+    }
+    else if(serialInfo.vendorIdentifier() == LEONARDO_SKETCH_VID
+        && serialInfo.productIdentifier() == LEONARDO_SKETCH_PID) {
+        uploader = new BlinkyTapeUploader(parent());
+    }
+    else if(serialInfo.vendorIdentifier() == BLINKYPENDANT_SKETCH_VID
+        && serialInfo.productIdentifier() == BLINKYPENDANT_SKETCH_PID) {
+        uploader = new BlinkyPendantUploader(parent());
+    }
+    else if(serialInfo.vendorIdentifier() == LIGHTBUDDY_SKETCH_VID
+        && serialInfo.productIdentifier() == LIGHTBUDDY_SKETCH_PID) {
+        uploader = new LightBuddyUploader(parent());
+    }
+    else {
+        return false;
+    }
 
     return true;
 }

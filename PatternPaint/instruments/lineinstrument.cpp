@@ -69,8 +69,10 @@ void LineInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe, co
 void LineInstrument::paint(PatternEditor& pe)
 {
     QPainter painter(pe.getPattern());
+
     painter.setPen(QPen(pe.getPrimaryColor(), pe.getPenSize() ,
                             Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+
 
     if(mStartPoint != mEndPoint) {
         painter.drawLine(mStartPoint, mEndPoint);

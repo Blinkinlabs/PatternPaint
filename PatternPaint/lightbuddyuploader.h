@@ -1,24 +1,31 @@
-//#ifndef LIGHTBUDDYPATTERNUPLOADER_H
-//#define LIGHTBUDDYPATTERNUPLOADER_H
+#ifndef LIGHTBUDDYUPLOADER_H
+#define LIGHTBUDDYUPLOADER_H
 
-//#include "patternuploader.h"
-//#include "blinkytape.h"
-
-//// TODO: Don't call it a blinkytape??
-
-//class LightBuddyPatternUploader : public PatternUploader
-//{
-//public:
-//    LightBuddyPatternUploader();
-//    ~LightBuddyPatternUploader();
-
-//    bool startUpload(BlinkyTape& tape, std::vector<Pattern> patterns);
-//    bool upgradeFirmware(BlinkyTape& tape);
-//    QString getErrorString() const;
+#include <QObject>
+#include "patternuploader.h"
+#include "lightbuddyprogrammer.h"
 
 
-//private:
-//    QString errorString;
-//};
+class LightBuddyUploader : public PatternUploader
+{
+    Q_OBJECT
 
-//#endif // LIGHTBUDDYPATTERNUPLOADER_H
+public:
+    LightBuddyUploader(QObject *parent=0);
+
+    bool startUpload(BlinkyController& controller, std::vector<Pattern> patterns);
+    bool upgradeFirmware(BlinkyController& controller);
+    QString getErrorString() const;
+
+private slots:
+    void handleProgrammerError(QString error);
+
+    void handleProgrammerCommandFinished(QString command, QByteArray returnData);
+
+private:
+    QString errorString;
+
+    LightBuddyProgrammer programmer;
+};
+
+#endif // LIGHTBUDDYPLOADER_H

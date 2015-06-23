@@ -60,8 +60,8 @@ SOURCES += main.cpp\
     blinkytapeuploader.cpp \
     blinkypendantuploader.cpp \
     lightbuddyuploader.cpp \
-    blinkypendant.cpp \
-    blinkypendantprogrammer.cpp
+    blinkypendantprogrammer.cpp \
+    lightbuddyprogrammer.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
@@ -87,8 +87,8 @@ HEADERS  += mainwindow.h \
     blinkypendantuploader.h \
     lightbuddyuploader.h \
     patternuploader.h \
-    blinkypendant.h \
-    blinkypendantprogrammer.h
+    blinkypendantprogrammer.h \
+    lightbuddyprogrammer.h
 
 FORMS    += mainwindow.ui \
     systeminformation.ui \

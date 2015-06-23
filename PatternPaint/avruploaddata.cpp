@@ -8,6 +8,11 @@
 #define PATTERN_TABLE_ENTRY_LENGTH      7
 
 
+#define FLASH_MEMORY_AVAILABLE          0x7000  // Amount of application space in the flash
+#define FLASH_MEMORY_PAGE_SIZE          0x80    // Size of a page of memory in our flash
+#define FLASH_MEMORY_SKETCH_ADDRESS     0x0000  // Location of sketch
+#define FLASH_MEMORY_PATTERN_TABLE_ADDRESS (FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE) // Location of pattern table
+
 bool avrUploadData::init(std::vector<Pattern> patterns) {
     char buff[BUFF_LENGTH];
     QString errorString;

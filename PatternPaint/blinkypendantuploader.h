@@ -4,7 +4,6 @@
 #include <QObject>
 #include "patternuploader.h"
 #include "blinkypendantprogrammer.h"
-#include "blinkypendant.h"
 
 class BlinkyPendantUploader : public PatternUploader
 {

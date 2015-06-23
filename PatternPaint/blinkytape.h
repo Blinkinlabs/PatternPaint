@@ -18,10 +18,16 @@
 #define LEONARDO_BOOTLOADER_VID         0x2341
 #define LEONARDO_BOOTLOADER_PID         0x0036
 
-#define FLASH_MEMORY_AVAILABLE          0x7000  // Amount of application space in the flash
-#define FLASH_MEMORY_PAGE_SIZE          0x80    // Size of a page of memory in our flash
-#define FLASH_MEMORY_SKETCH_ADDRESS     0x0000  // Location of sketch
-#define FLASH_MEMORY_PATTERN_TABLE_ADDRESS (FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE) // Location of pattern table
+#define BLINKYPENDANT_SKETCH_VID        0x1209
+#define BLINKYPENDANT_SKETCH_PID        0x8888
+#define BLINKYPENDANT_BOOTLOADER_VID    0x1209
+#define BLINKYPENDANT_BOOTLOADER_PID    0x8889
+
+#define LIGHTBUDDY_SKETCH_VID        0x1d50
+#define LIGHTBUDDY_SKETCH_PID        0x60aa
+#define LIGHTBUDDY_BOOTLOADER_VID    0x1d50
+#define LIGHTBUDDY_BOOTLOADER_PID    0x60a9
+
 
 /// Connect to a BlinkyTape over a serial port, and manage sending data to it.
 class BlinkyTape : public BlinkyController
@@ -50,6 +56,8 @@ public slots:
 private:
     /// Serial port the BlinkyTape is connected to
     QPointer<QSerialPort> serial;
+
+    QSerialPortInfo serialInfo;
 
     QTimer* resetTimer;
 
