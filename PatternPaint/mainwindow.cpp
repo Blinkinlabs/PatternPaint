@@ -374,7 +374,6 @@ void MainWindow::on_tapeConnectionStatusChanged(bool connected)
         // TODO: Does this delete the serial object reliably?
         controller.clear();
 
-        // TODO: Don't do this if we disconnected intentionally.
         connectionScannerTimer->start();
     }
 }
@@ -501,7 +500,8 @@ void MainWindow::on_actionSave_to_Tape_triggered()
     // Note: Converting frameRate to frame delay here.
     Pattern pattern(image,
                         drawTimer->interval(),
-                        Pattern::RGB24,
+                        //Pattern::RGB24,
+                        Pattern::RGB565_RLE,
                         colorMode);
 
     // TODO: Attempt different compressions till one works.
