@@ -35,7 +35,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     setupUi(this);
 
-
     // prepare undo/redo
     menuEdit->addSeparator();
     m_undoStackGroup = new QUndoGroup(this);
@@ -165,7 +164,6 @@ void MainWindow::drawTimer_timeout() {
     QImage image = patternEditor->getPatternAsImage();
 
     if(controller.isNull()) {
-//    if(!controller->isConnected()) {
         return;
     }
 
@@ -200,7 +198,6 @@ void MainWindow::drawTimer_timeout() {
 void MainWindow::connectionScannerTimer_timeout() {
     // If we are already connected, disregard.
     if((!controller.isNull()) || mode==Uploading) {
-//    if(controller->isConnected() || mode==Uploading) {
         return;
     }
 
@@ -218,36 +215,6 @@ void MainWindow::connectionScannerTimer_timeout() {
         controller->open(tapes[0]);
         return;
     }
-
-//    // Next, look for BlinkyPendants
-//    tapes = BlinkyPendant::probe();
-
-//    if(tapes.length() > 0) {
-//        qDebug() << "BlinkyPendants found:" << tapes.length();
-
-//        // TODO: Try another one if this one fails?
-//        qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
-
-//        controller = new BlinkyPendant(this);
-//        connectController();
-//        controller->open(tapes[0]);
-//        return;
-//    }
-
-//    // Finally, look for Light Buddys
-//    tapes = BlinkyPendant::probe();
-
-//    if(tapes.length() > 0) {
-//        qDebug() << "BlinkyPendants found:" << tapes.length();
-
-//        // TODO: Try another one if this one fails?
-//        qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
-
-//        controller = new BlinkyPendant(this);
-//        connectController();
-//        controller->open(tapes[0]);
-//        return;
-//    }
 }
 
 void MainWindow::on_patternSpeed_valueChanged(int value)
@@ -498,7 +465,6 @@ void MainWindow::on_actionClear_Pattern_triggered()
 void MainWindow::on_actionLoad_rainbow_sketch_triggered()
 {
     if(controller.isNull()) {
-//    if(!(controller->isConnected())) {
         return;
     }
 
@@ -526,7 +492,6 @@ void MainWindow::on_actionLoad_rainbow_sketch_triggered()
 void MainWindow::on_actionSave_to_Tape_triggered()
 {
     if(controller.isNull()) {
-//    if(!(controller->isConnected())) {
         return;
     }
 
@@ -653,7 +618,6 @@ void MainWindow::on_actionConnect_triggered()
 {
     // If we were already connected, disconnect here
     if(!controller.isNull()) {
-//    if(controller->isConnected()) {
         qDebug() << "Disconnecting from tape";
         controller->close();
 
@@ -753,15 +717,7 @@ void MainWindow::connectController()
 
 void MainWindow::connectUploader()
 {
-//    if(!uploader.isNull()) {
-//        return;
-//    }
-
-//    // TODO: Make this on demand by calling the blinkytape object?
-//    uploader = new AvrPatternUploader(this);
-
-    // TODO: Should this be a separate view? it seems weird to have it chillin
-    // all static like.
+    // TODO: Should this be a separate view?
     connect(uploader, SIGNAL(maxProgressChanged(int)),
             this, SLOT(on_uploaderMaxProgressChanged(int)));
     connect(uploader, SIGNAL(progressChanged(int)),
@@ -769,7 +725,6 @@ void MainWindow::connectUploader()
     connect(uploader, SIGNAL(finished(bool)),
             this, SLOT(on_uploaderFinished(bool)));
 
-//    uploader->open(target);
 }
 
 void MainWindow::setColorMode(Pattern::ColorMode newColorOrder)

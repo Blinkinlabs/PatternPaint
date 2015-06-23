@@ -13,7 +13,12 @@ AboutPatternPaint::AboutPatternPaint(QWidget *parent) :
     QString versionNumber = QString("Version %1.%2.%3").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_BUILD);
     ui->versionLabel->setText(versionNumber);
 
-    ui->InfoText->setOpenExternalLinks(true);
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+}
+
+void AboutPatternPaint::mousePressEvent(QMouseEvent *event) {
+    Q_UNUSED(event);
+    close();
 }
 
 AboutPatternPaint::~AboutPatternPaint()

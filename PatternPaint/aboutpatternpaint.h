@@ -16,6 +16,8 @@ public:
     explicit AboutPatternPaint(QWidget *parent = 0);
     ~AboutPatternPaint();
 
+    void mousePressEvent(QMouseEvent *event);
+
 private:
     Ui::AboutPatternPaint *ui;
 };
