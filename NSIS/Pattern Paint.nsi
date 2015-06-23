@@ -12,7 +12,7 @@
 !define APP_NAME "Pattern Paint"
 !define COMP_NAME "Blinkinlabs"
 !define WEB_SITE "http://blinkinlabs.com"
-!define VERSION "01.5.0.00"
+!define VERSION "01.6.0.00"
 !define COPYRIGHT "Blinkinlabs © 2015"
 !define DESCRIPTION "Application"
 !define INSTALLER_NAME "C:\Users\matt\My Documents\PatternPaint\PatternPaint Windows Installer.exe"
@@ -121,6 +121,18 @@ File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\lightbu
 SetOutPath "$INSTDIR\driver\lightbuddy\amd64"
 File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\lightbuddy\amd64\winusbcoinstaller2.dll"
 File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\lightbuddy\amd64\WdfCoInstaller01009.dll"
+SetOutPath "$INSTDIR\driver\blinkypendant"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\blinkypendant\blinkypendant_serial.inf"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\blinkypendant\blinkypendant_DFU_runtime.inf"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\blinkypendant\blinkypendant_DFU.inf"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\blinkypendant\libusb_device.cat"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\blinkypendant\blinkinlabs.cat"
+SetOutPath "$INSTDIR\driver\blinkypendant\x86"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\blinkypendant\x86\winusbcoinstaller2.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\blinkypendant\x86\WdfCoInstaller01009.dll"
+SetOutPath "$INSTDIR\driver\blinkypendant\amd64"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\blinkypendant\amd64\winusbcoinstaller2.dll"
+File "C:\Users\matt\My Documents\PatternPaint\PatternPaintWindows\driver\blinkypendant\amd64\WdfCoInstaller01009.dll"
 SectionEnd
 
 ######################################################################
@@ -169,9 +181,11 @@ Section Driver
 ${If} ${RunningX64}
        ExecWait '"$INSTDIR\driver\dpinst64.exe" /sa /sw /PATH "$INSTDIR\driver\blinkytape"'
        ExecWait '"$INSTDIR\driver\dpinst64.exe" /sa /sw /PATH "$INSTDIR\driver\lightbuddy"'
+       ExecWait '"$INSTDIR\driver\dpinst64.exe" /sa /sw /PATH "$INSTDIR\driver\blinkypendant"'
 	   ${Else}
        ExecWait '"$INSTDIR\driver\dpinst32.exe" /sa /sw /PATH "$INSTDIR\driver\blinkytape"'
        ExecWait '"$INSTDIR\driver\dpinst32.exe" /sa /sw /PATH "$INSTDIR\driver\lightbuddy"'
+       ExecWait '"$INSTDIR\driver\dpinst32.exe" /sa /sw /PATH "$INSTDIR\driver\blinkypendant"'
 	   ${EndIf}
 SectionEnd
 	
@@ -206,12 +220,24 @@ Delete "$INSTDIR\driver\lightbuddy\lightbuddy_DFU_runtime.inf"
 Delete "$INSTDIR\driver\lightbuddy\lightbuddy_DFU.inf"
 Delete "$INSTDIR\driver\lightbuddy\libusb_devices.cat"
 Delete "$INSTDIR\driver\lightbuddy\blinkinlabs.cat"
+Delete "$INSTDIR\driver\blinkypendant\x86\winusbcoinstaller2.dll"
+Delete "$INSTDIR\driver\blinkypendant\x86\WdfCoInstaller01009.dll"
+Delete "$INSTDIR\driver\blinkypendant\amd64\winusbcoinstaller2.dll"
+Delete "$INSTDIR\driver\blinkypendant\amd64\WdfCoInstaller01009.dll"
+Delete "$INSTDIR\driver\blinkypendant\blinkypendant_serial.inf"
+Delete "$INSTDIR\driver\blinkypendant\blinkypendant_DFU_runtime.inf"
+Delete "$INSTDIR\driver\blinkypendant\blinkypendant_DFU.inf"
+Delete "$INSTDIR\driver\blinkypendant\libusb_devices.cat"
+Delete "$INSTDIR\driver\blinkypendant\blinkinlabs.cat"
 Delete "$INSTDIR\driver\dpinst32.exe"
 Delete "$INSTDIR\driver\dpinst64.exe"
 
 RmDir "$INSTDIR\driver\lightbuddy\x86"
 RmDir "$INSTDIR\driver\lightbuddy\amd64"
-RmDir "$INSTDIR\driver\lightbuddy" 
+RmDir "$INSTDIR\driver\lightbuddy"
+RmDir "$INSTDIR\driver\blinkypendant\x86"
+RmDir "$INSTDIR\driver\blinkypendant\amd64"
+RmDir "$INSTDIR\driver\blinkypendant"
 RmDir "$INSTDIR\driver\blinkytape"
 RmDir "$INSTDIR\driver"
 RmDir "$INSTDIR\imageformats"

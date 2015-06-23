@@ -20,6 +20,8 @@ BLINKYTAPE='Blinkinlabs32u4_boards/'
 # BlinkyTile repository (for the LightBuddy driver)
 BLINKYTILE='Blinkytile/'
 
+BLINKYPENDANT='Blinkypendant/'
+
 # Staging directory for this release
 OUTDIR='PatternPaintWindows/'
 
@@ -53,6 +55,13 @@ cd ${BLINKYTILE}
 git pull
 cd ..
 
+################## Get BlinkyPendat driver #########################
+git clone https://github.com/Blinkinlabs/BlinkyPendant.git ${BLINKYPENDANT}
+
+cd ${BLINKYPENDANT}
+git pull
+cd ..
+
 ################## Package Everything ############################
 mkdir -p ${OUTDIR}
 mkdir -p ${OUTDIR}platforms
@@ -62,6 +71,9 @@ mkdir -p ${OUTDIR}driver/blinkytape
 mkdir -p ${OUTDIR}driver/lightbuddy
 mkdir -p ${OUTDIR}driver/lightbuddy/x86
 mkdir -p ${OUTDIR}driver/lightbuddy/amd64
+mkdir -p ${OUTDIR}driver/blinkypendant
+mkdir -p ${OUTDIR}driver/blinkypendant/x86
+mkdir -p ${OUTDIR}driver/blinkypendant/amd64
 
 # Main executable
 cp ${PATTERNPAINT}/bin/PatternPaint.exe ${OUTDIR}
@@ -104,6 +116,17 @@ cp ${BLINKYTILE}driver/x86/winusbcoinstaller2.dll ${OUTDIR}driver/lightbuddy/x86
 cp ${BLINKYTILE}driver/x86/WdfCoInstaller01009.dll ${OUTDIR}driver/lightbuddy/x86/
 cp ${BLINKYTILE}driver/amd64/winusbcoinstaller2.dll ${OUTDIR}driver/lightbuddy/amd64/
 cp ${BLINKYTILE}driver/amd64/WdfCoInstaller01009.dll ${OUTDIR}driver/lightbuddy/amd64/
+
+# BlinkyPendant Driver files
+cp ${BLINKYPENDANT}driver/blinkypendant_serial.inf ${OUTDIR}driver/blinkypendant/
+cp ${BLINKYPENDANT}driver/blinkypendant_DFU_runtime.inf ${OUTDIR}driver/blinkypendant/
+cp ${BLINKYPENDANT}driver/blinkypendant_DFU.inf ${OUTDIR}driver/blinkypendant/
+cp ${BLINKYPENDANT}driver/libusb_device.cat ${OUTDIR}driver/blinkypendant/
+cp ${BLINKYPENDANT}driver/blinkinlabs.cat ${OUTDIR}driver/blinkypendant/
+cp ${BLINKYPENDANT}driver/x86/winusbcoinstaller2.dll ${OUTDIR}driver/blinkypendant/x86/
+cp ${BLINKYPENDANT}driver/x86/WdfCoInstaller01009.dll ${OUTDIR}driver/blinkypendant/x86/
+cp ${BLINKYPENDANT}driver/amd64/winusbcoinstaller2.dll ${OUTDIR}driver/blinkypendant/amd64/
+cp ${BLINKYPENDANT}driver/amd64/WdfCoInstaller01009.dll ${OUTDIR}driver/blinkypendant/amd64/
 
 # Driver installer
 cp "${WIN_KIT}redist/DIFx/dpinst/MultiLin/x86/dpinst.exe" ${OUTDIR}driver/dpinst32.exe
