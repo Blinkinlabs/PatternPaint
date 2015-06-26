@@ -35,25 +35,26 @@ Developer certificate (optional, for signing the application)
 
 ## Manual Build
 
-1.	Download the repository:
-
-	git clone https://github.com/Blinkinlabs/PatternPaint.git
-
-2.	Set up the QT environment:
+1.	Set up the QT environment:
 
 	export QTDIR=~/Qt5.4.1/5.4/clang_64/
+	
+2.	Create a new directory and Download the repository:
+
+	cd $(mktemp -d -t PatternPaint)
+	git clone https://github.com/Blinkinlabs/PatternPaint.git
 
 3.	Build PatternPaint:
 
 	cd PatternPaint/PatternPaint
 	rm -R build/
-	${QTDIR}/bin/qmake MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build 	DESTDIR=bin VERSION=1.6.0
+	${QTDIR}/bin/qmake MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build 	DESTDIR=bin VERSION=1.6.1
 	make
 	cd ..
 	
 4.	Use the bundler tool to make a .dmg file, signing it in the process:
 
-	${QTDIR}/bin/macdeployqt PatternPaint/bin/PatternPaint.app/ -codesign="Developer ID Application: xxxx" -dmg
+	${QTDIR}/bin/macdeployqt PatternPaint/bin/PatternPaint.app/ -codesign="Developer ID Application: Blinkinlabs, LLC" -dmg
 	codesign --verify --verbose=4 PatternPaint/bin/PatternPaint.app
 
 5.	Test the signature:
