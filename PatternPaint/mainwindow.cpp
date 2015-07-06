@@ -15,6 +15,7 @@
 #include "colorpickerinstrument.h"
 #include "sprayinstrument.h"
 #include "fillinstrument.h"
+#include "patternlistitem.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -122,7 +123,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
     drawTimer->setInterval(33);
 
-
     // Start a scanner to connect to a BlinkyTape automatically
     connect(connectionScannerTimer, SIGNAL(timeout()), this, SLOT(connectionScannerTimer_timeout()));
     connectionScannerTimer->setInterval(CONNECTION_SCANNER_INTERVAL);
@@ -140,6 +140,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     QSettings settings;
     setColorMode(static_cast<Pattern::ColorMode>(settings.value("Options/ColorOrder", Pattern::RGB).toUInt()));
+
+    // Add some patterns to see what this looks like
+    PatternListItem* j = new PatternListItem();
+    PatternListItem* i = new PatternListItem();
+    this->PatternCollection->addItem(i);
+    this->PatternCollection->addItem(j);
 }
 
 MainWindow::~MainWindow(){}
