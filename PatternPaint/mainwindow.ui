@@ -212,7 +212,10 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionNew"/>
     <addaction name="actionLoad_File"/>
+    <addaction name="separator"/>
+    <addaction name="actionClose"/>
     <addaction name="actionSave_File"/>
     <addaction name="actionSave_File_as"/>
     <addaction name="separator"/>
@@ -589,6 +592,16 @@
    </property>
    <property name="text">
     <string>GRB (BlinkyPixel)</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="text">
+    <string>New</string>
    </property>
   </action>
  </widget>

@@ -7,7 +7,8 @@ ResizePattern::ResizePattern(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->patternLength->setValidator(new QDoubleValidator(this));
+    ui->patternLength->setValidator(new QIntValidator(1,std::numeric_limits<int>::max(),this));
+    ui->ledCount->setValidator(new QIntValidator(1,std::numeric_limits<int>::max(),this));
 }
 
 ResizePattern::~ResizePattern()

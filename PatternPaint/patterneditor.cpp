@@ -31,6 +31,30 @@ PatternEditor::PatternEditor(QWidget *parent) :
     m_edited = false;
 }
 
+void PatternEditor::setImage(const QImage& img) {
+    if(patternItem == NULL) {
+        return;
+    }
+
+    patternItem->setImage(img);
+}
+
+const QImage &PatternEditor::getPatternAsImage() const {
+    if(patternItem == NULL) {
+        return QImage(1,1,QImage::Format_RGB32);
+    }
+
+    return QImage(patternItem->getImage());
+}
+
+QImage* PatternEditor::getPattern() {
+    if(patternItem == NULL) {
+        return NULL;
+    }
+
+    return patternItem->getImagePointer();
+}
+
 void PatternEditor::resizeEvent(QResizeEvent * event)
 {
     Q_UNUSED(event);
@@ -38,57 +62,61 @@ void PatternEditor::resizeEvent(QResizeEvent * event)
     updateGridSize();
 }
 
-void PatternEditor::init(int frameCount, int stripLength)
-{
-    // Store the width and height, so that letterboxscrollarea can resize this widget properly
-    this->setBaseSize(frameCount, stripLength);
+//void PatternEditor::init(int frameCount, int stripLength)
+//{
+//    // Store the width and height, so that letterboxscrollarea can resize this widget properly
+//    this->setBaseSize(frameCount, stripLength);
 
-    // Initialize the pattern to a blank canvass
-    pattern = QImage(frameCount,
-                     stripLength,
-                     QImage::Format_ARGB32_Premultiplied);
-    pattern.fill(COLOR_CANVAS_DEFAULT);
+//    // Initialize the pattern to a blank canvass
+//    pattern = QImage(frameCount,
+//                     stripLength,
+//                     QImage::Format_ARGB32_Premultiplied);
+//    pattern.fill(COLOR_CANVAS_DEFAULT);
 
-    toolPreview = QImage(frameCount,
-                         stripLength,
-                         QImage::Format_ARGB32_Premultiplied);
-    toolPreview.fill(COLOR_CLEAR);
+//    toolPreview = QImage(frameCount,
+//                         stripLength,
+//                         QImage::Format_ARGB32_Premultiplied);
+//    toolPreview.fill(COLOR_CLEAR);
 
-    // Turn on mouse tracking so we can draw a preview
-    setMouseTracking(true);
+//    // Turn on mouse tracking so we can draw a preview
+//    setMouseTracking(true);
 
-    updateGridSize();
+//    updateGridSize();
 
-    update();
-}
+//    update();
+//}
 
-bool PatternEditor::init(QImage newPattern, bool scaled) {
-    // TODO: Implement 'save' check before overwriting?
+//bool PatternEditor::init(QImage newPattern, bool scaled) {
+//    // TODO: Implement 'save' check before overwriting?
 
-    // If the pattern doesn't fit, scale it.
-    // TODO: Display an import dialog to let the user decide what to do?
-    if(scaled && newPattern.height() != pattern.height()) {
-        newPattern = newPattern.scaledToHeight(pattern.height());
-    }
+//    // If the pattern doesn't fit, scale it.
+//    // TODO: Display an import dialog to let the user decide what to do?
+//    if(scaled && newPattern.height() != pattern.height()) {
+//        newPattern = newPattern.scaledToHeight(pattern.height());
+//    }
 
-    // Re-init the display using the new geometry
-    init(newPattern.width(), newPattern.height());
+//    // Re-init the display using the new geometry
+//    init(newPattern.width(), newPattern.height());
 
-    // Draw the new pattern to the display
-    QPainter painter(&pattern);
-    painter.drawImage(0,0,newPattern);
+//    // Draw the new pattern to the display
+//    QPainter painter(&pattern);
+//    painter.drawImage(0,0,newPattern);
 
-    // and force a screen update
-    update();
+//    // and force a screen update
+//    update();
 
-    emit resized();
-    return true;
-}
+//    emit resized();
+//    return true;
+//}
 
 void PatternEditor::updateGridSize() {
+    if(patternItem == NULL) {
+        return;
+    }
+
     // Base the widget size on the window height
     // cast float to int to save rounded scale
-    float scale = static_cast<int>(float(size().height() - 1)/pattern.height()*10);
+    float scale = static_cast<int>(float(size().height() - 1)/pattern->height()*10);
     scale /= 10;
 
     // Use a square aspect to display the grid
@@ -97,8 +125,8 @@ void PatternEditor::updateGridSize() {
 
 
     // And make a grid pattern to superimpose over the image
-    gridPattern = QImage(pattern.width()*xScale  +.5 + 1,
-                         pattern.height()*yScale +.5 + 1,
+    gridPattern = QImage(pattern->width()*xScale  +.5 + 1,
+                         pattern->height()*yScale +.5 + 1,
                          QImage::Format_ARGB32_Premultiplied);
     gridPattern.fill(COLOR_CLEAR);
 
@@ -108,7 +136,7 @@ void PatternEditor::updateGridSize() {
 
     // Draw vertical lines
     painter.setPen(COLOR_GRID_LINES);
-    for(int x = 0; x <= pattern.width(); x++) {
+    for(int x = 0; x <= pattern->width(); x++) {
         painter.drawLine(x*xScale+.5,
                          0,
                          x*xScale+.5,
@@ -116,7 +144,7 @@ void PatternEditor::updateGridSize() {
     }
 
     // Draw horizontal lines
-    for(int y = 0; y <= pattern.height(); y++) {
+    for(int y = 0; y <= pattern->height(); y++) {
         painter.drawLine(0,
                          y*yScale+.5,
                          gridPattern.width(),
@@ -125,8 +153,8 @@ void PatternEditor::updateGridSize() {
 
     // Draw corners
     painter.setPen(COLOR_GRID_EDGES);
-    for(int x = 0; x <= pattern.width(); x++) {
-        for(int y = 0; y <= pattern.height(); y++) {
+    for(int x = 0; x <= pattern->width(); x++) {
+        for(int y = 0; y <= pattern->height(); y++) {
             painter.drawPoint(QPoint(x*xScale     +.5 +1,    y*yScale     +.5 +1));
             painter.drawPoint(QPoint((x+1)*xScale +.5 -1,    y*yScale     +.5 +1));
             painter.drawPoint(QPoint(x*xScale     +.5 +1,    (y+1)*yScale +.5 -1));
@@ -197,6 +225,56 @@ void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
     }
 }
 
+void PatternEditor::setPatternItem(QListWidgetItem* current, QListWidgetItem* previous) {
+    Q_UNUSED(previous);
+
+    patternItem = dynamic_cast<PatternItem*>(current);
+
+    if(current == NULL) {
+        return;
+    }
+
+    pattern = patternItem->getImagePointer();
+
+
+    // TODO: REIMPLEMENT ME (needs to be in patternitem)
+//    // If the pattern doesn't fit, scale it.
+//    // TODO: Display an import dialog to let the user decide what to do?
+//    if(scaled && newPattern.height() != pattern.height()) {
+//        newPattern = newPattern.scaledToHeight(pattern.height());
+//    }
+
+    // Re-init the display using the new geometry
+
+    // Store the width and height, so that letterboxscrollarea can resize this widget properly
+    this->setBaseSize(pattern->width(), pattern->height());
+
+//    // Initialize the pattern to a blank canvass
+//    pattern = QImage(frameCount,
+//                     stripLength,
+//                     QImage::Format_ARGB32_Premultiplied);
+//    pattern.fill(COLOR_CANVAS_DEFAULT);
+
+    toolPreview = QImage(pattern->width(),
+                         pattern->height(),
+                         QImage::Format_ARGB32_Premultiplied);
+    toolPreview.fill(COLOR_CLEAR);
+
+    // Turn on mouse tracking so we can draw a preview
+    setMouseTracking(true);
+
+    updateGridSize();
+
+//    // Draw the new pattern to the display
+//    QPainter painter(&pattern);
+//    painter.drawImage(0,0,newPattern);
+
+    // and force a screen update
+    update();
+
+    emit resized();
+}
+
 void PatternEditor::setToolColor(QColor color) {
     toolColor = color;
 }
@@ -206,6 +284,7 @@ void PatternEditor::setToolSize(int size) {
 }
 
 void PatternEditor::setPlaybackRow(int row) {
+    // TODO: Sanitize this?
     playbackRow = row;
     lazyUpdate();
 }
@@ -233,9 +312,18 @@ void PatternEditor::paintEvent(QPaintEvent*)
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter.setRenderHint(QPainter::Antialiasing, false);
 
+    // If we don't have a pattern item, show an empty view
+    if(patternItem == NULL) {
+        painter.fillRect(0,0,this->width(),this->height(), QColor(0,0,0));
+        return;
+    }
+
     // Draw the image and tool preview
-    painter.drawImage(QRect(0,0,pattern.width()*xScale+.5,pattern.height()*yScale), pattern);
-    if (m_pi && m_pi->showPreview()) painter.drawImage(QRect(0,0,pattern.width()*xScale+.5,pattern.height()*yScale), toolPreview);
+    painter.drawImage(QRect(0,0,pattern->width()*xScale+.5,pattern->height()*yScale), *pattern);
+
+    if (m_pi && m_pi->showPreview())
+        painter.drawImage(QRect(0,0,pattern->width()*xScale+.5,pattern->height()*yScale), toolPreview);
+
     painter.drawImage(0,0,gridPattern);
 
     // Draw the playback indicator
@@ -245,11 +333,11 @@ void PatternEditor::paintEvent(QPaintEvent*)
     painter.drawRect(playbackRow*xScale +.5,
                      0,
                      int((playbackRow+1)*xScale +.5) - int(playbackRow*xScale +.5),
-                     pattern.height()*yScale);
+                     pattern->height()*yScale);
     painter.fillRect(playbackRow*xScale +.5,
                      0,
                      int((playbackRow+1)*xScale +.5) - int(playbackRow*xScale +.5),
-                     pattern.height()*yScale,
+                     pattern->height()*yScale,
                      COLOR_PLAYBACK_TOP);
 
 }

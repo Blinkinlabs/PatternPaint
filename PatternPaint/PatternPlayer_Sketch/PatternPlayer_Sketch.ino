@@ -144,8 +144,6 @@ void setup()
   patternCount = pgm_read_byte(PATTERN_TABLE_ADDRESS + PATTERN_COUNT_OFFSET);
   ledCount     = pgm_read_byte(PATTERN_TABLE_ADDRESS + LED_COUNT_OFFSET);
   
-  patternCount = 3;
-  
   // Now, read the first pattern from the table
   // TODO: Read a different pattern?
   loadPattern(0);

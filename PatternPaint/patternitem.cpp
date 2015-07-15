@@ -1,15 +1,18 @@
 #include "patternitem.h"
 
-PatternItem::PatternItem(QListWidget* parent) :
+#include <QPainter>
+
+#define COLOR_CANVAS_DEFAULT    QColor(0,0,0,0)
+
+PatternItem::PatternItem(int patternLength, int ledCount, QListWidget* parent) :
     QListWidgetItem(parent, QListWidgetItem::UserType + 1),
     modified(false) {
-        ustack.setUndoLimit(50);
-}
+    ustack.setUndoLimit(50);
 
-PatternItem::PatternItem(const QString& text) :
-    QListWidgetItem(text, 0, QListWidgetItem::UserType + 1),
-    modified(false) {
-
+    // TODO: Base me on passed parameters!
+    QImage newImage(patternLength, ledCount, QImage::Format_ARGB32_Premultiplied);
+    newImage.fill(COLOR_CANVAS_DEFAULT);
+    setImage(newImage);
 }
 
 QVariant PatternItem::data(int role) const {
@@ -26,8 +29,7 @@ void PatternItem::setData(int role, const QVariant& value) {
     switch(role)
     {
     case PreviewImage:
-        img = qvariant_cast<QImage>(value);
-        psize = img.size();
+        setImage(qvariant_cast<QImage>(value));
         break;
     case Modified:
         modified = qvariant_cast<bool>(value);
@@ -43,16 +45,25 @@ void PatternItem::setData(int role, const QVariant& value) {
 }
 
 void PatternItem::setImage(const QImage& image) {
+    // TODO: Resize the image here.
     img = image;
     psize= img.size();
 }
 
-bool PatternItem::saveToFile(const QString& fileName) {
-    if (img.save(fileName)) {
-        filename = fileName;
-        setToolTip(filename);
-        return true;
+void PatternItem::resizeImage(int newPatternLength, int newLedCount, bool scale) {
+
+    QImage originalImage = img;
+
+    if(scale && newLedCount != originalImage.height()) {
+        originalImage = originalImage.scaledToHeight(newLedCount);
     }
 
-    return false;
+    // Initialize the pattern to a blank canvass
+    img = QImage(newPatternLength,
+                     newLedCount,
+                     QImage::Format_ARGB32_Premultiplied);
+    img.fill(COLOR_CANVAS_DEFAULT);
+
+    QPainter painter(&img);
+    painter.drawImage(0,0,originalImage);
 }

@@ -94,6 +94,10 @@ private slots:
 
     void on_actionRGB_triggered();
 
+    void on_actionNew_triggered();
+
+    void on_actionClose_triggered();
+
 private:
     ColorChooser* m_colorChooser;
 

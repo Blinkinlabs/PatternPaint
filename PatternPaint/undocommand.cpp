@@ -34,12 +34,14 @@ UndoCommand::UndoCommand(const QImage& img, PatternEditor& editor, QUndoCommand 
 }
 
 void UndoCommand::undo() {
-    mCurrImage = m_editor.getPatternAsImage();
-    m_editor.init(mPrevImage, false);
-    m_editor.setEdited(m_editor.getUndoStack()->index() != 1);
+    //TODO: REIMPLEMENT ME
+//    mCurrImage = m_editor.getPatternAsImage();
+//    //m_editor.init(mPrevImage, false);
+//    m_editor.setEdited(m_editor.getUndoStack()->index() != 1);
 }
 
 void UndoCommand::redo() {
-    if (mCurrImage != m_editor.getPatternAsImage())
-        m_editor.init(mCurrImage, false);
+    //TODO: REIMPLEMENT ME
+//    if (mCurrImage != m_editor.getPatternAsImage())
+//       m_editor.init(mCurrImage, false);
 }

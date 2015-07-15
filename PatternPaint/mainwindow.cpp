@@ -26,7 +26,7 @@
 #include <QUndoGroup>
 #include <QToolButton>
 
-#define DEFAULT_PATTERN_HEIGHT 60
+#define DEFAULT_LED_COUNT 60
 #define DEFAULT_PATTERN_LENGTH 100
 
 #define MIN_TIMER_INTERVAL 10  // minimum interval to wait before firing a drawtimer update
@@ -95,17 +95,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     mode = Disconnected;
 
-    patternEditor->init(DEFAULT_PATTERN_LENGTH, DEFAULT_PATTERN_HEIGHT);
-
     // Our pattern editor wants to get some notifications
     connect(m_colorChooser, SIGNAL(sendColor(QColor)),
             patternEditor, SLOT(setToolColor(QColor)));
+    connect(penSizeSpin, SIGNAL(valueChanged(int)),
+            patternEditor, SLOT(setToolSize(int)));
+    connect(patternCollection, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),
+            patternEditor, SLOT(setPatternItem(QListWidgetItem*, QListWidgetItem*)));
+
     connect(patternEditor, SIGNAL(changed(bool)), SLOT(on_patternChanged(bool)));
     connect(patternEditor, SIGNAL(resized()), SLOT(on_patternResized()));
-
     connect(patternEditor, SIGNAL(changed(bool)), this, SLOT(on_imageChanged(bool)));
 
-    connect(penSizeSpin, SIGNAL(valueChanged(int)), patternEditor, SLOT(setToolSize(int)));
 
     // Pre-set the upload progress dialog
     progressDialog = new QProgressDialog(this);
@@ -130,9 +131,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connectionScannerTimer->start();
 
     // Initial values for interface
-    penSizeSpin->setValue(1);
-    patternEditor->setToolSize(1);
+    m_colorChooser->setColor(QColor(255,255,255));      // TODO: Why aren't signals propegated from this?
     patternEditor->setToolColor(QColor(255,255,255));
+
+    penSizeSpin->setValue(1);      // TODO: Why aren't signals propegated from this?
+    patternEditor->setToolSize(1);
+
     actionPen->setChecked(true);
     patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(actionPen->data()));
     readSettings();
@@ -142,15 +146,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     QSettings settings;
     setColorMode(static_cast<Pattern::ColorMode>(settings.value("Options/ColorOrder", Pattern::RGB).toUInt()));
 
-
     this->patternCollection->setDragDropMode(QAbstractItemView::InternalMove);
     this->patternCollection->setItemDelegate(new PatternItemDelegate());
 
     // Add some patterns to see what this looks like
-    // TODO: store this somewhere else.
-    this->patternCollection->addItem(new PatternItem());
-    this->patternCollection->addItem(new PatternItem());
-    this->patternCollection->addItem(new PatternItem());
+    int patternLength = settings.value("Options/patternLength", DEFAULT_PATTERN_LENGTH).toUInt();
+    int ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
+    this->patternCollection->addItem(new PatternItem(patternLength, ledCount));
 }
 
 MainWindow::~MainWindow(){}
@@ -170,13 +172,12 @@ void MainWindow::drawTimer_timeout() {
 
     lastTime = newTime;
 
-
-    // TODO: Get the width from elsewhere, so we don't need to load the image every frame
-    QImage image = patternEditor->getPatternAsImage();
-
     if(controller.isNull()) {
         return;
     }
+
+    // TODO: Get the width from elsewhere, so we don't need to load the image every frame
+    QImage image = patternEditor->getPatternAsImage();
 
     QByteArray ledData;
 
@@ -204,9 +205,9 @@ void MainWindow::drawTimer_timeout() {
     n = (n+1)%image.width();
     patternEditor->setPlaybackRow(n);
 
-    // TODO: Tie the data sources together so we don't need to update this independently
-    PatternItem* p = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
-    p->setImage(image);
+//    // TODO: Tie the data sources together so we don't need to update this independently
+//    PatternItem* p = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
+//    p->setImage(image);
 }
 
 
@@ -292,8 +293,10 @@ void MainWindow::on_actionLoad_File_triggered()
 
     on_patternFilenameChanged(fileInfo);
 
-    patternEditor->init(pattern);
-    patternEditor->setEdited(false);
+    // TODO: Update the patternCollection instead!
+    // IMPLEMENTME
+//    patternEditor->init(pattern);
+//    patternEditor->setEdited(false);
 }
 
 void MainWindow::on_actionSave_File_as_triggered() {
@@ -454,26 +457,29 @@ void MainWindow::on_actionTroubleshooting_tips_triggered()
 void MainWindow::on_actionFlip_Horizontal_triggered()
 {
     // TODO: This in a less hacky way?
-    QImage image =  patternEditor->getPatternAsImage();
-    patternEditor->pushUndoCommand(new UndoCommand(image, *(patternEditor)));
-    patternEditor->init(image.mirrored(true, false));
+    // IMPLEMENTME
+//    QImage image =  patternEditor->getPatternAsImage();
+//    patternEditor->pushUndoCommand(new UndoCommand(image, *(patternEditor)));
+//    patternEditor->init(image.mirrored(true, false));
 }
 
 void MainWindow::on_actionFlip_Vertical_triggered()
 {
     // TODO: This in a less hacky way?
-    QImage image =  patternEditor->getPatternAsImage();
-    patternEditor->pushUndoCommand(new UndoCommand(image, *(patternEditor)));
-    patternEditor->init(image.mirrored(false, true));
+    // IMPLEMENTME
+//    QImage image =  patternEditor->getPatternAsImage();
+//    patternEditor->pushUndoCommand(new UndoCommand(image, *(patternEditor)));
+//    patternEditor->init(image.mirrored(false, true));
 }
 
 void MainWindow::on_actionClear_Pattern_triggered()
 {
     // TODO: This in a less hacky way?
-    QImage image =  patternEditor->getPatternAsImage();
-    patternEditor->pushUndoCommand(new UndoCommand(image, *(patternEditor)));
-    image.fill(0);
-    patternEditor->init(image);
+
+//    QImage image =  patternEditor->getPatternAsImage();
+//    patternEditor->pushUndoCommand(new UndoCommand(image, *(patternEditor)));
+//    image.fill(0);
+//    patternEditor->init(image);
 }
 
 void MainWindow::on_actionLoad_rainbow_sketch_triggered()
@@ -513,7 +519,7 @@ void MainWindow::on_actionSave_to_Tape_triggered()
 
     for(int i = 0; i < this->patternCollection->count(); i++) {
         // Convert the current pattern into a Pattern
-        PatternItem* p = dynamic_cast<PatternItem*>(this->patternCollection->itemAt(i,0));
+        PatternItem* p = dynamic_cast<PatternItem*>(this->patternCollection->item(i));
 
         // Note: Converting frameRate to frame delay here.
         // TODO: Attempt different compressions till one works.
@@ -525,19 +531,6 @@ void MainWindow::on_actionSave_to_Tape_triggered()
 
         patterns.push_back(pattern);
     }
-
-//    // Convert the current pattern into a Pattern
-//    QImage image =  patternEditor->getPatternAsImage();
-
-//    // Note: Converting frameRate to frame delay here.
-//    // TODO: Attempt different compressions till one works.
-//    Pattern pattern(image,
-//                        drawTimer->interval(),
-//                        //Pattern::RGB24,
-//                        Pattern::RGB565_RLE,
-//                        colorMode);
-
-//    patterns.push_back(pattern);
 
     if(!controller->getUploader(uploader)) {
         return;
@@ -563,51 +556,47 @@ void MainWindow::on_actionSave_to_Tape_triggered()
 
 void MainWindow::on_actionResize_Pattern_triggered()
 {
-    int patternLength = patternEditor->getPatternAsImage().width();
-    int ledCount = patternEditor->getPatternAsImage().height();
+    QSettings settings;
 
-    ResizePattern* resizer = new ResizePattern(this);
-    resizer->setWindowModality(Qt::WindowModal);
-    resizer->setLength(patternLength);
-    resizer->setLedCount(ledCount);
-    resizer->exec();
+    int patternLength = settings.value("Options/patternLength", DEFAULT_PATTERN_LENGTH).toUInt();
+    int ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
 
-    if(resizer->result() != QDialog::Accepted) {
+    ResizePattern resizer(this);
+    resizer.setWindowModality(Qt::WindowModal);
+    resizer.setLength(patternLength);
+    resizer.setLedCount(ledCount);
+    resizer.exec();
+
+    if(resizer.result() != QDialog::Accepted) {
         return;
     }
 
-    // TODO: Data validation
-    if(resizer->length() > 0) {
-
-        qDebug() << "Resizing pattern, length:"
-                 << resizer->length()
-                 << "height:"
-                 << resizer->ledCount();
-
-        // Create a new pattern, filled with a black color
-        QImage newImage(resizer->length(),
-                            resizer->ledCount(),
-                            QImage::Format_RGB32);
-        newImage.fill(QColor(0,0,0,0));
-
-        // Copy over whatever portion of the original pattern will fit
-        QPainter painter(&newImage);
-        QImage originalImage = patternEditor->getPatternAsImage();
-        patternEditor->pushUndoCommand(new UndoCommand(originalImage, *(patternEditor)));
-        painter.drawImage(0,0,originalImage);
-        patternEditor->init(newImage, false);
+    // Do a quick sanity check on the inputs, they should be validated by the resizer class.
+    if(resizer.length() < 1 || resizer.ledCount() < 1) {
+        qDebug() << "Resize pattern: data out of range, discarding";
+        return;
     }
+    patternLength = resizer.length();
+    ledCount = resizer.ledCount();
+
+    settings.setValue("Options/patternLength", static_cast<uint>(patternLength));
+    settings.setValue("Options/ledCount", static_cast<uint>(ledCount));
+
+    qDebug() << "Resizing patterns, length:"
+             << patternLength
+             << "height:"
+             << ledCount;
+
+    // Resize the selected pattern
+    PatternItem* p = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
+    p->resizeImage(patternLength, ledCount, true);
 }
 
 void MainWindow::on_actionAddress_programmer_triggered()
 {
-//    int patternLength = patternEditor->getPatternAsImage().width();
-//    int ledCount = patternEditor->getPatternAsImage().height();
-
-    // TODO: Dispose of this?
-    AddressProgrammer* programmer = new AddressProgrammer(this);
-    programmer->setWindowModality(Qt::WindowModal);
-    programmer->exec();
+    AddressProgrammer programmer(this);
+    programmer.setWindowModality(Qt::WindowModal);
+    programmer.exec();
 }
 
 void MainWindow::writeSettings()
@@ -677,6 +666,7 @@ void MainWindow::on_patternChanged(bool changed) {
 }
 
 void MainWindow::on_patternResized() {
+    // Note: This is a hack to get the patterneditor area to redraw.
     scrollArea->resize(scrollArea->width()+1, scrollArea->height());
 }
 
@@ -782,4 +772,25 @@ void MainWindow::on_actionGRB_triggered()
 void MainWindow::on_actionRGB_triggered()
 {
     setColorMode(Pattern::RGB);
+}
+
+void MainWindow::on_actionNew_triggered()
+{
+    // TODO: Combine this with the init code in main window setup!
+    QSettings settings;
+    int patternLength = settings.value("Options/patternLength", DEFAULT_PATTERN_LENGTH).toUInt();
+    int ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
+    this->patternCollection->addItem(new PatternItem(patternLength, ledCount));
+    // TODO: Select this as the active pattern!
+}
+
+void MainWindow::on_actionClose_triggered()
+{
+    if(this->patternCollection->currentItem() == NULL) {
+        qDebug() << "on_actionClose: No items left to remove!";
+        return;
+    }
+
+    // TODO: This seems like the wrong way?
+    delete this->patternCollection->currentItem();
 }

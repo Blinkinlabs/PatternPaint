@@ -2,6 +2,7 @@
 #define PATTERNDITOR_H
 
 #include <QWidget>
+#include "patternitem.h"
 
 class QUndoStack;
 class UndoCommand;
@@ -13,25 +14,25 @@ class PatternEditor : public QWidget
 public:
     explicit PatternEditor(QWidget *parent = 0);
 
-    /// Re-initialze the pattern editor as a blank image with the given size
-    /// @param frameCount Number of frames in this pattern
-    /// @param stripLength Number of LEDs in this strip
-    /// @param initTools - temporary parameter - set tools parameters like size and color to default
-    void init(int frameCount, int stripLength);
+//    /// Initialize the pattern editor using a QImage as the new pattern
+//    /// @param newPattern New pattern to load
+//    /// @param scaled If true, scale the image to match the height of the previous pattern
+//    bool init(QImage newPattern, bool scaled = true);
 
-    /// Initialize the pattern editor using a QImage as the new pattern
-    /// @param newPattern New pattern to load
-    /// @param scaled If true, scale the image to match the height of the previous pattern
-    bool init(QImage newPattern, bool scaled = true);
+//    /// Re-initialze the pattern editor as a blank image with the given size
+//    /// @param frameCount Number of frames in this pattern
+//    /// @param stripLength Number of LEDs in this strip
+//    /// @param initTools - temporary parameter - set tools parameters like size and color to default
+//    void init(int frameCount, int stripLength);
 
-    void setImage(const QImage& img) { pattern = img; }
+    void setImage(const QImage& img);
 
     inline QUndoStack* getUndoStack() { return m_undoStack; }
 
     /// Get the image data for the current pattern
     /// @return QImage containing the current pattern
-    QImage getPatternAsImage() const { return pattern; }
-    QImage* getPattern() { return &pattern; }
+    const QImage& getPatternAsImage() const;
+    QImage* getPattern();
 
     bool isEdited() const { return m_edited; }
     void setEdited(bool e) {
@@ -59,7 +60,9 @@ protected:
     void paintEvent(QPaintEvent *event);
 
 private:
-    QImage pattern;        ///< The actual image
+    PatternItem* patternItem;    ///< Pattern item we are interacting with
+    QImage* pattern;        ///< The actual image, stored in the patternItem (TODO: Should we be referenceing this indirectly instead?
+
     QImage gridPattern;    ///< Holds the pre-rendered grid overlay
     QImage toolPreview;    ///< Holds a preview of the current tool
 
@@ -69,7 +72,7 @@ private:
     QColor toolColor;      ///< Color of the current drawing tool (TODO: This should be a pointer to a tool)
     int toolSize;          ///< Size of the current drawing tool (TODO: This should be a pointer to a tool)
 
-    int playbackRow;       ///< Row being played back
+    int playbackRow;       ///< Row being played back (for display purposes only)
     QUndoStack* m_undoStack;
     bool m_isPaint;
     AbstractInstrument* m_pi;
@@ -84,6 +87,7 @@ signals:
     void changed(bool);
     void resized();
 public slots:
+    void setPatternItem(QListWidgetItem* current, QListWidgetItem* previous);
     void setToolColor(QColor color);
     void setToolSize(int size);
     void setPlaybackRow(int row);
