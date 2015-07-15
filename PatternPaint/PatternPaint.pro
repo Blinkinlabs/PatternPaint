@@ -62,7 +62,8 @@ SOURCES += main.cpp\
     lightbuddyuploader.cpp \
     blinkypendantprogrammer.cpp \
     lightbuddyprogrammer.cpp \
-    patternlistitem.cpp
+    patternitemdelegate.cpp \
+    patternitem.cpp
 
 HEADERS  += mainwindow.h \
     blinkytape.h \
@@ -90,7 +91,8 @@ HEADERS  += mainwindow.h \
     patternuploader.h \
     blinkypendantprogrammer.h \
     lightbuddyprogrammer.h \
-    patternlistitem.h
+    patternitemdelegate.h \
+    patternitem.h
 
 FORMS    += mainwindow.ui \
     systeminformation.ui \

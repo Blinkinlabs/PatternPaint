@@ -31,24 +31,39 @@ struct CRGB leds[MAX_LEDS];   // Space to hold the pattern
 uint8_t ledCount;             // Actual number of LEDs present
 
 // Pattern information
-uint8_t patternCount;         // Number of available patterns
-uint8_t patternIndex;         // Index of the current patter
+volatile uint8_t patternCount;         // Number of available patterns
+volatile uint8_t currentPattern;         // Index of the current patter
 Animation pattern;            // Current pattern
 int frameDelay = 30;          // Number of ms each frame should be displayed.
 
-// Brightness selection
-#define BRIGHT_STEP_COUNT 5
-uint8_t brightnesSteps[BRIGHT_STEP_COUNT] = {5,15,40,70,93};
-uint8_t brightness = 4;
-uint8_t lastButtonState = 1;
+#define BRIGHT_STEP_COUNT 8
+#define STARTING_BRIGHTNESS 4
+volatile uint8_t brightnesSteps[BRIGHT_STEP_COUNT] = {5,15,40,70,93, 70, 40, 15};
 
+uint8_t brightness = 4;
+uint8_t lastBrightness = 4;
+
+// Button interrupt variables and Interrupt Service Routine
+uint8_t buttonState = 0;
+bool buttonDebounced;
+long buttonDownTime = 0;
+long buttonPressTime = 0;
+
+#define BUTTON_BRIGHTNESS_SWITCH_TIME  1     // Time to hold the button down to switch brightness
+#define BUTTON_PATTERN_SWITCH_TIME    1000   // Time to hold the button down to switch patterns
 
 // Read the pattern data from the end of the program memory, and construct a new Pattern from it.
-void loadPattern(uint8_t patternIndex) {
+void loadPattern(uint8_t newPattern) {
+//  if(newPattern >= patternCount) {
+//    return;
+//  }
+  
+  currentPattern = newPattern;
+  
   uint16_t patternEntryAddress =
         PATTERN_TABLE_ADDRESS
         + PATTERN_TABLE_HEADER_LENGTH
-        + patternIndex * PATTERN_TABLE_ENTRY_LENGTH;
+        + currentPattern * PATTERN_TABLE_ENTRY_LENGTH;
 
 
   uint8_t encodingType = pgm_read_byte(patternEntryAddress + ENCODING_TYPE_OFFSET);
@@ -66,6 +81,53 @@ void loadPattern(uint8_t patternIndex) {
   pattern.init(frameCount, frameData, encodingType, ledCount);
 }
 
+// Called when the button is both pressed and released.
+ISR(PCINT0_vect){
+  buttonState = !(PINB & (1 << PINB6)); // Reading state of the PB6 (remember that HIGH == released)
+  
+  if(buttonState) {
+    // On button down, record the time so we can convert this into a gesture later
+    buttonDownTime = millis();
+    buttonDebounced = false;
+    
+    // And configure and start timer4 interrupt.
+    TCCR4B = 0x0F; // Slowest prescaler
+    TCCR4D = _BV(WGM41) | _BV(WGM40);  // Fast PWM mode
+    OCR4C = 0x10;        // some random percentage of the clock
+    TCNT4 = 0;  // Reset the counter
+    TIMSK4 = _BV(TOV4);  // turn on the interrupt
+    
+  }
+  else {
+    TIMSK4 = 0;  // turn off the interrupt
+  }
+}
+
+// This is called every xx ms while the button is being held down; it counts down then displays a
+// visual cue and changes the pattern.
+ISR(TIMER4_OVF_vect) {
+  // If the user is still holding down the button after the first cycle, they were serious about it.
+  if(buttonDebounced == false) {
+    buttonDebounced = true;
+    lastBrightness = brightness;
+    brightness = (brightness + 1) % BRIGHT_STEP_COUNT;
+    LEDS.setBrightness(brightnesSteps[brightness]);
+  }
+  
+  // If we've waited long enough, switch the pattern
+  // TODO: visual indicator
+  buttonPressTime = millis() - buttonDownTime;
+  if(buttonPressTime > BUTTON_PATTERN_SWITCH_TIME) {
+    // first unroll the brightness!
+    brightness = lastBrightness;
+    LEDS.setBrightness(brightnesSteps[brightness]);
+    
+    loadPattern((currentPattern+1)%patternCount);
+    
+    // Finally, reset the button down time, so we don't advance again too quickly
+    buttonDownTime = millis();
+  }
+}
 
 void setup()
 {  
@@ -73,18 +135,24 @@ void setup()
   
   pinMode(BUTTON_IN, INPUT_PULLUP);
   
+  // Interrupt set-up; see Atmega32u4 datasheet section 11
+  PCIFR  |= (1 << PCIF0);  // Just in case, clear interrupt flag
+  PCMSK0 |= (1 << PCINT6); // Set interrupt mask to the button pin (PCINT6)
+  PCICR  |= (1 << PCIE0);  // Enable interrupt
 
   // First, load the pattern count and LED geometry from the pattern table
   patternCount = pgm_read_byte(PATTERN_TABLE_ADDRESS + PATTERN_COUNT_OFFSET);
   ledCount     = pgm_read_byte(PATTERN_TABLE_ADDRESS + LED_COUNT_OFFSET);
   
+  patternCount = 3;
+  
   // Now, read the first pattern from the table
   // TODO: Read a different pattern?
-  patternIndex = 0;
-  loadPattern(patternIndex);
+  loadPattern(0);
 
   LEDS.addLeds<WS2811, LED_OUT, GRB>(leds, ledCount);
   LEDS.showColor(CRGB(0, 0, 0));
+  brightness = STARTING_BRIGHTNESS;
   LEDS.setBrightness(brightnesSteps[brightness]);
   LEDS.show();
 }
@@ -124,17 +192,9 @@ void serialLoop() {
 void loop()
 {
   // If'n we get some data, switch to passthrough mode
-  if(Serial.available() > 2) {
+  if(Serial.available() > 0) {
     serialLoop();
   }
-  
-  // Check if the brightness should be adjusted
-  uint8_t buttonState = digitalRead(BUTTON_IN);
-  if((buttonState != lastButtonState) && (buttonState == 0)) {
-    brightness = (brightness + 1) % BRIGHT_STEP_COUNT;
-    LEDS.setBrightness(brightnesSteps[brightness]);
-  }
-  lastButtonState = buttonState;
   
   pattern.draw(leds);
   // TODO: More sophisticated wait loop to get constant framerate.

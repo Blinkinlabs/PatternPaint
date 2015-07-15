@@ -15,7 +15,8 @@
 #include "colorpickerinstrument.h"
 #include "sprayinstrument.h"
 #include "fillinstrument.h"
-#include "patternlistitem.h"
+#include "patternitemdelegate.h"
+#include "patternitem.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -141,11 +142,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     QSettings settings;
     setColorMode(static_cast<Pattern::ColorMode>(settings.value("Options/ColorOrder", Pattern::RGB).toUInt()));
 
+
+    this->patternCollection->setDragDropMode(QAbstractItemView::InternalMove);
+    this->patternCollection->setItemDelegate(new PatternItemDelegate());
+
     // Add some patterns to see what this looks like
-    PatternListItem* j = new PatternListItem();
-    PatternListItem* i = new PatternListItem();
-    this->PatternCollection->addItem(i);
-    this->PatternCollection->addItem(j);
+    // TODO: store this somewhere else.
+    this->patternCollection->addItem(new PatternItem());
+    this->patternCollection->addItem(new PatternItem());
+    this->patternCollection->addItem(new PatternItem());
 }
 
 MainWindow::~MainWindow(){}
@@ -198,6 +203,10 @@ void MainWindow::drawTimer_timeout() {
 
     n = (n+1)%image.width();
     patternEditor->setPlaybackRow(n);
+
+    // TODO: Tie the data sources together so we don't need to update this independently
+    PatternItem* p = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
+    p->setImage(image);
 }
 
 
@@ -500,22 +509,35 @@ void MainWindow::on_actionSave_to_Tape_triggered()
         return;
     }
 
-    // Convert the current pattern into a Pattern
-    QImage image =  patternEditor->getPatternAsImage();
+    std::vector<Pattern> patterns;
 
-    // Note: Converting frameRate to frame delay here.
-    Pattern pattern(image,
+    for(int i = 0; i < this->patternCollection->count(); i++) {
+        // Convert the current pattern into a Pattern
+        PatternItem* p = dynamic_cast<PatternItem*>(this->patternCollection->itemAt(i,0));
+
+        // Note: Converting frameRate to frame delay here.
+        // TODO: Attempt different compressions till one works.
+        Pattern pattern(p->getImage(),
                         drawTimer->interval(),
                         //Pattern::RGB24,
                         Pattern::RGB565_RLE,
                         colorMode);
 
-    // TODO: Attempt different compressions till one works.
+        patterns.push_back(pattern);
+    }
 
-    qDebug() << "Color count: " << pattern.colorCount();
+//    // Convert the current pattern into a Pattern
+//    QImage image =  patternEditor->getPatternAsImage();
 
-    std::vector<Pattern> patterns;
-    patterns.push_back(pattern);
+//    // Note: Converting frameRate to frame delay here.
+//    // TODO: Attempt different compressions till one works.
+//    Pattern pattern(image,
+//                        drawTimer->interval(),
+//                        //Pattern::RGB24,
+//                        Pattern::RGB565_RLE,
+//                        colorMode);
+
+//    patterns.push_back(pattern);
 
     if(!controller->getUploader(uploader)) {
         return;
