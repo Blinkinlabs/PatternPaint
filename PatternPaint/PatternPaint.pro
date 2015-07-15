@@ -24,7 +24,7 @@ TEMPLATE = app
 
 #Application version
 VERSION_MAJOR = 1
-VERSION_MINOR = 6
+VERSION_MINOR = 7
 VERSION_BUILD = 0
 
 DEFINES += "VERSION_MAJOR=$${VERSION_MAJOR}" \
@@ -39,10 +39,8 @@ DEFINES += ORGANIZATION_NAME=\\\""Blinkinlabs"\\\"
 DEFINES += ORGANIZATION_DOMAIN=\\\""blinkinlabs.com"\\\"
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-    blinkytape.cpp \
+    mainwindow.cpp \
     colorpicker.cpp \
-    avrprogrammer.cpp \
     systeminformation.cpp \
     colormodel.cpp \
     aboutpatternpaint.cpp \
@@ -50,23 +48,13 @@ SOURCES += main.cpp\
     patterneditor.cpp \
     resizepattern.cpp \
     addressprogrammer.cpp \
-    avruploaddata.cpp \
-    serialcommandqueue.cpp \
-    lightbuddyprotocol.cpp \
     letterboxscrollarea.cpp \
     undocommand.cpp \
     colorchooser.cpp \
-    blinkycontroller.cpp \
-    blinkytapeuploader.cpp \
-    blinkypendantuploader.cpp \
-    lightbuddyuploader.cpp \
-    blinkypendantprogrammer.cpp \
-    lightbuddyprogrammer.cpp \
     patternitemdelegate.cpp \
     patternitem.cpp
 
 HEADERS  += mainwindow.h \
-    blinkytape.h \
     colorpicker.h \
     avrprogrammer.h \
     PatternPlayer_Sketch.h \
@@ -78,19 +66,9 @@ HEADERS  += mainwindow.h \
     patterneditor.h \
     resizepattern.h \
     addressprogrammer.h \
-    avruploaddata.h \
-    serialcommandqueue.h \
-    lightbuddyprotocol.h \
     letterboxscrollarea.h \
     undocommand.h \
     colorchooser.h \
-    blinkycontroller.h \
-    blinkytapeuploader.h \
-    blinkypendantuploader.h \
-    lightbuddyuploader.h \
-    patternuploader.h \
-    blinkypendantprogrammer.h \
-    lightbuddyprogrammer.h \
     patternitemdelegate.h \
     patternitem.h
 
@@ -101,6 +79,7 @@ FORMS    += mainwindow.ui \
     addressprogrammer.ui
 
 include(instruments/instruments.pri)
+include(devices/devices.pri)
 
 # OS X: Specify icon resource to use
 ICON = images/patternpaint.icns
