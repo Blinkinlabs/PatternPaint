@@ -1,13 +1,15 @@
 #include "patternitem.h"
+#include "undocommand.h"
 
 #include <QPainter>
+#include <QDebug>
 
 #define COLOR_CANVAS_DEFAULT    QColor(0,0,0,0)
 
 PatternItem::PatternItem(int patternLength, int ledCount, QListWidget* parent) :
     QListWidgetItem(parent, QListWidgetItem::UserType + 1),
     modified(false) {
-    ustack.setUndoLimit(50);
+    undoStack.setUndoLimit(50);
 
     // TODO: Base me on passed parameters!
     QImage newImage(patternLength, ledCount, QImage::Format_ARGB32_Premultiplied);
@@ -15,11 +17,31 @@ PatternItem::PatternItem(int patternLength, int ledCount, QListWidget* parent) :
     setImage(newImage);
 }
 
+PatternItem::PatternItem(int patternLength, int ledCount, QImage newImage, QListWidget* parent) :
+    QListWidgetItem(parent, QListWidgetItem::UserType + 1),
+    modified(false) {
+    undoStack.setUndoLimit(50);
+
+    // TODO: Base me on passed parameters!
+    image = newImage;
+    resizePattern(patternLength, ledCount, true);
+}
+
+void PatternItem::pushUndoState() {
+    qDebug() << "Pushing undo state";
+    undoStack.push(new UndoCommand(image, this));
+    modified = true;
+}
+
+void PatternItem::popUndoState() {
+    qDebug() << "Popping undo state";
+}
+
 QVariant PatternItem::data(int role) const {
     switch(role) {
-        case PreviewImage: return img;
+        case PreviewImage: return image;
         case Modified: return modified;
-        case PatternSize: return psize;
+        case PatternSize: return image.size();
     };
 
     return QListWidgetItem::data(role);
@@ -44,26 +66,49 @@ void PatternItem::setData(int role, const QVariant& value) {
     QListWidgetItem::setData(role, value);
 }
 
-void PatternItem::setImage(const QImage& image) {
+void PatternItem::setImage(const QImage& newImage) {
     // TODO: Resize the image here.
-    img = image;
-    psize= img.size();
+    image = newImage;
 }
 
-void PatternItem::resizeImage(int newPatternLength, int newLedCount, bool scale) {
+void PatternItem::resizePattern(int newPatternLength, int newLedCount, bool scale) {
+    pushUndoState();
 
-    QImage originalImage = img;
+    QImage originalImage = image;
 
     if(scale && newLedCount != originalImage.height()) {
         originalImage = originalImage.scaledToHeight(newLedCount);
     }
 
     // Initialize the pattern to a blank canvass
-    img = QImage(newPatternLength,
+    image = QImage(newPatternLength,
                      newLedCount,
                      QImage::Format_ARGB32_Premultiplied);
-    img.fill(COLOR_CANVAS_DEFAULT);
+    image.fill(COLOR_CANVAS_DEFAULT);
 
-    QPainter painter(&img);
+    QPainter painter(&image);
     painter.drawImage(0,0,originalImage);
+}
+
+void PatternItem::flipHorizontal()
+{
+    pushUndoState();
+    image = image.mirrored(true, false);
+}
+
+void PatternItem::flipVertical()
+{
+    pushUndoState();
+    image = image.mirrored(false, true);
+}
+
+void PatternItem::clear()
+{
+    pushUndoState();
+    image.fill(COLOR_CANVAS_DEFAULT);
+}
+
+void PatternItem::setModified(bool newModified)  {
+    modified = newModified;
+//        emit changed(m_edited);
 }

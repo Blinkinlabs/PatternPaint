@@ -29,9 +29,7 @@
 #include <QUndoCommand>
 #include <QImage>
 
-#include "patterneditor.h"
-
-class PatternEditor;
+class PatternItem;
 
 /**
  * @brief Class which provides undo/redo actions
@@ -41,13 +39,13 @@ class PatternEditor;
 class UndoCommand : public QUndoCommand
 {
 public:
-    UndoCommand(const QImage& img, PatternEditor& editor,  QUndoCommand *parent = 0);
+    UndoCommand(const QImage& img, PatternItem* item,  QUndoCommand *parent = 0);
     virtual void undo();
     virtual void redo();
 private:
-    QImage mPrevImage;
-    QImage mCurrImage;
-    PatternEditor& m_editor;
+    QImage previousImage;
+    QImage currentImage;
+    PatternItem* patternItem;
 };
 
 #endif // UNDOCOMMAND_H

@@ -1,7 +1,9 @@
 #ifndef PATTERNITEM_H
 #define PATTERNITEM_H
 
+#include <QFileInfo>
 #include <QListWidgetItem>
+#include <QUndoGroup>
 #include <QUndoStack>
 
 class PatternItem : public QListWidgetItem
@@ -15,33 +17,53 @@ public:
 
     explicit PatternItem(int patternLength, int ledCount, QListWidget* parent = 0);
 
+    explicit PatternItem(int patternLength, int ledCount, QImage newImage, QListWidget *parent = 0);
+
     QVariant data(int role) const;
     void setData(int role, const QVariant& value);
 
     void setImage(const QImage&);
-    const QImage& getImage() const { return img; }
+    const QImage& getImage() const { return image; }
+    QImage* getImagePointer() { return &image; }
 
-    QImage* getImagePointer() { return &img; }
+    QUndoStack* getUndoStack() { return &undoStack; }
+    void pushUndoState();
+    void popUndoState();
 
-//    QUndoStack* stack() { return &ustack; }
-//    bool isModified() const { return modified; }
-
-    QString fileName() const { return filename; }
-    void setFileName(const QString& fileName) { filename = fileName; }
+    QFileInfo getFileInfo() const { return fileInfo; }
+    void setFileInfo(const QFileInfo& fileName) { fileInfo = fileName; }
 
     /// Resize the image
     /// @param patternLength new pattern length
     /// @param ledCount new LED count
     /// @param scale If true, scale the image to fit the new size. Otherwise crop/expand the image.
-    void resizeImage(int newPatternLength, int newLedCount, bool scale);
+    void resizePattern(int newPatternLength, int newLedCount, bool scale);
+
+    /// Flip the pattern horizontally
+    void flipHorizontal();
+
+    /// Flip the pattern vertically
+    void flipVertical();
+
+    /// Test if the pattern has unsaved changes
+    /// @return true if the pattern has unsaved changes
+    bool getModified() const { return modified; }
+
+    /// Set the unsaved pattern state
+    /// @param newModified New modified state.
+    void setModified(bool newModified);
+
+    void clear();
 
 private:
-    QUndoStack  ustack;
-    QImage  img;
-    QSize   psize;
-    bool    modified;
-    QString filename;
+    QUndoStack  undoStack;      ///< Undo stack for this pattern
+    QImage  image;              ///< Image representation of the pattern
+    QFileInfo fileInfo;         ///< Image filename
+
+    bool modified;              ///< True if the image has been modified since last save
+
 signals:
+//    void changed(bool);
 
 public slots:
 };

@@ -50,9 +50,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     m_redoAction->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Y")));
     menuEdit->addAction(m_redoAction);
 
-    m_undoStackGroup->addStack(patternEditor->getUndoStack());
-    m_undoStackGroup->setActiveStack(patternEditor->getUndoStack());
-
     // instruments
     ColorpickerInstrument* cpi = new ColorpickerInstrument(this);
     connect(cpi, SIGNAL(pickedColor(QColor)), SLOT(on_colorPicked(QColor)));
@@ -102,6 +99,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
             patternEditor, SLOT(setToolSize(int)));
     connect(patternCollection, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),
             patternEditor, SLOT(setPatternItem(QListWidgetItem*, QListWidgetItem*)));
+    connect(patternCollection, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),
+            this, SLOT(setPatternItem(QListWidgetItem*, QListWidgetItem*)));
 
     connect(patternEditor, SIGNAL(changed(bool)), SLOT(on_patternChanged(bool)));
     connect(patternEditor, SIGNAL(resized()), SLOT(on_patternResized()));
@@ -149,10 +148,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     this->patternCollection->setDragDropMode(QAbstractItemView::InternalMove);
     this->patternCollection->setItemDelegate(new PatternItemDelegate());
 
-    // Add some patterns to see what this looks like
-    int patternLength = settings.value("Options/patternLength", DEFAULT_PATTERN_LENGTH).toUInt();
-    int ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
-    this->patternCollection->addItem(new PatternItem(patternLength, ledCount));
+    // Create a pattern.
+    on_actionNew_triggered();
 }
 
 MainWindow::~MainWindow(){}
@@ -204,10 +201,6 @@ void MainWindow::drawTimer_timeout() {
 
     n = (n+1)%image.width();
     patternEditor->setPlaybackRow(n);
-
-//    // TODO: Tie the data sources together so we don't need to update this independently
-//    PatternItem* p = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
-//    p->setImage(image);
 }
 
 
@@ -261,10 +254,6 @@ void MainWindow::stopPlayback() {
 
 void MainWindow::on_actionLoad_File_triggered()
 {
-    if(!promptForSave()) {
-        return;
-    }
-
     QSettings settings;
     QString lastDirectory = settings.value("File/LoadDirectory").toString();
 
@@ -283,6 +272,11 @@ void MainWindow::on_actionLoad_File_triggered()
     QFileInfo fileInfo(fileName);
     settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
 
+    int patternLength = settings.value("Options/patternLength", DEFAULT_PATTERN_LENGTH).toUInt();
+    int ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
+
+
+    // TODO: Push this into PatternItem
     QImage pattern;
 
     if(!pattern.load(fileName)) {
@@ -291,12 +285,12 @@ void MainWindow::on_actionLoad_File_triggered()
         return;
     }
 
-    on_patternFilenameChanged(fileInfo);
+    PatternItem* patternItem = new PatternItem(patternLength, ledCount, pattern);
+    patternItem->setFileInfo(fileInfo);
 
-    // TODO: Update the patternCollection instead!
-    // IMPLEMENTME
-//    patternEditor->init(pattern);
-//    patternEditor->setEdited(false);
+    m_undoStackGroup->addStack(patternItem->getUndoStack());
+    this->patternCollection->addItem(patternItem);
+    this->patternCollection->setCurrentItem(patternItem);
 }
 
 void MainWindow::on_actionSave_File_as_triggered() {
@@ -318,19 +312,20 @@ void MainWindow::on_actionSave_File_as_triggered() {
     QFileInfo fileInfo(fileName);
     settings.setValue("File/SaveDirectory", fileInfo.absolutePath());
 
-    patternEditor->setEdited(!saveFile(fileInfo));
+    saveFile(fileInfo);
 }
 
 void MainWindow::on_actionSave_File_triggered() {
-    if (m_lastFileInfo.fileName() == "") {
+    QFileInfo fileInfo = dynamic_cast<PatternItem*>(patternCollection->currentItem())->getFileInfo();
+
+    if(fileInfo.baseName() == "") {
         on_actionSave_File_as_triggered();
     } else {
-        patternEditor->setEdited(!saveFile(m_lastFileInfo));
+        saveFile(fileInfo);
     }
 }
 
-void MainWindow::on_actionExit_triggered()
-{
+void MainWindow::on_actionExit_triggered() {
     this->close();
 }
 
@@ -456,30 +451,17 @@ void MainWindow::on_actionTroubleshooting_tips_triggered()
 
 void MainWindow::on_actionFlip_Horizontal_triggered()
 {
-    // TODO: This in a less hacky way?
-    // IMPLEMENTME
-//    QImage image =  patternEditor->getPatternAsImage();
-//    patternEditor->pushUndoCommand(new UndoCommand(image, *(patternEditor)));
-//    patternEditor->init(image.mirrored(true, false));
+    dynamic_cast<PatternItem*>(this->patternCollection->currentItem())->flipHorizontal();
 }
 
 void MainWindow::on_actionFlip_Vertical_triggered()
 {
-    // TODO: This in a less hacky way?
-    // IMPLEMENTME
-//    QImage image =  patternEditor->getPatternAsImage();
-//    patternEditor->pushUndoCommand(new UndoCommand(image, *(patternEditor)));
-//    patternEditor->init(image.mirrored(false, true));
+    dynamic_cast<PatternItem*>(this->patternCollection->currentItem())->flipVertical();
 }
 
 void MainWindow::on_actionClear_Pattern_triggered()
 {
-    // TODO: This in a less hacky way?
-
-//    QImage image =  patternEditor->getPatternAsImage();
-//    patternEditor->pushUndoCommand(new UndoCommand(image, *(patternEditor)));
-//    image.fill(0);
-//    patternEditor->init(image);
+    dynamic_cast<PatternItem*>(this->patternCollection->currentItem())->clear();
 }
 
 void MainWindow::on_actionLoad_rainbow_sketch_triggered()
@@ -588,8 +570,8 @@ void MainWindow::on_actionResize_Pattern_triggered()
              << ledCount;
 
     // Resize the selected pattern
-    PatternItem* p = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
-    p->resizeImage(patternLength, ledCount, true);
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
+    patternItem->resizePattern(patternLength, ledCount, true);
 }
 
 void MainWindow::on_actionAddress_programmer_triggered()
@@ -621,7 +603,9 @@ void MainWindow::readSettings()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if(!promptForSave()) {
+    // TODO: Iterate over all images.
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
+    if(!promptForSave(patternItem)) {
         event->ignore();
         return;
     }
@@ -677,33 +661,42 @@ void MainWindow::on_imageChanged(bool changed)
 
 void MainWindow::on_patternFilenameChanged(QFileInfo fileinfo)
 {
-    m_lastFileInfo = fileinfo;
-    this->setWindowTitle(m_lastFileInfo.baseName() + " - Pattern Paint");
+    this->setWindowTitle(fileinfo.baseName() + " - Pattern Paint");
 }
 
 bool MainWindow::saveFile(const QFileInfo fileinfo) {
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
+
+    // TODO: save file info per-pattern!
     if(fileinfo.fileName() == "") {
         return false;
     }
 
-    if(!patternEditor->getPatternAsImage().save(fileinfo.filePath())) {
+    if (!patternItem->getImage().save(fileinfo.filePath())) {
         QMessageBox::warning(this, tr("Error"), tr("Error saving pattern %1. Try saving it somewhere else?")
                        .arg(fileinfo.filePath()));
         return false;
     }
 
     on_patternFilenameChanged(fileinfo);
+
+    patternItem->setModified(false);
+
     return true;
 }
 
-int MainWindow::promptForSave() {
-    if (patternEditor->isEdited() == false) {
+int MainWindow::promptForSave(PatternItem* patternItem) {
+    if (patternItem->getModified() == false) {
         return true;
     }
 
+    QString messageText = QString("The pattern %1 has been modified.")
+            .arg(patternItem->getFileInfo().baseName());
+
     QMessageBox msgBox(this);
     msgBox.setWindowModality(Qt::WindowModal);
-    msgBox.setText("The pattern has been modified.");
+    msgBox.setIconPixmap(QPixmap::fromImage(patternItem->getImage()));
+    msgBox.setText(messageText);
     msgBox.setInformativeText("Do you want to save your changes?");
     msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Save);
@@ -712,7 +705,7 @@ int MainWindow::promptForSave() {
     if (ans == QMessageBox::Save) {
         on_actionSave_File_triggered();
 
-        return (patternEditor->isEdited() == false);
+        return (!patternItem->getModified());
     }
 
     if (ans == QMessageBox::Cancel) {
@@ -776,21 +769,44 @@ void MainWindow::on_actionRGB_triggered()
 
 void MainWindow::on_actionNew_triggered()
 {
-    // TODO: Combine this with the init code in main window setup!
     QSettings settings;
     int patternLength = settings.value("Options/patternLength", DEFAULT_PATTERN_LENGTH).toUInt();
     int ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
-    this->patternCollection->addItem(new PatternItem(patternLength, ledCount));
-    // TODO: Select this as the active pattern!
+
+    PatternItem* patternItem = new PatternItem(patternLength, ledCount);
+
+    m_undoStackGroup->addStack(patternItem->getUndoStack());
+    this->patternCollection->addItem(patternItem);
+    this->patternCollection->setCurrentItem(patternItem);
 }
 
 void MainWindow::on_actionClose_triggered()
 {
-    if(this->patternCollection->currentItem() == NULL) {
+    // TODO: Fix framework to allow no active image
+    //if(this->patternCollection->currentItem() == NULL) {
+    if(this->patternCollection->count() < 2) {
         qDebug() << "on_actionClose: No items left to remove!";
         return;
     }
 
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
+    if(!promptForSave(patternItem)) {
+        return;
+    }
+
+
+    // TODO: remove the undo stack from the undo group?
     // TODO: This seems like the wrong way?
     delete this->patternCollection->currentItem();
+}
+
+void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previous) {
+    Q_UNUSED(previous);
+
+    PatternItem* newPatternItem = dynamic_cast<PatternItem*>(current);
+
+    patternEditor->setPatternItem(newPatternItem);
+    m_undoStackGroup->setActiveStack(newPatternItem->getUndoStack());
+
+    on_patternFilenameChanged(newPatternItem->getFileInfo());
 }

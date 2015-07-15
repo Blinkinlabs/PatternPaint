@@ -14,31 +14,14 @@ class PatternEditor : public QWidget
 public:
     explicit PatternEditor(QWidget *parent = 0);
 
-//    /// Initialize the pattern editor using a QImage as the new pattern
-//    /// @param newPattern New pattern to load
-//    /// @param scaled If true, scale the image to match the height of the previous pattern
-//    bool init(QImage newPattern, bool scaled = true);
-
-//    /// Re-initialze the pattern editor as a blank image with the given size
-//    /// @param frameCount Number of frames in this pattern
-//    /// @param stripLength Number of LEDs in this strip
-//    /// @param initTools - temporary parameter - set tools parameters like size and color to default
-//    void init(int frameCount, int stripLength);
+    void setPatternItem(PatternItem* newPatternItem);
 
     void setImage(const QImage& img);
-
-    inline QUndoStack* getUndoStack() { return m_undoStack; }
 
     /// Get the image data for the current pattern
     /// @return QImage containing the current pattern
     const QImage& getPatternAsImage() const;
     QImage* getPattern();
-
-    bool isEdited() const { return m_edited; }
-    void setEdited(bool e) {
-        m_edited = e;
-        emit changed(m_edited);
-    }
 
     // for compatibility with EasyPaint sources
     QColor getPrimaryColor() const { return toolColor; }
@@ -53,7 +36,8 @@ public:
 
     void leaveEvent(QEvent * event);
 
-    void pushUndoCommand(UndoCommand *command);
+    void pushUndoState();
+
     bool isPaint() const { return m_isPaint; }
     void setPaint(bool paint) { m_isPaint = paint; }
 protected:
@@ -73,21 +57,20 @@ private:
     int toolSize;          ///< Size of the current drawing tool (TODO: This should be a pointer to a tool)
 
     int playbackRow;       ///< Row being played back (for display purposes only)
-    QUndoStack* m_undoStack;
+
     bool m_isPaint;
     AbstractInstrument* m_pi;
-    bool m_edited;
 
     /// Redraw the gridPattern to fit the current widget size.
     void updateGridSize();
 
     /// Update the screen, but only if we haven't done so in a while
     void lazyUpdate();
+
 signals:
-    void changed(bool);
     void resized();
+
 public slots:
-    void setPatternItem(QListWidgetItem* current, QListWidgetItem* previous);
     void setToolColor(QColor color);
     void setToolSize(int size);
     void setPlaybackRow(int row);

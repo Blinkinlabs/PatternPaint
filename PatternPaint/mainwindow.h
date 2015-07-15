@@ -25,6 +25,9 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+    void setPatternItem(QListWidgetItem *, QListWidgetItem *);
+
 protected:
     void closeEvent(QCloseEvent *event);
 
@@ -119,7 +122,6 @@ private:
     QUndoGroup *m_undoStackGroup;
     QAction* m_undoAction;
     QAction* m_redoAction;
-    QFileInfo  m_lastFileInfo;
 
     void writeSettings();
     void readSettings();
@@ -128,7 +130,7 @@ private:
     void startPlayback();
     void stopPlayback();
 
-    int promptForSave();
+    int promptForSave(PatternItem* patternItem);
 
     void connectController();
     void connectUploader();

@@ -1,12 +1,10 @@
 #include "patterneditor.h"
-#include "undocommand.h"
 #include "abstractinstrument.h"
 
 #include <iostream>
 #include <cmath>
 #include <QtWidgets>
 #include <QDebug>
-#include <QUndoStack>
 
 #define COLOR_CLEAR             QColor(0,0,0,0)
 #define COLOR_CANVAS_DEFAULT    QColor(0,0,0,0)
@@ -24,11 +22,8 @@
 PatternEditor::PatternEditor(QWidget *parent) :
     QWidget(parent)
 {
-    m_undoStack = new QUndoStack(this);
-    m_undoStack->setUndoLimit(40);  // TODO?
     m_isPaint = false;
     m_pi = NULL;
-    m_edited = false;
 }
 
 void PatternEditor::setImage(const QImage& img) {
@@ -225,35 +220,17 @@ void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
     }
 }
 
-void PatternEditor::setPatternItem(QListWidgetItem* current, QListWidgetItem* previous) {
-    Q_UNUSED(previous);
-
-    patternItem = dynamic_cast<PatternItem*>(current);
-
-    if(current == NULL) {
+void PatternEditor::setPatternItem(PatternItem* newPatternItem) {
+    if(newPatternItem == NULL) {
         return;
     }
 
+    patternItem = newPatternItem;
+
     pattern = patternItem->getImagePointer();
-
-
-    // TODO: REIMPLEMENT ME (needs to be in patternitem)
-//    // If the pattern doesn't fit, scale it.
-//    // TODO: Display an import dialog to let the user decide what to do?
-//    if(scaled && newPattern.height() != pattern.height()) {
-//        newPattern = newPattern.scaledToHeight(pattern.height());
-//    }
-
-    // Re-init the display using the new geometry
 
     // Store the width and height, so that letterboxscrollarea can resize this widget properly
     this->setBaseSize(pattern->width(), pattern->height());
-
-//    // Initialize the pattern to a blank canvass
-//    pattern = QImage(frameCount,
-//                     stripLength,
-//                     QImage::Format_ARGB32_Premultiplied);
-//    pattern.fill(COLOR_CANVAS_DEFAULT);
 
     toolPreview = QImage(pattern->width(),
                          pattern->height(),
@@ -264,10 +241,6 @@ void PatternEditor::setPatternItem(QListWidgetItem* current, QListWidgetItem* pr
     setMouseTracking(true);
 
     updateGridSize();
-
-//    // Draw the new pattern to the display
-//    QPainter painter(&pattern);
-//    painter.drawImage(0,0,newPattern);
 
     // and force a screen update
     update();
@@ -342,8 +315,7 @@ void PatternEditor::paintEvent(QPaintEvent*)
 
 }
 
-void PatternEditor::pushUndoCommand(UndoCommand *command)
+void PatternEditor::pushUndoState()
 {
-    if (command) m_undoStack->push(command);
-    setEdited(true);
+    patternItem->pushUndoState();
 }

@@ -81,10 +81,9 @@ protected:
     /**
      * @brief Creates UndoCommand & pushes it to UndoStack.
      *
-     * Base realisation simply save all image to UndoStack
-     * @param editor corresponse to image, which is edited
+     * Base realisation simply saves the image to the UndoStack
      */
-    virtual void makeUndoCommand(PatternEditor&);
+    virtual void makeUndoCommand(PatternEditor& editor);
 };
 
 /**
