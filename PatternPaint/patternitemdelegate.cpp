@@ -1,6 +1,9 @@
 #include "patternitemdelegate.h"
 #include "patternitem.h"
 
+#include <QDebug>
+
+#define ITEM_HEIGHT 120
 
 PatternItemDelegate::PatternItemDelegate(QObject* parent) : QStyledItemDelegate(parent) {
 }
@@ -11,9 +14,11 @@ PatternItemDelegate::~PatternItemDelegate()
 }
 
 void PatternItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex & index ) const {
+    qDebug() << "repainting!";
+
     painter->save();
     QImage img = qvariant_cast<QImage>(index.data(PatternItem::PreviewImage));
-    QImage scaled = img.scaledToWidth(200);
+    QImage scaled = img.scaledToHeight(ITEM_HEIGHT);
     QStyledItemDelegate::paint(painter, option, index);
 
     // Draw the image
@@ -38,7 +43,7 @@ void PatternItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
 QSize PatternItemDelegate::sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index ) const {
     Q_UNUSED(option);
     QSize size = qvariant_cast<QSize>(index.data(PatternItem::PatternSize));
-    float aspect = 200.0/size.width();
-    return QSize(200, size.height()*aspect + 5);
+    float aspect = ITEM_HEIGHT/size.height();
+    return QSize(size.width()*aspect + 5, ITEM_HEIGHT);
 }
 

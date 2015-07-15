@@ -572,6 +572,9 @@ void MainWindow::on_actionResize_Pattern_triggered()
     // Resize the selected pattern
     PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
     patternItem->resizePattern(patternLength, ledCount, true);
+
+    // Re-load the patterneditor to force a screen update
+    patternEditor->setPatternItem(patternItem);
 }
 
 void MainWindow::on_actionAddress_programmer_triggered()
@@ -603,11 +606,16 @@ void MainWindow::readSettings()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    // TODO: Iterate over all images.
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-    if(!promptForSave(patternItem)) {
-        event->ignore();
-        return;
+    // TODO: Combine all of these into one big 'save' message
+
+    for(int i = 0; i < this->patternCollection->count(); i++) {
+        // Convert the current pattern into a Pattern
+        PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->item(i));
+
+        if(!promptForSave(patternItem)) {
+            event->ignore();
+            return;
+        }
     }
 
     writeSettings();
@@ -794,10 +802,8 @@ void MainWindow::on_actionClose_triggered()
         return;
     }
 
-
     // TODO: remove the undo stack from the undo group?
-    // TODO: This seems like the wrong way?
-    delete this->patternCollection->currentItem();
+    this->patternCollection->takeItem(this->patternCollection->currentRow());
 }
 
 void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previous) {
