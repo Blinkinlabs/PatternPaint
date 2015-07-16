@@ -39,7 +39,7 @@ const QImage &PatternEditor::getPatternAsImage() const {
         return QImage(1,1,QImage::Format_RGB32);
     }
 
-    return QImage(patternItem->getImage());
+    return patternItem->getImage();
 }
 
 QImage* PatternEditor::getPattern() {
@@ -56,53 +56,6 @@ void PatternEditor::resizeEvent(QResizeEvent * event)
 
     updateGridSize();
 }
-
-//void PatternEditor::init(int frameCount, int stripLength)
-//{
-//    // Store the width and height, so that letterboxscrollarea can resize this widget properly
-//    this->setBaseSize(frameCount, stripLength);
-
-//    // Initialize the pattern to a blank canvass
-//    pattern = QImage(frameCount,
-//                     stripLength,
-//                     QImage::Format_ARGB32_Premultiplied);
-//    pattern.fill(COLOR_CANVAS_DEFAULT);
-
-//    toolPreview = QImage(frameCount,
-//                         stripLength,
-//                         QImage::Format_ARGB32_Premultiplied);
-//    toolPreview.fill(COLOR_CLEAR);
-
-//    // Turn on mouse tracking so we can draw a preview
-//    setMouseTracking(true);
-
-//    updateGridSize();
-
-//    update();
-//}
-
-//bool PatternEditor::init(QImage newPattern, bool scaled) {
-//    // TODO: Implement 'save' check before overwriting?
-
-//    // If the pattern doesn't fit, scale it.
-//    // TODO: Display an import dialog to let the user decide what to do?
-//    if(scaled && newPattern.height() != pattern.height()) {
-//        newPattern = newPattern.scaledToHeight(pattern.height());
-//    }
-
-//    // Re-init the display using the new geometry
-//    init(newPattern.width(), newPattern.height());
-
-//    // Draw the new pattern to the display
-//    QPainter painter(&pattern);
-//    painter.drawImage(0,0,newPattern);
-
-//    // and force a screen update
-//    update();
-
-//    emit resized();
-//    return true;
-//}
 
 void PatternEditor::updateGridSize() {
     if(patternItem == NULL) {
@@ -245,7 +198,7 @@ void PatternEditor::setPatternItem(PatternItem* newPatternItem) {
     // and force a screen update
     update();
 
-    emit resized();
+    emit forcePatternEditorRedraw();
 }
 
 void PatternEditor::setToolColor(QColor color) {
@@ -257,7 +210,6 @@ void PatternEditor::setToolSize(int size) {
 }
 
 void PatternEditor::setPlaybackRow(int row) {
-    // TODO: Sanitize this?
     playbackRow = row;
     lazyUpdate();
 }

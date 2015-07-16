@@ -43,30 +43,41 @@ SystemInformation::SystemInformation(QWidget *parent) :
     case QSysInfo::WV_WINDOWS8:
         osName = "Windows 8";
         break;
+    case QSysInfo::WV_WINDOWS8_1:
+        osName = "Windows 8.1";
+        break;
+//    case QSysInfo::WV_WINDOWS10:
+//        osName = "Windows 10";
+//        break;
     default:
         osName = "Windows (Unknown Version)";
         break;
     }
 #elif defined(Q_OS_MAC)
     switch(QSysInfo::macVersion()) {
-    case QSysInfo::MV_SNOWLEOPARD:
+    case QSysInfo::MV_10_6:
         osName = "OS X 10.6 (Snow Leopard)";
         break;
-    case QSysInfo::MV_LION:
+    case QSysInfo::MV_10_7:
         osName = "OS X 10.7 (Lion)";
         break;
-    case QSysInfo::MV_MOUNTAINLION:
+    case QSysInfo::MV_10_8:
         osName = "OS X 10.8 (Mountain Lion)";
         break;
-    case QSysInfo::MV_MAVERICKS:
+    case QSysInfo::MV_10_9:
         osName = "OS X 10.9 (Mavericks)";
         break;
+    case QSysInfo::MV_10_10:
+        osName = "OS X 10.10 (Yosemite)";
+        break;
+//    case QSysInfo::MV_10_11:
+//        osName = "OS X 10.11 (El Capitan)";
+//        break;
     default:
         osName = "OS X (Unknown version)";
         break;
     }
 #else
-// TODO: Linux
     osName = "Unknown";
 #endif
     report.append("Operating system: " + osName + "\r");

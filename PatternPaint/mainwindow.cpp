@@ -39,16 +39,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     // prepare undo/redo
     menuEdit->addSeparator();
-    m_undoStackGroup = new QUndoGroup(this);
-    m_undoAction = m_undoStackGroup->createUndoAction(this, tr("&Undo"));
-    m_undoAction->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Z")));
-    m_undoAction->setEnabled(false);
-    menuEdit->addAction(m_undoAction);
+    undoStackGroup = new QUndoGroup(this);
+    undoAction = undoStackGroup->createUndoAction(this, tr("&Undo"));
+    undoAction->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Z")));
+    undoAction->setEnabled(false);
+    menuEdit->addAction(undoAction);
 
-    m_redoAction = m_undoStackGroup->createRedoAction(this, tr("&Redo"));
-    m_redoAction->setEnabled(false);
-    m_redoAction->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Y")));
-    menuEdit->addAction(m_redoAction);
+    redoAction = undoStackGroup->createRedoAction(this, tr("&Redo"));
+    redoAction->setEnabled(false);
+    redoAction->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Y")));
+    menuEdit->addAction(redoAction);
 
     // instruments
     ColorpickerInstrument* cpi = new ColorpickerInstrument(this);
@@ -66,11 +66,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     actionSpray->setData(QVariant::fromValue(new SprayInstrument(this)));
     actionFill->setData(QVariant::fromValue(new FillInstrument(this)));
 
-    m_colorChooser = new ColorChooser(255, 255, 255, this);
-    m_colorChooser->setStatusTip(tr("Pen color"));
-    m_colorChooser->setToolTip(tr("Pen color"));
+    colorChooser = new ColorChooser(255, 255, 255, this);
+    colorChooser->setStatusTip(tr("Pen color"));
+    colorChooser->setToolTip(tr("Pen color"));
     instruments->addSeparator();
-    instruments->addWidget(m_colorChooser);
+    instruments->addWidget(colorChooser);
 
     QSpinBox *penSizeSpin = new QSpinBox();
     penSizeSpin->setRange(1, 20);
@@ -85,7 +85,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     pSpeed->setValue(20);
     pSpeed->setToolTip(tr("Pattern speed"));
     tools->addWidget(pSpeed);
-    connect(pSpeed, SIGNAL(valueChanged(int)), this, SLOT(on_patternSpeed_valueChanged(int)));
+    connect(pSpeed, SIGNAL(valueChanged(int)), this, SLOT(patternSpeed_valueChanged(int)));
 
     drawTimer = new QTimer(this);
     connectionScannerTimer = new QTimer(this);
@@ -93,18 +93,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     mode = Disconnected;
 
     // Our pattern editor wants to get some notifications
-    connect(m_colorChooser, SIGNAL(sendColor(QColor)),
+    connect(colorChooser, SIGNAL(sendColor(QColor)),
             patternEditor, SLOT(setToolColor(QColor)));
     connect(penSizeSpin, SIGNAL(valueChanged(int)),
             patternEditor, SLOT(setToolSize(int)));
     connect(patternCollection, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),
-            patternEditor, SLOT(setPatternItem(QListWidgetItem*, QListWidgetItem*)));
-    connect(patternCollection, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),
             this, SLOT(setPatternItem(QListWidgetItem*, QListWidgetItem*)));
 
-    connect(patternEditor, SIGNAL(changed(bool)), SLOT(on_patternChanged(bool)));
-    connect(patternEditor, SIGNAL(resized()), SLOT(on_patternResized()));
-    connect(patternEditor, SIGNAL(changed(bool)), this, SLOT(on_imageChanged(bool)));
+    connect(patternEditor, SIGNAL(forcePatternEditorRedraw()), SLOT(on_forcePatternEditorRedraw()));
 
 
     // Pre-set the upload progress dialog
@@ -130,7 +126,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connectionScannerTimer->start();
 
     // Initial values for interface
-    m_colorChooser->setColor(QColor(255,255,255));      // TODO: Why aren't signals propegated from this?
+    colorChooser->setColor(QColor(255,255,255));      // TODO: Why aren't signals propegated from this?
     patternEditor->setToolColor(QColor(255,255,255));
 
     penSizeSpin->setValue(1);      // TODO: Why aren't signals propegated from this?
@@ -145,7 +141,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     QSettings settings;
     setColorMode(static_cast<Pattern::ColorMode>(settings.value("Options/ColorOrder", Pattern::RGB).toUInt()));
 
-    this->patternCollection->setDragDropMode(QAbstractItemView::InternalMove);
     this->patternCollection->setItemDelegate(new PatternItemDelegate());
 
     // Create a pattern.
@@ -226,7 +221,7 @@ void MainWindow::connectionScannerTimer_timeout() {
     }
 }
 
-void MainWindow::on_patternSpeed_valueChanged(int value)
+void MainWindow::patternSpeed_valueChanged(int value)
 {
     drawTimer->setInterval(1000/value);
 }
@@ -288,7 +283,7 @@ void MainWindow::on_actionLoad_File_triggered()
     PatternItem* patternItem = new PatternItem(patternLength, ledCount, pattern);
     patternItem->setFileInfo(fileInfo);
 
-    m_undoStackGroup->addStack(patternItem->getUndoStack());
+    undoStackGroup->addStack(patternItem->getUndoStack());
     this->patternCollection->addItem(patternItem);
     this->patternCollection->setCurrentItem(patternItem);
 }
@@ -649,23 +644,19 @@ void MainWindow::on_instrumentAction(bool) {
 }
 
 void MainWindow::on_colorPicked(QColor color) {
-    m_colorChooser->setColor(color);
+    colorChooser->setColor(color);
     patternEditor->setToolColor(color);
 }
 
-void MainWindow::on_patternChanged(bool changed) {
-    Q_UNUSED(changed);
-}
-
-void MainWindow::on_patternResized() {
+void MainWindow::on_forcePatternEditorRedraw() {
     // Note: This is a hack to get the patterneditor area to redraw.
     scrollArea->resize(scrollArea->width()+1, scrollArea->height());
 }
 
-void MainWindow::on_imageChanged(bool changed)
-{
-    actionSave_File->setEnabled(changed);
-}
+//void MainWindow::on_imageChanged(bool changed)
+//{
+//    actionSave_File->setEnabled(changed);
+//}
 
 void MainWindow::on_patternFilenameChanged(QFileInfo fileinfo)
 {
@@ -783,7 +774,7 @@ void MainWindow::on_actionNew_triggered()
 
     PatternItem* patternItem = new PatternItem(patternLength, ledCount);
 
-    m_undoStackGroup->addStack(patternItem->getUndoStack());
+    undoStackGroup->addStack(patternItem->getUndoStack());
     this->patternCollection->addItem(patternItem);
     this->patternCollection->setCurrentItem(patternItem);
 }
@@ -812,7 +803,7 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
     PatternItem* newPatternItem = dynamic_cast<PatternItem*>(current);
 
     patternEditor->setPatternItem(newPatternItem);
-    m_undoStackGroup->setActiveStack(newPatternItem->getUndoStack());
+    undoStackGroup->setActiveStack(newPatternItem->getUndoStack());
 
     on_patternFilenameChanged(newPatternItem->getFileInfo());
 }

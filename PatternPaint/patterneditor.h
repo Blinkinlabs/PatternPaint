@@ -68,7 +68,7 @@ private:
     void lazyUpdate();
 
 signals:
-    void resized();
+    void forcePatternEditorRedraw();
 
 public slots:
     void setToolColor(QColor color);

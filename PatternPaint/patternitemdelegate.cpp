@@ -4,6 +4,7 @@
 #include <QDebug>
 
 #define ITEM_HEIGHT 120
+#define ITEM_LETTERBOX 10
 
 PatternItemDelegate::PatternItemDelegate(QObject* parent) : QStyledItemDelegate(parent) {
 }
@@ -18,12 +19,12 @@ void PatternItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
 
     painter->save();
     QImage img = qvariant_cast<QImage>(index.data(PatternItem::PreviewImage));
-    QImage scaled = img.scaledToHeight(ITEM_HEIGHT);
+    QImage scaled = img.scaledToHeight(ITEM_HEIGHT - 2*ITEM_LETTERBOX);
     QStyledItemDelegate::paint(painter, option, index);
 
     // Draw the image
-    painter->fillRect(QRect(option.rect.x(), option.rect.y(), scaled.width(), scaled.height()), QColor(0,0,0));
-    painter->drawImage(option.rect.x(), option.rect.y(), scaled);
+    painter->fillRect(QRect(option.rect.x()+ITEM_LETTERBOX, option.rect.y()+ITEM_LETTERBOX, scaled.width(), scaled.height()), QColor(10,10,10));
+    painter->drawImage(option.rect.x()+ITEM_LETTERBOX, option.rect.y()+ITEM_LETTERBOX, scaled);
 
 //    // Show modified indicator
 //    if (index.data(PatternItem::Modified).toBool()) {
@@ -33,7 +34,7 @@ void PatternItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
 //    // Draw index
 //    if (index.data(Qt::DisplayRole).toInt() != -1) {
 //        painter->setPen(QColor::fromRgb(255,255,0));
-//        painter->drawText(option.rect.x() + scaled.width() - 16, option.rect.y() + scaled.height() - 10,
+//        painter->drawText(option.rect.x(), option.rect.y() + scaled.height() + ITEM_LETTERBOX - 10,
 //                          QString::number(index.data(Qt::DisplayRole).toInt()));
 //    }
 
@@ -44,6 +45,6 @@ QSize PatternItemDelegate::sizeHint(const QStyleOptionViewItem & option, const Q
     Q_UNUSED(option);
     QSize size = qvariant_cast<QSize>(index.data(PatternItem::PatternSize));
     float aspect = ITEM_HEIGHT/size.height();
-    return QSize(size.width()*aspect + 5, ITEM_HEIGHT);
+    return QSize(size.width()*aspect, ITEM_HEIGHT);
 }
 

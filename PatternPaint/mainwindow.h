@@ -47,7 +47,7 @@ private slots:
 
     void on_actionSystem_Information_triggered();
 
-    void on_patternSpeed_valueChanged(int value);
+    void patternSpeed_valueChanged(int value);
 
     void on_actionPlay_triggered();
 
@@ -85,11 +85,9 @@ private slots:
 
     void on_colorPicked(QColor);
 
-    void on_patternChanged(bool);
+    void on_forcePatternEditorRedraw();
 
-    void on_patternResized();
-
-    void on_imageChanged(bool changed);
+//    void on_imageChanged(bool changed);
 
     void on_patternFilenameChanged(QFileInfo fileinfo);
 
@@ -102,7 +100,7 @@ private slots:
     void on_actionClose_triggered();
 
 private:
-    ColorChooser* m_colorChooser;
+    ColorChooser* colorChooser;
 
     QTimer* drawTimer;
 
@@ -119,9 +117,9 @@ private:
     enum Modes { Disconnected, Connected, Uploading };
     Modes mode;
 
-    QUndoGroup *m_undoStackGroup;
-    QAction* m_undoAction;
-    QAction* m_redoAction;
+    QUndoGroup *undoStackGroup;
+    QAction* undoAction;
+    QAction* redoAction;
 
     void writeSettings();
     void readSettings();
