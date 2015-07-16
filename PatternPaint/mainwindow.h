@@ -61,7 +61,7 @@ private slots:
 
     void on_actionExport_pattern_for_Arduino_triggered();
 
-    void on_actionVisit_the_BlinkyTape_forum_triggered();
+    void on_actionVisit_the_Blinkinlabs_forum_triggered();
 
     void on_actionTroubleshooting_tips_triggered();
 
@@ -81,13 +81,13 @@ private slots:
 
     void on_actionConnect_triggered();
 
-    void on_instrumentAction(bool);
+    void on_instrumentSelected(bool);
 
     void on_colorPicked(QColor);
 
     void on_forcePatternEditorRedraw();
 
-//    void on_imageChanged(bool changed);
+    void on_patternItemUpdated();
 
     void on_patternFilenameChanged(QFileInfo fileinfo);
 

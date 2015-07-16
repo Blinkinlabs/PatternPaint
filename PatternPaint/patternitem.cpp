@@ -8,7 +8,8 @@
 
 PatternItem::PatternItem(int patternLength, int ledCount, QListWidget* parent) :
     QListWidgetItem(parent, QListWidgetItem::UserType + 1),
-    modified(false) {
+    modified(false)
+{
     undoStack.setUndoLimit(50);
 
     QImage newImage(patternLength, ledCount, QImage::Format_ARGB32_Premultiplied);
@@ -16,23 +17,18 @@ PatternItem::PatternItem(int patternLength, int ledCount, QListWidget* parent) :
     setImage(newImage);
 }
 
-PatternItem::PatternItem(int patternLength, int ledCount, QImage newImage, QListWidget* parent) :
+PatternItem::PatternItem(int ledCount, QImage newImage, QListWidget* parent) :
     QListWidgetItem(parent, QListWidgetItem::UserType + 1),
-    modified(false) {
+    modified(false)
+{
     undoStack.setUndoLimit(50);
 
-    image = newImage;
-    resize(patternLength, ledCount, true);
+    image = newImage.scaledToHeight(ledCount);
 }
 
 void PatternItem::pushUndoState() {
-    qDebug() << "Pushing undo state";
     undoStack.push(new UndoCommand(image, this));
-    modified = true;
-}
-
-void PatternItem::popUndoState() {
-    qDebug() << "Popping undo state";
+    setModified(true);
 }
 
 QVariant PatternItem::data(int role) const {
@@ -113,6 +109,10 @@ void PatternItem::clear()
 }
 
 void PatternItem::setModified(bool newModified)  {
+    qDebug() << "Setting modified!";
+    qDebug() << "listwidget:" << this->listWidget();
     modified = newModified;
-//        emit changed(m_edited);
+
+    // Note: update() and redraw() don't seem to change anything, but this does.
+    this->listWidget()->doItemsLayout();
 }

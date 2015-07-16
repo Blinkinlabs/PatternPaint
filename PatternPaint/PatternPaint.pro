@@ -96,3 +96,5 @@ OTHER_FILES += \
     app.rc \
     Info.plist \
     README.md
+
+DISTFILES +=

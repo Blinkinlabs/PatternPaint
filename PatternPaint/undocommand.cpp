@@ -34,7 +34,7 @@ UndoCommand::UndoCommand(const QImage& img, PatternItem *item, QUndoCommand *par
 }
 
 void UndoCommand::undo() {
-    currentImage = *(patternItem->getImagePointer());
+    currentImage = patternItem->getImage();
     patternItem->setImage(previousImage);
     // TODO: Restore edited state?
 }

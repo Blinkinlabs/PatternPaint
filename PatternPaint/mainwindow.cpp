@@ -54,11 +54,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     ColorpickerInstrument* cpi = new ColorpickerInstrument(this);
     connect(cpi, SIGNAL(pickedColor(QColor)), SLOT(on_colorPicked(QColor)));
 
-    connect(actionPen, SIGNAL(triggered(bool)), SLOT(on_instrumentAction(bool)));
-    connect(actionLine, SIGNAL(triggered(bool)), SLOT(on_instrumentAction(bool)));
-    connect(actionSpray, SIGNAL(triggered(bool)), SLOT(on_instrumentAction(bool)));
-    connect(actionPipette, SIGNAL(triggered(bool)), SLOT(on_instrumentAction(bool)));
-    connect(actionFill, SIGNAL(triggered(bool)), SLOT(on_instrumentAction(bool)));
+    connect(actionPen, SIGNAL(triggered(bool)), SLOT(on_instrumentSelected(bool)));
+    connect(actionLine, SIGNAL(triggered(bool)), SLOT(on_instrumentSelected(bool)));
+    connect(actionSpray, SIGNAL(triggered(bool)), SLOT(on_instrumentSelected(bool)));
+    connect(actionPipette, SIGNAL(triggered(bool)), SLOT(on_instrumentSelected(bool)));
+    connect(actionFill, SIGNAL(triggered(bool)), SLOT(on_instrumentSelected(bool)));
 
     actionPen->setData(QVariant::fromValue(new PencilInstrument(this)));
     actionLine->setData(QVariant::fromValue(new LineInstrument(this)));
@@ -66,9 +66,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     actionSpray->setData(QVariant::fromValue(new SprayInstrument(this)));
     actionFill->setData(QVariant::fromValue(new FillInstrument(this)));
 
+
     colorChooser = new ColorChooser(255, 255, 255, this);
-    colorChooser->setStatusTip(tr("Pen color"));
-    colorChooser->setToolTip(tr("Pen color"));
+    colorChooser->setGeometry(0,0,32,32);
+
+    colorChooser->setStatusTip(tr("Drawing color"));
+    colorChooser->setToolTip(tr("Drawing color"));
     instruments->addSeparator();
     instruments->addWidget(colorChooser);
 
@@ -168,11 +171,10 @@ void MainWindow::drawTimer_timeout() {
         return;
     }
 
-    // TODO: Get the width from elsewhere, so we don't need to load the image every frame
     QImage image = patternEditor->getPatternAsImage();
 
+    // TODO: Put this in a converter class.
     QByteArray ledData;
-
     for(int i = 0; i < image.height(); i++) {
         QRgb color = ColorModel::correctBrightness(image.pixel(n, i));
 
@@ -189,8 +191,6 @@ void MainWindow::drawTimer_timeout() {
             ledData.append(qBlue(color));
             break;
         }
-
-
     }
     controller->sendUpdate(ledData);
 
@@ -280,7 +280,7 @@ void MainWindow::on_actionLoad_File_triggered()
         return;
     }
 
-    PatternItem* patternItem = new PatternItem(patternLength, ledCount, pattern);
+    PatternItem* patternItem = new PatternItem(ledCount, pattern);
     patternItem->setFileInfo(fileInfo);
 
     undoStackGroup->addStack(patternItem->getUndoStack());
@@ -434,7 +434,7 @@ void MainWindow::on_uploaderFinished(bool result)
     progressDialog->hide();
 }
 
-void MainWindow::on_actionVisit_the_BlinkyTape_forum_triggered()
+void MainWindow::on_actionVisit_the_Blinkinlabs_forum_triggered()
 {
     QDesktopServices::openUrl(QUrl("http://forums.blinkinlabs.com/", QUrl::TolerantMode));
 }
@@ -632,7 +632,7 @@ void MainWindow::on_actionConnect_triggered()
     connectionScannerTimer_timeout();
 }
 
-void MainWindow::on_instrumentAction(bool) {
+void MainWindow::on_instrumentSelected(bool) {
     QAction* act = dynamic_cast<QAction*>(sender());
     Q_ASSERT(act != NULL);
     foreach(QAction* a, instruments->actions()) {
@@ -651,6 +651,11 @@ void MainWindow::on_colorPicked(QColor color) {
 void MainWindow::on_forcePatternEditorRedraw() {
     // Note: This is a hack to get the patterneditor area to redraw.
     scrollArea->resize(scrollArea->width()+1, scrollArea->height());
+}
+
+void MainWindow::on_patternItemUpdated()
+{
+    // TODO: Something here!
 }
 
 //void MainWindow::on_imageChanged(bool changed)
@@ -775,6 +780,8 @@ void MainWindow::on_actionNew_triggered()
     PatternItem* patternItem = new PatternItem(patternLength, ledCount);
 
     undoStackGroup->addStack(patternItem->getUndoStack());
+    //connect(patternItem, SIGNAL(changed()),this,SLOT(on_patternItemUpdated()));
+
     this->patternCollection->addItem(patternItem);
     this->patternCollection->setCurrentItem(patternItem);
 }

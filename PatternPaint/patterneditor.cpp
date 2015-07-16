@@ -94,17 +94,20 @@ void PatternEditor::updateGridSize() {
 
 
 void PatternEditor::mousePressEvent(QMouseEvent *event) {
-    if (instrument) {
-        instrument->mousePressEvent(event, *this, QPoint(event->x()/xScale, event->y()/yScale));
-        lazyUpdate();
+    if (!instrument) {
+        return;
     }
-}
 
-void PatternEditor::leaveEvent(QEvent *) {
-//    update();
+    setCursor(instrument->cursor());
+    instrument->mousePressEvent(event, *this, QPoint(event->x()/xScale, event->y()/yScale));
+    lazyUpdate();
 }
 
 void PatternEditor::mouseMoveEvent(QMouseEvent *event){
+    if (!instrument) {
+        return;
+    }
+
     // Ignore the update request if it came too quickly
     static qint64 lastTime = 0;
     qint64 newTime = QDateTime::currentMSecsSinceEpoch();
@@ -132,21 +135,20 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
     oldX = x;
     oldY = y;
 
-    if (instrument) {
-        setCursor(instrument->cursor());
-        instrument->mouseMoveEvent(event, *this, QPoint(x, y));
-    } else {
-        setCursor(Qt::ArrowCursor);
-    }
+    instrument->mouseMoveEvent(event, *this, QPoint(x, y));
 
     lazyUpdate();
 }
 
 void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
-    if (instrument) {
-        instrument->mouseReleaseEvent(event, *this, QPoint(event->x()/xScale, event->y()/yScale));
-        lazyUpdate();
+    setCursor(Qt::ArrowCursor);
+
+    if (!instrument) {
+        return;
     }
+
+    instrument->mouseReleaseEvent(event, *this, QPoint(event->x()/xScale, event->y()/yScale));
+    lazyUpdate();
 }
 
 void PatternEditor::setPatternItem(PatternItem* newPatternItem) {

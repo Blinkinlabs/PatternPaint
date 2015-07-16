@@ -227,7 +227,7 @@
     <addaction name="actionAbout"/>
     <addaction name="actionSystem_Information"/>
     <addaction name="separator"/>
-    <addaction name="actionVisit_the_BlinkyTape_forum"/>
+    <addaction name="actionVisit_the_Blinkinlabs_forum"/>
     <addaction name="actionTroubleshooting_tips"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
@@ -281,6 +281,12 @@
    <property name="windowTitle">
     <string>File Commands</string>
    </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -298,6 +304,12 @@
    <property name="windowTitle">
     <string>Drawing Tools</string>
    </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -313,7 +325,7 @@
   <action name="actionLoad_File">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/resources/images/open.png</normaloff>:/resources/images/open.png</iconset>
+     <normaloff>:/icons/images/icons/Add File-100.png</normaloff>:/icons/images/icons/Add File-100.png</iconset>
    </property>
    <property name="text">
     <string>Open...</string>
@@ -337,7 +349,7 @@
    </property>
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/resources/images/save.png</normaloff>:/resources/images/save.png</iconset>
+     <normaloff>:/icons/images/icons/Save-100.png</normaloff>:/icons/images/icons/Save-100.png</iconset>
    </property>
    <property name="text">
     <string>Save</string>
@@ -372,9 +384,9 @@
     <string>Export pattern for Arduino</string>
    </property>
   </action>
-  <action name="actionVisit_the_BlinkyTape_forum">
+  <action name="actionVisit_the_Blinkinlabs_forum">
    <property name="text">
-    <string>Visit the BlinkyTape forum</string>
+    <string>Visit the Blinkinlabs forum</string>
    </property>
   </action>
   <action name="actionTroubleshooting_tips">
@@ -409,7 +421,7 @@
    </property>
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/resources/images/save_to_tape.png</normaloff>:/resources/images/save_to_tape.png</iconset>
+     <normaloff>:/icons/images/icons/Downloading Updates-100.png</normaloff>:/icons/images/icons/Downloading Updates-100.png</iconset>
    </property>
    <property name="text">
     <string>Save to Tape</string>
@@ -480,7 +492,7 @@
    </property>
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/instruments/images/instruments-icons/pencil.png</normaloff>:/instruments/images/instruments-icons/pencil.png</iconset>
+     <normaloff>:/icons/images/icons/Pencil-100.png</normaloff>:/icons/images/icons/Pencil-100.png</iconset>
    </property>
    <property name="text">
     <string>Pen</string>
@@ -495,7 +507,7 @@
    </property>
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/instruments/images/instruments-icons/line.png</normaloff>:/instruments/images/instruments-icons/line.png</iconset>
+     <normaloff>:/icons/images/icons/Line-100.png</normaloff>:/icons/images/icons/Line-100.png</iconset>
    </property>
    <property name="text">
     <string>Line</string>
@@ -510,7 +522,7 @@
    </property>
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/instruments/images/instruments-icons/pipette.png</normaloff>:/instruments/images/instruments-icons/pipette.png</iconset>
+     <normaloff>:/icons/images/icons/Color Dropper-100.png</normaloff>:/icons/images/icons/Color Dropper-100.png</iconset>
    </property>
    <property name="text">
     <string>Color Picker</string>
@@ -528,7 +540,7 @@
    </property>
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/instruments/images/instruments-icons/fill.png</normaloff>:/instruments/images/instruments-icons/fill.png</iconset>
+     <normaloff>:/icons/images/icons/Fill Color-100.png</normaloff>:/icons/images/icons/Fill Color-100.png</iconset>
    </property>
    <property name="text">
     <string>Fill</string>
@@ -546,7 +558,7 @@
    </property>
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/instruments/images/instruments-icons/spray.png</normaloff>:/instruments/images/instruments-icons/spray.png</iconset>
+     <normaloff>:/icons/images/icons/Deadly Spray-100.png</normaloff>:/icons/images/icons/Deadly Spray-100.png</iconset>
    </property>
    <property name="text">
     <string>Spray</string>
@@ -598,8 +610,15 @@
    </property>
   </action>
   <action name="actionNew">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/icons/images/icons/Create New-100.png</normaloff>:/icons/images/icons/Create New-100.png</iconset>
+   </property>
    <property name="text">
     <string>New</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
    </property>
   </action>
  </widget>

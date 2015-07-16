@@ -4,6 +4,7 @@
 #include <QDebug>
 
 #define ITEM_HEIGHT 120
+#define ITEM_WIDTH 150
 #define ITEM_LETTERBOX 10
 
 PatternItemDelegate::PatternItemDelegate(QObject* parent) : QStyledItemDelegate(parent) {
@@ -19,7 +20,9 @@ void PatternItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
 
     painter->save();
     QImage img = qvariant_cast<QImage>(index.data(PatternItem::PreviewImage));
-    QImage scaled = img.scaledToHeight(ITEM_HEIGHT - 2*ITEM_LETTERBOX);
+
+    QImage scaled = img.scaled(ITEM_WIDTH - 2*ITEM_LETTERBOX, ITEM_HEIGHT - 2*ITEM_LETTERBOX);
+
     QStyledItemDelegate::paint(painter, option, index);
 
     // Draw the image
