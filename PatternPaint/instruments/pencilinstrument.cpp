@@ -35,43 +35,43 @@ PencilInstrument::PencilInstrument(QObject *parent) :
 {
 }
 
-void PencilInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
+void PencilInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& editor, const QPoint& pt)
 {
     if(event->button() == Qt::LeftButton )
     {
+        toolPreview = QImage(editor.getPatternAsImage().width(),
+                             editor.getPatternAsImage().height(),
+                             QImage::Format_ARGB32_Premultiplied);
+        toolPreview.fill(COLOR_CLEAR);
+
         mStartPoint = mEndPoint = pt;
-        pe.setPaint(true);
-        makeUndoCommand(pe);
-        paint(pe);
+        paint(editor);
+        drawing = true;
     }
 }
 
-void PencilInstrument::mouseMoveEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
+void PencilInstrument::mouseMoveEvent(QMouseEvent *event, PatternEditor& editor, const QPoint& pt)
 {
-    if(pe.isPaint())
-    {
+    if(drawing) {
         mEndPoint = pt;
-        if(event->buttons() & Qt::LeftButton)  paint(pe);
+        if(event->buttons() & Qt::LeftButton)  paint(editor);
         mStartPoint = pt;
     }
 }
 
-void PencilInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
+void PencilInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& editor, const QPoint& pt)
 {
-    if(pe.isPaint())
-    {
-        mEndPoint = pt;
-        if(event->button() == Qt::LeftButton) paint(pe);
-        pe.setPaint(false);
-    }
+    editor.applyInstrument(toolPreview);
+    drawing = false;
 }
 
-void PencilInstrument::paint(PatternEditor& pe)
+void PencilInstrument::paint(PatternEditor& editor)
 {
-    QPainter painter(pe.getPattern());
-    painter.setPen(QPen(pe.getPrimaryColor(),
-                            pe.getPenSize(),
-                            Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    QPainter painter(&toolPreview);
+
+    painter.setPen(QPen(editor.getPrimaryColor(),
+                        editor.getPenSize(),
+                        Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
     if(mStartPoint != mEndPoint) {
         painter.drawLine(mStartPoint, mEndPoint);

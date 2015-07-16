@@ -33,14 +33,11 @@
 #include <QPixmap>
 #include <QCursor>
 
-QT_BEGIN_NAMESPACE
-class PatternEditor;
-QT_END_NAMESPACE
+#define COLOR_CLEAR             QColor(0,0,0,0)
 
-/**
- * @brief Abstract instrument class.
- *
- */
+class PatternEditor;
+
+/// Abstract instrument class.
 class AbstractInstrument : public QObject
 {
     Q_OBJECT
@@ -49,48 +46,47 @@ public:
     explicit AbstractInstrument(QObject *parent = 0);
     virtual ~AbstractInstrument(){}
 
-    /**
-     * @brief mousePressEvent
-     * @param event - mouse event
-     * @param PatternEditor - editor
-     * @param QPoint - logical position on image
-     */
+    /// mousePressEvent
+    /// @param event - mouse event
+    /// @param PatternEditor - editor
+    /// @param QPoint - logical position on image
     virtual void mousePressEvent(QMouseEvent *event, PatternEditor&, const QPoint&) = 0;
+
+    /// mousePressEvent
+    /// @param event - mouse event
+    /// @param PatternEditor - editor
+    /// @param QPoint - logical position on image
     virtual void mouseMoveEvent(QMouseEvent *event, PatternEditor&, const QPoint& pt) = 0;
+
+    /// mousePressEvent
+    /// @param event - mouse event
+    /// @param PatternEditor - editor
+    /// @param QPoint - logical position on image
     virtual void mouseReleaseEvent(QMouseEvent *event, PatternEditor&, const QPoint& pt) = 0;
 
-    /**
-     * @brief cursor
-     * @return cursor for this tool
-     */
+    /// Get the mouse cursor for this instrument
+    /// @return cursor for this tool
     virtual QCursor cursor() const = 0;
 
-    /**
-     * @brief showPreview
-     * @return true if instrument claims for display track on preview plan
-     */
-    virtual bool showPreview() const { return true; }
+    /// Check if the tool has preview data to display
+    /// @return true if the instrument has preview data to display
+    virtual bool showPreview() const { return drawing; }
+
+    virtual const QImage& getPreview() const {return toolPreview; }
 signals:
     
 protected:
-    QPoint mStartPoint, mEndPoint; /**< Point for events. */
-    QImage mImageCopy; /**< Image for storing copy of current image on imageArea, needed for some instruments. */
+    QPoint mStartPoint, mEndPoint; ///< Point for events.
+    QImage toolPreview; ///< Scratch space to draw tool output onto
+    bool drawing;       ///< True if we have an unsaved
 
     virtual void paint(PatternEditor&) = 0;
-
-    /**
-     * @brief Creates UndoCommand & pushes it to UndoStack.
-     *
-     * Base realisation simply saves the image to the UndoStack
-     */
-    virtual void makeUndoCommand(PatternEditor& editor);
 };
 
-/**
- * @brief The CustomCursorInstrument class implements custom cursor support
- */
-class CustomCursorInstrument : public AbstractInstrument {
 
+/// Class for managing the mouse cursor
+class CustomCursorInstrument : public AbstractInstrument
+{
     Q_OBJECT
 public:
     CustomCursorInstrument(const QString& resource, QObject* parent = 0);

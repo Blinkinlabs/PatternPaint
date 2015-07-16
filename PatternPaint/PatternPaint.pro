@@ -80,6 +80,7 @@ FORMS    += mainwindow.ui \
 
 include(instruments/instruments.pri)
 include(devices/devices.pri)
+include(updater/updater.pri)
 
 # OS X: Specify icon resource to use
 ICON = images/patternpaint.icns

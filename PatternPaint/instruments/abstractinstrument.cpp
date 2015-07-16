@@ -32,10 +32,6 @@ AbstractInstrument::AbstractInstrument(QObject *parent) :
 {
 }
 
-void AbstractInstrument::makeUndoCommand(PatternEditor& editor) {
-    editor.pushUndoState();
-}
-
 CustomCursorInstrument::CustomCursorInstrument(const QString& resource, QObject* parent):
     AbstractInstrument(parent), mpm(resource) {
     mcur = QCursor(mpm);

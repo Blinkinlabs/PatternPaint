@@ -11,7 +11,6 @@ PatternItem::PatternItem(int patternLength, int ledCount, QListWidget* parent) :
     modified(false) {
     undoStack.setUndoLimit(50);
 
-    // TODO: Base me on passed parameters!
     QImage newImage(patternLength, ledCount, QImage::Format_ARGB32_Premultiplied);
     newImage.fill(COLOR_CANVAS_DEFAULT);
     setImage(newImage);
@@ -22,9 +21,8 @@ PatternItem::PatternItem(int patternLength, int ledCount, QImage newImage, QList
     modified(false) {
     undoStack.setUndoLimit(50);
 
-    // TODO: Base me on passed parameters!
     image = newImage;
-    resizePattern(patternLength, ledCount, true);
+    resize(patternLength, ledCount, true);
 }
 
 void PatternItem::pushUndoState() {
@@ -67,11 +65,10 @@ void PatternItem::setData(int role, const QVariant& value) {
 }
 
 void PatternItem::setImage(const QImage& newImage) {
-    // TODO: Resize the image here.
     image = newImage;
 }
 
-void PatternItem::resizePattern(int newPatternLength, int newLedCount, bool scale) {
+void PatternItem::resize(int newPatternLength, int newLedCount, bool scale) {
     pushUndoState();
 
     QImage originalImage = image;
@@ -100,6 +97,13 @@ void PatternItem::flipVertical()
 {
     pushUndoState();
     image = image.mirrored(false, true);
+}
+
+void PatternItem::applyInstrument(QImage &update)
+{
+    pushUndoState();
+    QPainter painter(&image);
+    painter.drawImage(0,0,update);
 }
 
 void PatternItem::clear()

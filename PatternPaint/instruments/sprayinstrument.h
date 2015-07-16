@@ -42,7 +42,7 @@ public:
     
     void mousePressEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
     void mouseMoveEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
-    void mouseReleaseEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
+    void mouseReleaseEvent(QMouseEvent *event, PatternEditor& editor, const QPoint&);
 protected:
     void paint(PatternEditor&);
     

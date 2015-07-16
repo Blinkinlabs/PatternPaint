@@ -45,8 +45,10 @@ public:
     void mouseMoveEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
     void mouseReleaseEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
     bool showPreview() const { return false; }
+
 protected:
     void paint(PatternEditor&);
+
 signals:
     void pickedColor(QColor);
 };

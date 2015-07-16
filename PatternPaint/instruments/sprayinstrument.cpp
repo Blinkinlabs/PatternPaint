@@ -34,58 +34,62 @@ SprayInstrument::SprayInstrument(QObject *parent) :
     CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_spray.png", parent) {
 }
 
-void SprayInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
+void SprayInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& editor, const QPoint& pt)
 {
     if(event->button() == Qt::LeftButton)
     {
+        toolPreview = QImage(editor.getPatternAsImage().width(),
+                             editor.getPatternAsImage().height(),
+                             QImage::Format_ARGB32_Premultiplied);
+        toolPreview.fill(COLOR_CLEAR);
+        drawing = true;
+
         mStartPoint = mEndPoint = pt;
-        pe.setPaint(true);
-        makeUndoCommand(pe);
-        paint(pe);
+        paint(editor);
     }
 }
 
-void SprayInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& pe, const QPoint& pt)
+void SprayInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& editor, const QPoint& pt)
 {
-    if(pe.isPaint()) {
+    if(drawing) {
         mEndPoint = pt;
-        paint(pe);
+        paint(editor);
         mStartPoint = pt;
     }
 }
 
-void SprayInstrument::mouseReleaseEvent(QMouseEvent*, PatternEditor& pe, const QPoint&)
+void SprayInstrument::mouseReleaseEvent(QMouseEvent*, PatternEditor& editor, const QPoint&)
 {
-    if(pe.isPaint()) {
-        pe.setPaint(false);
-    }
+    editor.applyInstrument(toolPreview);
+    drawing = false;
 }
 
-void SprayInstrument::paint(PatternEditor& pe)
+void SprayInstrument::paint(PatternEditor& editor)
 {
-    QPainter painter(pe.getPattern());
-    painter.setPen(QPen(pe.getPrimaryColor(), pe.getPenSize(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    QPainter painter(&toolPreview);
+
+    painter.setPen(QPen(editor.getPrimaryColor(), editor.getPenSize(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
     int x, y;
     for(int i(0); i < 12; i++) {
         switch(i) {
         case 0: case 1: case 2: case 3:
             x = (qrand() % 5 - 2)
-                    * sqrt(pe.getPenSize());
+                    * sqrt(editor.getPenSize());
             y = (qrand() % 5 - 2)
-                    * sqrt(pe.getPenSize());
+                    * sqrt(editor.getPenSize());
             break;
         case 4: case 5: case 6: case 7:
             x = (qrand() % 10 - 4)
-                    * sqrt(pe.getPenSize());
+                    * sqrt(editor.getPenSize());
             y = (qrand() % 10 - 4)
-                    * sqrt(pe.getPenSize());
+                    * sqrt(editor.getPenSize());
             break;
         case 8: case 9: case 10: case 11:
             x = (qrand() % 15 - 7)
-                    * sqrt(pe.getPenSize());
+                    * sqrt(editor.getPenSize());
             y = (qrand() % 15 - 7)
-                    * sqrt(pe.getPenSize());
+                    * sqrt(editor.getPenSize());
             break;
         }
 

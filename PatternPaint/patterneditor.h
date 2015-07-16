@@ -14,6 +14,8 @@ class PatternEditor : public QWidget
 public:
     explicit PatternEditor(QWidget *parent = 0);
 
+    /// Set the patternItem to edit
+    /// @param newPatternItem Pattern
     void setPatternItem(PatternItem* newPatternItem);
 
     void setImage(const QImage& img);
@@ -21,11 +23,15 @@ public:
     /// Get the image data for the current pattern
     /// @return QImage containing the current pattern
     const QImage& getPatternAsImage() const;
-    QImage* getPattern();
 
-    // for compatibility with EasyPaint sources
+    /// Instrument interface
+
     QColor getPrimaryColor() const { return toolColor; }
     int getPenSize() const { return toolSize; }
+
+    /// Update the pattern with the given changes. Pushes the undo state first.
+    /// @param update RGBA QImage to draw on top of the current
+    void applyInstrument(QImage& update);
 
     /// Re-size the display grid and selector based on new widget geometery
     void resizeEvent(QResizeEvent * event);
@@ -36,10 +42,6 @@ public:
 
     void leaveEvent(QEvent * event);
 
-    void pushUndoState();
-
-    bool isPaint() const { return m_isPaint; }
-    void setPaint(bool paint) { m_isPaint = paint; }
 protected:
     void paintEvent(QPaintEvent *event);
 
@@ -48,7 +50,6 @@ private:
     QImage* pattern;        ///< The actual image, stored in the patternItem (TODO: Should we be referenceing this indirectly instead?
 
     QImage gridPattern;    ///< Holds the pre-rendered grid overlay
-    QImage toolPreview;    ///< Holds a preview of the current tool
 
     float xScale;          ///< Number of pixels in the grid pattern per pattern pixel.
     float yScale;          ///< Number of pixels in the grid pattern per pattern pixel.
@@ -58,8 +59,7 @@ private:
 
     int playbackRow;       ///< Row being played back (for display purposes only)
 
-    bool m_isPaint;
-    AbstractInstrument* m_pi;
+    AbstractInstrument* instrument;
 
     /// Redraw the gridPattern to fit the current widget size.
     void updateGridSize();

@@ -22,8 +22,7 @@
 PatternEditor::PatternEditor(QWidget *parent) :
     QWidget(parent)
 {
-    m_isPaint = false;
-    m_pi = NULL;
+    instrument = NULL;
 }
 
 void PatternEditor::setImage(const QImage& img) {
@@ -42,13 +41,13 @@ const QImage &PatternEditor::getPatternAsImage() const {
     return patternItem->getImage();
 }
 
-QImage* PatternEditor::getPattern() {
-    if(patternItem == NULL) {
-        return NULL;
-    }
+//QImage* PatternEditor::getPattern() {
+//    if(patternItem == NULL) {
+//        return NULL;
+//    }
 
-    return patternItem->getImagePointer();
-}
+//    return patternItem->getImagePointer();
+//}
 
 void PatternEditor::resizeEvent(QResizeEvent * event)
 {
@@ -113,16 +112,14 @@ void PatternEditor::updateGridSize() {
 
 
 void PatternEditor::mousePressEvent(QMouseEvent *event) {
-    if (m_pi) {
-        m_pi->mousePressEvent(event, *this, QPoint(event->x()/xScale, event->y()/yScale));
+    if (instrument) {
+        instrument->mousePressEvent(event, *this, QPoint(event->x()/xScale, event->y()/yScale));
         lazyUpdate();
     }
 }
 
 void PatternEditor::leaveEvent(QEvent * event) {
     Q_UNUSED(event);
-
-    toolPreview.fill(COLOR_CLEAR);
 
     update();
 }
@@ -156,9 +153,9 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
     oldX = x;
     oldY = y;
 
-    if (m_pi) {
-        setCursor(m_pi->cursor());
-        m_pi->mouseMoveEvent(event, *this, QPoint(x, y));
+    if (instrument) {
+        setCursor(instrument->cursor());
+        instrument->mouseMoveEvent(event, *this, QPoint(x, y));
     } else {
         setCursor(Qt::ArrowCursor);
     }
@@ -167,8 +164,8 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
 }
 
 void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
-    if (m_pi) {
-        m_pi->mouseReleaseEvent(event, *this, QPoint(event->x()/xScale, event->y()/yScale));
+    if (instrument) {
+        instrument->mouseReleaseEvent(event, *this, QPoint(event->x()/xScale, event->y()/yScale));
         lazyUpdate();
     }
 }
@@ -184,11 +181,6 @@ void PatternEditor::setPatternItem(PatternItem* newPatternItem) {
 
     // Store the width and height, so that letterboxscrollarea can resize this widget properly
     this->setBaseSize(pattern->width(), pattern->height());
-
-    toolPreview = QImage(pattern->width(),
-                         pattern->height(),
-                         QImage::Format_ARGB32_Premultiplied);
-    toolPreview.fill(COLOR_CLEAR);
 
     // Turn on mouse tracking so we can draw a preview
     setMouseTracking(true);
@@ -215,7 +207,7 @@ void PatternEditor::setPlaybackRow(int row) {
 }
 
 void PatternEditor::setInstrument(AbstractInstrument* pi) {
-    m_pi = pi;
+    instrument = pi;
 }
 
 void PatternEditor::lazyUpdate() {
@@ -238,7 +230,7 @@ void PatternEditor::paintEvent(QPaintEvent*)
     painter.setRenderHint(QPainter::Antialiasing, false);
 
     // If we don't have a pattern item, show an empty view
-    if(patternItem == NULL) {
+    if(!patternItem) {
         painter.fillRect(0,0,this->width(),this->height(), QColor(0,0,0));
         return;
     }
@@ -246,8 +238,8 @@ void PatternEditor::paintEvent(QPaintEvent*)
     // Draw the image and tool preview
     painter.drawImage(QRect(0,0,pattern->width()*xScale+.5,pattern->height()*yScale), *pattern);
 
-    if (m_pi && m_pi->showPreview())
-        painter.drawImage(QRect(0,0,pattern->width()*xScale+.5,pattern->height()*yScale), toolPreview);
+    if (instrument && instrument->showPreview())
+        painter.drawImage(QRect(0,0,pattern->width()*xScale+.5,pattern->height()*yScale), (instrument->getPreview()));
 
     painter.drawImage(0,0,gridPattern);
 
@@ -267,7 +259,7 @@ void PatternEditor::paintEvent(QPaintEvent*)
 
 }
 
-void PatternEditor::pushUndoState()
+void PatternEditor::applyInstrument(QImage& update)
 {
-    patternItem->pushUndoState();
+    patternItem->applyInstrument(update);
 }

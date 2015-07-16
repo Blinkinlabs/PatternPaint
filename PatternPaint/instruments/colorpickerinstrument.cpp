@@ -30,39 +30,38 @@ ColorpickerInstrument::ColorpickerInstrument(QObject *parent) :
     CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_pipette.png", parent) {
 }
 
-void ColorpickerInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
+void ColorpickerInstrument::mousePressEvent(QMouseEvent *event, PatternEditor&, const QPoint& pt)
 {
     if(event->button() == Qt::LeftButton) {
-        pe.setPaint(true);
         mStartPoint = mEndPoint = pt;
+        drawing = true;
     }
 }
 
-void ColorpickerInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor&, const QPoint&)
+void ColorpickerInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& editor, const QPoint& pt)
 {
-    //QRgb pixel(pe.getPattern()->pixel(pt));
-}
-
-void ColorpickerInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
-{
-    Q_UNUSED(event);
-    if(pe.isPaint()) {
+    if(drawing) {
         mStartPoint = mEndPoint = pt;
-        paint(pe);
-        pe.setPaint(false);
+        paint(editor);
     }
 }
 
-void ColorpickerInstrument::paint(PatternEditor& pe)
+void ColorpickerInstrument::mouseReleaseEvent(QMouseEvent *, PatternEditor& editor, const QPoint& pt)
 {
-    bool inArea(true);
+    drawing = false;
+}
+
+void ColorpickerInstrument::paint(PatternEditor& editor)
+{
+    bool inArea = true;
+
     if(mStartPoint.x() < 0 || mStartPoint.y() < 0
-            || mStartPoint.x() > pe.width()
-            || mStartPoint.y() > pe.height())
+            || mStartPoint.x() > editor.width()
+            || mStartPoint.y() > editor.height())
         inArea = false;
 
     if(inArea) {
-        QRgb pixel(pe.getPattern()->pixel(mStartPoint));
+        QRgb pixel(editor.getPatternAsImage().pixel(mStartPoint));
         QColor getColor(pixel);
         emit pickedColor(getColor);
     }

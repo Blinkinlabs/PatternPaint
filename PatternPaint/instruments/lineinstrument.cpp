@@ -35,42 +35,41 @@ LineInstrument::LineInstrument(QObject *parent) :
 {
 }
 
-void LineInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
+void LineInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& editor, const QPoint& pt)
 {
     if(event->button() == Qt::LeftButton)
     {
+        toolPreview = QImage(editor.getPatternAsImage().width(),
+                             editor.getPatternAsImage().height(),
+                             QImage::Format_ARGB32_Premultiplied);
+        toolPreview.fill(COLOR_CLEAR);
+
         mStartPoint = mEndPoint = pt;
-        pe.setPaint(true);
-        mImageCopy = pe.getPatternAsImage();
-        makeUndoCommand(pe);
-        paint(pe);
+        paint(editor);
+        drawing = true;
     }
 }
 
-void LineInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& pe, const QPoint& pt)
+void LineInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& editor, const QPoint& pt)
 {
-    if(pe.isPaint()) {
+    if(drawing) {
         mEndPoint = pt;
-        pe.setImage(mImageCopy);
-        paint(pe);
+        toolPreview.fill(COLOR_CLEAR);
+        paint(editor);
     }
 }
 
-void LineInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& pe, const QPoint&)
+void LineInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& editor, const QPoint&)
 {
-    if(pe.isPaint())
-    {
-        pe.setImage(mImageCopy);
-        if(event->button() == Qt::LeftButton)  paint(pe);
-        pe.setPaint(false);
-    }
+    editor.applyInstrument(toolPreview);
+    drawing = false;
 }
 
-void LineInstrument::paint(PatternEditor& pe)
+void LineInstrument::paint(PatternEditor& editor)
 {
-    QPainter painter(pe.getPattern());
+    QPainter painter(&toolPreview);
 
-    painter.setPen(QPen(pe.getPrimaryColor(), pe.getPenSize() ,
+    painter.setPen(QPen(editor.getPrimaryColor(), editor.getPenSize() ,
                             Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
 

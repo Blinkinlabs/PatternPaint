@@ -37,7 +37,7 @@ public:
     /// @param patternLength new pattern length
     /// @param ledCount new LED count
     /// @param scale If true, scale the image to fit the new size. Otherwise crop/expand the image.
-    void resizePattern(int newPatternLength, int newLedCount, bool scale);
+    void resize(int newPatternLength, int newLedCount, bool scale);
 
     /// Flip the pattern horizontally
     void flipHorizontal();
@@ -45,11 +45,15 @@ public:
     /// Flip the pattern vertically
     void flipVertical();
 
+    /// Apply changes to the pattern
+    void applyInstrument(QImage& update);
+
     /// Test if the pattern has unsaved changes
     /// @return true if the pattern has unsaved changes
     bool getModified() const { return modified; }
 
     /// Set the unsaved pattern state
+    /// TODO: Delete me
     /// @param newModified New modified state.
     void setModified(bool newModified);
 

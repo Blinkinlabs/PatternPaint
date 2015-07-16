@@ -566,7 +566,7 @@ void MainWindow::on_actionResize_Pattern_triggered()
 
     // Resize the selected pattern
     PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
-    patternItem->resizePattern(patternLength, ledCount, true);
+    patternItem->resize(patternLength, ledCount, true);
 
     // Re-load the patterneditor to force a screen update
     patternEditor->setPatternItem(patternItem);

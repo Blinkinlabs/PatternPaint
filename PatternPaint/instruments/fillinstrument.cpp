@@ -34,59 +34,58 @@ FillInstrument::FillInstrument(QObject *parent) :
     CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_fill.png", parent) {
 }
 
-void FillInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& pe, const QPoint& pt)
+void FillInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& editor, const QPoint& pt)
 {
     if(event->button() == Qt::LeftButton)
     {
+        drawing = true;
+        toolPreview = editor.getPatternAsImage();
+
         mStartPoint = mEndPoint = pt;
-        pe.setPaint(true);
-        makeUndoCommand(pe);
-        paint(pe);
+        paint(editor);
     }
 }
 
 void FillInstrument::mouseMoveEvent(QMouseEvent *, PatternEditor&, const QPoint&) {
 }
 
-void FillInstrument::mouseReleaseEvent(QMouseEvent*, PatternEditor& pe, const QPoint&)
+void FillInstrument::mouseReleaseEvent(QMouseEvent*, PatternEditor& editor, const QPoint&)
 {
-    if(pe.isPaint()) {
-        pe.setPaint(false);
-    }
+    editor.applyInstrument(toolPreview);
+    drawing = false;
 }
 
-void FillInstrument::paint(PatternEditor& pe)
+void FillInstrument::paint(PatternEditor& editor)
 {
-    QColor switchColor = pe.getPrimaryColor();
-    QRgb pixel(pe.getPattern()->pixel(mStartPoint));
+    // Make a copy of the image
+    toolPreview = editor.getPatternAsImage();
+
+    QColor switchColor = editor.getPrimaryColor();
+    QRgb pixel(toolPreview.pixel(mStartPoint));
 
     QColor oldColor(pixel);
 
     if(switchColor.rgb() != oldColor.rgb()) {
-        fill(mStartPoint, switchColor.rgb(), pixel, pe.getPattern());
-        /*fillRecurs(mStartPoint.x(), mStartPoint.y(),
-                   switchColor.rgb(), pixel,
-                   *pe.getPattern());
-                   */
+        fill(mStartPoint, switchColor.rgb(), pixel, toolPreview);
     }
 
-    pe.update();
+    editor.update();
 }
 
-QList<QPoint> neighbors(const QPoint& pt, const QImage* img) {
+QList<QPoint> neighbors(const QPoint& pt, const QImage& img) {
     QList<QPoint> res;
     if (pt.x() > 0)                 res << QPoint(pt.x()-1, pt.y()  );
     if (pt.y() > 0)                 res << QPoint(pt.x()  , pt.y()-1);
-    if (pt.x() < img->width() - 1)  res << QPoint(pt.x()+1, pt.y()  );
-    if (pt.y() < img->height() - 1) res << QPoint(pt.x()  , pt.y()+1);
+    if (pt.x() < img.width() - 1)  res << QPoint(pt.x()+1, pt.y()  );
+    if (pt.y() < img.height() - 1) res << QPoint(pt.x()  , pt.y()+1);
     return res;
 }
 
-void FillInstrument::fill(const QPoint& pt, QRgb newColor, QRgb oldColor, QImage* pattern) {
-    if (pattern->pixel(pt) != oldColor) return;
-    pattern->setPixel(pt, newColor);
+void FillInstrument::fill(const QPoint& pt, QRgb newColor, QRgb oldColor, QImage& pattern) {
+    if (pattern.pixel(pt) != oldColor) return;
+    pattern.setPixel(pt, newColor);
 
     foreach(const QPoint& p, neighbors(pt, pattern)) {
-        if (pattern->pixel(p) == oldColor) fill(p, newColor, oldColor, pattern);
+        if (pattern.pixel(p) == oldColor) fill(p, newColor, oldColor, pattern);
     }
 }
