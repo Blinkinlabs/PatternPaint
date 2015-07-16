@@ -1,6 +1,8 @@
 #include "resizepattern.h"
 #include "ui_resizepattern.h"
 
+#include <limits>
+
 ResizePattern::ResizePattern(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ResizePattern)

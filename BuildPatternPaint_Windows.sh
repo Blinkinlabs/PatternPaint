@@ -1,3 +1,7 @@
+
+#Stop on any error
+set -e
+
 ################## Library Locations #############################
 # Location of the MINGW libraries (Installed as part of Qt)
 QT_DIR='/c/Qt/'
@@ -27,7 +31,9 @@ OUTDIR='PatternPaintWindows/'
 
 
 ################## Pull PatternPaint and build ###################
-git clone https://github.com/Blinkinlabs/PatternPaint.git ${PATTERNPAINT}
+if [ ! -d "${PATTERNPAINT}" ]; then
+	git clone https://github.com/Blinkinlabs/PatternPaint.git ${PATTERNPAINT}
+fi
 
 # TODO: Detect if it's already installed?
 cd ${PATTERNPAINT}
@@ -35,28 +41,34 @@ git pull
 
 PATH=${QT_TOOLS}:${PATH}
 
-${QT_MINGW}bin/qmake.exe -config release MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build DESTDIR=bin VERSION=1.5.0
+${QT_MINGW}bin/qmake.exe -config release MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build DESTDIR=bin VERSION=1.7.0
 mingw32-make.exe clean
 mingw32-make.exe -j 4
 
 cd ..
 
 ################## Get BlinkyTape driver #########################
-git clone https://github.com/Blinkinlabs/Blinkinlabs32u4_boards.git ${BLINKYTAPE}
+if [ ! -d "${BLINKYTAPE}" ]; then
+	git clone https://github.com/Blinkinlabs/Blinkinlabs32u4_boards.git ${BLINKYTAPE}
+fi
 
 cd ${BLINKYTAPE}
 git pull
 cd ..
 
 ################## Get BlinkyTile driver #########################
-git clone https://github.com/Blinkinlabs/BlinkyTile.git ${BLINKYTILE}
+if [ ! -d "${BLINKYTILE}" ]; then
+	git clone https://github.com/Blinkinlabs/BlinkyTile.git ${BLINKYTILE}
+fi
 
 cd ${BLINKYTILE}
 git pull
 cd ..
 
 ################## Get BlinkyPendat driver #########################
-git clone https://github.com/Blinkinlabs/BlinkyPendant.git ${BLINKYPENDANT}
+if [ ! -d "${BLINKYPENDANT}" ]; then
+	git clone https://github.com/Blinkinlabs/BlinkyPendant.git ${BLINKYPENDANT}
+fi
 
 cd ${BLINKYPENDANT}
 git pull

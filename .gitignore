@@ -6,6 +6,7 @@ PatternPaint/tmp/*
 PatternPaint/Makefile*
 Blinkinlabs32u4_boards/*
 Blinkytile/*
+Blinkypendant/*
 PatternPaintWindows/*
 build-*
 PatternPaint/PatternPaint.pro.user
