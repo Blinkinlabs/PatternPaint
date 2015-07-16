@@ -27,7 +27,9 @@
 #include "patterneditor.h"
 
 ColorpickerInstrument::ColorpickerInstrument(QObject *parent) :
-    CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_pipette.png", parent) {
+    CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_pipette.png", parent)
+{
+    drawing = false;
 }
 
 void ColorpickerInstrument::mousePressEvent(QMouseEvent *event, PatternEditor&, const QPoint& pt)
@@ -46,7 +48,7 @@ void ColorpickerInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& editor, 
     }
 }
 
-void ColorpickerInstrument::mouseReleaseEvent(QMouseEvent *, PatternEditor& editor, const QPoint& pt)
+void ColorpickerInstrument::mouseReleaseEvent(QMouseEvent *, PatternEditor&, const QPoint&)
 {
     drawing = false;
 }

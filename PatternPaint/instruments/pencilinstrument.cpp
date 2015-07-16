@@ -33,6 +33,7 @@
 PencilInstrument::PencilInstrument(QObject *parent) :
     AbstractInstrument(parent)
 {
+    drawing = false;
 }
 
 void PencilInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& editor, const QPoint& pt)
@@ -59,7 +60,7 @@ void PencilInstrument::mouseMoveEvent(QMouseEvent *event, PatternEditor& editor,
     }
 }
 
-void PencilInstrument::mouseReleaseEvent(QMouseEvent *event, PatternEditor& editor, const QPoint& pt)
+void PencilInstrument::mouseReleaseEvent(QMouseEvent *, PatternEditor& editor, const QPoint&)
 {
     editor.applyInstrument(toolPreview);
     drawing = false;
@@ -80,6 +81,4 @@ void PencilInstrument::paint(PatternEditor& editor)
     if(mStartPoint == mEndPoint)  {
         painter.drawPoint(mStartPoint);
     }
-
-    painter.end();
 }

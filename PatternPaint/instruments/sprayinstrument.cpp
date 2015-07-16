@@ -31,7 +31,9 @@
 #include <math.h>
 
 SprayInstrument::SprayInstrument(QObject *parent) :
-    CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_spray.png", parent) {
+    CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_spray.png", parent)
+{
+    drawing = false;
 }
 
 void SprayInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& editor, const QPoint& pt)
@@ -95,6 +97,4 @@ void SprayInstrument::paint(PatternEditor& editor)
 
         painter.drawPoint(mEndPoint.x() + x, mEndPoint.y() + y);
     }
-
-    painter.end();
 }

@@ -11,7 +11,9 @@ HEADERS += $$PWD/avrprogrammer.h \
     $$PWD/blinkytape.h \
     $$PWD/lightbuddyprogrammer.h \
     $$PWD/lightbuddyuploader.h \
-    $$PWD/patternuploader.h
+    $$PWD/patternuploader.h \
+    $$PWD/PatternPlayer_Sketch.h \
+    $$PWD/ColorSwirl_Sketch.h
 
 
 SOURCES +=  $$PWD/avrprogrammer.cpp \

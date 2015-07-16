@@ -57,9 +57,7 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     colorpicker.h \
     avrprogrammer.h \
-    PatternPlayer_Sketch.h \
     systeminformation.h \
-    ColorSwirl_Sketch.h \
     colormodel.h \
     aboutpatternpaint.h \
     pattern.h \

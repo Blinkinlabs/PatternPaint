@@ -4,7 +4,7 @@
 #include <QPainter>
 #include <QDebug>
 
-#define COLOR_CANVAS_DEFAULT    QColor(0,0,0,0)
+#define COLOR_CANVAS_DEFAULT    QColor(0,0,0,255)
 
 PatternItem::PatternItem(int patternLength, int ledCount, QListWidget* parent) :
     QListWidgetItem(parent, QListWidgetItem::UserType + 1),

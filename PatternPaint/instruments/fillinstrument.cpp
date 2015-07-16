@@ -31,7 +31,9 @@
 #include <QDebug>
 
 FillInstrument::FillInstrument(QObject *parent) :
-    CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_fill.png", parent) {
+    CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_fill.png", parent)
+{
+    drawing = false;
 }
 
 void FillInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& editor, const QPoint& pt)
@@ -68,8 +70,6 @@ void FillInstrument::paint(PatternEditor& editor)
     if(switchColor.rgb() != oldColor.rgb()) {
         fill(mStartPoint, switchColor.rgb(), pixel, toolPreview);
     }
-
-    editor.update();
 }
 
 QList<QPoint> neighbors(const QPoint& pt, const QImage& img) {

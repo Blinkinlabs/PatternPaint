@@ -18,8 +18,6 @@ public:
     /// @param newPatternItem Pattern
     void setPatternItem(PatternItem* newPatternItem);
 
-    void setImage(const QImage& img);
-
     /// Get the image data for the current pattern
     /// @return QImage containing the current pattern
     const QImage& getPatternAsImage() const;
@@ -40,14 +38,11 @@ public:
     void mouseMoveEvent(QMouseEvent * event);
     void mouseReleaseEvent(QMouseEvent*);
 
-    void leaveEvent(QEvent * event);
-
 protected:
     void paintEvent(QPaintEvent *event);
 
 private:
     PatternItem* patternItem;    ///< Pattern item we are interacting with
-    QImage* pattern;        ///< The actual image, stored in the patternItem (TODO: Should we be referenceing this indirectly instead?
 
     QImage gridPattern;    ///< Holds the pre-rendered grid overlay
 
