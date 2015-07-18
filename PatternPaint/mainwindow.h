@@ -51,7 +51,7 @@ private slots:
 
     void on_actionPlay_triggered();
 
-    void on_tapeConnectionStatusChanged(bool connected);
+    void on_blinkyConnectionStatusChanged(bool connected);
 
     void on_uploaderMaxProgressChanged(int progressDialog);
 
@@ -71,7 +71,7 @@ private slots:
 
     void on_actionLoad_rainbow_sketch_triggered();
 
-    void on_actionSave_to_Tape_triggered();
+    void on_actionSave_to_Blinky_triggered();
 
     void on_actionClear_Pattern_triggered();
 

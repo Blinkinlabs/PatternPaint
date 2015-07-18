@@ -13,8 +13,8 @@
 
 // Pattern table definitions
 #define PATTERN_TABLE_ADDRESS  (0x7000 - 0x80)   // Location of the pattern table in the flash memory
-#define PATTERN_TABLE_HEADER_LENGTH     2        // Length of the header
-#define PATTERN_TABLE_ENTRY_LENGTH      7        // Length of each entry
+#define PATTERN_TABLE_HEADER_LENGTH     2        // Length of the header, in bytes
+#define PATTERN_TABLE_ENTRY_LENGTH      7        // Length of each entry, in bytes
   
 #define PATTERN_COUNT_OFFSET    0    // Number of patterns in the pattern table
 #define LED_COUNT_OFFSET        1    // Number of LEDs in the pattern

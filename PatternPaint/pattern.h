@@ -33,7 +33,7 @@ public:
     QString header;     /// C++ header representation of the pattern
 
     int frameCount;     /// Number of frames in this pattern
-    int ledCount;       /// Number of LEDs in this tape
+    int ledCount;       /// Number of LEDs attached to this blinky
     int frameDelay;     /// Length of time between frames of data, in ms
     ColorMode colorMode;    /// Pattern color mode
 

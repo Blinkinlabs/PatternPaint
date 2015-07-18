@@ -252,7 +252,7 @@
      <addaction name="actionRGB"/>
      <addaction name="actionGRB"/>
     </widget>
-    <addaction name="actionSave_to_Tape"/>
+    <addaction name="actionSave_to_Blinky"/>
     <addaction name="separator"/>
     <addaction name="actionAutomatically_connect"/>
     <addaction name="separator"/>
@@ -296,7 +296,7 @@
    <addaction name="actionNew"/>
    <addaction name="actionLoad_File"/>
    <addaction name="actionSave_File"/>
-   <addaction name="actionSave_to_Tape"/>
+   <addaction name="actionSave_to_Blinky"/>
    <addaction name="separator"/>
    <addaction name="actionPlay"/>
   </widget>
@@ -415,7 +415,7 @@
     <string>Restore Rainbow Sketch</string>
    </property>
   </action>
-  <action name="actionSave_to_Tape">
+  <action name="actionSave_to_Blinky">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -424,7 +424,7 @@
      <normaloff>:/icons/images/icons/Downloading Updates-100.png</normaloff>:/icons/images/icons/Downloading Updates-100.png</iconset>
    </property>
    <property name="text">
-    <string>Save to Tape</string>
+    <string>Save to Blinky</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
@@ -479,7 +479,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/resources/images/connect.png</normaloff>:/resources/images/connect.png</iconset>
    </property>
    <property name="text">

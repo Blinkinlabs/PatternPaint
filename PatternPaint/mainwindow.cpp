@@ -108,8 +108,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     // Pre-set the upload progress dialog
     progressDialog = new QProgressDialog(this);
-    progressDialog->setWindowTitle("BlinkyTape exporter");
-    progressDialog->setLabelText("Saving pattern to BlinkyTape...");
+    progressDialog->setWindowTitle("Blinky exporter");
+    progressDialog->setLabelText("Saving pattern to Blinky...");
     progressDialog->setMinimum(0);
     progressDialog->setMaximum(150);
     progressDialog->setWindowModality(Qt::WindowModal);
@@ -123,7 +123,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
     drawTimer->setInterval(33);
 
-    // Start a scanner to connect to a BlinkyTape automatically
+    // Start a scanner to connect to a Blinky automatically
     connect(connectionScannerTimer, SIGNAL(timeout()), this, SLOT(connectionScannerTimer_timeout()));
     connectionScannerTimer->setInterval(CONNECTION_SCANNER_INTERVAL);
     connectionScannerTimer->start();
@@ -157,7 +157,7 @@ void MainWindow::drawTimer_timeout() {
     // TODO: move this state to somewhere; the patternEditor class maybe?
     static int n = 0;
 
-    // Ignore the timeout if it came to quickly, so that we don't overload the tape
+    // Ignore the timeout if it came to quickly, so that we don't overload the blinky
     static qint64 lastTime = 0;
     qint64 newTime = QDateTime::currentMSecsSinceEpoch();
     if (newTime - lastTime < MIN_TIMER_INTERVAL) {
@@ -205,18 +205,18 @@ void MainWindow::connectionScannerTimer_timeout() {
         return;
     }
 
-    // First look for BlinkyTapes
-    QList<QSerialPortInfo> tapes = BlinkyTape::probe();
+    // First look for Blinky devices
+    QList<QSerialPortInfo> blinky = BlinkyTape::probe();
 
-    if(tapes.length() > 0) {
-        qDebug() << "BlinkyTapes found:" << tapes.length();
+    if(blinky.length() > 0) {
+        qDebug() << "BlinkyTapes found:" << blinky.length();
 
         // TODO: Try another one if this one fails?
-        qDebug() << "Attempting to connect to tape on:" << tapes[0].portName();
+        qDebug() << "Attempting to connect to tape on:" << blinky[0].portName();
 
         controller = new BlinkyTape(this);
         connectController();
-        controller->open(tapes[0]);
+        controller->open(blinky[0]);
         return;
     }
 }
@@ -366,7 +366,7 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
 }
 
 
-void MainWindow::on_tapeConnectionStatusChanged(bool connected)
+void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
 {
     qDebug() << "status changed, connected=" << connected;
     actionSave_to_Tape->setEnabled(connected);
@@ -486,7 +486,7 @@ void MainWindow::on_actionLoad_rainbow_sketch_triggered()
     progressDialog->show();
 }
 
-void MainWindow::on_actionSave_to_Tape_triggered()
+void MainWindow::on_actionSave_to_Blinky_triggered()
 {
     if(controller.isNull()) {
         return;
@@ -727,7 +727,7 @@ void MainWindow::connectController()
 {
     // Modify our UI when the tape connection status changes
     connect(controller, SIGNAL(connectionStatusChanged(bool)),
-            this,SLOT(on_tapeConnectionStatusChanged(bool)));
+            this,SLOT(on_blinkyConnectionStatusChanged(bool)));
 }
 
 void MainWindow::connectUploader()
