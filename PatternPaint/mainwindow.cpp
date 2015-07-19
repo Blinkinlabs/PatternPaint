@@ -369,7 +369,7 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
 void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
 {
     qDebug() << "status changed, connected=" << connected;
-    actionSave_to_Tape->setEnabled(connected);
+    actionSave_to_Blinky->setEnabled(connected);
 
     if(connected) {
         mode = Connected;

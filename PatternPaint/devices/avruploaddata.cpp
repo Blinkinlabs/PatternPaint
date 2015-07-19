@@ -54,7 +54,10 @@ bool avrUploadData::init(std::vector<Pattern> patterns) {
     int dataOffset = sketch.length();
 
     // Now, for each pattern, append the image data to the sketch
-    for(std::vector<Pattern>::iterator pattern = patterns.begin(); pattern != patterns.end(); ++pattern) {
+    for(std::vector<Pattern>::iterator pattern = patterns.begin();
+        pattern != patterns.end();
+        ++pattern) {
+
         snprintf(buff, BUFF_LENGTH, "Adding pattern. Encoding: %x, framecount: %i, frameDelay: %i, size: %iB, offset: %iB",
                  pattern->encoding,
                  pattern->frameCount,
