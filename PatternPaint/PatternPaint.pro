@@ -25,7 +25,7 @@ TEMPLATE = app
 #Application version
 VERSION_MAJOR = 1
 VERSION_MINOR = 7
-VERSION_BUILD = 0
+VERSION_BUILD = 1
 
 DEFINES += "VERSION_MAJOR=$${VERSION_MAJOR}" \
        "VERSION_MINOR=$${VERSION_MINOR}" \
@@ -80,21 +80,25 @@ include(instruments/instruments.pri)
 include(devices/devices.pri)
 include(updater/updater.pri)
 
-# OS X: Specify icon resource to use
-ICON = images/patternpaint.icns
+mac {
+    # OS X: Specify icon resource to use
+    ICON = images/patternpaint.icns
 
-# OS X: Disable app nap using custom plist file
-QMAKE_INFO_PLIST = Info.plist
+    # OS X: Disable app nap using custom plist file
+    QMAKE_INFO_PLIST = Info.plist
+}
 
-# Windows: Specify icon in custom rc file
-RC_FILE += app.rc
+windows {
+    # Windows: Specify icon in custom rc file
+    RC_FILE += app.rc
+}
 
 RESOURCES += \
     images.qrc
 
 OTHER_FILES += \
     app.rc \
-    Info.plist \
     README.md
 
-DISTFILES +=
+DISTFILES += \
+    Info.plist
