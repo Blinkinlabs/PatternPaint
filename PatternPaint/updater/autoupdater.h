@@ -1,7 +1,16 @@
-// Note: This is designed for future integration with sparkle:
-// https://el-tramo.be/blog/mixing-cocoa-and-qt/
+/*
+ * Copyright (C) 2008 Remko Troncon
+ */
 
-class AutoUpdater {
-  public:
-    virtual void checkForUpdates() = 0;
+#ifndef AUTOUPDATER_H
+#define AUTOUPDATER_H
+
+class AutoUpdater
+{
+    public:
+        virtual ~AutoUpdater();
+
+        virtual void checkForUpdates() = 0;
 };
+
+#endif

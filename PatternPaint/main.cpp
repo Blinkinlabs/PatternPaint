@@ -2,6 +2,11 @@
 #include <QApplication>
 #include "autoupdater.h"
 
+#ifdef Q_OS_MAC
+#include "CocoaInitializer.h"
+#include "SparkleAutoUpdater.h"
+#endif
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -13,10 +18,10 @@ int main(int argc, char *argv[])
 
     AutoUpdater* updater = 0;
 
-  #ifdef Q_OS_MAC
-//    CocoaInitializer cocoaInitiarizer;
-//    updater = new SparkleUpdater("http://el-tramo.be/myapp/appcast.xml");
-  #endif
+#ifdef Q_OS_MAC
+  CocoaInitializer cocoaInitiarizer;
+  updater = new SparkleAutoUpdater("http://el-tramo.be/myapp/appcast.xml");
+#endif
 
     if (updater) {
       updater->checkForUpdates();
