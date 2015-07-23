@@ -14,13 +14,16 @@ pushd $(mktemp -d -t PatternPaint)
 echo "Building in: " `pwd`
 
 # Get the repository
-git clone https://github.com/Blinkinlabs/PatternPaint.git
+git clone -b sparkle https://github.com/Blinkinlabs/PatternPaint.git
 
 # Build PatternPaint
 cd PatternPaint/PatternPaint
 ${QTDIR}/bin/qmake MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build   DESTDIR=bin VERSION=1.6.1
 make
 cd ..
+
+# Sign the Sparkle framework
+codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/bin/PatternPaint.app/Contents/Frameworks/Sparkle.framework/Versions/A
 
 # Deploy and sign the release
 ${QTDIR}/bin/macdeployqt PatternPaint/bin/PatternPaint.app/ -codesign="Developer ID Application: Blinkinlabs, LLC" -dmg

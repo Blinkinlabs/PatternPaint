@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 
 #ifdef Q_OS_MAC
   CocoaInitializer cocoaInitiarizer;
-  updater = new SparkleAutoUpdater("blinkinlabs.com/updates/patternpaint/patternpaint-osx.xml");
+  updater = new SparkleAutoUpdater("http://blinkinlabs.com/updates/patternpaint/patternpaint-osx.xml");
 #endif
 
     if (updater) {
