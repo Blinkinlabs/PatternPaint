@@ -1,6 +1,5 @@
 #include "winsparkleautoupdater.h"
 #include <winsparkle.h>
-//#include "../../thirdparty/WinSparkle-0.4/include/winsparkle.h"
 
 class WinSparkleAutoUpdater::Private {
 public:
