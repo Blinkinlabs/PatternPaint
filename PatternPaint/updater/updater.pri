@@ -16,12 +16,6 @@ mac {
         $$PWD/sparkleautoupdater.mm
     LIBS += -framework Sparkle -framework AppKit
 
-#    # Find the sparkle library
-#    QMAKE_LFLAGS += -F.
-#    QMAKE_CXXFLAGS += -F.
-#    QMAKE_CFLAGS += -F.
-#    QMAKE_OBJECTIVE_CFLAGS += -F.
-
     # TODO: Relative path
     QMAKE_LFLAGS += -F /Users/matt/Blinkinlabs-Projects/PatternPaint/PatternPaint/updater/
     QMAKE_CXXFLAGS += -F /Users/matt/Blinkinlabs-Projects/PatternPaint/PatternPaint/updater/
@@ -50,7 +44,8 @@ win32 {
 
     SPARKLE_DLL = $$PWD/../../thirdparty/WinSparkle-0.4/Release/WinSparkle.dll
 
-    LIBS += $$SPARKLE_DLL
+    INCLUDEPATH += $$PWD/../../thirdparty/WinSparkle-0.4/include/
+    LIBS += $$PWD/../../thirdparty/WinSparkle-0.4/Release/WinSparkle.dll
 
     # Copy the Sparkle DLL into the build directory so that it can be used
     QMAKE_PRE_LINK += copy $$shell_path($$SPARKLE_DLL)  $$shell_path($$OUT_PWD) &

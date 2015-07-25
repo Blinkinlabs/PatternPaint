@@ -1,7 +1,6 @@
 #include "winsparkleautoupdater.h"
-// TODO: Configure project correctly.
-//#include <winsparkle.h>
-#include "../../thirdparty/WinSparkle-0.4/include/winsparkle.h"
+#include <winsparkle.h>
+//#include "../../thirdparty/WinSparkle-0.4/include/winsparkle.h"
 
 class WinSparkleAutoUpdater::Private {
 public:

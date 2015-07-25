@@ -97,5 +97,7 @@ OTHER_FILES += \
     app.rc \
     README.md
 
+
+# TODO: Am i needed?
 DISTFILES += \
     Info.plist
