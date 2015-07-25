@@ -24,7 +24,11 @@ BLINKYTAPE='Blinkinlabs32u4_boards/'
 # BlinkyTile repository (for the LightBuddy driver)
 BLINKYTILE='Blinkytile/'
 
+# BlinkyPendant repository (for the BlinkyPendant driver)
 BLINKYPENDANT='Blinkypendant/'
+
+# Winsparkle library release
+WINSPARKLE='thirdparty/WinSparkle-0.4/'
 
 # Staging directory for this release
 OUTDIR='PatternPaintWindows/'
@@ -114,6 +118,9 @@ cp ${QT_MINGW}/plugins/imageformats/qjpeg.dll ${OUTDIR}imageformats/
 cp ${QT_MINGW}/plugins/imageformats/qsvg.dll ${OUTDIR}imageformats/
 cp ${QT_MINGW}/plugins/imageformats/qtiff.dll ${OUTDIR}imageformats/
 
+# Winsparkle Files
+cp ${WINSPARKLE}/release/WinSparkle.dll ${OUTDIR}
+
 # BlinkyTape Driver files
 cp ${BLINKYTAPE}avr/driver/blinkinlabs.inf ${OUTDIR}driver/blinkytape/
 cp ${BLINKYTAPE}avr/driver/blinkinlabs.cat ${OUTDIR}driver/blinkytape/
@@ -145,7 +152,7 @@ cp "${WIN_KIT}redist/DIFx/dpinst/MultiLin/x86/dpinst.exe" ${OUTDIR}driver/dpinst
 cp "${WIN_KIT}redist/DIFx/dpinst/MultiLin/x64/dpinst.exe" ${OUTDIR}driver/dpinst64.exe
 
 # Run NSIS to make an executable
-"${NSIS}/makensis.exe" "NSIS/Pattern Paint.nsi"
+"${NSIS}/makensis.exe" "Pattern Paint.nsi"
 
 # Sign the installer
 # NOTE: You need to install the Blinkinlabs key and the GlobalSign Root CA for this to work

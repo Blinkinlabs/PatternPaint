@@ -35,8 +35,6 @@ DEFINES += APPLICATION_NAME=\\\"PatternPaint\\\"
 DEFINES += ORGANIZATION_NAME=\\\"Blinkinlabs\\\"
 DEFINES += ORGANIZATION_DOMAIN=\\\"blinkinlabs.com\\\"
 
-DEFINES += APPLICATION_NAME_W="L{APPLICATION_NAME}"
-
 
 SOURCES += main.cpp\
     mainwindow.cpp \

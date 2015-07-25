@@ -20,10 +20,13 @@ WinSparkleAutoUpdater::WinSparkleAutoUpdater(const QString& url)
     // TODO: Better string conversion here?
     win_sparkle_set_appcast_url(d->url.toStdString().c_str());
 
+#define W(x)          W_(x)
+#define W_(x)         L ## x
+
     win_sparkle_set_app_details(
-                L"A",
-                L"A",
-                L"A");
+                W(ORGANIZATION_NAME),
+                W(APPLICATION_NAME),
+                W(VERSION_STRING));
 }
 
 void WinSparkleAutoUpdater::checkForUpdates()
