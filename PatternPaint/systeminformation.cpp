@@ -18,7 +18,7 @@ SystemInformation::SystemInformation(QWidget *parent) :
     QString osName;
 
     report.append("Pattern Paint ");
-    report.append(QString("%1.%2.%3").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_BUILD));
+    report.append(VERSION_STRING);
     report.append("\r");
     report.append("  Build Date: ");
     report.append(__DATE__);

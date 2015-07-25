@@ -27,16 +27,16 @@ VERSION_MAJOR = 1
 VERSION_MINOR = 7
 VERSION_BUILD = 1
 
-DEFINES += "VERSION_MAJOR=$${VERSION_MAJOR}" \
-       "VERSION_MINOR=$${VERSION_MINOR}" \
-       "VERSION_BUILD=$${VERSION_BUILD}"
-
 #Target version
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
 
-DEFINES += APPLICATION_NAME=\\\""PatternPaint"\\\"
-DEFINES += ORGANIZATION_NAME=\\\""Blinkinlabs"\\\"
-DEFINES += ORGANIZATION_DOMAIN=\\\""blinkinlabs.com"\\\"
+DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
+DEFINES += APPLICATION_NAME=\\\"PatternPaint\\\"
+DEFINES += ORGANIZATION_NAME=\\\"Blinkinlabs\\\"
+DEFINES += ORGANIZATION_DOMAIN=\\\"blinkinlabs.com\\\"
+
+DEFINES += APPLICATION_NAME_W="L{APPLICATION_NAME}"
+
 
 SOURCES += main.cpp\
     mainwindow.cpp \
@@ -56,7 +56,6 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     colorpicker.h \
-    avrprogrammer.h \
     systeminformation.h \
     colormodel.h \
     aboutpatternpaint.h \
@@ -88,7 +87,7 @@ mac {
     QMAKE_INFO_PLIST = Info.plist
 }
 
-windows {
+win32 {
     # Windows: Specify icon in custom rc file
     RC_FILE += app.rc
 }
