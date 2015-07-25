@@ -7,6 +7,9 @@
 #include "SparkleAutoUpdater.h"
 #endif
 
+#define OSX_RELEASE_APPCAST_DEFAULT "http://software.blinkinlabs.com/patternpaint/patternpaint-osx.xml"
+#define WINDOWNS_RELEASE_APPCAST_DEFAULT "http://software.blinkinlabs.com/patternpaint/patternpaint-windows.xml"
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -20,7 +23,11 @@ int main(int argc, char *argv[])
 
 #ifdef Q_OS_MAC
   CocoaInitializer cocoaInitiarizer;
-  updater = new SparkleAutoUpdater("http://blinkinlabs.com/updates/patternpaint/patternpaint-osx.xml");
+
+  QSettings settings;
+  QString updateUrl = settings.value("Udpates/osx-release-appcast", OSX_RELEASE_APPCAST_DEFAULT).toString();
+
+  updater = new SparkleAutoUpdater(updateUrl);
 #endif
 
     if (updater) {
