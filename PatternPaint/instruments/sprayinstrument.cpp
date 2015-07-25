@@ -72,7 +72,8 @@ void SprayInstrument::paint(PatternEditor& editor)
 
     painter.setPen(QPen(editor.getPrimaryColor(), editor.getPenSize(), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
-    int x, y;
+    int x;
+    int y;
     for(int i(0); i < 12; i++) {
         switch(i) {
         case 0: case 1: case 2: case 3:
@@ -93,6 +94,8 @@ void SprayInstrument::paint(PatternEditor& editor)
             y = (qrand() % 15 - 7)
                     * sqrt(editor.getPenSize());
             break;
+        default:
+            return;
         }
 
         painter.drawPoint(mEndPoint.x() + x, mEndPoint.y() + y);
