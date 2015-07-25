@@ -16,14 +16,15 @@ mac {
         $$PWD/sparkleautoupdater.mm
     LIBS += -framework Sparkle -framework AppKit
 
-    # TODO: Relative path
-    QMAKE_LFLAGS += -F /Users/matt/Blinkinlabs-Projects/PatternPaint/PatternPaint/updater/
-    QMAKE_CXXFLAGS += -F /Users/matt/Blinkinlabs-Projects/PatternPaint/PatternPaint/updater/
-    QMAKE_CFLAGS += -F /Users/matt/Blinkinlabs-Projects/PatternPaint/PatternPaint/updater/
-    QMAKE_OBJECTIVE_CFLAGS += -F /Users/matt/Blinkinlabs-Projects/PatternPaint/PatternPaint/updater/
+    SPARKLE_PATH = $$PWD/../../thirdparty/Sparkle-1.11.0rc2/
+
+    QMAKE_LFLAGS += -F $$SPARKLE_PATH
+#    QMAKE_CXXFLAGS += -F $$SPARKLE_PATH
+#    QMAKE_CFLAGS += -F $$SPARKLE_PATH
+    QMAKE_OBJECTIVE_CFLAGS += -F $$SPARKLE_PATH
 
     # Copy Sparkle into the app bundle
-    SparkleFiles.files = /Users/matt/Blinkinlabs-Projects/PatternPaint/PatternPaint/updater/Sparkle.framework
+    SparkleFiles.files = $$SPARKLE_PATH/Sparkle.framework
     SparkleFiles.path = Contents/Frameworks
     QMAKE_BUNDLE_DATA += SparkleFiles
 
