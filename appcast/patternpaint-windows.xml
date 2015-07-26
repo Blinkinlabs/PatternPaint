@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>PatternPaint Changelog</title>
+    <link>http://software.blinkinlabs.com/patternpaint/patternpaint-windows.xml</link>
+    <description>Most recent changes with links to updates.</description>
+    <language>en</language>
+      <item>
+        <title>PatternPaint 1.7.2</title>
+        <pubDate>Sat, 24 Jul 2015 2:17:00 +0000</pubDate>
+        <description>
+          <![CDATA[
+            <ul>
+              <li>Support for multiple animations!</li>
+              <li>Add auto-update feature for OS X, Windows</li>
+            </ul>
+          ]]>
+        </description>
+        <enclosure url="http://software.blinkinlabs.com/patternpaint/PatternPaint_Windows_1.7.1.zip"
+          sparkle:version="1.7.2"
+          length="25545744"
+          type="application/x-zip-compressed"
+        />
+
+      </item>
+  </channel>
+</rss>
