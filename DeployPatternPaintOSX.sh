@@ -18,7 +18,7 @@ git clone -b sparkle https://github.com/Blinkinlabs/PatternPaint.git
 
 # Build PatternPaint
 cd PatternPaint/PatternPaint
-${QTDIR}/bin/qmake MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build   DESTDIR=bin VERSION=1.6.1
+${QTDIR}/bin/qmake MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build   DESTDIR=bin VERSION=1.7.2
 make
 cd ..
 

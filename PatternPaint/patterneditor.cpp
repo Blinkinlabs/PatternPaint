@@ -23,11 +23,40 @@ PatternEditor::PatternEditor(QWidget *parent) :
     QWidget(parent)
 {
     instrument = NULL;
+
+    this->setAcceptDrops(true);
+}
+
+void PatternEditor::dragEnterEvent(QDragEnterEvent *event)
+{
+    if(event->mimeData()->hasUrls()) {
+        event->acceptProposedAction();
+    }
+}
+
+void PatternEditor::dropEvent(QDropEvent *event)
+{
+    QList<QUrl> droppedUrls = event->mimeData()->urls();
+    int droppedUrlCnt = droppedUrls.size();
+    for(int i = 0; i < droppedUrlCnt; i++) {
+        QString localPath = droppedUrls[i].toLocalFile();
+        QFileInfo fileInfo(localPath);
+
+        // TODO: OS X Yosemite hack for /.file/id= references
+
+        if(fileInfo.isFile()) {
+            patternItem->replace(fileInfo.absoluteFilePath());
+            // And stop on the first one we've found.
+            return;
+        }
+    }
 }
 
 const QImage &PatternEditor::getPatternAsImage() const {
     if(patternItem == NULL) {
-        return QImage(1,1,QImage::Format_RGB32);
+        // TODO: Refactor so we don't have to do this?
+        static QImage nullimage(1,1,QImage::Format_RGB32);
+        return nullimage;
     }
 
     return patternItem->getImage();

@@ -33,7 +33,7 @@ public:
     /// Set the pattern image directly without resizing or setting an undo state. This
     /// is used by the undocommand and should probably be refactored.
     /// @param newImage Set the pattern to this image
-    void setImage(const QImage& newImage);
+    void applyUndoState(const QImage& newImage);
 
     /// Get a pointer to the undo stack. This is used to wire the undo stack
     /// into the main window gui.
@@ -48,8 +48,22 @@ public:
     ///         this returns an empty fileInfo object.
     const QFileInfo& getFileInfo() const { return fileInfo; }
 
-    /// Set the file
-    void setFileInfo(const QFileInfo& fileName) { fileInfo = fileName; }
+    /// Initialize the pattern from an image file
+    /// @param newFileInfo URL of file to load
+    bool load(const QFileInfo& newFileInfo);
+
+    /// Save the pattern
+    /// Note: The file must already have a filename, otherwise use saveAs
+    bool save();
+
+    /// Save the pattern to a new file
+    /// newFileInfo URL of the new file to save to.
+    bool saveAs(const QFileInfo& newFileInfo);
+
+    /// Replace the current image with one from a new file, but don't
+    /// change the filename (for drag&drop operations)
+    /// @param newFileInfo URL of file to load
+    bool replace(const QFileInfo& newFileInfo);
 
     /// Resize the image
     /// @param patternLength new pattern length
@@ -78,15 +92,24 @@ public:
     /// @param newModified New modified state.
     void setModified(bool newModified);
 
+    /// Register a callback function to be notified when
+    /// this data has changed
+    void setUpdateCallback(void function());
 
 private:
     QUndoStack  undoStack;      ///< Undo stack for this pattern
     QImage  image;              ///< Image representation of the pattern
     QFileInfo fileInfo;         ///< Image filename
 
+    void (*updateCallback)();   ///< Callback to notify that the data has been updated.
+
     bool modified;              ///< True if the image has been modified since last save
 
     void pushUndoState();
+
+    // Notify any listeners that the data has changed
+    // TODO: Is there some other way to do this?
+    void notifyUpdated();
 };
 
 #endif // PATTERNITEM_H

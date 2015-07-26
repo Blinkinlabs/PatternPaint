@@ -7,7 +7,6 @@
 #include "resizepattern.h"
 #include "undocommand.h"
 #include "colorchooser.h"
-//#include "blinkypendant.h"
 #include "blinkytape.h"
 
 #include "pencilinstrument.h"
@@ -65,7 +64,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     actionPipette->setData(QVariant::fromValue(cpi));
     actionSpray->setData(QVariant::fromValue(new SprayInstrument(this)));
     actionFill->setData(QVariant::fromValue(new FillInstrument(this)));
-
 
     colorChooser = new ColorChooser(255, 255, 255, this);
     colorChooser->setGeometry(0,0,32,32);
@@ -267,21 +265,17 @@ void MainWindow::on_actionLoad_File_triggered()
     QFileInfo fileInfo(fileName);
     settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
 
-    int patternLength = settings.value("Options/patternLength", DEFAULT_PATTERN_LENGTH).toUInt();
     int ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
 
 
-    // TODO: Push this into PatternItem
-    QImage pattern;
+    // Create a patternItem, and attempt to load the file
+    PatternItem* patternItem = new PatternItem(1, ledCount);
 
-    if(!pattern.load(fileName)) {
+    if(!patternItem->load(fileInfo)) {
         errorMessageDialog->setText("Could not open file " + fileName + ". Perhaps it has a formatting problem?");
         errorMessageDialog->show();
         return;
     }
-
-    PatternItem* patternItem = new PatternItem(ledCount, pattern);
-    patternItem->setFileInfo(fileInfo);
 
     undoStackGroup->addStack(patternItem->getUndoStack());
     this->patternCollection->addItem(patternItem);
@@ -307,16 +301,23 @@ void MainWindow::on_actionSave_File_as_triggered() {
     QFileInfo fileInfo(fileName);
     settings.setValue("File/SaveDirectory", fileInfo.absolutePath());
 
-    saveFile(fileInfo);
+    PatternItem* item = dynamic_cast<PatternItem*>(patternCollection->currentItem());
+    if (!item->saveAs(fileInfo)) {
+        QMessageBox::warning(this, tr("Error"), tr("Error saving pattern %1. Try saving it somewhere else?")
+                       .arg(fileInfo.absolutePath()));
+    }
 }
 
 void MainWindow::on_actionSave_File_triggered() {
-    QFileInfo fileInfo = dynamic_cast<PatternItem*>(patternCollection->currentItem())->getFileInfo();
+    PatternItem* item = dynamic_cast<PatternItem*>(patternCollection->currentItem());
 
-    if(fileInfo.baseName() == "") {
+    if(item->getFileInfo().baseName() == "") {
         on_actionSave_File_as_triggered();
     } else {
-        saveFile(fileInfo);
+        if (!item->save()) {
+            QMessageBox::warning(this, tr("Error"), tr("Error saving pattern %1. Try saving it somewhere else?")
+                           .arg(item->getFileInfo().absolutePath()));
+        }
     }
 }
 
@@ -538,23 +539,23 @@ void MainWindow::on_actionResize_Pattern_triggered()
     int patternLength = settings.value("Options/patternLength", DEFAULT_PATTERN_LENGTH).toUInt();
     int ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
 
-    ResizePattern resizer(this);
-    resizer.setWindowModality(Qt::WindowModal);
-    resizer.setLength(patternLength);
-    resizer.setLedCount(ledCount);
-    resizer.exec();
+    ResizePattern resizeDialog(this);
+    resizeDialog.setWindowModality(Qt::WindowModal);
+    resizeDialog.setLength(patternLength);
+    resizeDialog.setLedCount(ledCount);
+    resizeDialog.exec();
 
-    if(resizer.result() != QDialog::Accepted) {
+    if(resizeDialog.result() != QDialog::Accepted) {
         return;
     }
 
     // Do a quick sanity check on the inputs, they should be validated by the resizer class.
-    if(resizer.length() < 1 || resizer.ledCount() < 1) {
+    if(resizeDialog.length() < 1 || resizeDialog.ledCount() < 1) {
         qDebug() << "Resize pattern: data out of range, discarding";
         return;
     }
-    patternLength = resizer.length();
-    ledCount = resizer.ledCount();
+    patternLength = resizeDialog.length();
+    ledCount = resizeDialog.ledCount();
 
     settings.setValue("Options/patternLength", static_cast<uint>(patternLength));
     settings.setValue("Options/ledCount", static_cast<uint>(ledCount));
@@ -653,11 +654,6 @@ void MainWindow::on_forcePatternEditorRedraw() {
     scrollArea->resize(scrollArea->width()+1, scrollArea->height());
 }
 
-void MainWindow::on_patternItemUpdated()
-{
-    // TODO: Something here!
-}
-
 //void MainWindow::on_imageChanged(bool changed)
 //{
 //    actionSave_File->setEnabled(changed);
@@ -666,27 +662,6 @@ void MainWindow::on_patternItemUpdated()
 void MainWindow::on_patternFilenameChanged(QFileInfo fileinfo)
 {
     this->setWindowTitle(fileinfo.baseName() + " - Pattern Paint");
-}
-
-bool MainWindow::saveFile(const QFileInfo fileinfo) {
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-
-    // TODO: save file info per-pattern!
-    if(fileinfo.fileName() == "") {
-        return false;
-    }
-
-    if (!patternItem->getImage().save(fileinfo.filePath())) {
-        QMessageBox::warning(this, tr("Error"), tr("Error saving pattern %1. Try saving it somewhere else?")
-                       .arg(fileinfo.filePath()));
-        return false;
-    }
-
-    on_patternFilenameChanged(fileinfo);
-
-    patternItem->setModified(false);
-
-    return true;
 }
 
 int MainWindow::promptForSave(PatternItem* patternItem) {
@@ -780,7 +755,6 @@ void MainWindow::on_actionNew_triggered()
     PatternItem* patternItem = new PatternItem(patternLength, ledCount);
 
     undoStackGroup->addStack(patternItem->getUndoStack());
-    //connect(patternItem, SIGNAL(changed()),this,SLOT(on_patternItemUpdated()));
 
     this->patternCollection->addItem(patternItem);
     this->patternCollection->setCurrentItem(patternItem);
@@ -809,8 +783,16 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
 
     PatternItem* newPatternItem = dynamic_cast<PatternItem*>(current);
 
+    // Set a callback so that the pattern item can inform the UI when it is modified
+//    newPatternItem->setUpdateCallback(&this->notifyPatternModified);
+//    newPatternItem->setUpdateCallback(NULL);
+
     patternEditor->setPatternItem(newPatternItem);
     undoStackGroup->setActiveStack(newPatternItem->getUndoStack());
 
     on_patternFilenameChanged(newPatternItem->getFileInfo());
+}
+
+void MainWindow::notifyPatternModified() {
+    on_forcePatternEditorRedraw();
 }

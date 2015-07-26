@@ -8,17 +8,19 @@
 
 PatternItem::PatternItem(int patternLength, int ledCount, QListWidget* parent) :
     QListWidgetItem(parent, QListWidgetItem::UserType + 1),
+    updateCallback(NULL),
     modified(false)
 {
     undoStack.setUndoLimit(50);
 
     QImage newImage(patternLength, ledCount, QImage::Format_ARGB32_Premultiplied);
     newImage.fill(COLOR_CANVAS_DEFAULT);
-    setImage(newImage);
+    applyUndoState(newImage);
 }
 
 PatternItem::PatternItem(int ledCount, QImage newImage, QListWidget* parent) :
     QListWidgetItem(parent, QListWidgetItem::UserType + 1),
+    updateCallback(NULL),
     modified(false)
 {
     undoStack.setUndoLimit(50);
@@ -29,6 +31,76 @@ PatternItem::PatternItem(int ledCount, QImage newImage, QListWidget* parent) :
 void PatternItem::pushUndoState() {
     undoStack.push(new UndoCommand(image, this));
     setModified(true);
+}
+
+void PatternItem::applyUndoState(const QImage& newImage) {
+    image = newImage;
+
+    setModified(modified);
+}
+
+bool PatternItem::load(const QFileInfo &newFileInfo)
+{
+    // TODO: Fail if there is unsaved data?
+
+    // Attempt to load the iamge
+    if(!replace(newFileInfo)) {
+        return false;
+    }
+
+    // If successful, record the filename and clear the undo stack.
+    fileInfo = newFileInfo;
+
+    undoStack.clear();
+    setModified(false);
+
+    return true;
+}
+
+bool PatternItem::saveAs(const QFileInfo &newFileInfo) {
+    // Attempt to save to this location
+    if(!image.save(newFileInfo.absoluteFilePath())) {
+        return false;
+    }
+
+    // If successful, update the filename
+    fileInfo = newFileInfo;
+
+    // TODO: Notify the main window that the filename was updated!
+    //on_patternFilenameChanged(fileinfo);
+
+    setModified(false);
+    return true;
+}
+
+bool PatternItem::replace(const QFileInfo &newFileInfo)
+{
+    pushUndoState();
+
+    QImage newImage;
+
+    // Attempt to load the iamge
+    if(!newImage.load(newFileInfo.absoluteFilePath())) {
+        return false;
+    }
+
+    // Scale the image (TODO: present a dialog for this?)
+    image=newImage.scaledToHeight(image.height());
+    setModified(true);
+
+    return true;
+}
+
+
+bool PatternItem::save()
+{
+    if(!image.save(fileInfo.absoluteFilePath())) {
+        return false;
+    }
+
+    // TODO: Set new save point here
+    setModified(false);
+    return true;
 }
 
 QVariant PatternItem::data(int role) const {
@@ -45,7 +117,7 @@ void PatternItem::setData(int role, const QVariant& value) {
     switch(role)
     {
     case PreviewImage:
-        setImage(qvariant_cast<QImage>(value));
+        applyUndoState(qvariant_cast<QImage>(value));
         break;
     case Modified:
         modified = qvariant_cast<bool>(value);
@@ -58,10 +130,6 @@ void PatternItem::setData(int role, const QVariant& value) {
     }
 
     QListWidgetItem::setData(role, value);
-}
-
-void PatternItem::setImage(const QImage& newImage) {
-    image = newImage;
 }
 
 void PatternItem::resize(int newPatternLength, int newLedCount, bool scale) {
@@ -108,11 +176,27 @@ void PatternItem::clear()
     image.fill(COLOR_CANVAS_DEFAULT);
 }
 
+void PatternItem::notifyUpdated() {
+    // TODO
+//    if(updateCallback) {
+//        updateCallback();
+//    }
+
+    // Force the listwidget to redraw
+    // Note: update() and redraw() don't seem to change anything, but this does.
+    if(this->listWidget()) {
+        this->listWidget()->doItemsLayout();
+    }
+}
+
 void PatternItem::setModified(bool newModified)  {
-    qDebug() << "Setting modified!";
-    qDebug() << "listwidget:" << this->listWidget();
     modified = newModified;
 
-    // Note: update() and redraw() don't seem to change anything, but this does.
-    this->listWidget()->doItemsLayout();
+    if(modified) {
+        notifyUpdated();
+    }
+}
+
+void PatternItem::setUpdateCallback(void function()) {
+    updateCallback = function;
 }

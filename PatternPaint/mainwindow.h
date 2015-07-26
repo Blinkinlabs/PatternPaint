@@ -25,6 +25,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void notifyPatternModified();
+
 public slots:
     void setPatternItem(QListWidgetItem *, QListWidgetItem *);
 
@@ -87,8 +89,6 @@ private slots:
 
     void on_forcePatternEditorRedraw();
 
-    void on_patternItemUpdated();
-
     void on_patternFilenameChanged(QFileInfo fileinfo);
 
     void on_actionGRB_triggered();
@@ -123,7 +123,6 @@ private:
 
     void writeSettings();
     void readSettings();
-    bool saveFile(const QFileInfo fileinfo);
 
     void startPlayback();
     void stopPlayback();

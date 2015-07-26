@@ -14,13 +14,12 @@ mac {
     OBJECTIVE_SOURCES += \
         $$PWD/cocoainitializer.mm \
         $$PWD/sparkleautoupdater.mm
+
     LIBS += -framework Sparkle -framework AppKit
 
     SPARKLE_PATH = $$PWD/../../thirdparty/Sparkle-1.11.0rc2/
 
     QMAKE_LFLAGS += -F $$SPARKLE_PATH
-#    QMAKE_CXXFLAGS += -F $$SPARKLE_PATH
-#    QMAKE_CFLAGS += -F $$SPARKLE_PATH
     QMAKE_OBJECTIVE_CFLAGS += -F $$SPARKLE_PATH
 
     # Copy Sparkle into the app bundle

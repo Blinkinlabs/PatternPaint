@@ -6,8 +6,6 @@
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
 greaterThan(QT_MAJOR_VERSION, 4) {
     QT       += widgets serialport
 } else {
@@ -25,13 +23,13 @@ TEMPLATE = app
 #Application version
 VERSION_MAJOR = 1
 VERSION_MINOR = 7
-VERSION_BUILD = 1
+VERSION_BUILD = 2
 
 #Target version
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
 
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
-DEFINES += APPLICATION_NAME=\\\"PatternPaint\\\"
+DEFINES += APPLICATION_NAME=\\\"$${TARGET}\\\"
 DEFINES += ORGANIZATION_NAME=\\\"Blinkinlabs\\\"
 DEFINES += ORGANIZATION_DOMAIN=\\\"blinkinlabs.com\\\"
 
@@ -98,6 +96,6 @@ OTHER_FILES += \
     README.md
 
 
-# TODO: Am i needed?
-DISTFILES += \
-    Info.plist
+## TODO: Am i needed?
+#DISTFILES += \
+#    Info.plist

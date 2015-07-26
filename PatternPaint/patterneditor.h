@@ -38,6 +38,8 @@ public:
     void mouseMoveEvent(QMouseEvent * event);
     void mouseReleaseEvent(QMouseEvent*);
 
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dropEvent(QDropEvent *event);
 protected:
     void paintEvent(QPaintEvent *event);
 
