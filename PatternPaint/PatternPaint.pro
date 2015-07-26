@@ -34,7 +34,7 @@ DEFINES += ORGANIZATION_NAME=\\\"Blinkinlabs\\\"
 DEFINES += ORGANIZATION_DOMAIN=\\\"blinkinlabs.com\\\"
 
 mac {
-    QMAKE_TARGET_BUNDLE_PREFIX = \\\"com.blinkinlabs.$${TARGET}\\\"
+    QMAKE_TARGET_BUNDLE_PREFIX = com.blinkinlabs
 }
 
 SOURCES += main.cpp\
