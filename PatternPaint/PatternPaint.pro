@@ -65,6 +65,14 @@ HEADERS  += mainwindow.h \
     patternitemdelegate.h \
     patternitem.h
 
+mac {
+HEADERS  += \
+    appnap.h
+OBJECTIVE_SOURCES += \
+    appnap.mm
+}
+
+
 FORMS    += mainwindow.ui \
     systeminformation.ui \
     aboutpatternpaint.ui \
@@ -99,3 +107,6 @@ OTHER_FILES += \
 ## TODO: Am i needed?
 #DISTFILES += \
 #    Info.plist
+
+OBJECTIVE_SOURCES += \
+    appnap.mm
