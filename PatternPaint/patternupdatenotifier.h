@@ -10,10 +10,12 @@ public:
     explicit PatternUpdateNotifier(QObject *parent = 0);
     ~PatternUpdateNotifier();
 
-    void signalUpdated() {emit updated();}
+    void signalDataUpdated() {emit patternDataUpdated();}
+    void signalSizeUpdated() {emit patternSizeUpdated();}
 
 signals:
-    void updated();
+    void patternDataUpdated();
+    void patternSizeUpdated();
 
 public slots:
 };

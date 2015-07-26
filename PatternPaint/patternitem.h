@@ -111,10 +111,6 @@ private:
     bool modified;              ///< True if the image has been modified since last save
 
     void pushUndoState();
-
-    // Notify any listeners that the data has changed
-    // TODO: Is there some other way to do this?
-    void notifyUpdated();
 };
 
 #endif // PATTERNITEM_H

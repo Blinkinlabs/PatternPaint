@@ -36,6 +36,10 @@ void PatternItem::pushUndoState() {
 void PatternItem::applyUndoState(const QImage& newImage) {
     image = newImage;
 
+    if(notifier) {
+        notifier->signalSizeUpdated();
+    }
+
     setModified(modified);
 }
 
@@ -93,8 +97,12 @@ bool PatternItem::replace(const QFileInfo &newFileInfo)
     }
 
     // Scale the image (TODO: present a dialog for this?)
-    image=newImage.scaledToHeight(image.height());
+    image = newImage.scaledToHeight(image.height());
     setModified(true);
+
+    if(notifier) {
+        notifier->signalSizeUpdated();
+    }
 
     return true;
 }
@@ -157,6 +165,10 @@ void PatternItem::resize(int newPatternLength, int newLedCount, bool scale) {
 
     QPainter painter(&image);
     painter.drawImage(0,0,originalImage);
+
+    if(notifier) {
+        notifier->signalSizeUpdated();
+    }
 }
 
 void PatternItem::flipHorizontal()
@@ -184,23 +196,11 @@ void PatternItem::clear()
     image.fill(COLOR_CANVAS_DEFAULT);
 }
 
-void PatternItem::notifyUpdated() {
-    if(notifier) {
-        notifier->signalUpdated();
-    }
-
-    // Force the listwidget to redraw
-    // Note: update() and redraw() don't seem to change anything, but this does.
-    if(this->listWidget()) {
-//        this->listWidget()->doItemsLayout();
-    }
-}
-
 void PatternItem::setModified(bool newModified)  {
     modified = newModified;
 
-    if(modified) {
-        notifyUpdated();
+    if(notifier) {
+        notifier->signalDataUpdated();
     }
 }
 

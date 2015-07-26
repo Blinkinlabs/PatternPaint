@@ -141,8 +141,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     this->patternCollection->setItemDelegate(new PatternItemDelegate());
 
-    connect(&patternUpdateNotifier, SIGNAL(updated()),
-            this, SLOT(on_patternUpdated()));
+    connect(&patternUpdateNotifier, SIGNAL(patternSizeUpdated()),
+            this, SLOT(on_patternSizeUpdated()));
+    connect(&patternUpdateNotifier, SIGNAL(patternDataUpdated()),
+            this, SLOT(on_patternDataUpdated()));
 
     // Create a pattern.
     on_actionNew_triggered();
@@ -570,9 +572,6 @@ void MainWindow::on_actionResize_Pattern_triggered()
     // Resize the selected pattern
     PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
     patternItem->resize(patternLength, ledCount, true);
-
-    // Re-load the patterneditor to force a screen update
-    patternEditor->setPatternItem(patternItem);
 }
 
 void MainWindow::on_actionAddress_programmer_triggered()
@@ -786,10 +785,19 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
     on_patternNameChanged(newPatternItem->getPatternName());
 }
 
-void MainWindow::on_patternUpdated()
+void MainWindow::on_patternDataUpdated()
 {
     // Redraw the data-dependent views
-    scrollArea->resize(scrollArea->width()+1, scrollArea->height());
     this->patternCollection->doItemsLayout();
+
+    scrollArea->resize(scrollArea->width()+1, scrollArea->height());
 }
 
+void MainWindow::on_patternSizeUpdated()
+{
+    // Resize the selected pattern
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
+
+    // Re-load the patterneditor to force a screen update
+    patternEditor->setPatternItem(patternItem);
+}

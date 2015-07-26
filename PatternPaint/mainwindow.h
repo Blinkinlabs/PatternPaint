@@ -28,7 +28,8 @@ public:
 public slots:
     void setPatternItem(QListWidgetItem *, QListWidgetItem *);
 
-    void on_patternUpdated();
+    void on_patternDataUpdated();
+    void on_patternSizeUpdated();
 
 protected:
     void closeEvent(QCloseEvent *event);
