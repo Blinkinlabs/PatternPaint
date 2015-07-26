@@ -51,7 +51,8 @@ SOURCES += main.cpp\
     undocommand.cpp \
     colorchooser.cpp \
     patternitemdelegate.cpp \
-    patternitem.cpp
+    patternitem.cpp \
+    patternupdatenotifier.cpp
 
 HEADERS  += mainwindow.h \
     colorpicker.h \
@@ -66,7 +67,8 @@ HEADERS  += mainwindow.h \
     undocommand.h \
     colorchooser.h \
     patternitemdelegate.h \
-    patternitem.h
+    patternitem.h \
+    patternupdatenotifier.h
 
 mac {
 HEADERS  += \

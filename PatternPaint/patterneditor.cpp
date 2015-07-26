@@ -197,8 +197,6 @@ void PatternEditor::setPatternItem(PatternItem* newPatternItem) {
 
     // and force a screen update
     update();
-
-    emit forcePatternEditorRedraw();
 }
 
 void PatternEditor::setToolColor(QColor color) {

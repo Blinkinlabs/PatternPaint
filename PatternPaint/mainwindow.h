@@ -25,10 +25,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void notifyPatternModified();
-
 public slots:
     void setPatternItem(QListWidgetItem *, QListWidgetItem *);
+
+    void on_patternUpdated();
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -87,8 +87,6 @@ private slots:
 
     void on_colorPicked(QColor);
 
-    void on_forcePatternEditorRedraw();
-
     void on_patternNameChanged(QString name);
 
     void on_actionGRB_triggered();
@@ -111,6 +109,8 @@ private:
 
     QProgressDialog* progressDialog;
     QMessageBox* errorMessageDialog;
+
+    PatternUpdateNotifier patternUpdateNotifier;
 
     QSpinBox* pSpeed;
 

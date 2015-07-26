@@ -101,9 +101,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(patternCollection, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),
             this, SLOT(setPatternItem(QListWidgetItem*, QListWidgetItem*)));
 
-    connect(patternEditor, SIGNAL(forcePatternEditorRedraw()), SLOT(on_forcePatternEditorRedraw()));
-
-
     // Pre-set the upload progress dialog
     progressDialog = new QProgressDialog(this);
     progressDialog->setWindowTitle("Blinky exporter");
@@ -143,6 +140,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     setColorMode(static_cast<Pattern::ColorMode>(settings.value("Options/ColorOrder", Pattern::RGB).toUInt()));
 
     this->patternCollection->setItemDelegate(new PatternItemDelegate());
+
+    connect(&patternUpdateNotifier, SIGNAL(updated()),
+            this, SLOT(on_patternUpdated()));
 
     // Create a pattern.
     on_actionNew_triggered();
@@ -278,6 +278,8 @@ void MainWindow::on_actionLoad_File_triggered()
     }
 
     undoStackGroup->addStack(patternItem->getUndoStack());
+    patternItem->setNotifier(&patternUpdateNotifier);
+
     this->patternCollection->addItem(patternItem);
     this->patternCollection->setCurrentItem(patternItem);
 }
@@ -649,16 +651,6 @@ void MainWindow::on_colorPicked(QColor color) {
     patternEditor->setToolColor(color);
 }
 
-void MainWindow::on_forcePatternEditorRedraw() {
-    // Note: This is a hack to get the patterneditor area to redraw.
-    scrollArea->resize(scrollArea->width()+1, scrollArea->height());
-}
-
-//void MainWindow::on_imageChanged(bool changed)
-//{
-//    actionSave_File->setEnabled(changed);
-//}
-
 void MainWindow::on_patternNameChanged(QString name)
 {
     this->setWindowTitle(name + " - Pattern Paint");
@@ -753,6 +745,7 @@ void MainWindow::on_actionNew_triggered()
     int ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
 
     PatternItem* patternItem = new PatternItem(patternLength, ledCount);
+    patternItem->setNotifier(&patternUpdateNotifier);
 
     undoStackGroup->addStack(patternItem->getUndoStack());
 
@@ -793,6 +786,10 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
     on_patternNameChanged(newPatternItem->getPatternName());
 }
 
-void MainWindow::notifyPatternModified() {
-    on_forcePatternEditorRedraw();
+void MainWindow::on_patternUpdated()
+{
+    // Redraw the data-dependent views
+    scrollArea->resize(scrollArea->width()+1, scrollArea->height());
+    this->patternCollection->doItemsLayout();
 }
+

@@ -8,7 +8,7 @@
 
 PatternItem::PatternItem(int patternLength, int ledCount, QListWidget* parent) :
     QListWidgetItem(parent, QListWidgetItem::UserType + 1),
-    updateCallback(NULL),
+    notifier(NULL),
     modified(false)
 {
     undoStack.setUndoLimit(50);
@@ -20,7 +20,7 @@ PatternItem::PatternItem(int patternLength, int ledCount, QListWidget* parent) :
 
 PatternItem::PatternItem(int ledCount, QImage newImage, QListWidget* parent) :
     QListWidgetItem(parent, QListWidgetItem::UserType + 1),
-    updateCallback(NULL),
+    notifier(NULL),
     modified(false)
 {
     undoStack.setUndoLimit(50);
@@ -185,15 +185,14 @@ void PatternItem::clear()
 }
 
 void PatternItem::notifyUpdated() {
-    // TODO
-//    if(updateCallback) {
-//        updateCallback();
-//    }
+    if(notifier) {
+        notifier->signalUpdated();
+    }
 
     // Force the listwidget to redraw
     // Note: update() and redraw() don't seem to change anything, but this does.
     if(this->listWidget()) {
-        this->listWidget()->doItemsLayout();
+//        this->listWidget()->doItemsLayout();
     }
 }
 
@@ -205,6 +204,6 @@ void PatternItem::setModified(bool newModified)  {
     }
 }
 
-void PatternItem::setUpdateCallback(void function()) {
-    updateCallback = function;
+void PatternItem::setNotifier(PatternUpdateNotifier* newNotifier) {
+    notifier = newNotifier;
 }

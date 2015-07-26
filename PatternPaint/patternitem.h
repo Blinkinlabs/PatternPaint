@@ -4,6 +4,7 @@
 #include <QFileInfo>
 #include <QListWidgetItem>
 #include <QUndoStack>
+#include "patternupdatenotifier.h"
 
 /// patternItem is a combination of data storage and some simple operators for a
 /// pattern. There is one patternItem per open pattern.
@@ -98,14 +99,14 @@ public:
 
     /// Register a callback function to be notified when
     /// this data has changed
-    void setUpdateCallback(void function());
+    void setNotifier(PatternUpdateNotifier* newNotifier);
 
 private:
     QUndoStack  undoStack;      ///< Undo stack for this pattern
     QImage  image;              ///< Image representation of the pattern
     QFileInfo fileInfo;         ///< Image filename
 
-    void (*updateCallback)();   ///< Callback to notify that the data has been updated.
+    PatternUpdateNotifier* notifier; ///< Callback to notify that the data has been updated.
 
     bool modified;              ///< True if the image has been modified since last save
 
