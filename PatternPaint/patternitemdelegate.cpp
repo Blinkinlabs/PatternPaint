@@ -16,8 +16,6 @@ PatternItemDelegate::~PatternItemDelegate()
 }
 
 void PatternItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex & index ) const {
-    qDebug() << "repainting!";
-
     painter->save();
     QImage img = qvariant_cast<QImage>(index.data(PatternItem::PreviewImage));
 
@@ -44,10 +42,7 @@ void PatternItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
     painter->restore();
 }
 
-QSize PatternItemDelegate::sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index ) const {
-    Q_UNUSED(option);
-    QSize size = qvariant_cast<QSize>(index.data(PatternItem::PatternSize));
-    float aspect = ITEM_HEIGHT/size.height();
-    return QSize(size.width()*aspect, ITEM_HEIGHT);
+QSize PatternItemDelegate::sizeHint(const QStyleOptionViewItem &, const QModelIndex & ) const {
+    return QSize(ITEM_WIDTH, ITEM_HEIGHT);
 }
 
