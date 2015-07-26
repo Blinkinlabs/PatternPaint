@@ -43,14 +43,18 @@ public:
     /// @return Pattern image data
     const QImage& getImage() const { return image; }
 
-    /// Get the file information for this pattern, if any
-    /// @return File information for the file. If the file has not been saved,
-    ///         this returns an empty fileInfo object.
-    const QFileInfo& getFileInfo() const { return fileInfo; }
+    /// Check if the animation has a valid filename
+    /// @return true if the animation filename has been set
+    bool hasValidFilename() const { return fileInfo.baseName() != "";}
+
+    /// Get the pattern filename, or a default if one is not set
+    /// @return Pattern name
+    QString getPatternName() const;
 
     /// Initialize the pattern from an image file
     /// @param newFileInfo URL of file to load
     bool load(const QFileInfo& newFileInfo);
+
 
     /// Save the pattern
     /// Note: The file must already have a filename, otherwise use saveAs

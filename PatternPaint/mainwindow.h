@@ -89,7 +89,7 @@ private slots:
 
     void on_forcePatternEditorRedraw();
 
-    void on_patternFilenameChanged(QFileInfo fileinfo);
+    void on_patternNameChanged(QString name);
 
     void on_actionGRB_triggered();
 

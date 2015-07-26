@@ -39,6 +39,14 @@ void PatternItem::applyUndoState(const QImage& newImage) {
     setModified(modified);
 }
 
+QString PatternItem::getPatternName() const
+{
+    if(fileInfo.baseName() == "") {
+        return "Untitled";
+    }
+    return fileInfo.baseName();
+}
+
 bool PatternItem::load(const QFileInfo &newFileInfo)
 {
     // TODO: Fail if there is unsaved data?

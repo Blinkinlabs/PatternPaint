@@ -311,12 +311,12 @@ void MainWindow::on_actionSave_File_as_triggered() {
 void MainWindow::on_actionSave_File_triggered() {
     PatternItem* item = dynamic_cast<PatternItem*>(patternCollection->currentItem());
 
-    if(item->getFileInfo().baseName() == "") {
+    if(!item->hasValidFilename()) {
         on_actionSave_File_as_triggered();
     } else {
         if (!item->save()) {
             QMessageBox::warning(this, tr("Error"), tr("Error saving pattern %1. Try saving it somewhere else?")
-                           .arg(item->getFileInfo().absolutePath()));
+                           .arg(item->getPatternName()));
         }
     }
 }
@@ -659,9 +659,9 @@ void MainWindow::on_forcePatternEditorRedraw() {
 //    actionSave_File->setEnabled(changed);
 //}
 
-void MainWindow::on_patternFilenameChanged(QFileInfo fileinfo)
+void MainWindow::on_patternNameChanged(QString name)
 {
-    this->setWindowTitle(fileinfo.baseName() + " - Pattern Paint");
+    this->setWindowTitle(name + " - Pattern Paint");
 }
 
 int MainWindow::promptForSave(PatternItem* patternItem) {
@@ -670,7 +670,7 @@ int MainWindow::promptForSave(PatternItem* patternItem) {
     }
 
     QString messageText = QString("The pattern %1 has been modified.")
-            .arg(patternItem->getFileInfo().baseName());
+            .arg(patternItem->getPatternName());
 
     QMessageBox msgBox(this);
     msgBox.setWindowModality(Qt::WindowModal);
@@ -790,7 +790,7 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
     patternEditor->setPatternItem(newPatternItem);
     undoStackGroup->setActiveStack(newPatternItem->getUndoStack());
 
-    on_patternFilenameChanged(newPatternItem->getFileInfo());
+    on_patternNameChanged(newPatternItem->getPatternName());
 }
 
 void MainWindow::notifyPatternModified() {
