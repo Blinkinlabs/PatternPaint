@@ -118,7 +118,7 @@ private:
     enum Modes { Disconnected, Connected, Uploading };
     Modes mode;
 
-    QUndoGroup *undoStackGroup;
+    QUndoGroup *undoGroup;
     QAction* undoAction;
     QAction* redoAction;
 

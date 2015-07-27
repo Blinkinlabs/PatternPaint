@@ -52,7 +52,8 @@ SOURCES += main.cpp\
     colorchooser.cpp \
     patternitemdelegate.cpp \
     patternitem.cpp \
-    patternupdatenotifier.cpp
+    patternupdatenotifier.cpp \
+    patterncollection.cpp
 
 HEADERS  += mainwindow.h \
     colorpicker.h \
@@ -68,7 +69,8 @@ HEADERS  += mainwindow.h \
     colorchooser.h \
     patternitemdelegate.h \
     patternitem.h \
-    patternupdatenotifier.h
+    patternupdatenotifier.h \
+    patterncollection.h
 
 mac {
 HEADERS  += \

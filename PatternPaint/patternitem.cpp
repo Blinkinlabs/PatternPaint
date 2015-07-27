@@ -8,7 +8,6 @@
 
 PatternItem::PatternItem(int patternLength, int ledCount, QListWidget* parent) :
     QListWidgetItem(parent, QListWidgetItem::UserType + 1),
-    notifier(NULL),
     modified(false)
 {
     undoStack.setUndoLimit(50);
@@ -20,7 +19,6 @@ PatternItem::PatternItem(int patternLength, int ledCount, QListWidget* parent) :
 
 PatternItem::PatternItem(int ledCount, QImage newImage, QListWidget* parent) :
     QListWidgetItem(parent, QListWidgetItem::UserType + 1),
-    notifier(NULL),
     modified(false)
 {
     undoStack.setUndoLimit(50);
@@ -36,7 +34,7 @@ void PatternItem::pushUndoState() {
 void PatternItem::applyUndoState(const QImage& newImage) {
     image = newImage;
 
-    if(notifier) {
+    if(!notifier.isNull()) {
         notifier->signalSizeUpdated();
     }
 
@@ -100,7 +98,7 @@ bool PatternItem::replace(const QFileInfo &newFileInfo)
     image = newImage.scaledToHeight(image.height());
     setModified(true);
 
-    if(notifier) {
+    if(!notifier.isNull()) {
         notifier->signalSizeUpdated();
     }
 
@@ -166,7 +164,7 @@ void PatternItem::resize(int newPatternLength, int newLedCount, bool scale) {
     QPainter painter(&image);
     painter.drawImage(0,0,originalImage);
 
-    if(notifier) {
+    if(!notifier.isNull()) {
         notifier->signalSizeUpdated();
     }
 }
@@ -199,11 +197,11 @@ void PatternItem::clear()
 void PatternItem::setModified(bool newModified)  {
     modified = newModified;
 
-    if(notifier) {
+    if(!notifier.isNull()) {
         notifier->signalDataUpdated();
     }
 }
 
-void PatternItem::setNotifier(PatternUpdateNotifier* newNotifier) {
+void PatternItem::setNotifier(QPointer<PatternUpdateNotifier> newNotifier) {
     notifier = newNotifier;
 }

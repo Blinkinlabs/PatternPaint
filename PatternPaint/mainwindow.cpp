@@ -38,13 +38,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     // prepare undo/redo
     menuEdit->addSeparator();
-    undoStackGroup = new QUndoGroup(this);
-    undoAction = undoStackGroup->createUndoAction(this, tr("&Undo"));
+    undoGroup = new QUndoGroup(this);
+    undoAction = undoGroup->createUndoAction(this, tr("&Undo"));
     undoAction->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Z")));
     undoAction->setEnabled(false);
     menuEdit->addAction(undoAction);
 
-    redoAction = undoStackGroup->createRedoAction(this, tr("&Redo"));
+    redoAction = undoGroup->createRedoAction(this, tr("&Redo"));
     redoAction->setEnabled(false);
     redoAction->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Y")));
     menuEdit->addAction(redoAction);
@@ -145,6 +145,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
             this, SLOT(on_patternSizeUpdated()));
     connect(&patternUpdateNotifier, SIGNAL(patternDataUpdated()),
             this, SLOT(on_patternDataUpdated()));
+
+
+    this->patternCollection->setNotifier(&patternUpdateNotifier);
+    this->patternCollection->setUndoGroup(undoGroup);
 
     // Create a pattern.
     on_actionNew_triggered();
@@ -278,9 +282,6 @@ void MainWindow::on_actionLoad_File_triggered()
         errorMessageDialog->show();
         return;
     }
-
-    undoStackGroup->addStack(patternItem->getUndoStack());
-    patternItem->setNotifier(&patternUpdateNotifier);
 
     this->patternCollection->addItem(patternItem);
     this->patternCollection->setCurrentItem(patternItem);
@@ -744,9 +745,6 @@ void MainWindow::on_actionNew_triggered()
     int ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
 
     PatternItem* patternItem = new PatternItem(patternLength, ledCount);
-    patternItem->setNotifier(&patternUpdateNotifier);
-
-    undoStackGroup->addStack(patternItem->getUndoStack());
 
     this->patternCollection->addItem(patternItem);
     this->patternCollection->setCurrentItem(patternItem);
@@ -780,7 +778,7 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
     PatternItem* newPatternItem = dynamic_cast<PatternItem*>(current);
 
     patternEditor->setPatternItem(newPatternItem);
-    undoStackGroup->setActiveStack(newPatternItem->getUndoStack());
+    undoGroup->setActiveStack(newPatternItem->getUndoStack());
 
     on_patternNameChanged(newPatternItem->getPatternName());
 }

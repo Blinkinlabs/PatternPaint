@@ -54,7 +54,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
-       <widget class="QListWidget" name="patternCollection">
+       <widget class="PatternCollection" name="patternCollection">
         <property name="minimumSize">
          <size>
           <width>150</width>
@@ -162,7 +162,7 @@
            <x>0</x>
            <y>0</y>
            <width>500</width>
-           <height>386</height>
+           <height>397</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -189,6 +189,9 @@
            <height>10</height>
           </size>
          </property>
+         <property name="acceptDrops">
+          <bool>false</bool>
+         </property>
         </widget>
        </widget>
       </item>
@@ -202,7 +205,7 @@
      <x>0</x>
      <y>0</y>
      <width>880</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -635,6 +638,11 @@
    <extends>QScrollArea</extends>
    <header>letterboxscrollarea.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PatternCollection</class>
+   <extends>QListWidget</extends>
+   <header>patterncollection.h</header>
   </customwidget>
  </customwidgets>
  <resources>

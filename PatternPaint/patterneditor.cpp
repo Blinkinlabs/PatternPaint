@@ -1,7 +1,6 @@
 #include "patterneditor.h"
 #include "abstractinstrument.h"
 
-#include <iostream>
 #include <cmath>
 #include <QtWidgets>
 #include <QDebug>
