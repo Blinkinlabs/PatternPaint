@@ -460,16 +460,28 @@ void MainWindow::on_actionTroubleshooting_tips_triggered()
 
 void MainWindow::on_actionFlip_Horizontal_triggered()
 {
+    if(patternCollection->currentItem() == NULL) {
+        return;
+    }
+
     dynamic_cast<PatternItem*>(this->patternCollection->currentItem())->flipHorizontal();
 }
 
 void MainWindow::on_actionFlip_Vertical_triggered()
 {
+    if(patternCollection->currentItem() == NULL) {
+        return;
+    }
+
     dynamic_cast<PatternItem*>(this->patternCollection->currentItem())->flipVertical();
 }
 
 void MainWindow::on_actionClear_Pattern_triggered()
 {
+    if(patternCollection->currentItem() == NULL) {
+        return;
+    }
+
     dynamic_cast<PatternItem*>(this->patternCollection->currentItem())->clear();
 }
 
@@ -503,6 +515,10 @@ void MainWindow::on_actionLoad_rainbow_sketch_triggered()
 void MainWindow::on_actionSave_to_Blinky_triggered()
 {
     if(controller.isNull()) {
+        return;
+    }
+
+    if(patternCollection->currentItem() == NULL) {
         return;
     }
 
@@ -572,6 +588,10 @@ void MainWindow::on_actionResize_Pattern_triggered()
 
     settings.setValue("Options/patternLength", static_cast<uint>(patternLength));
     settings.setValue("Options/ledCount", static_cast<uint>(ledCount));
+
+    if(patternCollection->currentItem() == NULL) {
+        return;
+    }
 
     qDebug() << "Resizing patterns, length:"
              << patternLength
@@ -760,7 +780,6 @@ void MainWindow::on_actionNew_triggered()
 
 void MainWindow::on_actionClose_triggered()
 {
-    // TODO: Fix framework to allow no active image
     if(this->patternCollection->currentItem() == NULL) {
         return;
     }
@@ -793,6 +812,10 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
 
 void MainWindow::on_patternDataUpdated()
 {
+    if(patternCollection->currentItem() == NULL) {
+        return;
+    }
+
     // Redraw the data-dependent views
     this->patternCollection->doItemsLayout();
 
@@ -801,6 +824,10 @@ void MainWindow::on_patternDataUpdated()
 
 void MainWindow::on_patternSizeUpdated()
 {
+    if(patternCollection->currentItem() == NULL) {
+        return;
+    }
+
     // Resize the selected pattern
     PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
 
