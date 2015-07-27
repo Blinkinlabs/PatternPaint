@@ -35,6 +35,9 @@ OUTDIR='PatternPaintWindows/'
 TEMPDIR='TempWindowsBuild'
 
 
+VERSION='1.8.0'
+
+
 ################## New directory #################################
 if [ ! -d "${PATTERNPAINT}" ]; then
 	mkdir ${TEMPDIR}
@@ -167,7 +170,12 @@ cp "${WIN_KIT}redist/DIFx/dpinst/MultiLin/x64/dpinst.exe" ${OUTDIR}driver/dpinst
 
 # Run NSIS to make an executable
 # For some reason the NSIS file is run from the directory it's located in?
-cp ${PATTERNPAINT}/"Pattern Paint.nsi" "Pattern Paint.nsi" 
+cp ${PATTERNPAINT}/"Pattern Paint.nsi" "Pattern Paint.nsi"
+
+# Update the version info in the NSI, fail if it didn't change
+sed -i 's/VERSION_STRING/'${VERSION}'/g' "Pattern Paint.nsi"
+grep -q ${VERSION} "Pattern Paint.nsi"
+
 "${NSIS}/makensis.exe" "Pattern Paint.nsi"
 
 # Sign the installer
