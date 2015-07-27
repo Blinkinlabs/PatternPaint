@@ -39,7 +39,7 @@ VERSION='1.8.0'
 
 
 ################## New directory #################################
-if [ ! -d "${PATTERNPAINT}" ]; then
+if [ ! -d "${TEMPDIR}" ]; then
 	mkdir ${TEMPDIR}
 else
 	echo "Warning: Directory already exists, stale files may be used for build."
@@ -168,18 +168,20 @@ cp ${BLINKYPENDANT}driver/amd64/WdfCoInstaller01009.dll ${OUTDIR}driver/blinkype
 cp "${WIN_KIT}redist/DIFx/dpinst/MultiLin/x86/dpinst.exe" ${OUTDIR}driver/dpinst32.exe
 cp "${WIN_KIT}redist/DIFx/dpinst/MultiLin/x64/dpinst.exe" ${OUTDIR}driver/dpinst64.exe
 
-# Run NSIS to make an executable
+# Run NSIS to make an executablels
 # For some reason the NSIS file is run from the directory it's located in?
 cp ${PATTERNPAINT}/"Pattern Paint.nsi" "Pattern Paint.nsi"
 
 # Update the version info in the NSI, fail if it didn't change
-sed -i 's/VERSION_STRING/'${VERSION}'/g' "Pattern Paint.nsi"
+sed -i 's/VERSION_STRING/'${VERSION}'.0/g' "Pattern Paint.nsi"
 grep -q ${VERSION} "Pattern Paint.nsi"
 
 "${NSIS}/makensis.exe" "Pattern Paint.nsi"
+
+rm "Pattern Paint.nsi"
 
 # Sign the installer
 # NOTE: You need to install the Blinkinlabs key and the GlobalSign Root CA for this to work
 "${WIN_KIT2}bin/x86/signtool.exe" sign //v //ac "../GlobalSign Root CA.crt" //n "Blinkinlabs, LLC" //tr http://tsa.starfieldtech.com "PatternPaint Windows Installer.exe"
 
-mv "PatternPaint Windows Installer.exe" ../
+mv "PatternPaint Windows Installer.exe" "../PatternPaint_Installer_"${VERSION}".exe"
