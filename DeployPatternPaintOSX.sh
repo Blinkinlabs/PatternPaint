@@ -3,6 +3,8 @@
 # Stop at any error
 set -e
 
+VERSION="1.8.0"
+
 # Pull in the QT tools
 export QTDIR=~/Qt5.4.1/5.4/clang_64/
 
@@ -14,11 +16,11 @@ pushd $(mktemp -d -t PatternPaint)
 echo "Building in: " `pwd`
 
 # Get the repository
-git clone -b sparkle https://github.com/Blinkinlabs/PatternPaint.git
+git clone https://github.com/Blinkinlabs/PatternPaint.git
 
 # Build PatternPaint
 cd PatternPaint/PatternPaint
-${QTDIR}/bin/qmake MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build   DESTDIR=bin VERSION=1.7.2
+${QTDIR}/bin/qmake MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build   DESTDIR=bin
 make
 cd ..
 
@@ -35,6 +37,6 @@ codesign --verify --verbose=4 /Volumes/PatternPaint:bin:PatternPaint/PatternPain
 umount /Volumes/PatternPaint\:bin\:PatternPaint/
 
 # And copy out the resulting disk image
-mv PatternPaint/bin/PatternPaint.dmg ${OUTPUTDIR}/PatternPaint_1.6.1.dmg
+mv PatternPaint/bin/PatternPaint.dmg ${OUTPUTDIR}/PatternPaint_${VERSION}.dmg
 
 # TODO: Clean up temp dir
