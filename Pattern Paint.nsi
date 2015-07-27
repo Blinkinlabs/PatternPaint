@@ -7,12 +7,15 @@
 # http://stackoverflow.com/questions/2464843/installing-drivers-from-nsis-installer-in-x64-system
 ############################################################################################
 
+# Avoid windows installation workaround, so we put the start menu items in the right place?
+RequestExecutionLevel admin
+
 !include "x64.nsh"
 
 !define APP_NAME "Pattern Paint"
 !define COMP_NAME "Blinkinlabs"
 !define WEB_SITE "http://blinkinlabs.com"
-!define VERSION "01.7.1.00"
+!define VERSION "1.8.0.0"
 !define COPYRIGHT "Blinkinlabs © 2015"
 !define DESCRIPTION "Application"
 !define INSTALLER_NAME "PatternPaint Windows Installer.exe"
@@ -63,7 +66,7 @@ InstallDir "$PROGRAMFILES\Pattern Paint"
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT "${REG_ROOT}"
 !define MUI_STARTMENUPAGE_REGISTRY_KEY "${UNINSTALL_PATH}"
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "${REG_START_MENU}"
-!insertmacro MUI_PAGE_STARTMENU Application $SM_Folder
+!insertmacro MUI_PAGE_STARTMENU Application $SMPROGRAMS
 !endif
 
 !insertmacro MUI_PAGE_INSTFILES
@@ -145,24 +148,16 @@ WriteUninstaller "$INSTDIR\uninstall.exe"
 
 !ifdef REG_START_MENU
 !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
-CreateDirectory "$SMPROGRAMS\$SM_Folder"
-CreateShortCut "$SMPROGRAMS\$SM_Folder\${APP_NAME}.lnk" "$INSTDIR\${MAIN_APP_EXE}"
+CreateDirectory "$SMPROGRAMS\"
+CreateShortCut "$SMPROGRAMS\${APP_NAME}.lnk" "$INSTDIR\${MAIN_APP_EXE}"
 CreateShortCut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\${MAIN_APP_EXE}"
-!ifdef WEB_SITE
-WriteIniStr "$INSTDIR\${APP_NAME} website.url" "InternetShortcut" "URL" "${WEB_SITE}"
-CreateShortCut "$SMPROGRAMS\$SM_Folder\${APP_NAME} Website.lnk" "$INSTDIR\${APP_NAME} website.url"
-!endif
 !insertmacro MUI_STARTMENU_WRITE_END
 !endif
 
 !ifndef REG_START_MENU
-CreateDirectory "$SMPROGRAMS\Pattern Paint"
-CreateShortCut "$SMPROGRAMS\Pattern Paint\${APP_NAME}.lnk" "$INSTDIR\${MAIN_APP_EXE}"
+CreateDirectory "$SMPROGRAMS\"
+CreateShortCut "$SMPROGRAMS\${APP_NAME}.lnk" "$INSTDIR\${MAIN_APP_EXE}"
 CreateShortCut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\${MAIN_APP_EXE}"
-!ifdef WEB_SITE
-WriteIniStr "$INSTDIR\${APP_NAME} website.url" "InternetShortcut" "URL" "${WEB_SITE}"
-CreateShortCut "$SMPROGRAMS\Pattern Paint\${APP_NAME} Website.lnk" "$INSTDIR\${APP_NAME} website.url"
-!endif
 !endif
 
 WriteRegStr ${REG_ROOT} "${REG_APP_PATH}" "" "$INSTDIR\${MAIN_APP_EXE}"
@@ -172,9 +167,6 @@ WriteRegStr ${REG_ROOT} "${UNINSTALL_PATH}"  "DisplayIcon" "$INSTDIR\${MAIN_APP_
 WriteRegStr ${REG_ROOT} "${UNINSTALL_PATH}"  "DisplayVersion" "${VERSION}"
 WriteRegStr ${REG_ROOT} "${UNINSTALL_PATH}"  "Publisher" "${COMP_NAME}"
 
-!ifdef WEB_SITE
-WriteRegStr ${REG_ROOT} "${UNINSTALL_PATH}"  "URLInfoAbout" "${WEB_SITE}"
-!endif
 SectionEnd
 
 ######################################################################
@@ -247,31 +239,20 @@ RmDir "$INSTDIR\imageformats"
 RmDir "$INSTDIR\platforms"
  
 Delete "$INSTDIR\uninstall.exe"
-!ifdef WEB_SITE
-Delete "$INSTDIR\${APP_NAME} website.url"
-!endif
 
 RmDir "$INSTDIR"
 
 !ifdef REG_START_MENU
-!insertmacro MUI_STARTMENU_GETFOLDER "Application" $SM_Folder
-Delete "$SMPROGRAMS\$SM_Folder\${APP_NAME}.lnk"
-!ifdef WEB_SITE
-Delete "$SMPROGRAMS\$SM_Folder\${APP_NAME} Website.lnk"
-!endif
+!insertmacro MUI_STARTMENU_GETFOLDER "Application" $SMPROGRAMS
+Delete "$SMPROGRAMS\${APP_NAME}.lnk"
 Delete "$DESKTOP\${APP_NAME}.lnk"
 
-RmDir "$SMPROGRAMS\$SM_Folder"
 !endif
 
 !ifndef REG_START_MENU
-Delete "$SMPROGRAMS\Pattern Paint\${APP_NAME}.lnk"
-!ifdef WEB_SITE
-Delete "$SMPROGRAMS\Pattern Paint\${APP_NAME} Website.lnk"
-!endif
+Delete "$SMPROGRAMS\${APP_NAME}.lnk"
 Delete "$DESKTOP\${APP_NAME}.lnk"
 
-RmDir "$SMPROGRAMS\Pattern Paint"
 !endif
 
 DeleteRegKey ${REG_ROOT} "${REG_APP_PATH}"

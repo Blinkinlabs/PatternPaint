@@ -1,4 +1,3 @@
-
 #Stop on any error
 set -e
 
@@ -45,7 +44,7 @@ git pull
 
 PATH=${QT_TOOLS}:${PATH}
 
-${QT_MINGW}bin/qmake.exe -config release MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build DESTDIR=bin VERSION=1.7.0
+${QT_MINGW}bin/qmake.exe -config release MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build DESTDIR=bin
 mingw32-make.exe clean
 mingw32-make.exe -j 4
 
