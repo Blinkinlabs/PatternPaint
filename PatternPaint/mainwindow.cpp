@@ -288,6 +288,10 @@ void MainWindow::on_actionLoad_File_triggered()
 }
 
 void MainWindow::on_actionSave_File_as_triggered() {
+    if(patternCollection->currentItem() == NULL) {
+        return;
+    }
+
     QSettings settings;
     QString lastDirectory = settings.value("File/SaveDirectory").toString();
 
@@ -314,6 +318,10 @@ void MainWindow::on_actionSave_File_as_triggered() {
 }
 
 void MainWindow::on_actionSave_File_triggered() {
+    if(patternCollection->currentItem() == NULL) {
+        return;
+    }
+
     PatternItem* item = dynamic_cast<PatternItem*>(patternCollection->currentItem());
 
     if(!item->hasValidFilename()) {
