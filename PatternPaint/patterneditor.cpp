@@ -22,13 +22,15 @@
 PatternEditor::PatternEditor(QWidget *parent) :
     QWidget(parent)
 {
-    instrument = NULL;
-
     this->setAcceptDrops(true);
 }
 
 void PatternEditor::dragEnterEvent(QDragEnterEvent *event)
 {
+    if(patternItem == NULL) {
+        return;
+    }
+
     if(event->mimeData()->hasUrls()) {
         event->acceptProposedAction();
     }
@@ -36,6 +38,10 @@ void PatternEditor::dragEnterEvent(QDragEnterEvent *event)
 
 void PatternEditor::dropEvent(QDropEvent *event)
 {
+    if(patternItem == NULL) {
+        return;
+    }
+
     QList<QUrl> droppedUrls = event->mimeData()->urls();
     int droppedUrlCnt = droppedUrls.size();
     for(int i = 0; i < droppedUrlCnt; i++) {
@@ -53,7 +59,7 @@ void PatternEditor::dropEvent(QDropEvent *event)
 }
 
 const QImage &PatternEditor::getPatternAsImage() const {
-    if(patternItem == NULL) {
+    if(patternItem ==NULL) {
         // TODO: Refactor so we don't have to do this?
         static QImage nullimage(1,1,QImage::Format_RGB32);
         return nullimage;
@@ -123,7 +129,7 @@ void PatternEditor::updateGridSize() {
 
 
 void PatternEditor::mousePressEvent(QMouseEvent *event) {
-    if (!instrument) {
+    if (patternItem == NULL || instrument.isNull()) {
         return;
     }
 
@@ -133,7 +139,7 @@ void PatternEditor::mousePressEvent(QMouseEvent *event) {
 }
 
 void PatternEditor::mouseMoveEvent(QMouseEvent *event){
-    if (!instrument) {
+    if (patternItem == NULL || instrument.isNull()) {
         return;
     }
 
@@ -172,7 +178,7 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
 void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
     setCursor(Qt::ArrowCursor);
 
-    if (!instrument) {
+    if (patternItem == NULL || instrument.isNull()) {
         return;
     }
 
@@ -181,11 +187,12 @@ void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
 }
 
 void PatternEditor::setPatternItem(PatternItem* newPatternItem) {
-    if(newPatternItem == NULL) {
+    patternItem = newPatternItem;
+
+    if(patternItem == NULL) {
+        // TODO: Reset size to some default?
         return;
     }
-
-    patternItem = newPatternItem;
 
     // Store the width and height, so that letterboxscrollarea can resize this widget properly
     this->setBaseSize(patternItem->getImage().width(), patternItem->getImage().height());
@@ -236,7 +243,7 @@ void PatternEditor::paintEvent(QPaintEvent*)
     painter.setRenderHint(QPainter::Antialiasing, false);
 
     // If we don't have a pattern item, show an empty view
-    if(!patternItem) {
+    if(patternItem == NULL) {
         painter.fillRect(0,0,this->width(),this->height(), QColor(0,0,0));
         return;
     }
@@ -247,8 +254,9 @@ void PatternEditor::paintEvent(QPaintEvent*)
                             patternItem->getImage().height()*yScale),
                       patternItem->getImage());
 
-    if (instrument && instrument->showPreview())
+    if (!instrument.isNull() && instrument->showPreview()) {
         painter.drawImage(QRect(0,0,patternItem->getImage().width()*xScale+.5,patternItem->getImage().height()*yScale), (instrument->getPreview()));
+    }
 
     painter.drawImage(0,0,gridPattern);
 
@@ -270,5 +278,9 @@ void PatternEditor::paintEvent(QPaintEvent*)
 
 void PatternEditor::applyInstrument(QImage& update)
 {
+    if(patternItem == NULL) {
+        return;
+    }
+
     patternItem->applyInstrument(update);
 }

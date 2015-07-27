@@ -2,6 +2,7 @@
 #define PATTERNDITOR_H
 
 #include <QWidget>
+#include <QPointer>
 #include "patternitem.h"
 
 class QUndoStack;
@@ -18,6 +19,9 @@ public:
     /// @param newPatternItem Pattern
     void setPatternItem(PatternItem* newPatternItem);
 
+    /// Clear the patternItem, if one was selected
+    void clearPatternItem();
+
     /// Get the image data for the current pattern
     /// @return QImage containing the current pattern
     const QImage& getPatternAsImage() const;
@@ -31,20 +35,26 @@ public:
     /// @param update RGBA QImage to draw on top of the current
     void applyInstrument(QImage& update);
 
+
     /// Re-size the display grid and selector based on new widget geometery
     void resizeEvent(QResizeEvent * event);
 
+    // Pass messages to the selected instrument
     void mousePressEvent(QMouseEvent * event);
     void mouseMoveEvent(QMouseEvent * event);
     void mouseReleaseEvent(QMouseEvent*);
 
+
+    // Handle file URLs dropped from other programs
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
+
 protected:
     void paintEvent(QPaintEvent *event);
 
 private:
     PatternItem* patternItem;    ///< Pattern item we are interacting with
+    QPointer<AbstractInstrument> instrument;
 
     QImage gridPattern;    ///< Holds the pre-rendered grid overlay
 
@@ -55,8 +65,6 @@ private:
     int toolSize;          ///< Size of the current drawing tool (TODO: This should be a pointer to a tool)
 
     int playbackRow;       ///< Row being played back (for display purposes only)
-
-    AbstractInstrument* instrument;
 
     /// Redraw the gridPattern to fit the current widget size.
     void updateGridSize();

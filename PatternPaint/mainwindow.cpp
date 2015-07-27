@@ -773,11 +773,13 @@ void MainWindow::on_actionClose_triggered()
 void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previous) {
     Q_UNUSED(previous);
 
-    PatternItem* newPatternItem = dynamic_cast<PatternItem*>(current);
+    // TODO: we're going to have to unload our references, but for now skip that.
+    if(current == NULL) {
+        patternEditor->setPatternItem(NULL);
+        return;
+    }
 
-    // Set a callback so that the pattern item can inform the UI when it is modified
-//    newPatternItem->setUpdateCallback(&this->notifyPatternModified);
-//    newPatternItem->setUpdateCallback(NULL);
+    PatternItem* newPatternItem = dynamic_cast<PatternItem*>(current);
 
     patternEditor->setPatternItem(newPatternItem);
     undoStackGroup->setActiveStack(newPatternItem->getUndoStack());
