@@ -6,22 +6,28 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
       <item>
-        <title>PatternPaint 1.7.2</title>
-        <pubDate>Sat, 24 Jul 2015 2:17:00 +0000</pubDate>
+        <title>PatternPaint 1.8.0</title>
+        <pubDate>Mon, 27 Jul 2015 8:32:00 +0000</pubDate>
         <description>
           <![CDATA[
-            <ul>
-              <li>Support for multiple animations!</li>
-              <li>Add auto-update feature for OS X, Windows</li>
-            </ul>
+<b>Introducing PatternPaint 1.8! This is a big one- now you can store multiple animations on your BlinkyTape at once!<b>
+<br>Changelog:<br>
+<ul>
+<li>New slideshow editor to load and manage multiple patterns</li>
+<li>Upload multiple patterns to your BlinkyTape (BlinkyTile and BlinkyPendant coming soon)</li>
+<li>Drag and drop support for loading animations directly from your file manager or favorite program</li>
+<li>Automatically checks for new versions (using Sparkle and WinSparkle)</li>
+<li>Mac: Appnap automatically disabled</li>
+</ul>
           ]]>
         </description>
-        <enclosure url="http://software.blinkinlabs.com/patternpaint/PatternPaint_1.7.1.dmg"
-          sparkle:version="1.7.2"
-          length="10183200"
+        <enclosure url="https://github.com/Blinkinlabs/PatternPaint/releases/download/1.8.0/PatternPaint_1.8.0.dmg"
+          sparkle:version="1.8.0"
+          length="13321443"
           type="application/octet-stream"
         />
 
       </item>
   </channel>
 </rss>
+
