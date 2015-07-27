@@ -755,9 +755,7 @@ void MainWindow::on_actionNew_triggered()
 void MainWindow::on_actionClose_triggered()
 {
     // TODO: Fix framework to allow no active image
-    //if(this->patternCollection->currentItem() == NULL) {
-    if(this->patternCollection->count() < 2) {
-        qDebug() << "on_actionClose: No items left to remove!";
+    if(this->patternCollection->currentItem() == NULL) {
         return;
     }
 
