@@ -1,7 +1,7 @@
 #Stop on any error
 set -e
 
-################## Library Locations #############################
+################# Library Locations #############################
 # Location of the MINGW libraries (Installed as part of Qt)
 QT_DIR='/c/Qt/'
 QT_MINGW=${QT_DIR}'/5.4/mingw491_32/'
@@ -27,20 +27,61 @@ BLINKYTILE='Blinkytile/'
 BLINKYPENDANT='Blinkypendant/'
 
 # Winsparkle library release
-WINSPARKLE='thirdparty/WinSparkle-0.4/'
+WINSPARKLE=${PATTERNPAINT}'/thirdparty/WinSparkle-0.4/'
 
 # Staging directory for this release
 OUTDIR='PatternPaintWindows/'
 
+TEMPDIR='TempWindowsBuild'
 
-################## Pull PatternPaint and build ###################
+
+################## New directory #################################
+if [ ! -d "${PATTERNPAINT}" ]; then
+	mkdir ${TEMPDIR}
+else
+	echo "Warning: Directory already exists, stale files may be used for build."
+fi
+cd ${TEMPDIR}
+
+
+################## Get PatternPaint ###################
 if [ ! -d "${PATTERNPAINT}" ]; then
 	git clone https://github.com/Blinkinlabs/PatternPaint.git ${PATTERNPAINT}
+else
+	cd ${PATTERNPAINT}
+	git pull
+	cd ..
 fi
 
-# TODO: Detect if it's already installed?
-cd ${PATTERNPAINT}
-git pull
+################## Get BlinkyTape driver #########################
+if [ ! -d "${BLINKYTAPE}" ]; then
+	git clone https://github.com/Blinkinlabs/Blinkinlabs32u4_boards.git ${BLINKYTAPE}
+else
+	cd ${BLINKYTAPE}
+	git pull
+	cd ..
+fi
+
+################## Get BlinkyTile driver #########################
+if [ ! -d "${BLINKYTILE}" ]; then
+	git clone https://github.com/Blinkinlabs/BlinkyTile.git ${BLINKYTILE}
+else
+	cd ${BLINKYTILE}
+	git pull
+	cd ..
+fi
+
+################## Get BlinkyPendat driver #########################
+if [ ! -d "${BLINKYPENDANT}" ]; then
+	git clone https://github.com/Blinkinlabs/BlinkyPendant.git ${BLINKYPENDANT}
+else
+	cd ${BLINKYPENDANT}
+	git pull
+	cd ..
+fi
+
+################## Build PatternPaint ###################
+cd ${PATTERNPAINT}/PatternPaint
 
 PATH=${QT_TOOLS}:${PATH}
 
@@ -48,34 +89,8 @@ ${QT_MINGW}bin/qmake.exe -config release MOC_DIR=build OBJECTS_DIR=build RCC_DIR
 mingw32-make.exe clean
 mingw32-make.exe -j 4
 
-cd ..
+cd ../../
 
-################## Get BlinkyTape driver #########################
-if [ ! -d "${BLINKYTAPE}" ]; then
-	git clone https://github.com/Blinkinlabs/Blinkinlabs32u4_boards.git ${BLINKYTAPE}
-fi
-
-cd ${BLINKYTAPE}
-git pull
-cd ..
-
-################## Get BlinkyTile driver #########################
-if [ ! -d "${BLINKYTILE}" ]; then
-	git clone https://github.com/Blinkinlabs/BlinkyTile.git ${BLINKYTILE}
-fi
-
-cd ${BLINKYTILE}
-git pull
-cd ..
-
-################## Get BlinkyPendat driver #########################
-if [ ! -d "${BLINKYPENDANT}" ]; then
-	git clone https://github.com/Blinkinlabs/BlinkyPendant.git ${BLINKYPENDANT}
-fi
-
-cd ${BLINKYPENDANT}
-git pull
-cd ..
 
 ################## Package Everything ############################
 mkdir -p ${OUTDIR}
@@ -91,7 +106,7 @@ mkdir -p ${OUTDIR}driver/blinkypendant/x86
 mkdir -p ${OUTDIR}driver/blinkypendant/amd64
 
 # Main executable
-cp ${PATTERNPAINT}/bin/PatternPaint.exe ${OUTDIR}
+cp ${PATTERNPAINT}/PatternPaint/bin/PatternPaint.exe ${OUTDIR}
 
 # Note: This list of DLLs must be determined by hand, using Dependency Walker
 # Also, the .nsi file should be synchronized with this list, otherwise the file
@@ -151,9 +166,12 @@ cp "${WIN_KIT}redist/DIFx/dpinst/MultiLin/x86/dpinst.exe" ${OUTDIR}driver/dpinst
 cp "${WIN_KIT}redist/DIFx/dpinst/MultiLin/x64/dpinst.exe" ${OUTDIR}driver/dpinst64.exe
 
 # Run NSIS to make an executable
+# For some reason the NSIS file is run from the directory it's located in?
+cp ${PATTERNPAINT}/"Pattern Paint.nsi" "Pattern Paint.nsi" 
 "${NSIS}/makensis.exe" "Pattern Paint.nsi"
 
 # Sign the installer
 # NOTE: You need to install the Blinkinlabs key and the GlobalSign Root CA for this to work
-"${WIN_KIT2}bin/x86/signtool.exe" sign //v //ac "GlobalSign Root CA.crt" //n "Blinkinlabs, LLC" //tr http://tsa.starfieldtech.com "PatternPaint Windows Installer.exe"
+"${WIN_KIT2}bin/x86/signtool.exe" sign //v //ac "../GlobalSign Root CA.crt" //n "Blinkinlabs, LLC" //tr http://tsa.starfieldtech.com "PatternPaint Windows Installer.exe"
 
+mv "PatternPaint Windows Installer.exe" ../
