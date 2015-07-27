@@ -13,32 +13,18 @@ bool BlinkyPendantUploader::startUpload(BlinkyController& controller, std::vecto
 {
     // TODO: push the image conversions into here so they are less awkward.
 
-//    // Make sure we have an image compatible with the BlinkyPendant
-//    QImage image = patterns.at(0).image;
-//    QImage croppedImage;
-//    croppedImage = image.copy( 0, 0, image.width(), 10);
-
-//    Pattern pattern(croppedImage, 0, Pattern::RGB24, Pattern::RGB);
-
-//    // Create the data structure to write to the device memory
-//    QByteArray data;
-//    data.append((char)0x13);    // header
-//    data.append((char)0x37);
-//    data.append((char)pattern.frameCount);  // frame count
-//    data += pattern.data;       // image data (RGB24, uncompressed)
-
-    // TODO: upgrade firmware for v1 devices?
-
+// TODO: Update blinkypendant firmware!
+#if defined BLINKY_PENDANT_2
 
     // Create the data structure to write to the device memory
     // Animation table
-    QByteArray headerData;
+    QByteArray data;
     QByteArray patternData;
 
-    headerData.append((char)0x31);    // header
-    headerData.append((char)0x23);
-    headerData.append((char)patterns.size()); // Number of patterns in the table
-    headerData.append((char)10);            // Number of LEDs in the pattern
+    data.append((char)0x31);    // header
+    data.append((char)0x23);
+    data.append((char)patterns.size()); // Number of patterns in the table
+    data.append((char)10);            // Number of LEDs in the pattern
 
     for(std::vector<Pattern>::iterator pattern = patterns.begin();
         pattern != patterns.end();
@@ -51,21 +37,38 @@ bool BlinkyPendantUploader::startUpload(BlinkyController& controller, std::vecto
         Pattern croppedPattern(croppedImage, 0, Pattern::RGB24, Pattern::RGB);
 
         // Animation entry
-        headerData.append((char)0);             // Encoding type (1 byte) (RGB24, uncompressed) (TODO)
-        headerData.append((char)((patternData.length() >> 24) &0xFF)); // Data offset (4 bytes)
-        headerData.append((char)((patternData.length() >> 16) &0xFF));
-        headerData.append((char)((patternData.length() >>  8) &0xFF));
-        headerData.append((char)((patternData.length() >>  0) &0xFF));
-        headerData.append((char)((croppedPattern.frameCount >> 8)&0xFF));   // Frame count (2 bytes)
-        headerData.append((char)((croppedPattern.frameCount     )&0xFF));
-        headerData.append((char)0);             // Frame delay (2 bytes) TODO
-        headerData.append((char)0);
+        data.append((char)0);             // Encoding type (1 byte) (RGB24, uncompressed) (TODO)
+        data.append((char)((patternData.length() >> 24) &0xFF)); // Data offset (4 bytes)
+        data.append((char)((patternData.length() >> 16) &0xFF));
+        data.append((char)((patternData.length() >>  8) &0xFF));
+        data.append((char)((patternData.length() >>  0) &0xFF));
+        data.append((char)((croppedPattern.frameCount >> 8)&0xFF));   // Frame count (2 bytes)
+        data.append((char)((croppedPattern.frameCount     )&0xFF));
+        data.append((char)0);             // Frame delay (2 bytes) TODO
+        data.append((char)0);
 
         // Make sure we have an image compatible with the BlinkyPendant
         patternData += croppedPattern.data;       // image data (RGB24, uncompressed)
     }
 
-    headerData += patternData;
+    data += patternData;
+
+#else
+    // Make sure we have an image compatible with the BlinkyPendant
+    QImage image = patterns.at(0).image;
+    QImage croppedImage;
+    croppedImage = image.copy( 0, 0, image.width(), 10);
+
+    Pattern pattern(croppedImage, 0, Pattern::RGB24, Pattern::RGB);
+
+    // Create the data structure to write to the device memory
+    QByteArray data;
+    data.append((char)0x13);    // header
+    data.append((char)0x37);
+    data.append((char)pattern.frameCount);  // frame count
+    data += pattern.data;       // image data (RGB24, uncompressed)
+#endif
+
 
     // TODO: Check if the data can fit in the device memory
 
@@ -87,7 +90,7 @@ bool BlinkyPendantUploader::startUpload(BlinkyController& controller, std::vecto
     programmer.startWrite();
 
     // 2-n. write data (aligned to 1024-byte sectors, 64 bytes at a time)
-    programmer.writeData(headerData);
+    programmer.writeData(data);
 
     // n+1 stop write
     programmer.stopWrite();
