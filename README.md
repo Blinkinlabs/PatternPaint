@@ -138,6 +138,11 @@ Test this file manually on clean Windows 7 and 8 hosts.
 
 8. Tweet about it and maybe a blog post?
 
+## Update the website
+
+The PatternPaint page at blinkinlabs.com contains links to the latest releases. Update those! The page is:
+
+http://blinkinlabs.com/patternpaint
 
 ## Update the appcast files
 
