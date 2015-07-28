@@ -25,6 +25,15 @@
 #include <QUndoGroup>
 #include <QToolButton>
 
+
+#define PATTERN_SPEED_MINIMUM_VALUE 1
+#define PATTERN_SPEED_MAXIMUM_VALUE 100
+#define PATTERN_SPEED_DEFAULT_VALUE 1
+
+#define DRAWING_SIZE_MINIMUM_VALUE 1
+#define DRAWING_SIZE_MAXIMUM_VALUE 20
+#define DRAWING_SIZE_DEFAULT_VALUE 1
+
 #define DEFAULT_LED_COUNT 60
 #define DEFAULT_PATTERN_LENGTH 100
 
@@ -35,6 +44,9 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     setupUi(this);
+
+    drawTimer = new QTimer(this);
+    connectionScannerTimer = new QTimer(this);
 
     // prepare undo/redo
     menuEdit->addSeparator();
@@ -74,22 +86,21 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     instruments->addWidget(colorChooser);
 
     QSpinBox *penSizeSpin = new QSpinBox();
-    penSizeSpin->setRange(1, 20);
-    penSizeSpin->setValue(1);
+    penSizeSpin->setRange(DRAWING_SIZE_MINIMUM_VALUE, DRAWING_SIZE_MAXIMUM_VALUE);
+    penSizeSpin->setValue(DRAWING_SIZE_DEFAULT_VALUE);
     penSizeSpin->setStatusTip(tr("Pen size"));
     penSizeSpin->setToolTip(tr("Pen size"));
     instruments->addWidget(penSizeSpin);
 
+
     // tools
     pSpeed = new QSpinBox(this);
-    pSpeed->setRange(1, 100);
-    pSpeed->setValue(20);
+    pSpeed->setRange(PATTERN_SPEED_MINIMUM_VALUE, PATTERN_SPEED_MAXIMUM_VALUE);
+    pSpeed->setValue(PATTERN_SPEED_DEFAULT_VALUE);
     pSpeed->setToolTip(tr("Pattern speed"));
     tools->addWidget(pSpeed);
     connect(pSpeed, SIGNAL(valueChanged(int)), this, SLOT(patternSpeed_valueChanged(int)));
-
-    drawTimer = new QTimer(this);
-    connectionScannerTimer = new QTimer(this);
+    patternSpeed_valueChanged(PATTERN_SPEED_DEFAULT_VALUE);
 
     mode = Disconnected;
 
@@ -116,7 +127,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     // The draw timer tells the pattern to advance
     connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
-    drawTimer->setInterval(33);
 
     // Start a scanner to connect to a Blinky automatically
     connect(connectionScannerTimer, SIGNAL(timeout()), this, SLOT(connectionScannerTimer_timeout()));

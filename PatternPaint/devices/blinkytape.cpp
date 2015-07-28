@@ -3,6 +3,7 @@
 #include "lightbuddyuploader.h"
 #include "blinkytape.h"
 #include <QDebug>
+#include <QTime>
 
 /// Interval between scans to see if the device is still connected
 #define CONNECTION_SCANNER_INTERVAL 100
@@ -235,7 +236,7 @@ bool BlinkyTape::isConnected() {
     return serial->isOpen();
 }
 
-void BlinkyTape::sendUpdate(QByteArray LedData)
+void BlinkyTape::sendUpdate(QByteArray ledData)
 {
     if(!isConnected()) {
         qCritical() << "Strip not connected, not sending update!";
@@ -244,32 +245,61 @@ void BlinkyTape::sendUpdate(QByteArray LedData)
 
     // If there is data pending to send, skip this update to prevent overflowing
     // the buffer.
-    if(serial->bytesToWrite() >0) {
-//        qDebug() << "Output data still in buffer, dropping this update frame";
+    if(serial->bytesToWrite() > 0) {
+        qDebug() << "Output data still in buffer, dropping this update frame";
         return;
     }
 
     // If we have a blinkyPendant, fit the data to the output device
     if(serialInfo.vendorIdentifier() == BLINKYPENDANT_SKETCH_VID
         && serialInfo.productIdentifier() == BLINKYPENDANT_SKETCH_PID) {
-        LedData = LedData.leftJustified(PENDANT_MAX_PIXELS*3, (char)0x00, true);
+        ledData = ledData.leftJustified(PENDANT_MAX_PIXELS*3, (char)0x00, true);
     }
 
     // Trim anything that's 0xff
-    for(int i = 0; i < LedData.length(); i++) {
-        if(LedData[i] == (char)255) {
-            LedData[i] = 254;
+    for(int i = 0; i < ledData.length(); i++) {
+        if(ledData[i] == (char)255) {
+            ledData[i] = 254;
         }
     }
 
     // Append an 0xFF to signal the flip command
-    LedData.append(0xFF);
+    ledData.append(0xFF);
 
-    int writeLength = serial->write(LedData);
-    if(writeLength != LedData.length()) {
-        qCritical() << "Error writing all the data out, expected:" << LedData.length()
-                    << ", wrote:" << writeLength;
+    // Write chunks of data?
+    #define CHUNK_SIZE 300
+
+    for(int chunk = 0; chunk*CHUNK_SIZE < ledData.length(); chunk++) {
+
+        int chunkLength = CHUNK_SIZE;
+        if((chunk+1)*CHUNK_SIZE > ledData.length()) {
+           chunkLength = ledData.length() - chunk*CHUNK_SIZE;
+        }
+
+        QByteArray chunkData = ledData.mid(chunk*CHUNK_SIZE,chunkLength);
+
+//        qDebug() << "size=" << ledData.length() << " chunk=" << chunk << " position=" << chunk*CHUNK_SIZE << " length=" << chunkLength;
+//        qDebug() << chunkData.toHex();
+
+        int writeLength = serial->write(chunkData);
+        if(writeLength != chunkData.length()) {
+            qCritical() << "Error writing all the data out, expected:" << chunkLength
+                        << ", wrote:" << writeLength;
+        }
+        serial->flush();
+
+        // Pause a short amount of time to let the OS do anything else
+        if((chunk+1)*CHUNK_SIZE < ledData.length()) {
+            int millisecondsToWait = 1;
+            QTime dieTime = QTime::currentTime().addMSecs( millisecondsToWait );
+            while( QTime::currentTime() < dieTime )
+            {
+                QCoreApplication::processEvents( QEventLoop::AllEvents, millisecondsToWait );
+            }
+        }
+
     }
+
 }
 
 bool BlinkyTape::getPortInfo(QSerialPortInfo& info)
