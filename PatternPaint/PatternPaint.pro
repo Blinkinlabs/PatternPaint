@@ -22,7 +22,7 @@ TEMPLATE = app
 
 #Application version
 VERSION_MAJOR = 1
-VERSION_MINOR = 8
+VERSION_MINOR = 9
 VERSION_BUILD = 0
 
 #Target version

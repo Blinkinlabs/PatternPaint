@@ -290,7 +290,7 @@ void BlinkyTape::sendUpdate(QByteArray ledData)
 
         // Pause a short amount of time to let the OS do anything else
         if((chunk+1)*CHUNK_SIZE < ledData.length()) {
-            int millisecondsToWait = 1;
+            int millisecondsToWait = 3;
             QTime dieTime = QTime::currentTime().addMSecs( millisecondsToWait );
             while( QTime::currentTime() < dieTime )
             {
