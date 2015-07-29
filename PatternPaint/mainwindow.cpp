@@ -28,7 +28,7 @@
 
 #define PATTERN_SPEED_MINIMUM_VALUE 1
 #define PATTERN_SPEED_MAXIMUM_VALUE 100
-#define PATTERN_SPEED_DEFAULT_VALUE 1
+#define PATTERN_SPEED_DEFAULT_VALUE 25
 
 #define DRAWING_SIZE_MINIMUM_VALUE 1
 #define DRAWING_SIZE_MAXIMUM_VALUE 20
@@ -37,7 +37,7 @@
 #define DEFAULT_LED_COUNT 60
 #define DEFAULT_PATTERN_LENGTH 100
 
-#define MIN_TIMER_INTERVAL 10  // minimum interval to wait before firing a drawtimer update
+#define MIN_TIMER_INTERVAL 5  // minimum interval to wait between blinkytape updates
 
 #define CONNECTION_SCANNER_INTERVAL 1000
 
@@ -82,15 +82,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     colorChooser->setStatusTip(tr("Drawing color"));
     colorChooser->setToolTip(tr("Drawing color"));
-    instruments->addSeparator();
-    instruments->addWidget(colorChooser);
+    instrumentToolbar->addSeparator();
+    instrumentToolbar->addWidget(colorChooser);
 
     QSpinBox *penSizeSpin = new QSpinBox();
     penSizeSpin->setRange(DRAWING_SIZE_MINIMUM_VALUE, DRAWING_SIZE_MAXIMUM_VALUE);
     penSizeSpin->setValue(DRAWING_SIZE_DEFAULT_VALUE);
     penSizeSpin->setStatusTip(tr("Pen size"));
     penSizeSpin->setToolTip(tr("Pen size"));
-    instruments->addWidget(penSizeSpin);
+    instrumentToolbar->addWidget(penSizeSpin);
 
 
     // tools
@@ -98,7 +98,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     pSpeed->setRange(PATTERN_SPEED_MINIMUM_VALUE, PATTERN_SPEED_MAXIMUM_VALUE);
     pSpeed->setValue(PATTERN_SPEED_DEFAULT_VALUE);
     pSpeed->setToolTip(tr("Pattern speed"));
-    tools->addWidget(pSpeed);
+    playbackToolbar->addWidget(pSpeed);
     connect(pSpeed, SIGNAL(valueChanged(int)), this, SLOT(patternSpeed_valueChanged(int)));
     patternSpeed_valueChanged(PATTERN_SPEED_DEFAULT_VALUE);
 
@@ -169,49 +169,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 MainWindow::~MainWindow(){}
 
 void MainWindow::drawTimer_timeout() {
-
-    // TODO: move this state to somewhere; the patternEditor class maybe?
-    static int n = 0;
-
-    // Ignore the timeout if it came to quickly, so that we don't overload the blinky
-    static qint64 lastTime = 0;
-    qint64 newTime = QDateTime::currentMSecsSinceEpoch();
-    if (newTime - lastTime < MIN_TIMER_INTERVAL) {
-        qDebug() << "Dropping timer update due to rate limiting. Last update " << newTime - lastTime << "ms ago";
-        return;
-    }
-
-    lastTime = newTime;
-
-    if(controller.isNull()) {
-        return;
-    }
-
     QImage image = patternEditor->getPatternAsImage();
-
-    // TODO: Put this in a converter class.
-    QByteArray ledData;
-    for(int i = 0; i < image.height(); i++) {
-        QRgb color = ColorModel::correctBrightness(image.pixel(n, i));
-
-        switch(colorMode) {
-        case Pattern::GRB:
-            ledData.append(qGreen(color));
-            ledData.append(qRed(color));
-            ledData.append(qBlue(color));
-            break;
-        case Pattern::RGB:
-        default:
-            ledData.append(qRed(color));
-            ledData.append(qGreen(color));
-            ledData.append(qBlue(color));
-            break;
-        }
-    }
-    controller->sendUpdate(ledData);
-
-    n = (n+1)%image.width();
-    patternEditor->setPlaybackRow(n);
+    setNewFrame((frame+1)%image.width());
 }
 
 
@@ -254,13 +213,13 @@ void MainWindow::on_actionPlay_triggered()
 void MainWindow::startPlayback() {
     drawTimer->start();
     actionPlay->setText(tr("Pause"));
-    actionPlay->setIcon(QIcon(":/resources/images/pause.png"));
+    actionPlay->setIcon(QIcon(":/icons/images/icons/Pause-100.png"));
 }
 
 void MainWindow::stopPlayback() {
     drawTimer->stop();
     actionPlay->setText(tr("Play"));
-    actionPlay->setIcon(QIcon(":/resources/images/play.png"));
+    actionPlay->setIcon(QIcon(":/icons/images/icons/Play-100.png"));
 }
 
 void MainWindow::on_actionLoad_File_triggered()
@@ -679,7 +638,7 @@ void MainWindow::on_actionConnect_triggered()
 void MainWindow::on_instrumentSelected(bool) {
     QAction* act = dynamic_cast<QAction*>(sender());
     Q_ASSERT(act != NULL);
-    foreach(QAction* a, instruments->actions()) {
+    foreach(QAction* a, instrumentToolbar->actions()) {
         a->setChecked(false);
     }
 
@@ -765,6 +724,73 @@ void MainWindow::setColorMode(Pattern::ColorMode newColorOrder)
     }
 }
 
+void MainWindow::setNewFrame(int newFrame)
+{
+    QImage image = patternEditor->getPatternAsImage();
+
+    if(newFrame >= image.width()) {
+        newFrame = image.width() - 1;
+    }
+    if(newFrame < 0) {
+        newFrame = 0;
+    }
+
+    frame = newFrame;
+
+    patternEditor->setPlaybackRow(frame);
+    updateBlinky();
+}
+
+void MainWindow::updateBlinky()
+{
+    // Ignore the timeout if it came to quickly, so that we don't overload the blinky
+    // TODO: Push this into setNewFrame()
+    static qint64 lastTime = 0;
+    qint64 newTime = QDateTime::currentMSecsSinceEpoch();
+    if (newTime - lastTime < MIN_TIMER_INTERVAL) {
+        qDebug() << "Skipping update due to rate limiting. Last update " << newTime - lastTime << "ms ago";
+        return;
+    }
+
+    lastTime = newTime;
+
+    if(this->patternCollection->currentItem() == NULL) {
+        return;
+    }
+
+    // If we are already connected, disregard.
+    if(controller.isNull()) {
+        return;
+    }
+
+    // Note: We should pull from patternEditor if we want to get realtime tool drawing, but for some reason it's behind?
+    //QImage image = patternEditor->getPatternAsImage();
+
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
+    QImage image = patternItem->getImage();
+
+    // TODO: Put this in a converter class.
+    QByteArray ledData;
+    for(int i = 0; i < image.height(); i++) {
+        QRgb color = ColorModel::correctBrightness(image.pixel(frame, i));
+
+        switch(colorMode) {
+        case Pattern::GRB:
+            ledData.append(qGreen(color));
+            ledData.append(qRed(color));
+            ledData.append(qBlue(color));
+            break;
+        case Pattern::RGB:
+        default:
+            ledData.append(qRed(color));
+            ledData.append(qGreen(color));
+            ledData.append(qBlue(color));
+            break;
+        }
+    }
+    controller->sendUpdate(ledData);
+}
+
 void MainWindow::on_actionGRB_triggered()
 {
     setColorMode(Pattern::GRB);
@@ -805,6 +831,9 @@ void MainWindow::on_actionClose_triggered()
 void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previous) {
     Q_UNUSED(previous);
 
+    // Always update the pattern name
+    on_patternNameUpdated();
+
     // TODO: we're going to have to unload our references, but for now skip that.
     if(current == NULL) {
         patternEditor->setPatternItem(NULL);
@@ -813,11 +842,10 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
 
     PatternItem* newPatternItem = dynamic_cast<PatternItem*>(current);
 
-    patternEditor->setPatternItem(newPatternItem);
     undoGroup->setActiveStack(newPatternItem->getUndoStack());
 
-    on_patternNameUpdated();
     on_patternSizeUpdated();
+    on_patternDataUpdated();
 }
 
 void MainWindow::on_patternDataUpdated()
@@ -829,7 +857,8 @@ void MainWindow::on_patternDataUpdated()
     // Redraw the data-dependent views
     this->patternCollection->doItemsLayout();
 
-    scrollArea->resize(scrollArea->width()+1, scrollArea->height());
+    // Update the LED output
+    updateBlinky();
 }
 
 void MainWindow::on_patternSizeUpdated()
@@ -862,4 +891,16 @@ void MainWindow::on_patternNameUpdated()
     }
 
     this->setWindowTitle(name + " - Pattern Paint");
+}
+
+void MainWindow::on_actionStepForward_triggered()
+{
+    QImage image = patternEditor->getPatternAsImage();
+    setNewFrame((frame+1)%image.width());
+}
+
+void MainWindow::on_actionStepBackward_triggered()
+{
+    QImage image = patternEditor->getPatternAsImage();
+    setNewFrame(frame<=01?image.width()-1:frame-1);
 }

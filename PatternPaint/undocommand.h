@@ -46,6 +46,7 @@ private:
     QImage previousImage;
     QImage currentImage;
     PatternItem* patternItem;
+    bool firstRun;
 };
 
 #endif // UNDOCOMMAND_H

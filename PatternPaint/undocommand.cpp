@@ -31,6 +31,7 @@ UndoCommand::UndoCommand(const QImage& img, PatternItem *item, QUndoCommand *par
     : QUndoCommand(parent), previousImage(img), patternItem(item)
 {
     currentImage = previousImage;
+    firstRun = true;
 }
 
 void UndoCommand::undo() {
@@ -40,6 +41,12 @@ void UndoCommand::undo() {
 }
 
 void UndoCommand::redo() {
+    // TODO: Were likely not handling undo/redo correctly if we need this?
+    if(firstRun) {
+        firstRun = false;
+        return;
+    }
+
     patternItem->applyUndoState(currentImage);
     // TODO: Restore edited state?
 }

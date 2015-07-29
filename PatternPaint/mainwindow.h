@@ -98,6 +98,10 @@ private slots:
 
     void on_actionClose_triggered();
 
+    void on_actionStepForward_triggered();
+
+    void on_actionStepBackward_triggered();
+
 private:
     ColorChooser* colorChooser;
 
@@ -137,6 +141,10 @@ private:
 
     Pattern::ColorMode colorMode;
 
+    int frame;      // Current frame we are drawing
+    void setNewFrame(int newFrame);
+
+    void updateBlinky();
 };
 
 #endif // MAINWINDOW_H

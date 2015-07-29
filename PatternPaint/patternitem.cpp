@@ -28,7 +28,6 @@ PatternItem::PatternItem(int ledCount, QImage newImage, QListWidget* parent) :
 
 void PatternItem::pushUndoState() {
     undoStack.push(new UndoCommand(image, this));
-    setModified(true);
 }
 
 void PatternItem::applyUndoState(const QImage& newImage) {
@@ -62,8 +61,8 @@ bool PatternItem::load(const QFileInfo &newFileInfo)
     fileInfo = newFileInfo;
 
     undoStack.clear();
-    setModified(false);
 
+    setModified(false);
     return true;
 }
 
@@ -100,12 +99,12 @@ bool PatternItem::replace(const QFileInfo &newFileInfo)
 
     // Scale the image (TODO: present a dialog for this?)
     image = newImage.scaledToHeight(image.height());
-    setModified(true);
 
     if(!notifier.isNull()) {
         notifier->signalSizeUpdated();
     }
 
+    setModified(true);
     return true;
 }
 
@@ -138,7 +137,7 @@ void PatternItem::setData(int role, const QVariant& value) {
         applyUndoState(qvariant_cast<QImage>(value));
         break;
     case Modified:
-        modified = qvariant_cast<bool>(value);
+        setModified(qvariant_cast<bool>(value));
         break;
     case PatternSize:
         Q_ASSERT(false);    // never set size separated from image!
@@ -171,18 +170,22 @@ void PatternItem::resize(int newPatternLength, int newLedCount, bool scale) {
     if(!notifier.isNull()) {
         notifier->signalSizeUpdated();
     }
+
+    setModified(true);
 }
 
 void PatternItem::flipHorizontal()
 {
     pushUndoState();
     image = image.mirrored(true, false);
+    setModified(true);
 }
 
 void PatternItem::flipVertical()
 {
     pushUndoState();
     image = image.mirrored(false, true);
+    setModified(true);
 }
 
 void PatternItem::applyInstrument(QImage &update)
@@ -190,12 +193,14 @@ void PatternItem::applyInstrument(QImage &update)
     pushUndoState();
     QPainter painter(&image);
     painter.drawImage(0,0,update);
+    setModified(true);
 }
 
 void PatternItem::clear()
 {
     pushUndoState();
     image.fill(COLOR_CANVAS_DEFAULT);
+    setModified(true);
 }
 
 void PatternItem::setModified(bool newModified)  {

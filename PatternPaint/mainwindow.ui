@@ -162,7 +162,7 @@
            <x>0</x>
            <y>0</y>
            <width>500</width>
-           <height>397</height>
+           <height>386</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -205,7 +205,7 @@
      <x>0</x>
      <y>0</y>
      <width>880</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -280,7 +280,7 @@
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="QToolBar" name="tools">
+  <widget class="QToolBar" name="fileToolbar">
    <property name="windowTitle">
     <string>File Commands</string>
    </property>
@@ -300,10 +300,28 @@
    <addaction name="actionLoad_File"/>
    <addaction name="actionSave_File"/>
    <addaction name="actionSave_to_Blinky"/>
-   <addaction name="separator"/>
+  </widget>
+  <widget class="QToolBar" name="playbackToolbar">
+   <property name="windowTitle">
+    <string>Animation controls</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionStepBackward"/>
+   <addaction name="actionStepForward"/>
    <addaction name="actionPlay"/>
   </widget>
-  <widget class="QToolBar" name="instruments">
+  <widget class="QToolBar" name="instrumentToolbar">
    <property name="windowTitle">
     <string>Drawing Tools</string>
    </property>
@@ -471,7 +489,7 @@
    </property>
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/resources/images/play.png</normaloff>:/resources/images/play.png</iconset>
+     <normaloff>:/icons/images/icons/Play-100.png</normaloff>:/icons/images/icons/Play-100.png</iconset>
    </property>
    <property name="text">
     <string>Play</string>
@@ -575,7 +593,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/resources/images/save.png</normaloff>:/resources/images/save.png</iconset>
    </property>
    <property name="text">
@@ -622,6 +640,27 @@
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionStepBackward">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/icons/images/icons/Rewind-100.png</normaloff>:/icons/images/icons/Rewind-100.png</iconset>
+   </property>
+   <property name="text">
+    <string>Step backward</string>
+   </property>
+  </action>
+  <action name="actionStepForward">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/icons/images/icons/Fast Forward-100.png</normaloff>:/icons/images/icons/Fast Forward-100.png</iconset>
+   </property>
+   <property name="text">
+    <string>Step forward</string>
+   </property>
+   <property name="toolTip">
+    <string>Step forward</string>
    </property>
   </action>
  </widget>
