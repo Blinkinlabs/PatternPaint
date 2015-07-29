@@ -574,8 +574,14 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
 void MainWindow::on_actionResize_Pattern_triggered()
 {
     QSettings settings;
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
 
-    int patternLength = settings.value("Options/patternLength", DEFAULT_PATTERN_LENGTH).toUInt();
+    if(patternCollection->currentItem() == NULL) {
+        return;
+    }
+
+    int patternLength = patternItem->getImage().width();
+
     int ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
 
     ResizePattern resizeDialog(this);
@@ -599,17 +605,12 @@ void MainWindow::on_actionResize_Pattern_triggered()
     settings.setValue("Options/patternLength", static_cast<uint>(patternLength));
     settings.setValue("Options/ledCount", static_cast<uint>(ledCount));
 
-    if(patternCollection->currentItem() == NULL) {
-        return;
-    }
-
     qDebug() << "Resizing patterns, length:"
              << patternLength
              << "height:"
              << ledCount;
 
     // Resize the selected pattern
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
     patternItem->resize(patternLength, ledCount, true);
 }
 
@@ -818,6 +819,7 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
     undoGroup->setActiveStack(newPatternItem->getUndoStack());
 
     on_patternNameChanged(newPatternItem->getPatternName());
+    on_patternSizeUpdated();
 }
 
 void MainWindow::on_patternDataUpdated()
@@ -841,6 +843,9 @@ void MainWindow::on_patternSizeUpdated()
     // Resize the selected pattern
     PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
 
-    // Re-load the patterneditor to force a screen update
+    // Re-load the patterneditor so that it can redraw its view
     patternEditor->setPatternItem(patternItem);
+
+    // And kick the scroll area so that it will size itself
+    scrollArea->resize(scrollArea->width()+1, scrollArea->height());
 }
