@@ -88,7 +88,7 @@ private slots:
 
     void on_colorPicked(QColor);
 
-    void on_patternNameChanged(QString name);
+    void on_patternNameUpdated();
 
     void on_actionGRB_triggered();
 

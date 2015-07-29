@@ -12,10 +12,12 @@ public:
 
     void signalDataUpdated() {emit patternDataUpdated();}
     void signalSizeUpdated() {emit patternSizeUpdated();}
+    void signalNameUpdated() {emit patternNameUpdated();}
 
 signals:
     void patternDataUpdated();
     void patternSizeUpdated();
+    void patternNameUpdated();
 
 public slots:
 };

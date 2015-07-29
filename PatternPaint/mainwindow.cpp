@@ -155,6 +155,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
             this, SLOT(on_patternSizeUpdated()));
     connect(&patternUpdateNotifier, SIGNAL(patternDataUpdated()),
             this, SLOT(on_patternDataUpdated()));
+    connect(&patternUpdateNotifier, SIGNAL(patternNameUpdated()),
+            this, SLOT(on_patternNameUpdated()));
 
 
     this->patternCollection->setNotifier(&patternUpdateNotifier);
@@ -690,10 +692,6 @@ void MainWindow::on_colorPicked(QColor color) {
     patternEditor->setToolColor(color);
 }
 
-void MainWindow::on_patternNameChanged(QString name)
-{
-    this->setWindowTitle(name + " - Pattern Paint");
-}
 
 int MainWindow::promptForSave(PatternItem* patternItem) {
     if (patternItem->getModified() == false) {
@@ -818,7 +816,7 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
     patternEditor->setPatternItem(newPatternItem);
     undoGroup->setActiveStack(newPatternItem->getUndoStack());
 
-    on_patternNameChanged(newPatternItem->getPatternName());
+    on_patternNameUpdated();
     on_patternSizeUpdated();
 }
 
@@ -848,4 +846,20 @@ void MainWindow::on_patternSizeUpdated()
 
     // And kick the scroll area so that it will size itself
     scrollArea->resize(scrollArea->width()+1, scrollArea->height());
+}
+
+
+void MainWindow::on_patternNameUpdated()
+{
+    QString name;
+
+    if(patternCollection->currentItem() == NULL) {
+        name = "()";
+    }
+    else {
+        PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
+        name = patternItem->getPatternName();
+    }
+
+    this->setWindowTitle(name + " - Pattern Paint");
 }

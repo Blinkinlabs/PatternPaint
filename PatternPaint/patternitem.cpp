@@ -79,6 +79,10 @@ bool PatternItem::saveAs(const QFileInfo &newFileInfo) {
     // TODO: Notify the main window that the filename was updated!
     //on_patternFilenameChanged(fileinfo);
 
+    if(!notifier.isNull()) {
+        notifier->signalNameUpdated();
+    }
+
     setModified(false);
     return true;
 }
