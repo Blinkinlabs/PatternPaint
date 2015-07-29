@@ -25,7 +25,7 @@ VERSION_MAJOR = 1
 VERSION_MINOR = 9
 VERSION_BUILD = 0
 
-#Target version
+#Target version and application information
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
 
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
@@ -35,6 +35,11 @@ DEFINES += ORGANIZATION_DOMAIN=\\\"blinkinlabs.com\\\"
 
 mac {
     QMAKE_TARGET_BUNDLE_PREFIX = com.blinkinlabs
+}
+
+# Disable updater checks when debugging, since the test app isn't signed and will fail anyway.
+debug {
+    DEFINES += DISABLE_UPDATE_CHECKS
 }
 
 SOURCES += main.cpp\
@@ -109,11 +114,6 @@ RESOURCES += \
 OTHER_FILES += \
     app.rc \
     README.md
-
-
-## TODO: Am i needed?
-#DISTFILES += \
-#    Info.plist
 
 OBJECTIVE_SOURCES += \
     appnap.mm
