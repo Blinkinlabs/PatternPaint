@@ -8,7 +8,6 @@
 #define COLOR_CLEAR             QColor(0,0,0,0)
 #define COLOR_CANVAS_DEFAULT    QColor(0,0,0,0)
 #define COLOR_GRID_LINES        QColor(30,30,30,200)
-#define COLOR_GRID_EDGES        QColor(30,30,30, 60)
 
 #define COLOR_TOOL_DEFAULT      QColor(255,255,255)
 
@@ -17,6 +16,8 @@
 
 #define MIN_UPDATE_INTERVAL     15  // minimum interval between screen updates, in ms
 #define MIN_MOUSE_INTERVAL      5   // minimum interval between mouse inputs, in ms
+
+#define GRID_MIN_Y_SCALE 6      // Minimum scale that the image needs to scale to before the grid is displayed
 
 PatternEditor::PatternEditor(QWidget *parent) :
     QWidget(parent)
@@ -86,42 +87,33 @@ void PatternEditor::updateGridSize() {
     xScale = scale;
     yScale = scale;
 
+    // If the drawing space is large enough, make a grid pattern to superimpose over the image
+    if(yScale >= GRID_MIN_Y_SCALE) {
+        gridPattern = QImage(patternItem->getImage().width()*xScale  +.5 + 1,
+                             patternItem->getImage().height()*yScale +.5 + 1,
+                             QImage::Format_ARGB32_Premultiplied);
+        gridPattern.fill(COLOR_CLEAR);
 
-    // And make a grid pattern to superimpose over the image
-    gridPattern = QImage(patternItem->getImage().width()*xScale  +.5 + 1,
-                         patternItem->getImage().height()*yScale +.5 + 1,
-                         QImage::Format_ARGB32_Premultiplied);
-    gridPattern.fill(COLOR_CLEAR);
 
-    QPainter painter(&gridPattern);
-    painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
-    painter.setRenderHint(QPainter::Antialiasing, false);
+        QPainter painter(&gridPattern);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
+        painter.setRenderHint(QPainter::Antialiasing, false);
 
-    // Draw vertical lines
-    painter.setPen(COLOR_GRID_LINES);
-    for(int x = 0; x <= patternItem->getImage().width(); x++) {
-        painter.drawLine(x*xScale+.5,
-                         0,
-                         x*xScale+.5,
-                         gridPattern.height());
-    }
+        // Draw vertical lines
+        painter.setPen(COLOR_GRID_LINES);
+        for(int x = 0; x <= patternItem->getImage().width(); x++) {
+            painter.drawLine(x*xScale+.5,
+                             0,
+                             x*xScale+.5,
+                             gridPattern.height());
+        }
 
-    // Draw horizontal lines
-    for(int y = 0; y <= patternItem->getImage().height(); y++) {
-        painter.drawLine(0,
-                         y*yScale+.5,
-                         gridPattern.width(),
-                         y*yScale+.5);
-    }
-
-    // Draw corners
-    painter.setPen(COLOR_GRID_EDGES);
-    for(int x = 0; x <= patternItem->getImage().width(); x++) {
+        // Draw horizontal lines
         for(int y = 0; y <= patternItem->getImage().height(); y++) {
-            painter.drawPoint(QPoint(x*xScale     +.5 +1,    y*yScale     +.5 +1));
-            painter.drawPoint(QPoint((x+1)*xScale +.5 -1,    y*yScale     +.5 +1));
-            painter.drawPoint(QPoint(x*xScale     +.5 +1,    (y+1)*yScale +.5 -1));
-            painter.drawPoint(QPoint((x+1)*xScale +.5 -1,    (y+1)*yScale +.5 -1));
+            painter.drawLine(0,
+                             y*yScale+.5,
+                             gridPattern.width(),
+                             y*yScale+.5);
         }
     }
 }
@@ -257,7 +249,9 @@ void PatternEditor::paintEvent(QPaintEvent*)
         painter.drawImage(QRect(0,0,patternItem->getImage().width()*xScale+.5,patternItem->getImage().height()*yScale), (instrument->getPreview()));
     }
 
-    painter.drawImage(0,0,gridPattern);
+    if(yScale >= GRID_MIN_Y_SCALE) {
+        painter.drawImage(0,0,gridPattern);
+    }
 
     // Draw the playback indicator
     // Note that we need to compute the correct width based on the rounding error of
