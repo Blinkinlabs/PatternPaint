@@ -169,8 +169,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 MainWindow::~MainWindow(){}
 
 void MainWindow::drawTimer_timeout() {
-    QImage image = patternEditor->getPatternAsImage();
-    setNewFrame((frame+1)%image.width());
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
+    setNewFrame((frame+1)%patternItem->getImage().width());
 }
 
 
@@ -763,9 +763,6 @@ void MainWindow::updateBlinky()
         return;
     }
 
-    // Note: We should pull from patternEditor if we want to get realtime tool drawing, but for some reason it's behind?
-    //QImage image = patternEditor->getPatternAsImage();
-
     PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
     QImage image = patternItem->getImage();
 
@@ -895,12 +892,12 @@ void MainWindow::on_patternNameUpdated()
 
 void MainWindow::on_actionStepForward_triggered()
 {
-    QImage image = patternEditor->getPatternAsImage();
-    setNewFrame((frame+1)%image.width());
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
+    setNewFrame((frame+1)%patternItem->getImage().width());
 }
 
 void MainWindow::on_actionStepBackward_triggered()
 {
-    QImage image = patternEditor->getPatternAsImage();
-    setNewFrame(frame<=01?image.width()-1:frame-1);
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
+    setNewFrame(frame<=0?patternItem->getImage().width()-1:frame-1);
 }
