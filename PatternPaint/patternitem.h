@@ -77,17 +77,8 @@ public:
     /// @param scale If true, scale the image to fit the new size. Otherwise crop/expand the image.
     void resize(int newPatternLength, int newLedCount, bool scale);
 
-    /// Flip the pattern horizontally
-    void flipHorizontal();
-
-    /// Flip the pattern vertically
-    void flipVertical();
-
-    /// Clear the image
-    void clear();
-
     /// Apply changes to the pattern
-    void applyInstrument(QImage& update);
+    void applyInstrument(const QImage& update);
 
     /// Test if the pattern has unsaved changes
     /// @return true if the pattern has unsaved changes

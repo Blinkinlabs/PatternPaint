@@ -58,7 +58,9 @@ SOURCES += main.cpp\
     patternitemdelegate.cpp \
     patternitem.cpp \
     patternupdatenotifier.cpp \
-    patterncollection.cpp
+    patterncollection.cpp \
+    matrixdisplay.cpp \
+    timelinedisplay.cpp
 
 HEADERS  += mainwindow.h \
     colorpicker.h \
@@ -75,7 +77,10 @@ HEADERS  += mainwindow.h \
     patternitemdelegate.h \
     patternitem.h \
     patternupdatenotifier.h \
-    patterncollection.h
+    patterncollection.h \
+    displaymodel.h \
+    matrixdisplay.h \
+    timelinedisplay.h
 
 mac {
 HEADERS  += \

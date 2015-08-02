@@ -174,21 +174,7 @@ void PatternItem::resize(int newPatternLength, int newLedCount, bool scale) {
     setModified(true);
 }
 
-void PatternItem::flipHorizontal()
-{
-    pushUndoState();
-    image = image.mirrored(true, false);
-    setModified(true);
-}
-
-void PatternItem::flipVertical()
-{
-    pushUndoState();
-    image = image.mirrored(false, true);
-    setModified(true);
-}
-
-void PatternItem::applyInstrument(QImage &update)
+void PatternItem::applyInstrument(const QImage &update)
 {
     pushUndoState();
     QPainter painter(&image);
@@ -196,12 +182,6 @@ void PatternItem::applyInstrument(QImage &update)
     setModified(true);
 }
 
-void PatternItem::clear()
-{
-    pushUndoState();
-    image.fill(COLOR_CANVAS_DEFAULT);
-    setModified(true);
-}
 
 void PatternItem::setModified(bool newModified)  {
     modified = newModified;

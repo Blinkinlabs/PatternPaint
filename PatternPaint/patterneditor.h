@@ -4,16 +4,20 @@
 #include <QWidget>
 #include <QPointer>
 #include "patternitem.h"
+#include "displaymodel.h"
 
 class QUndoStack;
 class UndoCommand;
 class AbstractInstrument;
+
 
 class PatternEditor : public QWidget
 {
     Q_OBJECT
 public:
     explicit PatternEditor(QWidget *parent = 0);
+
+    void setDisplayModel(DisplayModel* newDisplayModel);
 
     /// Set the patternItem to edit
     /// @param newPatternItem Pattern
@@ -53,6 +57,7 @@ protected:
     void paintEvent(QPaintEvent *event);
 
 private:
+    DisplayModel* deviceModel;    ///< LED model we are interacting with
     PatternItem* patternItem;    ///< Pattern item we are interacting with
     QPointer<AbstractInstrument> instrument;
 
@@ -60,6 +65,7 @@ private:
 
     float xScale;          ///< Number of pixels in the grid pattern per pattern pixel.
     float yScale;          ///< Number of pixels in the grid pattern per pattern pixel.
+
 
     QColor toolColor;      ///< Color of the current drawing tool (TODO: This should be a pointer to a tool)
     int toolSize;          ///< Size of the current drawing tool (TODO: This should be a pointer to a tool)

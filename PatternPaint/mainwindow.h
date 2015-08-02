@@ -12,6 +12,10 @@
 
 #include "ui_mainwindow.h"
 
+#include "displaymodel.h"
+#include "matrixdisplay.h"
+#include "timelinedisplay.h"
+
 class QUndoGroup;
 class ColorChooser;
 class QToolButton;
@@ -102,6 +106,10 @@ private slots:
 
     void on_actionStepBackward_triggered();
 
+    void on_actionTimeline_triggered();
+
+    void on_actionMatrix_triggered();
+
 private:
     ColorChooser* colorChooser;
 
@@ -140,6 +148,8 @@ private:
     void setColorMode(Pattern::ColorMode newColorOrder);
 
     Pattern::ColorMode colorMode;
+
+    DisplayModel* displayModel;
 
     int frame;      // Current frame we are drawing
     void setNewFrame(int newFrame);

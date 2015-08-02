@@ -255,11 +255,20 @@
      <addaction name="actionRGB"/>
      <addaction name="actionGRB"/>
     </widget>
+    <widget class="QMenu" name="menuMode">
+     <property name="title">
+      <string>Mode</string>
+     </property>
+     <addaction name="actionTimeline"/>
+     <addaction name="actionMatrix"/>
+    </widget>
     <addaction name="actionSave_to_Blinky"/>
     <addaction name="separator"/>
     <addaction name="actionAutomatically_connect"/>
     <addaction name="separator"/>
     <addaction name="menuColor_Order"/>
+    <addaction name="separator"/>
+    <addaction name="menuMode"/>
     <addaction name="separator"/>
     <addaction name="actionLoad_rainbow_sketch"/>
     <addaction name="actionAddress_programmer"/>
@@ -661,6 +670,16 @@
    </property>
    <property name="toolTip">
     <string>Step forward</string>
+   </property>
+  </action>
+  <action name="actionTimeline">
+   <property name="text">
+    <string>LED Strip</string>
+   </property>
+  </action>
+  <action name="actionMatrix">
+   <property name="text">
+    <string>8x8 Matrix</string>
    </property>
   </action>
  </widget>

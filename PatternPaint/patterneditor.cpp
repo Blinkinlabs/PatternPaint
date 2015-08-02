@@ -1,5 +1,6 @@
 #include "patterneditor.h"
 #include "abstractinstrument.h"
+#include "timelinedisplay.h"
 
 #include <cmath>
 #include <QtWidgets>
@@ -19,10 +20,19 @@
 
 #define GRID_MIN_Y_SCALE 6      // Minimum scale that the image needs to scale to before the grid is displayed
 
+
 PatternEditor::PatternEditor(QWidget *parent) :
     QWidget(parent)
 {
     this->setAcceptDrops(true);
+    deviceModel = new TimelineDisplay();
+}
+
+
+void PatternEditor::setDisplayModel(DisplayModel *newDisplayModel)
+{
+    deviceModel = newDisplayModel;
+    setPatternItem(patternItem);
 }
 
 void PatternEditor::dragEnterEvent(QDragEnterEvent *event)
@@ -42,6 +52,8 @@ void PatternEditor::dropEvent(QDropEvent *event)
         return;
     }
 
+    // TODO: Pass this down for someone else to handle?
+
     QList<QUrl> droppedUrls = event->mimeData()->urls();
     int droppedUrlCnt = droppedUrls.size();
     for(int i = 0; i < droppedUrlCnt; i++) {
@@ -59,13 +71,13 @@ void PatternEditor::dropEvent(QDropEvent *event)
 }
 
 const QImage &PatternEditor::getPatternAsImage() const {
-    if(patternItem ==NULL) {
+    if(!deviceModel->hasPatternItem()) {
         // TODO: Refactor so we don't have to do this?
         static QImage nullimage(1,1,QImage::Format_RGB32);
         return nullimage;
     }
 
-    return patternItem->getImage();
+    return deviceModel->getFrameData();
 }
 
 void PatternEditor::resizeEvent(QResizeEvent * )
@@ -74,13 +86,15 @@ void PatternEditor::resizeEvent(QResizeEvent * )
 }
 
 void PatternEditor::updateGridSize() {
-    if(patternItem == NULL) {
+    if(!deviceModel->hasPatternItem()) {
         return;
     }
 
     // Base the widget size on the window height
     // cast float to int to save rounded scale
-    float scale = static_cast<int>(float(size().height() - 1)/patternItem->getImage().height()*10);
+    QSize frameSize = deviceModel->getFrameData().size();
+
+    float scale = static_cast<int>(float(size().height() - 1)/frameSize.height()*10);
     scale /= 10;
 
     // Use a square aspect to display the grid
@@ -89,8 +103,8 @@ void PatternEditor::updateGridSize() {
 
     // If the drawing space is large enough, make a grid pattern to superimpose over the image
     if(yScale >= GRID_MIN_Y_SCALE) {
-        gridPattern = QImage(patternItem->getImage().width()*xScale  +.5 + 1,
-                             patternItem->getImage().height()*yScale +.5 + 1,
+        gridPattern = QImage(frameSize.width()*xScale  +.5 + 1,
+                             frameSize.height()*yScale +.5 + 1,
                              QImage::Format_ARGB32_Premultiplied);
         gridPattern.fill(COLOR_CLEAR);
 
@@ -101,7 +115,7 @@ void PatternEditor::updateGridSize() {
 
         // Draw vertical lines
         painter.setPen(COLOR_GRID_LINES);
-        for(int x = 0; x <= patternItem->getImage().width(); x++) {
+        for(int x = 0; x <= frameSize.width(); x++) {
             painter.drawLine(x*xScale+.5,
                              0,
                              x*xScale+.5,
@@ -109,7 +123,7 @@ void PatternEditor::updateGridSize() {
         }
 
         // Draw horizontal lines
-        for(int y = 0; y <= patternItem->getImage().height(); y++) {
+        for(int y = 0; y <= frameSize.height(); y++) {
             painter.drawLine(0,
                              y*yScale+.5,
                              gridPattern.width(),
@@ -120,7 +134,7 @@ void PatternEditor::updateGridSize() {
 
 
 void PatternEditor::mousePressEvent(QMouseEvent *event) {
-    if (patternItem == NULL || instrument.isNull()) {
+    if (!deviceModel->hasPatternItem() || instrument.isNull()) {
         return;
     }
 
@@ -130,7 +144,7 @@ void PatternEditor::mousePressEvent(QMouseEvent *event) {
 }
 
 void PatternEditor::mouseMoveEvent(QMouseEvent *event){
-    if (patternItem == NULL || instrument.isNull()) {
+    if (!deviceModel->hasPatternItem() || instrument.isNull()) {
         return;
     }
 
@@ -169,7 +183,7 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
 void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
     setCursor(Qt::ArrowCursor);
 
-    if (patternItem == NULL || instrument.isNull()) {
+    if (!deviceModel->hasPatternItem() || instrument.isNull()) {
         return;
     }
 
@@ -179,14 +193,14 @@ void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
 
 void PatternEditor::setPatternItem(PatternItem* newPatternItem) {
     patternItem = newPatternItem;
+    deviceModel->setSource(newPatternItem);
 
-    if(patternItem == NULL) {
+    if(!deviceModel->hasPatternItem()) {
         // TODO: Reset size to some default?
         return;
     }
 
-    // Store the width and height, so that letterboxscrollarea can resize this widget properly
-    this->setBaseSize(patternItem->getImage().width(), patternItem->getImage().height());
+    this->setBaseSize(deviceModel->getFrameData().size());
 
     // Turn on mouse tracking so we can draw a preview
     setMouseTracking(true);
@@ -206,7 +220,7 @@ void PatternEditor::setToolSize(int size) {
 }
 
 void PatternEditor::setPlaybackRow(int row) {
-    playbackRow = row;
+    deviceModel->setFrame(row);
     lazyUpdate();
 }
 
@@ -234,46 +248,48 @@ void PatternEditor::paintEvent(QPaintEvent*)
     painter.setRenderHint(QPainter::Antialiasing, false);
 
     // If we don't have a pattern item, show an empty view
-    if(patternItem == NULL) {
+    if(!deviceModel->hasPatternItem()) {
         painter.fillRect(0,0,this->width(),this->height(), QColor(0,0,0));
         return;
     }
 
+    QImage frameData = deviceModel->getFrameData();
+
     // Draw the image and tool preview
     painter.drawImage(QRect(0,0,
-                            patternItem->getImage().width()*xScale+.5,
-                            patternItem->getImage().height()*yScale),
-                      patternItem->getImage());
+                            frameData.width()*xScale+.5,
+                            frameData.height()*yScale),
+                            frameData);
 
     if (!instrument.isNull() && instrument->showPreview()) {
-        painter.drawImage(QRect(0,0,patternItem->getImage().width()*xScale+.5,patternItem->getImage().height()*yScale), (instrument->getPreview()));
+        painter.drawImage(QRect(0,0,frameData.width()*xScale+.5,frameData.height()*yScale), (instrument->getPreview()));
     }
 
     if(yScale >= GRID_MIN_Y_SCALE) {
         painter.drawImage(0,0,gridPattern);
     }
 
-    // Draw the playback indicator
-    // Note that we need to compute the correct width based on the rounding error of
-    // the current cell, otherwise it won't line up correctly with the actual image.
-    painter.setPen(COLOR_PLAYBACK_EDGE);
-    painter.drawRect(playbackRow*xScale +.5,
-                     0,
-                     int((playbackRow+1)*xScale +.5) - int(playbackRow*xScale +.5),
-                     patternItem->getImage().height()*yScale);
-    painter.fillRect(playbackRow*xScale +.5,
-                     0,
-                     int((playbackRow+1)*xScale +.5) - int(playbackRow*xScale +.5),
-                     patternItem->getImage().height()*yScale,
-                     COLOR_PLAYBACK_TOP);
+//    // Draw the playback indicator
+//    // Note that we need to compute the correct width based on the rounding error of
+//    // the current cell, otherwise it won't line up correctly with the actual image.
+//    painter.setPen(COLOR_PLAYBACK_EDGE);
+//    painter.drawRect(playbackRow*xScale +.5,
+//                     0,
+//                     int((playbackRow+1)*xScale +.5) - int(playbackRow*xScale +.5),
+//                     viewPort.height()*yScale);
+//    painter.fillRect(playbackRow*xScale +.5,
+//                     0,
+//                     int((playbackRow+1)*xScale +.5) - int(playbackRow*xScale +.5),
+//                     viewPort.height()*yScale,
+//                     COLOR_PLAYBACK_TOP);
 
 }
 
 void PatternEditor::applyInstrument(QImage& update)
 {
-    if(patternItem == NULL) {
+    if(!deviceModel->hasPatternItem()) {
         return;
     }
 
-    patternItem->applyInstrument(update);
+    deviceModel->applyInstrument(update);
 }

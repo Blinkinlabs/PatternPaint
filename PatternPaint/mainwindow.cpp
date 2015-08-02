@@ -28,11 +28,13 @@
 
 #define PATTERN_SPEED_MINIMUM_VALUE 1
 #define PATTERN_SPEED_MAXIMUM_VALUE 100
-#define PATTERN_SPEED_DEFAULT_VALUE 25
+#define PATTERN_SPEED_DEFAULT_VALUE 20
 
 #define DRAWING_SIZE_MINIMUM_VALUE 1
 #define DRAWING_SIZE_MAXIMUM_VALUE 20
 #define DRAWING_SIZE_DEFAULT_VALUE 1
+
+#define COLOR_CANVAS_DEFAULT    QColor(0,0,0,255)
 
 #define DEFAULT_LED_COUNT 60
 #define DEFAULT_PATTERN_LENGTH 100
@@ -149,7 +151,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     QSettings settings;
     setColorMode(static_cast<Pattern::ColorMode>(settings.value("Options/ColorOrder", Pattern::RGB).toUInt()));
 
-    this->patternCollection->setItemDelegate(new PatternItemDelegate());
+    patternCollection->setItemDelegate(new PatternItemDelegate());
 
     connect(&patternUpdateNotifier, SIGNAL(patternSizeUpdated()),
             this, SLOT(on_patternSizeUpdated()));
@@ -159,8 +161,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
             this, SLOT(on_patternNameUpdated()));
 
 
-    this->patternCollection->setNotifier(&patternUpdateNotifier);
-    this->patternCollection->setUndoGroup(undoGroup);
+    patternCollection->setNotifier(&patternUpdateNotifier);
+    patternCollection->setUndoGroup(undoGroup);
+
+    on_actionTimeline_triggered();
 
     // Create a pattern.
     on_actionNew_triggered();
@@ -169,7 +173,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 MainWindow::~MainWindow(){}
 
 void MainWindow::drawTimer_timeout() {
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
     setNewFrame((frame+1)%patternItem->getImage().width());
 }
 
@@ -254,8 +258,8 @@ void MainWindow::on_actionLoad_File_triggered()
         return;
     }
 
-    this->patternCollection->addItem(patternItem);
-    this->patternCollection->setCurrentItem(patternItem);
+    patternCollection->addItem(patternItem);
+    patternCollection->setCurrentItem(patternItem);
 }
 
 void MainWindow::on_actionSave_File_as_triggered() {
@@ -310,6 +314,10 @@ void MainWindow::on_actionExit_triggered() {
 }
 
 void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
+    if(patternCollection->currentItem() == NULL) {
+        return;
+    }
+
     QSettings settings;
     QString lastDirectory = settings.value("File/ExportArduinoDirectory").toString();
 
@@ -328,8 +336,8 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
     QFileInfo fileInfo(fileName);
     settings.setValue("File/ExportArduinoDirectory", fileInfo.absolutePath());
 
-    // Convert the current pattern into a Pattern
-    QImage image =  patternEditor->getPatternAsImage();
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
+    QImage image =  patternItem->getImage();
 
     // Note: Converting frameRate to frame delay here.
     Pattern pattern(image, drawTimer->interval(),
@@ -431,29 +439,35 @@ void MainWindow::on_actionTroubleshooting_tips_triggered()
 
 void MainWindow::on_actionFlip_Horizontal_triggered()
 {
-    if(patternCollection->currentItem() == NULL) {
+    if (!displayModel->hasPatternItem()) {
         return;
     }
 
-    dynamic_cast<PatternItem*>(this->patternCollection->currentItem())->flipHorizontal();
+    QImage frameData = displayModel->getFrameData();
+    frameData = frameData.mirrored(true, false);
+    displayModel->applyInstrument(frameData);
 }
 
 void MainWindow::on_actionFlip_Vertical_triggered()
 {
-    if(patternCollection->currentItem() == NULL) {
+    if (!displayModel->hasPatternItem()) {
         return;
     }
 
-    dynamic_cast<PatternItem*>(this->patternCollection->currentItem())->flipVertical();
+    QImage frameData = displayModel->getFrameData();
+    frameData = frameData.mirrored(false, true);
+    displayModel->applyInstrument(frameData);
 }
 
 void MainWindow::on_actionClear_Pattern_triggered()
 {
-    if(patternCollection->currentItem() == NULL) {
+    if (!displayModel->hasPatternItem()) {
         return;
     }
 
-    dynamic_cast<PatternItem*>(this->patternCollection->currentItem())->clear();
+    QImage frameData = displayModel->getFrameData();
+    frameData.fill(COLOR_CANVAS_DEFAULT);
+    displayModel->applyInstrument(frameData);
 }
 
 void MainWindow::on_actionLoad_rainbow_sketch_triggered()
@@ -495,9 +509,9 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
 
     std::vector<Pattern> patterns;
 
-    for(int i = 0; i < this->patternCollection->count(); i++) {
+    for(int i = 0; i < patternCollection->count(); i++) {
         // Convert the current pattern into a Pattern
-        PatternItem* p = dynamic_cast<PatternItem*>(this->patternCollection->item(i));
+        PatternItem* p = dynamic_cast<PatternItem*>(patternCollection->item(i));
 
         // Note: Converting frameRate to frame delay here.
         // TODO: Attempt different compressions till one works.
@@ -535,7 +549,7 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
 void MainWindow::on_actionResize_Pattern_triggered()
 {
     QSettings settings;
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
 
     if(patternCollection->currentItem() == NULL) {
         return;
@@ -606,9 +620,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     // TODO: Combine all of these into one big 'save' message
 
-    for(int i = 0; i < this->patternCollection->count(); i++) {
+    for(int i = 0; i < patternCollection->count(); i++) {
         // Convert the current pattern into a Pattern
-        PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->item(i));
+        PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->item(i));
 
         if(!promptForSave(patternItem)) {
             event->ignore();
@@ -726,7 +740,12 @@ void MainWindow::setColorMode(Pattern::ColorMode newColorOrder)
 
 void MainWindow::setNewFrame(int newFrame)
 {
-    QImage image = patternEditor->getPatternAsImage();
+    if(patternCollection->currentItem() == NULL) {
+        return;
+    }
+
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
+    QImage image =  patternItem->getImage();
 
     if(newFrame >= image.width()) {
         newFrame = image.width() - 1;
@@ -754,7 +773,7 @@ void MainWindow::updateBlinky()
 
     lastTime = newTime;
 
-    if(this->patternCollection->currentItem() == NULL) {
+    if(patternCollection->currentItem() == NULL) {
         return;
     }
 
@@ -806,13 +825,13 @@ void MainWindow::on_actionNew_triggered()
 
     PatternItem* patternItem = new PatternItem(patternLength, ledCount);
 
-    this->patternCollection->addItem(patternItem);
-    this->patternCollection->setCurrentItem(patternItem);
+    patternCollection->addItem(patternItem);
+    patternCollection->setCurrentItem(patternItem);
 }
 
 void MainWindow::on_actionClose_triggered()
 {
-    if(this->patternCollection->currentItem() == NULL) {
+    if(patternCollection->currentItem() == NULL) {
         return;
     }
 
@@ -822,7 +841,7 @@ void MainWindow::on_actionClose_triggered()
     }
 
     // TODO: remove the undo stack from the undo group?
-    this->patternCollection->takeItem(this->patternCollection->currentRow());
+    patternCollection->takeItem(patternCollection->currentRow());
 }
 
 void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previous) {
@@ -851,8 +870,10 @@ void MainWindow::on_patternDataUpdated()
         return;
     }
 
+    patternEditor->update();
+
     // Redraw the data-dependent views
-    this->patternCollection->doItemsLayout();
+    patternCollection->doItemsLayout();
 
     // Update the LED output
     updateBlinky();
@@ -865,7 +886,7 @@ void MainWindow::on_patternSizeUpdated()
     }
 
     // Resize the selected pattern
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
 
     // Re-load the patterneditor so that it can redraw its view
     patternEditor->setPatternItem(patternItem);
@@ -883,7 +904,7 @@ void MainWindow::on_patternNameUpdated()
         name = "()";
     }
     else {
-        PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
+        PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
         name = patternItem->getPatternName();
     }
 
@@ -892,12 +913,32 @@ void MainWindow::on_patternNameUpdated()
 
 void MainWindow::on_actionStepForward_triggered()
 {
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
     setNewFrame((frame+1)%patternItem->getImage().width());
 }
 
 void MainWindow::on_actionStepBackward_triggered()
 {
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(this->patternCollection->currentItem());
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
     setNewFrame(frame<=0?patternItem->getImage().width()-1:frame-1);
+}
+
+void MainWindow::on_actionTimeline_triggered()
+{
+    // TODO: Delete old object!
+    displayModel = new TimelineDisplay();
+    displayModel->setSource(dynamic_cast<PatternItem*>(patternCollection->currentItem()));
+    patternEditor->setDisplayModel(displayModel);
+
+    on_patternSizeUpdated();
+}
+
+void MainWindow::on_actionMatrix_triggered()
+{
+    // TODO: Delete old object!
+    displayModel = new MatrixDisplay(8,8);
+    displayModel->setSource(dynamic_cast<PatternItem*>(patternCollection->currentItem()));
+    patternEditor->setDisplayModel(displayModel);
+
+    on_patternSizeUpdated();
 }
