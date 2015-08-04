@@ -646,7 +646,7 @@
      <normaloff>:/icons/images/icons/Minus-100.png</normaloff>:/icons/images/icons/Minus-100.png</iconset>
    </property>
    <property name="text">
-    <string>Close</string>
+    <string>Close Pattern</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
@@ -658,7 +658,7 @@
      <normaloff>:/icons/images/icons/Create New-100.png</normaloff>:/icons/images/icons/Create New-100.png</iconset>
    </property>
    <property name="text">
-    <string>New</string>
+    <string>New Pattern</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>

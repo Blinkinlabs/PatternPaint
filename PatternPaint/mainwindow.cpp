@@ -111,7 +111,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     pFrame->setToolTip(tr("Current frame"));
     playbackToolbar->insertWidget(actionStepForward, pFrame);
     connect(pFrame, SIGNAL(textEdited(QString)), this, SLOT(frameIndex_valueChanged(QString)));
-    frameIndex_valueChanged("0");
+    frameIndex_valueChanged("1");
 
     mode = Disconnected;
 
