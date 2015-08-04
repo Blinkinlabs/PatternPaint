@@ -13,7 +13,7 @@ HEADERS += $$PWD/avrprogrammer.h \
     $$PWD/lightbuddyuploader.h \
     $$PWD/patternuploader.h \
     $$PWD/PatternPlayer_Sketch.h \
-    $$PWD/ColorSwirl_Sketch.h
+    $$PWD/ProductionSketch.h
 
 
 SOURCES +=  $$PWD/avrprogrammer.cpp \

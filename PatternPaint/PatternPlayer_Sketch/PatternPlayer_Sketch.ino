@@ -21,8 +21,7 @@
 
 
 // LED data array
-#define MAX_LEDS 255          // Maximum number of LEDs supported
-struct CRGB leds[MAX_LEDS];   // Space to hold the pattern
+struct CRGB leds[LED_COUNT];   // Space to hold the pattern
 uint8_t ledCount;             // Actual number of LEDs present
 
 // Pattern information

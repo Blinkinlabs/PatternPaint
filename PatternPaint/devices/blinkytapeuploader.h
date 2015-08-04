@@ -10,12 +10,18 @@
 #include "patternuploader.h"
 
 struct FlashSection {
+    /// Create a new flash section
+    /// @param address Address in the flash memory where the data should be stored
+    /// @param data Data to store
     FlashSection(int address,
                  QByteArray data) :
         address(address),
         data(data) {}
 
+    /// Address to store the data
     int address;
+
+    /// Data to store
     QByteArray data;
 };
 

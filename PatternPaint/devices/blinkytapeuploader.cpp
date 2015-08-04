@@ -1,7 +1,7 @@
 #include "blinkytapeuploader.h"
 #include "avruploaddata.h"
 
-#include "ColorSwirl_Sketch.h"
+#include "ProductionSketch.h"
 
 #include <QDebug>
 
@@ -111,7 +111,7 @@ bool BlinkyTapeUploader::startUpload(BlinkyController& tape, std::vector<Pattern
 
 
 bool BlinkyTapeUploader::upgradeFirmware(BlinkyController& tape) {
-    QByteArray sketch = QByteArray(reinterpret_cast<const char*>(COLORSWIRL_DATA),COLORSWIRL_LENGTH);
+    QByteArray sketch = QByteArray(reinterpret_cast<const char*>(PRODUCTION_DATA),PRODUCTION_LENGTH);
 
     char buff[BUFF_LENGTH];
     snprintf(buff, BUFF_LENGTH, "Sketch size: %iB",
@@ -132,7 +132,7 @@ bool BlinkyTapeUploader::upgradeFirmware(BlinkyController& tape) {
     }
 
     // Put the sketch, pattern, and metadata into the programming queue.
-    flashData.push_back(FlashSection(0, sketch));
+    flashData.push_back(FlashSection(PRODUCTION_ADDRESS, sketch));
 
     return startUpload(tape);
 }
