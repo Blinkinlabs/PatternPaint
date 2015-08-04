@@ -309,6 +309,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionNew"/>
+   <addaction name="actionClose"/>
    <addaction name="actionLoad_File"/>
    <addaction name="actionSave_File"/>
    <addaction name="actionSave_to_Blinky"/>
@@ -332,6 +333,8 @@
    <addaction name="actionStepBackward"/>
    <addaction name="actionStepForward"/>
    <addaction name="actionPlay"/>
+   <addaction name="actionAddFrame"/>
+   <addaction name="actionDeleteFrame"/>
   </widget>
   <widget class="QToolBar" name="instrumentToolbar">
    <property name="windowTitle">
@@ -638,8 +641,15 @@
    </property>
   </action>
   <action name="actionClose">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/icons/images/icons/Minus-100.png</normaloff>:/icons/images/icons/Minus-100.png</iconset>
+   </property>
    <property name="text">
     <string>Close</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionNew">
@@ -686,13 +696,27 @@
    </property>
   </action>
   <action name="actionAddFrame">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/icons/images/icons/Add Image-100.png</normaloff>:/icons/images/icons/Add Image-100.png</iconset>
+   </property>
    <property name="text">
     <string>Add frame</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionDeleteFrame">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/icons/images/icons/Remove Image-100.png</normaloff>:/icons/images/icons/Remove Image-100.png</iconset>
+   </property>
    <property name="text">
     <string>Delete frame</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
    </property>
   </action>
  </widget>

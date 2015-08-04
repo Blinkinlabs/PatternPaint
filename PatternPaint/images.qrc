@@ -34,5 +34,8 @@
         <file>images/icons/Deadly Spray-100.png</file>
         <file>images/icons/Rewind-100.png</file>
         <file>images/icons/Fast Forward-100.png</file>
+        <file>images/icons/Add Image-100.png</file>
+        <file>images/icons/Remove Image-100.png</file>
+        <file>images/icons/Minus-100.png</file>
     </qresource>
 </RCC>

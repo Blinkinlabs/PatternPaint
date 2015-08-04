@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>601</width>
-    <height>423</height>
+    <width>600</width>
+    <height>435</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -15,6 +15,18 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>600</width>
+    <height>435</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>600</width>
+    <height>435</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>About PatternPaint</string>
@@ -37,9 +49,9 @@
       <colorrole role="WindowText">
        <brush brushstyle="SolidPattern">
         <color alpha="255">
-         <red>146</red>
-         <green>146</green>
-         <blue>146</blue>
+         <red>176</red>
+         <green>176</green>
+         <blue>176</blue>
         </color>
        </brush>
       </colorrole>
@@ -48,9 +60,9 @@
       <colorrole role="WindowText">
        <brush brushstyle="SolidPattern">
         <color alpha="255">
-         <red>146</red>
-         <green>146</green>
-         <blue>146</blue>
+         <red>176</red>
+         <green>176</green>
+         <blue>176</blue>
         </color>
        </brush>
       </colorrole>
@@ -99,9 +111,9 @@
       <colorrole role="WindowText">
        <brush brushstyle="SolidPattern">
         <color alpha="255">
-         <red>217</red>
-         <green>217</green>
-         <blue>217</blue>
+         <red>169</red>
+         <green>169</green>
+         <blue>169</blue>
         </color>
        </brush>
       </colorrole>
@@ -110,9 +122,9 @@
       <colorrole role="WindowText">
        <brush brushstyle="SolidPattern">
         <color alpha="255">
-         <red>217</red>
-         <green>217</green>
-         <blue>217</blue>
+         <red>169</red>
+         <green>169</green>
+         <blue>169</blue>
         </color>
        </brush>
       </colorrole>

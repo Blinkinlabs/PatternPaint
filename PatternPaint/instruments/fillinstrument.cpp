@@ -82,7 +82,7 @@ QList<QPoint> neighbors(const QPoint& pt, const QImage& img) {
 }
 
 void FillInstrument::fill(const QPoint& pt, QRgb newColor, QRgb oldColor, QImage& pattern) {
-    if(pt.x() >= pattern.height() || pt.y() >= pattern.width()) {
+    if(pt.x() >= pattern.width() || pt.y() >= pattern.height()) {
         return;
     }
 
