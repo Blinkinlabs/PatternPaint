@@ -29,6 +29,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void setDisplayMode(DisplayModel::Mode newDisplayMode);
 public slots:
     void setPatternItem(QListWidgetItem *, QListWidgetItem *);
 
@@ -55,6 +56,8 @@ private slots:
     void on_actionSystem_Information_triggered();
 
     void patternSpeed_valueChanged(int value);
+
+    void frameIndex_valueChanged(QString value);
 
     void on_actionPlay_triggered();
 
@@ -130,6 +133,8 @@ private:
     PatternUpdateNotifier patternUpdateNotifier;
 
     QSpinBox* pSpeed;
+
+    QLineEdit* pFrame;
 
     enum Modes { Disconnected, Connected, Uploading };
     Modes mode;

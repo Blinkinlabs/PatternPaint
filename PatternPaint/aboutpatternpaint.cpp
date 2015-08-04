@@ -10,7 +10,7 @@ AboutPatternPaint::AboutPatternPaint(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->versionLabel->setText(VERSION_STRING);
+    ui->versionLabel->setText(QString("Version %1").arg(VERSION_STRING));
 
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 }

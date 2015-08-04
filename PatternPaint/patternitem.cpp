@@ -182,6 +182,75 @@ void PatternItem::applyInstrument(const QImage &update)
     setModified(true);
 }
 
+void PatternItem::deleteFrame(int newFrame) {
+    if(image.width() < 2) {
+        return;
+    }
+
+    if(newFrame > image.width() || newFrame < 0) {
+        return;
+    }
+
+    QImage newImage(image.width()-1,
+                    image.height(),
+                    QImage::Format_ARGB32_Premultiplied);
+
+    QPainter painter(&newImage);
+
+    if(newFrame == 0) {
+        // Crop the front from the original image
+        painter.drawImage(0,0,image,1,0,-1,-1);
+    }
+    else if(newFrame == image.width()-1) {
+        // Crop the back from the original image
+        painter.drawImage(0,0,image,0,0,-1,-1);
+    }
+    else {
+        // Crop somewhere in the middle
+        painter.drawImage(0,0,image,0,0,newFrame,-1);
+        painter.drawImage(newFrame,0,image,newFrame+1,0,-1,-1);
+    }
+
+    // TODO: This pushes two undo operations...
+    resize(newImage.width(), newImage.height(), false);
+    applyInstrument(newImage);
+}
+
+void PatternItem::addFrame(int newFrame) {
+    // TODO: Design patternItem() around a QData() array instead of an image, drop this junk.
+
+    if(newFrame > image.width() || newFrame < 0) {
+        return;
+    }
+
+    QImage newImage(image.width()+1,
+                    image.height(),
+                    QImage::Format_ARGB32_Premultiplied);
+
+    // copy data from the original image over
+    // Initialize the pattern to a blank canvass
+    newImage.fill(COLOR_CANVAS_DEFAULT);
+    QPainter painter(&newImage);
+
+    if(newFrame == image.width()-1) {
+        // Crop the back from the original image
+        painter.drawImage(0,0,image,0,0,-1,-1);
+    }
+    else {
+        // Crop somewhere in the middle
+        painter.drawImage(0,0,image,0,0,newFrame+1,-1);
+        painter.drawImage(newFrame+2,0,image,newFrame+1,0,-1,-1);
+    }
+
+    // TODO: This pushes two undo operations...
+    resize(newImage.width(), newImage.height(), false);
+    applyInstrument(newImage);
+}
+
+
+int PatternItem::getFrameCount() const {
+    return image.width();
+}
 
 void PatternItem::setModified(bool newModified)  {
     modified = newModified;

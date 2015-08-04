@@ -37,9 +37,9 @@
   <widget class="QLabel" name="versionLabel">
    <property name="geometry">
     <rect>
-     <x>170</x>
-     <y>350</y>
-     <width>361</width>
+     <x>50</x>
+     <y>360</y>
+     <width>151</width>
      <height>41</height>
     </rect>
    </property>
@@ -49,9 +49,9 @@
       <colorrole role="WindowText">
        <brush brushstyle="SolidPattern">
         <color alpha="255">
-         <red>176</red>
-         <green>176</green>
-         <blue>176</blue>
+         <red>178</red>
+         <green>178</green>
+         <blue>178</blue>
         </color>
        </brush>
       </colorrole>
@@ -60,9 +60,9 @@
       <colorrole role="WindowText">
        <brush brushstyle="SolidPattern">
         <color alpha="255">
-         <red>176</red>
-         <green>176</green>
-         <blue>176</blue>
+         <red>178</red>
+         <green>178</green>
+         <blue>178</blue>
         </color>
        </brush>
       </colorrole>
@@ -83,7 +83,7 @@
    <property name="font">
     <font>
      <family>Helvetica Neue</family>
-     <pointsize>43</pointsize>
+     <pointsize>22</pointsize>
     </font>
    </property>
    <property name="styleSheet">
@@ -99,7 +99,69 @@
   <widget class="QLabel" name="versionLabel_2">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>220</x>
+     <y>360</y>
+     <width>321</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="palette">
+    <palette>
+     <active>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>178</red>
+         <green>178</green>
+         <blue>178</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </active>
+     <inactive>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>178</red>
+         <green>178</green>
+         <blue>178</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </inactive>
+     <disabled>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>127</red>
+         <green>127</green>
+         <blue>127</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </disabled>
+    </palette>
+   </property>
+   <property name="font">
+    <font>
+     <family>Helvetica Neue</family>
+     <pointsize>22</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background:none</string>
+   </property>
+   <property name="text">
+    <string>Copyright 2015 Blinkinlabs, LLC</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="versionLabel_3">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
      <y>400</y>
      <width>561</width>
      <height>21</height>
@@ -111,9 +173,9 @@
       <colorrole role="WindowText">
        <brush brushstyle="SolidPattern">
         <color alpha="255">
-         <red>169</red>
-         <green>169</green>
-         <blue>169</blue>
+         <red>108</red>
+         <green>108</green>
+         <blue>108</blue>
         </color>
        </brush>
       </colorrole>
@@ -122,9 +184,9 @@
       <colorrole role="WindowText">
        <brush brushstyle="SolidPattern">
         <color alpha="255">
-         <red>169</red>
-         <green>169</green>
-         <blue>169</blue>
+         <red>108</red>
+         <green>108</green>
+         <blue>108</blue>
         </color>
        </brush>
       </colorrole>
@@ -152,7 +214,7 @@
     <string notr="true">background:none</string>
    </property>
    <property name="text">
-    <string>Copyright 2015 Blinkinlabs, LLC            Icons by icons8.com</string>
+    <string>Icons by icons8.com</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>

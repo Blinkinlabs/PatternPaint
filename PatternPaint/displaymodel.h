@@ -7,6 +7,11 @@
 class DisplayModel
 {
 public:
+    enum Mode {
+        TIMELINE    = 0,     /// Timeline (classic) mode
+        MATRIX8x8   = 1,     /// 8x8 Matrix mode
+    };
+
     /// Set the source pattern that we are interacting with
     virtual void setSource(PatternItem* newPatternItem) = 0;
 
@@ -23,14 +28,6 @@ public:
     /// Get the index of the active frame
     /// @return Index of the active fraome
     virtual int getFrameIndex() const = 0;
-
-    /// Delete the frame at the given index
-    /// @param frame Index of the frame to delete
-    virtual void deleteFrame(int newFrame) = 0;
-
-    /// Insert a frame at the given index
-    /// @param frame Index that the frame should be inserted at
-    virtual void addFrame(int newFrame) = 0;
 
     /// Get an image representing the current frame
     /// @return an NxN QImage reperesenting the current frame data

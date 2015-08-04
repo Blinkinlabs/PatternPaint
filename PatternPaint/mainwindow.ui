@@ -686,11 +686,17 @@
    </property>
   </action>
   <action name="actionTimeline">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>LED Strip</string>
    </property>
   </action>
   <action name="actionMatrix">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>8x8 Matrix</string>
    </property>

@@ -104,6 +104,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(pSpeed, SIGNAL(valueChanged(int)), this, SLOT(patternSpeed_valueChanged(int)));
     patternSpeed_valueChanged(PATTERN_SPEED_DEFAULT_VALUE);
 
+    pFrame = new QLineEdit(this);
+    pFrame->setMaximumWidth(30);
+    pFrame->setMinimumWidth(30);
+    pFrame->setValidator(new QIntValidator(1,std::numeric_limits<int>::max(),this));
+    pFrame->setToolTip(tr("Current frame"));
+    playbackToolbar->insertWidget(actionStepForward, pFrame);
+    connect(pFrame, SIGNAL(textEdited(QString)), this, SLOT(frameIndex_valueChanged(QString)));
+    frameIndex_valueChanged("0");
+
     mode = Disconnected;
 
     // Our pattern editor wants to get some notifications
@@ -125,7 +134,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     errorMessageDialog = new QMessageBox(this);
     errorMessageDialog->setWindowModality(Qt::WindowModal);
-
 
     // The draw timer tells the pattern to advance
     connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
@@ -151,6 +159,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     QSettings settings;
     setColorMode(static_cast<Pattern::ColorMode>(settings.value("Options/ColorOrder", Pattern::RGB).toUInt()));
 
+    setDisplayMode(static_cast<DisplayModel::Mode>(settings.value("Options/DisplayMode", DisplayModel::TIMELINE).toUInt()));
+
     patternCollection->setItemDelegate(new PatternItemDelegate());
 
     connect(&patternUpdateNotifier, SIGNAL(patternSizeUpdated()),
@@ -163,8 +173,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     patternCollection->setNotifier(&patternUpdateNotifier);
     patternCollection->setUndoGroup(undoGroup);
-
-    on_actionTimeline_triggered();
 
     // Create a pattern.
     on_actionNew_triggered();
@@ -203,6 +211,11 @@ void MainWindow::connectionScannerTimer_timeout() {
 void MainWindow::patternSpeed_valueChanged(int value)
 {
     drawTimer->setInterval(1000/value);
+}
+
+void MainWindow::frameIndex_valueChanged(QString value)
+{
+    setNewFrame(value.toInt() - 1);
 }
 
 void MainWindow::on_actionPlay_triggered()
@@ -721,12 +734,7 @@ void MainWindow::connectUploader()
 
 void MainWindow::setColorMode(Pattern::ColorMode newColorOrder)
 {
-    colorMode = newColorOrder;
-
-    QSettings settings;
-    settings.setValue("Options/ColorOrder", static_cast<uint>(colorMode));
-
-    switch(colorMode) {
+    switch(newColorOrder) {
     case Pattern::RGB:
         actionRGB->setChecked(true);
         actionGRB->setChecked(false);
@@ -735,7 +743,48 @@ void MainWindow::setColorMode(Pattern::ColorMode newColorOrder)
         actionRGB->setChecked(false);
         actionGRB->setChecked(true);
         break;
+    default:
+        return;
+        break;
     }
+
+    colorMode = newColorOrder;
+
+    QSettings settings;
+    settings.setValue("Options/ColorOrder", static_cast<uint>(colorMode));
+}
+
+void MainWindow::setDisplayMode(DisplayModel::Mode newDisplayMode)
+{
+    switch(newDisplayMode) {
+    case DisplayModel::TIMELINE:
+        actionTimeline->setChecked(true);
+        actionMatrix->setChecked(false);
+        break;
+    case DisplayModel::MATRIX8x8:
+        actionTimeline->setChecked(false);
+        actionMatrix->setChecked(true);
+        break;
+    default:
+        return;
+        break;
+    }
+
+    QSettings settings;
+    settings.setValue("Options/DisplayMode", static_cast<uint>(newDisplayMode));
+
+    // TODO: Delete old object!
+    if(newDisplayMode == DisplayModel::TIMELINE) {
+        displayModel = new TimelineDisplay();
+    }
+    else if(newDisplayMode == DisplayModel::MATRIX8x8) {
+        displayModel = new MatrixDisplay(8,8);
+    }
+
+    displayModel->setSource(dynamic_cast<PatternItem*>(patternCollection->currentItem()));
+    patternEditor->setDisplayModel(displayModel);
+    on_patternSizeUpdated();
+    on_patternDataUpdated();
 }
 
 void MainWindow::setNewFrame(int newFrame)
@@ -745,10 +794,10 @@ void MainWindow::setNewFrame(int newFrame)
     }
 
     PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-    QImage image =  patternItem->getImage();
+    const int frameCount = patternItem->getFrameCount();
 
-    if(newFrame >= image.width()) {
-        newFrame = image.width() - 1;
+    if(newFrame >= frameCount) {
+        newFrame = frameCount - 1;
     }
     if(newFrame < 0) {
         newFrame = 0;
@@ -756,6 +805,7 @@ void MainWindow::setNewFrame(int newFrame)
 
     frame = newFrame;
 
+    pFrame->setText(QString("%1").arg(frame+1));
     patternEditor->setPlaybackRow(frame);
     updateBlinky();
 }
@@ -885,8 +935,10 @@ void MainWindow::on_patternSizeUpdated()
         return;
     }
 
-    // Resize the selected pattern
     PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
+
+    // Reset the current frame, in case the new size is smaller than the old one
+    setNewFrame(frame);
 
     // Re-load the patterneditor so that it can redraw its view
     patternEditor->setPatternItem(patternItem);
@@ -914,33 +966,23 @@ void MainWindow::on_patternNameUpdated()
 void MainWindow::on_actionStepForward_triggered()
 {
     PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-    setNewFrame((frame+1)%patternItem->getImage().width());
+    setNewFrame((frame+1)%patternItem->getFrameCount());
 }
 
 void MainWindow::on_actionStepBackward_triggered()
 {
     PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-    setNewFrame(frame<=0?patternItem->getImage().width()-1:frame-1);
+    setNewFrame(frame<=0?patternItem->getFrameCount()-1:frame-1);
 }
 
 void MainWindow::on_actionTimeline_triggered()
 {
-    // TODO: Delete old object!
-    displayModel = new TimelineDisplay();
-    displayModel->setSource(dynamic_cast<PatternItem*>(patternCollection->currentItem()));
-    patternEditor->setDisplayModel(displayModel);
-
-    on_patternSizeUpdated();
+    setDisplayMode(DisplayModel::TIMELINE);
 }
 
 void MainWindow::on_actionMatrix_triggered()
 {
-    // TODO: Delete old object!
-    displayModel = new MatrixDisplay(8,8);
-    displayModel->setSource(dynamic_cast<PatternItem*>(patternCollection->currentItem()));
-    patternEditor->setDisplayModel(displayModel);
-
-    on_patternSizeUpdated();
+    setDisplayMode(DisplayModel::MATRIX8x8);
 }
 
 void MainWindow::on_actionAddFrame_triggered()
@@ -949,10 +991,16 @@ void MainWindow::on_actionAddFrame_triggered()
         return;
     }
 
-    displayModel->addFrame(displayModel->getFrameIndex());
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
+    patternItem->addFrame(displayModel->getFrameIndex());
+
+    setNewFrame(displayModel->getFrameIndex()+1);
 }
 
 void MainWindow::on_actionDeleteFrame_triggered()
 {
-    displayModel->deleteFrame(displayModel->getFrameIndex());
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
+    patternItem->deleteFrame(displayModel->getFrameIndex());
+
+    setNewFrame(displayModel->getFrameIndex()-1);
 }
