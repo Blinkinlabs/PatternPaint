@@ -48,19 +48,15 @@ public:
     /**
      * @brief Constructor
      *
-     * @param r Red
-     * @param g Green
-     * @param b Blue
+     * @param color Default color
      * @param parent Pointer for parent.
      */
-    explicit ColorChooser(const int &r, const int &g, const int &b,
-                          QWidget *parent = 0);
+    explicit ColorChooser(const QColor& color, QWidget *parent = 0);
     ~ColorChooser();
     
 private:
-    QColor *mCurrentColor;
-    QPixmap *mPixmapColor;
-    QPainter *mPainterColor;
+    QColor currentColor;
+    QPixmap pixmap;
 
 public slots:
     /**

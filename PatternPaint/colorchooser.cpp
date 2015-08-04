@@ -31,41 +31,36 @@
 #include <QMouseEvent>
 #include <QColorDialog>
 
-ColorChooser::ColorChooser(const int &r, const int &g, const int &b, QWidget *parent) :
+ColorChooser::ColorChooser(const QColor& color, QWidget *parent) :
     QLabel(parent)
 {
-    setFrameStyle(QFrame::Raised | QFrame::Box);
-    mCurrentColor = new QColor(r, g, b);
-    mPixmapColor = new QPixmap(20, 20);
-    mPainterColor = new QPainter(mPixmapColor);
-    mPainterColor->fillRect(0, 0, 20, 20, *mCurrentColor);
-    mPainterColor->end();
-    setMargin(3);
-    setAlignment(Qt::AlignHCenter);
-    setPixmap(*mPixmapColor);
+    setFrameStyle(QFrame::StyledPanel | QFrame::Box);
+    pixmap = QPixmap(30, 30);
+
+    setMargin(2);
+    setAlignment(Qt::AlignCenter);
+
+    setColor(color);
+    setPixmap(pixmap);
 }
 
 ColorChooser::~ColorChooser()
 {
-    delete mCurrentColor;
-    delete mPainterColor;
-    delete mPixmapColor;
 }
 
 void ColorChooser::setColor(const QColor &color)
 {
-    *mCurrentColor = color;
-    mPainterColor->begin(mPixmapColor);
-    mPainterColor->fillRect(0, 0, 20, 20, *mCurrentColor);
-    mPainterColor->end();
-    setPixmap(*mPixmapColor);
+   currentColor = color;
+
+    pixmap.fill(currentColor);
+    setPixmap(pixmap);
 }
 
 void ColorChooser::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton)
     {
-        QColor color = QColorDialog::getColor(*mCurrentColor, this);
+        QColor color = QColorDialog::getColor(currentColor, this);
         if(color.isValid())
         {
             setColor(color);

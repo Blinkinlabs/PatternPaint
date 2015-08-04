@@ -35,6 +35,7 @@
 #define DRAWING_SIZE_DEFAULT_VALUE 1
 
 #define COLOR_CANVAS_DEFAULT    QColor(0,0,0,255)
+#define COLOR_TOOL_DEFAULT    QColor(255,255,255,255)
 
 #define DEFAULT_LED_COUNT 60
 #define DEFAULT_PATTERN_LENGTH 100
@@ -81,18 +82,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     actionSpray->setData(QVariant::fromValue(new SprayInstrument(this)));
     actionFill->setData(QVariant::fromValue(new FillInstrument(this)));
 
-    colorChooser = new ColorChooser(255, 255, 255, this);
-    colorChooser->setGeometry(0,0,32,32);
-
-    colorChooser->setStatusTip(tr("Drawing color"));
+    colorChooser = new ColorChooser(COLOR_TOOL_DEFAULT, this);
     colorChooser->setToolTip(tr("Drawing color"));
-    instrumentToolbar->addSeparator();
     instrumentToolbar->addWidget(colorChooser);
+    patternEditor->setToolColor(COLOR_TOOL_DEFAULT);
 
     QSpinBox *penSizeSpin = new QSpinBox();
     penSizeSpin->setRange(DRAWING_SIZE_MINIMUM_VALUE, DRAWING_SIZE_MAXIMUM_VALUE);
     penSizeSpin->setValue(DRAWING_SIZE_DEFAULT_VALUE);
-    penSizeSpin->setStatusTip(tr("Pen size"));
     penSizeSpin->setToolTip(tr("Pen size"));
     instrumentToolbar->addWidget(penSizeSpin);
 
@@ -125,6 +122,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(patternCollection, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),
             this, SLOT(setPatternItem(QListWidgetItem*, QListWidgetItem*)));
 
+
     // Pre-set the upload progress dialog
     progressDialog = new QProgressDialog(this);
     progressDialog->setWindowTitle("Blinky exporter");
@@ -145,9 +143,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connectionScannerTimer->setInterval(CONNECTION_SCANNER_INTERVAL);
     connectionScannerTimer->start();
 
-    // Initial values for interface
-    colorChooser->setColor(QColor(255,255,255));      // TODO: Why aren't signals propegated from this?
-    patternEditor->setToolColor(QColor(255,255,255));
 
     penSizeSpin->setValue(1);      // TODO: Why aren't signals propegated from this?
     patternEditor->setToolSize(1);
@@ -181,7 +176,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     on_actionNew_triggered();
 }
 
-MainWindow::~MainWindow(){}
+MainWindow::~MainWindow(){
+#if defined(Q_OS_MAC)
+    // start the app nap inhibitor
+    if(appNap != NULL) {
+        delete appNap;
+        appNap = NULL;
+    }
+#endif
+}
 
 void MainWindow::drawTimer_timeout() {
     PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
