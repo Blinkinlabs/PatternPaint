@@ -110,6 +110,10 @@ private slots:
 
     void on_actionMatrix_triggered();
 
+    void on_actionAddFrame_triggered();
+
+    void on_actionDeleteFrame_triggered();
+
 private:
     ColorChooser* colorChooser;
 

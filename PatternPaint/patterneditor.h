@@ -70,8 +70,6 @@ private:
     QColor toolColor;      ///< Color of the current drawing tool (TODO: This should be a pointer to a tool)
     int toolSize;          ///< Size of the current drawing tool (TODO: This should be a pointer to a tool)
 
-    int playbackRow;       ///< Row being played back (for display purposes only)
-
     /// Redraw the gridPattern to fit the current widget size.
     void updateGridSize();
 

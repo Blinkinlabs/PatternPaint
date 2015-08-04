@@ -10,9 +10,14 @@ public:
     void setSource(PatternItem* newPatternItem);
     bool hasPatternItem() const;
 
-    void setFrame(int newFrame);
-    int getFrame() const;
-    int frameCount() const;
+    bool showPlaybackIndicator() const {return false;}
+
+    void setFrameIndex(int newFrame);
+    int getFrameIndex() const;
+//    int frameCount() const;
+
+    void deleteFrame(int newFrame);
+    void addFrame(int newFrame);
 
     const QImage& getFrameData();
     void applyInstrument(const QImage& instrumentFrameData) ;

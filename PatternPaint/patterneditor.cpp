@@ -220,7 +220,7 @@ void PatternEditor::setToolSize(int size) {
 }
 
 void PatternEditor::setPlaybackRow(int row) {
-    deviceModel->setFrame(row);
+    deviceModel->setFrameIndex(row);
     lazyUpdate();
 }
 
@@ -269,19 +269,24 @@ void PatternEditor::paintEvent(QPaintEvent*)
         painter.drawImage(0,0,gridPattern);
     }
 
-//    // Draw the playback indicator
-//    // Note that we need to compute the correct width based on the rounding error of
-//    // the current cell, otherwise it won't line up correctly with the actual image.
-//    painter.setPen(COLOR_PLAYBACK_EDGE);
-//    painter.drawRect(playbackRow*xScale +.5,
-//                     0,
-//                     int((playbackRow+1)*xScale +.5) - int(playbackRow*xScale +.5),
-//                     viewPort.height()*yScale);
-//    painter.fillRect(playbackRow*xScale +.5,
-//                     0,
-//                     int((playbackRow+1)*xScale +.5) - int(playbackRow*xScale +.5),
-//                     viewPort.height()*yScale,
-//                     COLOR_PLAYBACK_TOP);
+    // TODO: How to do this more generically?
+    if(deviceModel->showPlaybackIndicator()) {
+        int playbackRow = deviceModel->getFrameIndex();
+
+        // Draw the playback indicator
+        // Note that we need to compute the correct width based on the rounding error of
+        // the current cell, otherwise it won't line up correctly with the actual image.
+        painter.setPen(COLOR_PLAYBACK_EDGE);
+        painter.drawRect(playbackRow*xScale +.5,
+                         0,
+                         int((playbackRow+1)*xScale +.5) - int(playbackRow*xScale +.5),
+                         frameData.height()*yScale);
+        painter.fillRect(playbackRow*xScale +.5,
+                         0,
+                         int((playbackRow+1)*xScale +.5) - int(playbackRow*xScale +.5),
+                         frameData.height()*yScale,
+                         COLOR_PLAYBACK_TOP);
+    }
 
 }
 

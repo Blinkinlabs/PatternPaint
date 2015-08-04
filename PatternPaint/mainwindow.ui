@@ -242,6 +242,9 @@
     <addaction name="actionFlip_Horizontal"/>
     <addaction name="actionFlip_Vertical"/>
     <addaction name="separator"/>
+    <addaction name="actionAddFrame"/>
+    <addaction name="actionDeleteFrame"/>
+    <addaction name="separator"/>
     <addaction name="actionClear_Pattern"/>
    </widget>
    <widget class="QMenu" name="menuTools">
@@ -680,6 +683,16 @@
   <action name="actionMatrix">
    <property name="text">
     <string>8x8 Matrix</string>
+   </property>
+  </action>
+  <action name="actionAddFrame">
+   <property name="text">
+    <string>Add frame</string>
+   </property>
+  </action>
+  <action name="actionDeleteFrame">
+   <property name="text">
+    <string>Delete frame</string>
    </property>
   </action>
  </widget>

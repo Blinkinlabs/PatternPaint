@@ -3,13 +3,8 @@
 #include <FastLED.h>
 #include <avr/pgmspace.h>
 
-// Output pins
-#define LED_OUT      13      // LED output signal
-#define BUTTON_IN    10      // Pin that the button is connected to
-#define ANALOG_INPUT A9      // Analog input on the bottom of the board
-#define IO_A         7       // Extra digital input on the bottom of the board
-#define IO_B         11      // Extra digital input on the bottom of the board
-
+#include "BlinkyTape.h"
+#include "SerialLoop.h"
 
 // Pattern table definitions
 #define PATTERN_TABLE_ADDRESS  (0x7000 - 0x80)   // Location of the pattern table in the flash memory
@@ -156,42 +151,12 @@ void setup()
 }
 
 
-void serialLoop() {
-  
-  static int pixelIndex;
-  uint8_t idx = 0;
-  uint8_t buffer[3];
-  uint8_t c;
-  
-  while(true) {
-    if (Serial.available() > 0) {
-      c = Serial.read();
-      if (c == 255) {
-	LEDS.show();
-	pixelIndex = 0;
-	idx = 0;   
-	// BUTTON_IN (D10):   07 - 0111
-	// EXTRA_PIN_A(D7):          11 - 1011
-	// EXTRA_PIN_B (D11):        13 - 1101
-	// ANALOG_INPUT (A9): 14 - 1110
-      } else {        
-        buffer[idx++] = c;
-        if (idx == 3) {
-          if(pixelIndex == MAX_LEDS) break; // Prevent overflow by ignoring the pixel data beyond LED_COUNT
-          leds[pixelIndex] = CRGB(buffer[0], buffer[1], buffer[2]);
-          pixelIndex++;
-          idx = 0;
-        }
-      }
-    }
-  }
-}
 
 void loop()
 {
   // If'n we get some data, switch to passthrough mode
   if(Serial.available() > 0) {
-    serialLoop();
+    serialLoop(leds);
   }
   
   pattern.draw(leds);

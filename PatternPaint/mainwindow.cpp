@@ -942,3 +942,17 @@ void MainWindow::on_actionMatrix_triggered()
 
     on_patternSizeUpdated();
 }
+
+void MainWindow::on_actionAddFrame_triggered()
+{
+    if(!displayModel->hasPatternItem()) {
+        return;
+    }
+
+    displayModel->addFrame(displayModel->getFrameIndex());
+}
+
+void MainWindow::on_actionDeleteFrame_triggered()
+{
+    displayModel->deleteFrame(displayModel->getFrameIndex());
+}
