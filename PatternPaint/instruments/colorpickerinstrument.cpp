@@ -32,10 +32,11 @@ ColorpickerInstrument::ColorpickerInstrument(QObject *parent) :
     drawing = false;
 }
 
-void ColorpickerInstrument::mousePressEvent(QMouseEvent *event, PatternEditor&, const QPoint& pt)
+void ColorpickerInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& editor, const QPoint& pt)
 {
     if(event->button() == Qt::LeftButton) {
         mStartPoint = mEndPoint = pt;
+        paint(editor);
         drawing = true;
     }
 }
