@@ -925,6 +925,7 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
 
     // Always update the pattern name
     on_patternNameUpdated();
+    on_patternModifiedChanged();
 
     // TODO: we're going to have to unload our references, but for now skip that.
     if(current == NULL) {
@@ -938,7 +939,6 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
 
     on_patternSizeUpdated();
     on_patternDataUpdated();
-    on_patternModifiedChanged();
 }
 
 void MainWindow::on_patternDataUpdated()
@@ -1047,6 +1047,7 @@ void MainWindow::on_actionDeleteFrame_triggered()
 void MainWindow::on_patternModifiedChanged()
 {
     if(patternCollection->currentItem() == NULL) {
+        actionSave_File->setEnabled(false);
         return;
     }
 

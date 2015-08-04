@@ -220,6 +220,11 @@ void PatternEditor::setToolSize(int size) {
 }
 
 void PatternEditor::setPlaybackRow(int row) {
+    if(!deviceModel->hasPatternItem()) {
+        // TODO: Reset size to some default?
+        return;
+    }
+
     deviceModel->setFrameIndex(row);
     lazyUpdate();
 }
