@@ -169,7 +169,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
             this, SLOT(on_patternDataUpdated()));
     connect(&patternUpdateNotifier, SIGNAL(patternNameUpdated()),
             this, SLOT(on_patternNameUpdated()));
-
+    connect(&patternUpdateNotifier, SIGNAL(patternModifiedChanged()),
+            this, SLOT(on_patternModifiedChanged()));  // TODO
 
     patternCollection->setNotifier(&patternUpdateNotifier);
     patternCollection->setUndoGroup(undoGroup);
@@ -912,6 +913,7 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
 
     on_patternSizeUpdated();
     on_patternDataUpdated();
+    on_patternModifiedChanged();
 }
 
 void MainWindow::on_patternDataUpdated()
@@ -1003,4 +1005,21 @@ void MainWindow::on_actionDeleteFrame_triggered()
     patternItem->deleteFrame(displayModel->getFrameIndex());
 
     setNewFrame(displayModel->getFrameIndex()-1);
+}
+
+void MainWindow::on_patternModifiedChanged()
+{
+    if(!displayModel->hasPatternItem()) {
+        return;
+    }
+
+    qDebug() << "test";
+
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
+    if(patternItem->getModified() == true) {
+        actionSave_File->setEnabled(true);
+    }
+    else {
+        actionSave_File->setEnabled(false);
+    }
 }

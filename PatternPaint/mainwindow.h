@@ -117,6 +117,8 @@ private slots:
 
     void on_actionDeleteFrame_triggered();
 
+    void on_patternModifiedChanged();
+
 private:
     ColorChooser* colorChooser;
 
@@ -133,7 +135,6 @@ private:
     PatternUpdateNotifier patternUpdateNotifier;
 
     QSpinBox* pSpeed;
-
     QLineEdit* pFrame;
 
     enum Modes { Disconnected, Connected, Uploading };

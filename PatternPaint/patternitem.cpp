@@ -253,10 +253,19 @@ int PatternItem::getFrameCount() const {
 }
 
 void PatternItem::setModified(bool newModified)  {
+    bool modifiedChanged = false;
+
+    if(modified != newModified) {
+        modifiedChanged = true;
+    }
+
     modified = newModified;
 
     if(!notifier.isNull()) {
         notifier->signalDataUpdated();
+        if(modifiedChanged) {
+            notifier->signalModifiedChange();
+        }
     }
 }
 
