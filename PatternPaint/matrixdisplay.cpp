@@ -7,11 +7,16 @@
 MatrixDisplay::MatrixDisplay(int height, int width) :
     height(height),
     width(width),
-    patternItem(NULL)
+    patternItem(NULL),
+    frame(0)
 {}
 
 void MatrixDisplay::setSource(PatternItem *newPatternItem) {
     patternItem = newPatternItem;
+
+    if(patternItem != NULL) {
+        setFrameIndex(frame);
+    }
 }
 
 bool MatrixDisplay::hasPatternItem() const {
@@ -20,6 +25,13 @@ bool MatrixDisplay::hasPatternItem() const {
 
 
 void MatrixDisplay::setFrameIndex(int newFrame) {
+    if(frame < 0) {
+        frame = 0;
+    }
+    if(frame > patternItem->getFrameCount()) {
+        frame = patternItem->getFrameCount()-1;
+    }
+
     frame = newFrame;
 }
 
