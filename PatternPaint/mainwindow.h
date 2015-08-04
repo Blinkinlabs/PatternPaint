@@ -16,6 +16,10 @@
 #include "matrixdisplay.h"
 #include "timelinedisplay.h"
 
+#if defined Q_OS_MAC
+#include "appnap.h"
+#endif
+
 class QUndoGroup;
 class ColorChooser;
 class QToolButton;
@@ -165,6 +169,11 @@ private:
     void setNewFrame(int newFrame);
 
     void updateBlinky();
+
+#if defined(Q_OS_MAC)
+    /// Object to inhibit app nap when connected to a blinky
+    CAppNapInhibitor* appNap;
+#endif
 };
 
 #endif // MAINWINDOW_H

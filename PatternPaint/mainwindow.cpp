@@ -47,6 +47,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     setupUi(this);
 
+    appNap = NULL;
+
     drawTimer = new QTimer(this);
     connectionScannerTimer = new QTimer(this);
 
@@ -381,6 +383,14 @@ void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
     if(connected) {
         mode = Connected;
         startPlayback();
+
+#if defined(Q_OS_MAC)
+        // start the app nap inhibitor
+        if(appNap == NULL) {
+            appNap = new CAppNapInhibitor("Interaction with hardware");
+        }
+#endif
+
     }
     else {
         mode = Disconnected;
@@ -390,6 +400,14 @@ void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
         controller.clear();
 
         connectionScannerTimer->start();
+
+#if defined(Q_OS_MAC)
+        // start the app nap inhibitor
+        if(appNap != NULL) {
+            delete appNap;
+            appNap = NULL;
+        }
+#endif
     }
 }
 

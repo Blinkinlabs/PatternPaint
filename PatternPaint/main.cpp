@@ -9,10 +9,6 @@
 #include "winsparkleautoupdater.h"
 #endif
 
-#if defined Q_OS_MAC
-#include "appnap.h"
-#endif
-
 #define OSX_RELEASE_APPCAST_DEFAULT "http://software.blinkinlabs.com/patternpaint/patternpaint-osx.xml"
 #define WINDOWS_RELEASE_APPCAST_DEFAULT "http://software.blinkinlabs.com/patternpaint/patternpaint-windows.xml"
 
@@ -55,10 +51,6 @@ int main(int argc, char *argv[])
         // TODO: Defer this until after the app opens on Windows (to prevent the dialog from being hidden?)
         updater->checkForUpdates();
     }
-
-#if defined Q_OS_MAC
-    CAppNapInhibitor appNapInhibitor("Interaction with hardware");
-#endif
 
     MainWindow w;
     w.show();
