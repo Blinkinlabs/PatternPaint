@@ -187,8 +187,12 @@ MainWindow::~MainWindow(){
 }
 
 void MainWindow::drawTimer_timeout() {
+    if(patternCollection->currentItem() == NULL) {
+        return;
+    }
+
     PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-    setNewFrame((frame+1)%patternItem->getImage().width());
+    setNewFrame((frame+1)%patternItem->getFrameCount());
 }
 
 
@@ -988,12 +992,20 @@ void MainWindow::on_patternNameUpdated()
 
 void MainWindow::on_actionStepForward_triggered()
 {
+    if(patternCollection->currentItem() == NULL) {
+        return;
+    }
+
     PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
     setNewFrame((frame+1)%patternItem->getFrameCount());
 }
 
 void MainWindow::on_actionStepBackward_triggered()
 {
+    if(patternCollection->currentItem() == NULL) {
+        return;
+    }
+
     PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
     setNewFrame(frame<=0?patternItem->getFrameCount()-1:frame-1);
 }
@@ -1010,7 +1022,7 @@ void MainWindow::on_actionMatrix_triggered()
 
 void MainWindow::on_actionAddFrame_triggered()
 {
-    if(!displayModel->hasPatternItem()) {
+    if(patternCollection->currentItem() == NULL) {
         return;
     }
 
@@ -1022,6 +1034,10 @@ void MainWindow::on_actionAddFrame_triggered()
 
 void MainWindow::on_actionDeleteFrame_triggered()
 {
+    if(patternCollection->currentItem() == NULL) {
+        return;
+    }
+
     PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
     patternItem->deleteFrame(displayModel->getFrameIndex());
 
@@ -1030,7 +1046,7 @@ void MainWindow::on_actionDeleteFrame_triggered()
 
 void MainWindow::on_patternModifiedChanged()
 {
-    if(!displayModel->hasPatternItem()) {
+    if(patternCollection->currentItem() == NULL) {
         return;
     }
 
