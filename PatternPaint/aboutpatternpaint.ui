@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>399</width>
-    <height>215</height>
+    <width>601</width>
+    <height>423</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,21 +20,58 @@
    <string>About PatternPaint</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background:url(:/resources/images/PatternPaintAbout.png)</string>
+   <string notr="true">background:url(:/resources/images/PatternPaint-Splash-Screen.png)</string>
   </property>
   <widget class="QLabel" name="versionLabel">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>140</y>
-     <width>391</width>
-     <height>31</height>
+     <x>170</x>
+     <y>350</y>
+     <width>361</width>
+     <height>41</height>
     </rect>
+   </property>
+   <property name="palette">
+    <palette>
+     <active>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>146</red>
+         <green>146</green>
+         <blue>146</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </active>
+     <inactive>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>146</red>
+         <green>146</green>
+         <blue>146</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </inactive>
+     <disabled>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>127</red>
+         <green>127</green>
+         <blue>127</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </disabled>
+    </palette>
    </property>
    <property name="font">
     <font>
      <family>Helvetica Neue</family>
-     <pointsize>24</pointsize>
+     <pointsize>43</pointsize>
     </font>
    </property>
    <property name="styleSheet">
@@ -50,11 +87,48 @@
   <widget class="QLabel" name="versionLabel_2">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>180</y>
-     <width>391</width>
-     <height>31</height>
+     <x>10</x>
+     <y>400</y>
+     <width>561</width>
+     <height>21</height>
     </rect>
+   </property>
+   <property name="palette">
+    <palette>
+     <active>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>217</red>
+         <green>217</green>
+         <blue>217</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </active>
+     <inactive>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>217</red>
+         <green>217</green>
+         <blue>217</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </inactive>
+     <disabled>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>127</red>
+         <green>127</green>
+         <blue>127</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </disabled>
+    </palette>
    </property>
    <property name="font">
     <font>
@@ -66,7 +140,7 @@
     <string notr="true">background:none</string>
    </property>
    <property name="text">
-    <string>Copyright 2015 Blinkinlabs, LLC</string>
+    <string>Copyright 2015 Blinkinlabs, LLC            Icons by icons8.com</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>

@@ -6,6 +6,7 @@
         <file>images/patternpaint.icns</file>
         <file>images/patternpaint.ico</file>
         <file>images/patternpaint.png</file>
+        <file>images/PatternPaint-Splash-Screen.png</file>
     </qresource>
     <qresource prefix="/instruments">
         <file>images/instruments-icons/cursor.png</file>
