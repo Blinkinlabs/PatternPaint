@@ -12,6 +12,8 @@ public:
         MATRIX8x8   = 1,     /// 8x8 Matrix mode
     };
 
+    virtual ~DisplayModel() {}
+
     virtual bool hasFixedLedCount() const = 0;
     virtual int getFixedLedCount() const = 0;
 
