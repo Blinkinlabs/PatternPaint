@@ -101,22 +101,19 @@ mac {
 
     # OS X: Specify our developer information using a custom plist
     QMAKE_INFO_PLIST = Info.plist
+
+    OBJECTIVE_SOURCES += \
+        appnap.mm
 }
 
 win32 {
-    # Windows: Specify icon in custom rc file
-    RC_FILE += app.rc
-
-# TODO: Windows: See if we can drop the app.rc file and use this to specify the icon instead.
-#    RC_ICONS += images/patternpaint.ico
+    # Windows: Specify the icon to use
+    RC_ICONS += images/patternpaint.ico
 }
 
 RESOURCES += \
     images.qrc
 
 OTHER_FILES += \
-    app.rc \
     README.md
 
-OBJECTIVE_SOURCES += \
-    appnap.mm
