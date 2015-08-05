@@ -25,27 +25,28 @@ int main(int argc, char *argv[])
 
 #if defined(Q_OS_MAC)
     CocoaInitializer cocoaInitiarizer;
+#endif
 
+
+#if defined(DISABLE_UPDATE_CHECKS)
+
+#warning Updater initialization disabled
+
+#else
+
+#if defined(Q_OS_MAC)
     QSettings settings;
     QString updateUrl = settings.value("Updates/releaseAppcastUrl", OSX_RELEASE_APPCAST_DEFAULT).toString();
-
-#if defined(DISABLE_UPDATE_CHECKS)
-#warning Updater initialization disabled
-#else
     updater = new SparkleAutoUpdater(updateUrl);
-#endif
+#endif /// Q_OS__MAC
 
-#elif defined(Q_OS_WIN)
+#if defined(Q_OS_WIN)
     QSettings settings;
     QString updateUrl = settings.value("Updates/releaseAppcastUrl", WINDOWS_RELEASE_APPCAST_DEFAULT).toString();
-
-#if defined(DISABLE_UPDATE_CHECKS)
-#warning Updater initialization disabled
-#else
     updater = new WinSparkleAutoUpdater(updateUrl);
-#endif
+#endif // Q_OS_WIN
 
-#endif
+#endif  //DISABLE_UPDATE_CHECKSS
 
     if (updater) {
         // TODO: Defer this until after the app opens on Windows (to prevent the dialog from being hidden?)
