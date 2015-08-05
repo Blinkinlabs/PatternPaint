@@ -58,6 +58,12 @@ MainWindow::MainWindow(QWidget *parent) :
     appNap = NULL;
 #endif
 
+#if defined(Q_OS_LINUX)
+    // If we're on linux, we probably don't have a desktop icon registered,
+    // so set one manually
+    setWindowIcon(QIcon(":/resources/images/patternpaint.ico"));
+#endif
+
     drawTimer = new QTimer(this);
     connectionScannerTimer = new QTimer(this);
 
@@ -158,8 +164,6 @@ MainWindow::MainWindow(QWidget *parent) :
     actionPen->setChecked(true);
     patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(actionPen->data()));
     readSettings();
-
-    this->setWindowTitle("Untitled - Pattern Paint");
 
     QSettings settings;
     setColorMode(static_cast<Pattern::ColorMode>(settings.value("Options/ColorOrder", Pattern::RGB).toUInt()));
