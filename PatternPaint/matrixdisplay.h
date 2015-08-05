@@ -14,7 +14,6 @@ public:
 
     void setFrameIndex(int newFrame);
     int getFrameIndex() const;
-//    int frameCount() const;
 
     const QImage& getFrameData();
     void applyInstrument(const QImage& instrumentFrameData) ;

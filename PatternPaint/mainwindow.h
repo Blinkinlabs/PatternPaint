@@ -13,8 +13,6 @@
 #include "ui_mainwindow.h"
 
 #include "displaymodel.h"
-#include "matrixdisplay.h"
-#include "timelinedisplay.h"
 
 #if defined Q_OS_MAC
 #include "appnap.h"
