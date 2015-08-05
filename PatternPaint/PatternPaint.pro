@@ -33,7 +33,7 @@ mac {
 }
 
 # Disable updater checks when debugging, since the test app isn't signed and will fail anyway.
-debug {
+CONFIG(debug, debug|release) {
     DEFINES += DISABLE_UPDATE_CHECKS
 }
 
@@ -99,13 +99,16 @@ mac {
     # OS X: Specify icon resource to use
     ICON = images/patternpaint.icns
 
-    # OS X: Disable app nap using custom plist file
+    # OS X: Specify our developer information using a custom plist
     QMAKE_INFO_PLIST = Info.plist
 }
 
 win32 {
     # Windows: Specify icon in custom rc file
     RC_FILE += app.rc
+
+# TODO: Windows: See if we can drop the app.rc file and use this to specify the icon instead.
+#    RC_ICONS += images/patternpaint.ico
 }
 
 RESOURCES += \

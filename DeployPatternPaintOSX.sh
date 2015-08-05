@@ -20,7 +20,7 @@ git clone https://github.com/Blinkinlabs/PatternPaint.git
 
 # Build PatternPaint
 cd PatternPaint/PatternPaint
-${QTDIR}/bin/qmake MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build   DESTDIR=bin
+${QTDIR}/bin/qmake MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build   DESTDIR=bin -config release
 make
 cd ..
 
