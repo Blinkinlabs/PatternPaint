@@ -286,8 +286,13 @@ void MainWindow::on_actionLoad_File_triggered()
     QFileInfo fileInfo(fileName);
     settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
 
-    int ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
-
+    int ledCount = 0;
+    if((displayModel != NULL) && (displayModel->hasFixedLedCount())) {
+        ledCount = displayModel->getFixedLedCount();
+    }
+    else {
+        ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
+    }
 
     // Create a patternItem, and attempt to load the file
     PatternItem* patternItem = new PatternItem(1, ledCount);
@@ -607,18 +612,25 @@ void MainWindow::on_actionResize_Pattern_triggered()
     QSettings settings;
     PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
 
-    if(patternCollection->currentItem() == NULL) {
+    if((displayModel == NULL) || (patternCollection->currentItem() == NULL)) {
         return;
     }
 
     int patternLength = patternItem->getImage().width();
+    int ledCount = patternItem->getImage().height();
 
-    int ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
+    bool fixedLedCount = displayModel->hasFixedLedCount();
+
+    if(fixedLedCount) {
+        ledCount = displayModel->getFixedLedCount();
+    }
 
     ResizePattern resizeDialog(this);
     resizeDialog.setWindowModality(Qt::WindowModal);
     resizeDialog.setLength(patternLength);
     resizeDialog.setLedCount(ledCount);
+    resizeDialog.setFixedLedCount(fixedLedCount);
+
     resizeDialog.exec();
 
     if(resizeDialog.result() != QDialog::Accepted) {
@@ -966,7 +978,14 @@ void MainWindow::on_actionNew_triggered()
 {
     QSettings settings;
     int patternLength = settings.value("Options/patternLength", DEFAULT_PATTERN_LENGTH).toUInt();
-    int ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
+
+    int ledCount = 0;
+    if((displayModel != NULL) && (displayModel->hasFixedLedCount())) {
+        ledCount = displayModel->getFixedLedCount();
+    }
+    else {
+        ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
+    }
 
     PatternItem* patternItem = new PatternItem(patternLength, ledCount);
 

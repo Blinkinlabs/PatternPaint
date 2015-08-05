@@ -35,3 +35,7 @@ int ResizePattern::ledCount()
 {
     return ui->ledCount->text().toInt();
 }
+
+void ResizePattern::setFixedLedCount(bool fixed) {
+    ui->ledCount->setEnabled(!fixed);
+}

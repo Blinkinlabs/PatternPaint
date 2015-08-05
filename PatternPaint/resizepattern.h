@@ -22,6 +22,9 @@ public:
     void setLedCount(int ledCount);
     int ledCount();
 
+    /// Set this to true if the LED count can't be modified
+    void setFixedLedCount(bool fixed);
+
 private:
     Ui::ResizePattern *ui;
 };
