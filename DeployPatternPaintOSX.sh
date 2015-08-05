@@ -3,7 +3,7 @@
 # Stop at any error
 set -e
 
-VERSION="1.8.0"
+VERSION="1.9.0"
 
 # Pull in the QT tools
 export QTDIR=~/Qt5.4.1/5.4/clang_64/

@@ -815,12 +815,12 @@ void MainWindow::setDisplayMode(DisplayModel::Mode newDisplayMode)
 
 void MainWindow::setNewFrame(int newFrame)
 {
-    if(patternCollection->currentItem() == NULL) {
-        return;
-    }
+    int frameCount = 0;
 
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-    const int frameCount = patternItem->getFrameCount();
+    if(!(patternCollection->currentItem() == NULL)) {
+        PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
+        frameCount = patternItem->getFrameCount();
+    }
 
     if(newFrame >= frameCount) {
         newFrame = frameCount - 1;
@@ -838,8 +838,7 @@ void MainWindow::setNewFrame(int newFrame)
 
 void MainWindow::updateBlinky()
 {
-    // Ignore the timeout if it came to quickly, so that we don't overload the blinky
-    // TODO: Push this into setNewFrame()
+    // Ignore the timeout if it came too quickly, so that we don't overload the blinky
     static qint64 lastTime = 0;
     qint64 newTime = QDateTime::currentMSecsSinceEpoch();
     if (newTime - lastTime < MIN_TIMER_INTERVAL) {
@@ -923,21 +922,39 @@ void MainWindow::on_actionClose_triggered()
 void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previous) {
     Q_UNUSED(previous);
 
-    // Always update the pattern name
     on_patternNameUpdated();
     on_patternModifiedChanged();
+    on_patternSizeUpdated();
 
     // TODO: we're going to have to unload our references, but for now skip that.
     if(current == NULL) {
+        actionClose->setEnabled(false);  // TODO: move me?
+        actionFlip_Horizontal->setEnabled(false);
+        actionFlip_Vertical->setEnabled(false);
+        actionClear_Pattern->setEnabled(false);
+        actionAddFrame->setEnabled(false);
+        actionDeleteFrame->setEnabled(false);
+        actionPlay->setEnabled(false);
+        actionStepForward->setEnabled(false);
+        actionStepBackward->setEnabled(false);
+
         patternEditor->setPatternItem(NULL);
+        undoGroup->setActiveStack(NULL);
         return;
     }
+    actionClose->setEnabled(true);      // TODO: Move me?
+    actionFlip_Horizontal->setEnabled(true);
+    actionFlip_Vertical->setEnabled(true);
+    actionClear_Pattern->setEnabled(true);
+    actionAddFrame->setEnabled(true);
+    actionDeleteFrame->setEnabled(true);
+    actionPlay->setEnabled(true);
+    actionStepForward->setEnabled(true);
+    actionStepBackward->setEnabled(true);
 
     PatternItem* newPatternItem = dynamic_cast<PatternItem*>(current);
-
     undoGroup->setActiveStack(newPatternItem->getUndoStack());
 
-    on_patternSizeUpdated();
     on_patternDataUpdated();
 }
 
@@ -958,14 +975,14 @@ void MainWindow::on_patternDataUpdated()
 
 void MainWindow::on_patternSizeUpdated()
 {
+    // Reset the current frame, in case the new size is smaller than the old one
+    setNewFrame(frame);
+
     if(patternCollection->currentItem() == NULL) {
         return;
     }
 
     PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-
-    // Reset the current frame, in case the new size is smaller than the old one
-    setNewFrame(frame);
 
     // Re-load the patterneditor so that it can redraw its view
     patternEditor->setPatternItem(patternItem);
