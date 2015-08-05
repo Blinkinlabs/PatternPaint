@@ -6,6 +6,10 @@
 
 class TimelineDisplay : public DisplayModel {
 public:
+
+    bool hasFixedLedCount() const { return false; }
+    int getFixedLedCount() const { return 0; }
+
     void setSource(PatternItem* newPatternItem);
     bool hasPatternItem() const;
 

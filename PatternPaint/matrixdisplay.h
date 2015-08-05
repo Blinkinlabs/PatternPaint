@@ -7,6 +7,9 @@ class MatrixDisplay : public DisplayModel {
 public:
     MatrixDisplay(int height, int width);
 
+    bool hasFixedLedCount() const { return true; }
+    int getFixedLedCount() const { return height*width; }
+
     void setSource(PatternItem* newPatternItem);
     bool hasPatternItem() const;
 

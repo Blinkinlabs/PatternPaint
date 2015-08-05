@@ -16,12 +16,12 @@ bool LightBuddyUploader::startUpload(BlinkyController& controller, std::vector<P
     Q_UNUSED(patterns);
 
     // Upload procedure:
-    // 1. Count the number of stored patterns;
-    // 2. If we have 6, iterate through sectors until the last file is found
-    // 3. If we have 6, delete the last file
-    // 4. Create a new file to store the pattern
-    // 5. Upload each sector to the lightbuddy
-    // 6. Reset the lightbuddy state machine
+    // 1. Erase the flash (slow! TODO: new firmware that's faster)
+    // 2. For each pattern:
+    //    a. create a new file
+    //    b. if creation successful, upload image data
+    // 3. Reset controller
+
     errorString = "Pattern upload not currently supported for Lightbuddy!";
     return false;
 }

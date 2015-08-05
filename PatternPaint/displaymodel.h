@@ -12,6 +12,9 @@ public:
         MATRIX8x8   = 1,     /// 8x8 Matrix mode
     };
 
+    virtual bool hasFixedLedCount() const = 0;
+    virtual int getFixedLedCount() const = 0;
+
     /// Set the source pattern that we are interacting with
     virtual void setSource(PatternItem* newPatternItem) = 0;
 

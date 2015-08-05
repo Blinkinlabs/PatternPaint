@@ -799,6 +799,62 @@ void MainWindow::setColorMode(Pattern::ColorMode newColorOrder)
 
 void MainWindow::setDisplayMode(DisplayModel::Mode newDisplayMode)
 {
+    DisplayModel* newDisplayModel;
+
+    // Create a new displaymodel if possible
+    switch(newDisplayMode) {
+    case DisplayModel::TIMELINE:
+        newDisplayModel = new TimelineDisplay();
+        break;
+    case DisplayModel::MATRIX8x8:
+        newDisplayModel = new MatrixDisplay(8,8);
+        break;
+    default:
+        return;
+        break;
+    }
+
+    // Check if any of the patterns need to be resized
+    if(newDisplayModel->hasFixedLedCount()) {
+        bool needToResize = false;
+
+        for(int i = 0; i < patternCollection->count(); i++) {
+            // Convert the current pattern into a Pattern
+            PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->item(i));
+            if(patternItem->getImage().height() != newDisplayModel->getFixedLedCount()) {
+                needToResize = true;
+                break;
+            }
+        }
+
+        // ask about it
+        if(needToResize) {
+            QMessageBox msgBox(this);
+            msgBox.setWindowModality(Qt::WindowModal);
+            //msgBox.setText(messageText);
+            msgBox.setText("Some patterns need to be resized to use this mode. Ok to resize?");
+            msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+            msgBox.setDefaultButton(QMessageBox::Cancel);
+            int ans = msgBox.exec();
+
+            if (ans == QMessageBox::Cancel) {
+                delete newDisplayModel;
+                return;
+            }
+        }
+
+        // then resize them
+        for(int i = 0; i < patternCollection->count(); i++) {
+            // Convert the current pattern into a Pattern
+            PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->item(i));
+            if(patternItem->getImage().height() != newDisplayModel->getFixedLedCount()) {
+                patternItem->resize(patternItem->getFrameCount(),newDisplayModel->getFixedLedCount(),true);
+            }
+        }
+    }
+
+    // Finally, apply the new mode.
+
     switch(newDisplayMode) {
     case DisplayModel::TIMELINE:
         actionTimeline->setChecked(true);
@@ -808,30 +864,20 @@ void MainWindow::setDisplayMode(DisplayModel::Mode newDisplayMode)
         actionTimeline->setChecked(false);
         actionMatrix->setChecked(true);
         break;
-    default:
-        return;
-        break;
     }
 
     QSettings settings;
     settings.setValue("Options/DisplayMode", static_cast<uint>(newDisplayMode));
 
-    // TODO: Delete old object!
-    DisplayModel* previousDisplayModel = displayModel;
-    if(newDisplayMode == DisplayModel::TIMELINE) {
-        displayModel = new TimelineDisplay();
+
+    // TODO: Smart pointer for this.
+    if(displayModel != NULL) {
+        delete displayModel;
     }
-    else if(newDisplayMode == DisplayModel::MATRIX8x8) {
-        displayModel = new MatrixDisplay(8,8);
-    }
+    displayModel = newDisplayModel;
 
     displayModel->setSource(dynamic_cast<PatternItem*>(patternCollection->currentItem()));
     patternEditor->setDisplayModel(displayModel);
-
-    // TODO: Smart pointer for this.
-    if(previousDisplayModel != NULL) {
-        delete previousDisplayModel;
-    }
 
     on_patternSizeUpdated();
     on_patternDataUpdated();
