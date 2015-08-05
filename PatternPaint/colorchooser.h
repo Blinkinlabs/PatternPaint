@@ -36,21 +36,15 @@ class QMouseEvent;
 class QColorDialog;
 QT_END_NAMESPACE
 
-/**
- * @brief Widget for selecting color.
- *
- */
+/// @brief Widget for selecting color.
 class ColorChooser : public QLabel
 {
     Q_OBJECT
 
 public:
-    /**
-     * @brief Constructor
-     *
-     * @param color Default color
-     * @param parent Pointer for parent.
-     */
+    /// Constructor
+    /// @param color Default color
+    /// @param parent Pointer for parent.
     explicit ColorChooser(const QColor& color, QWidget *parent = 0);
     ~ColorChooser();
     
@@ -59,19 +53,13 @@ private:
     QPixmap pixmap;
 
 public slots:
-    /**
-     * @brief Slot for set color to widget.
-     *
-     * @param color Color to set.
-     */
+    /// Slot for set color to widget
+    /// @param Color to send
     void setColor(const QColor &color);
 
 signals:
-    /**
-     * @brief Signal for sending choosen color
-     *
-     * @param Color to send
-     */
+    /// Signal for sending choosen color
+    /// @param Color to send
     void sendColor(const QColor &);
 
 protected:

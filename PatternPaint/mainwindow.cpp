@@ -14,8 +14,11 @@
 #include "colorpickerinstrument.h"
 #include "sprayinstrument.h"
 #include "fillinstrument.h"
-#include "patternitemdelegate.h"
 #include "patternitem.h"
+#include "patternitemdelegate.h"
+
+#include "matrixdisplay.h"
+#include "timelinedisplay.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -44,7 +47,10 @@
 
 #define CONNECTION_SCANNER_INTERVAL 1000
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent),
+    displayModel(NULL),
+    frame(0)
 {
     setupUi(this);
 
@@ -89,7 +95,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     instrumentToolbar->addWidget(colorChooser);
     patternEditor->setToolColor(COLOR_TOOL_DEFAULT);
 
-    QSpinBox *penSizeSpin = new QSpinBox();
+    QSpinBox *penSizeSpin = new QSpinBox(this);
     penSizeSpin->setRange(DRAWING_SIZE_MINIMUM_VALUE, DRAWING_SIZE_MAXIMUM_VALUE);
     penSizeSpin->setValue(DRAWING_SIZE_DEFAULT_VALUE);
     penSizeSpin->setToolTip(tr("Pen size"));
@@ -160,7 +166,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     setDisplayMode(static_cast<DisplayModel::Mode>(settings.value("Options/DisplayMode", DisplayModel::TIMELINE).toUInt()));
 
-    patternCollection->setItemDelegate(new PatternItemDelegate());
+
+    patternCollection->setItemDelegate(new PatternItemDelegate(this));
 
     connect(&patternUpdateNotifier, SIGNAL(patternSizeUpdated()),
             this, SLOT(on_patternSizeUpdated()));
@@ -186,6 +193,10 @@ MainWindow::~MainWindow(){
         appNap = NULL;
     }
 #endif
+
+    if(displayModel != NULL) {
+        delete displayModel;
+    }
 }
 
 void MainWindow::drawTimer_timeout() {
@@ -802,6 +813,7 @@ void MainWindow::setDisplayMode(DisplayModel::Mode newDisplayMode)
     settings.setValue("Options/DisplayMode", static_cast<uint>(newDisplayMode));
 
     // TODO: Delete old object!
+    DisplayModel* previousDisplayModel = displayModel;
     if(newDisplayMode == DisplayModel::TIMELINE) {
         displayModel = new TimelineDisplay();
     }
@@ -811,6 +823,12 @@ void MainWindow::setDisplayMode(DisplayModel::Mode newDisplayMode)
 
     displayModel->setSource(dynamic_cast<PatternItem*>(patternCollection->currentItem()));
     patternEditor->setDisplayModel(displayModel);
+
+    // TODO: Smart pointer for this.
+    if(previousDisplayModel != NULL) {
+        delete previousDisplayModel;
+    }
+
     on_patternSizeUpdated();
     on_patternDataUpdated();
 }
@@ -1069,8 +1087,6 @@ void MainWindow::on_patternModifiedChanged()
         actionSave_File->setEnabled(false);
         return;
     }
-
-    qDebug() << "test";
 
     PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
     if(patternItem->getModified() == true) {

@@ -18,14 +18,15 @@
 #define MIN_UPDATE_INTERVAL     15  // minimum interval between screen updates, in ms
 #define MIN_MOUSE_INTERVAL      5   // minimum interval between mouse inputs, in ms
 
-#define GRID_MIN_Y_SCALE 6      // Minimum scale that the image needs to scale to before the grid is displayed
+#define GRID_MIN_Y_SCALE        6   // Minimum scale that the image needs to scale to before the grid is displayed
 
 
 PatternEditor::PatternEditor(QWidget *parent) :
-    QWidget(parent)
+    QWidget(parent),
+    deviceModel(NULL),
+    patternItem(NULL)
 {
     this->setAcceptDrops(true);
-    deviceModel = new TimelineDisplay();
 }
 
 
@@ -71,7 +72,7 @@ void PatternEditor::dropEvent(QDropEvent *event)
 }
 
 const QImage &PatternEditor::getPatternAsImage() const {
-    if(!deviceModel->hasPatternItem()) {
+    if(!deviceModel || !deviceModel->hasPatternItem()) {
         // TODO: Refactor so we don't have to do this?
         static QImage nullimage(1,1,QImage::Format_RGB32);
         return nullimage;
@@ -86,7 +87,7 @@ void PatternEditor::resizeEvent(QResizeEvent * )
 }
 
 void PatternEditor::updateGridSize() {
-    if(!deviceModel->hasPatternItem()) {
+    if(!deviceModel || !deviceModel->hasPatternItem()) {
         return;
     }
 
@@ -134,7 +135,7 @@ void PatternEditor::updateGridSize() {
 
 
 void PatternEditor::mousePressEvent(QMouseEvent *event) {
-    if (!deviceModel->hasPatternItem() || instrument.isNull()) {
+    if(!deviceModel || !deviceModel->hasPatternItem()) {
         return;
     }
 
@@ -144,7 +145,7 @@ void PatternEditor::mousePressEvent(QMouseEvent *event) {
 }
 
 void PatternEditor::mouseMoveEvent(QMouseEvent *event){
-    if (!deviceModel->hasPatternItem() || instrument.isNull()) {
+    if(!deviceModel || !deviceModel->hasPatternItem()) {
         return;
     }
 
@@ -183,7 +184,7 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
 void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
     setCursor(Qt::ArrowCursor);
 
-    if (!deviceModel->hasPatternItem() || instrument.isNull()) {
+    if (!deviceModel || !deviceModel->hasPatternItem() || instrument.isNull()) {
         return;
     }
 
@@ -192,6 +193,10 @@ void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
 }
 
 void PatternEditor::setPatternItem(PatternItem* newPatternItem) {
+    if(!deviceModel) {
+        return;
+    }
+
     patternItem = newPatternItem;
     deviceModel->setSource(newPatternItem);
 
@@ -220,7 +225,7 @@ void PatternEditor::setToolSize(int size) {
 }
 
 void PatternEditor::setPlaybackRow(int row) {
-    if(!deviceModel->hasPatternItem()) {
+    if(!deviceModel || !deviceModel->hasPatternItem()) {
         // TODO: Reset size to some default?
         return;
     }
@@ -253,7 +258,7 @@ void PatternEditor::paintEvent(QPaintEvent*)
     painter.setRenderHint(QPainter::Antialiasing, false);
 
     // If we don't have a pattern item, show an empty view
-    if(!deviceModel->hasPatternItem()) {
+    if(!deviceModel || !deviceModel->hasPatternItem()) {
         painter.fillRect(0,0,this->width(),this->height(), QColor(0,0,0));
         return;
     }
@@ -297,7 +302,7 @@ void PatternEditor::paintEvent(QPaintEvent*)
 
 void PatternEditor::applyInstrument(QImage& update)
 {
-    if(!deviceModel->hasPatternItem()) {
+    if(!deviceModel || !deviceModel->hasPatternItem()) {
         return;
     }
 
