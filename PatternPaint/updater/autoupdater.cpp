@@ -2,7 +2,7 @@
  * Copyright (C) 2008 Remko Troncon
  */
 
-#include "AutoUpdater.h"
+#include "autoupdater.h"
 
 AutoUpdater::~AutoUpdater()
 {

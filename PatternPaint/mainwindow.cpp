@@ -48,7 +48,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     setupUi(this);
 
+#if defined(Q_OS_MAC)
     appNap = NULL;
+#endif
 
     drawTimer = new QTimer(this);
     connectionScannerTimer = new QTimer(this);
