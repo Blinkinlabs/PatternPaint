@@ -39,7 +39,6 @@ CONFIG(debug, debug|release) {
 
 SOURCES += main.cpp\
     mainwindow.cpp \
-    colorpicker.cpp \
     systeminformation.cpp \
     colormodel.cpp \
     aboutpatternpaint.cpp \
@@ -58,7 +57,6 @@ SOURCES += main.cpp\
     timelinedisplay.cpp
 
 HEADERS  += mainwindow.h \
-    colorpicker.h \
     systeminformation.h \
     colormodel.h \
     aboutpatternpaint.h \
