@@ -106,6 +106,12 @@ bool BlinkyPendantUploader::upgradeFirmware(BlinkyController& controller)
     return false;
 }
 
+bool BlinkyPendantUploader::upgradeFirmware(int)
+{
+    errorString = "Firmware update not currently supported for BlinkyPendant!";
+    return false;
+}
+
 QString BlinkyPendantUploader::getErrorString() const
 {
     return errorString;

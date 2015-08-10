@@ -12,7 +12,7 @@
 #define BOOTLOADER_POLL_INTERVAL 200
 
 /// Maximum time to wait before giving up on finding a bootloader
-#define BOOTLOADER_POLL_TIMEOUT 8000
+#define BOOTLOADER_POLL_TIMEOUT 10000
 
 
 /// How long to wait between receiving notification that the programmer has been
@@ -137,11 +137,49 @@ bool BlinkyTapeUploader::upgradeFirmware(BlinkyController& tape) {
     return startUpload(tape);
 }
 
+bool BlinkyTapeUploader::upgradeFirmware(int timeout) {
+    QByteArray sketch = QByteArray(reinterpret_cast<const char*>(PRODUCTION_DATA),PRODUCTION_LENGTH);
+
+    bootloaderPollTimeout = timeout;
+
+    char buff[BUFF_LENGTH];
+    snprintf(buff, BUFF_LENGTH, "Sketch size: %iB",
+             sketch.length()),
+    qDebug() << buff;
+
+    // The entire sketch must fit into the available memory, minus a single page
+    // at the end of flash for the configuration header
+    // TODO: Could save ~100 bytes if we let the sketch spill into the unused portion
+    // of the header.
+    if(sketch.length() > FLASH_MEMORY_AVAILABLE) {
+        qDebug() << "sketch can't fit into memory!";
+
+        errorString = QString("Sorry! The Pattern is a bit too big to fit in BlinkyTape memory right now. We're working on improving this! Avaiable space=%1, Pattern size=%2")
+                .arg(FLASH_MEMORY_AVAILABLE)
+                .arg(sketch.length());
+        return false;
+    }
+
+    // Put the sketch, pattern, and metadata into the programming queue.
+    flashData.push_back(FlashSection(PRODUCTION_ADDRESS, sketch));
+
+    setProgress(0);
+    // TODO: Calculate this based on feedback from the programmer.
+    setMaxProgress(300);
+
+    stateStartTime = QDateTime::currentDateTime();
+    state = State_WaitForBootloaderPort;
+    bootloaderResetTimer->singleShot(0,this,SLOT(doWork()));
+    return true;
+}
+
+
 bool BlinkyTapeUploader::startUpload(BlinkyController& tape) {
     setProgress(0);
     // TODO: Calculate this based on feedback from the programmer.
     setMaxProgress(300);
 
+    bootloaderPollTimeout = BOOTLOADER_POLL_TIMEOUT;
 
     // Now, start the polling processes to detect a new bootloader
     // We can't reset if we weren't already connected...
@@ -180,8 +218,9 @@ void BlinkyTapeUploader::doWork() {
             // If we didn't detect a bootloader and still have time, then queue the timer and
             // wait. Otherwise, we timed out, so fail.
             if(postResetTapes.length() == 0) {
-                if(stateStartTime.msecsTo(QDateTime::currentDateTime())
-                        > BOOTLOADER_POLL_TIMEOUT) {
+                if((bootloaderPollTimeout > 0)
+                        && (stateStartTime.msecsTo(QDateTime::currentDateTime())
+                        > bootloaderPollTimeout)) {
                     handleProgrammerError("Timeout waiting for a bootloader device");
                     return;
                 }

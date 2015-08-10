@@ -14,6 +14,7 @@ public:
 
     bool startUpload(BlinkyController& controller, std::vector<Pattern> patterns);
     bool upgradeFirmware(BlinkyController& controller);
+    bool upgradeFirmware(int timeout);
     QString getErrorString() const;
 
 private slots:

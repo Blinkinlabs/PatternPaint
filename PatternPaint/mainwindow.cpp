@@ -27,6 +27,7 @@
 #include <QtWidgets>
 #include <QUndoGroup>
 #include <QToolButton>
+#include <blinkytapeuploader.h>
 
 
 #define PATTERN_SPEED_MINIMUM_VALUE 1
@@ -135,8 +136,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Pre-set the upload progress dialog
     progressDialog = new QProgressDialog(this);
-    progressDialog->setWindowTitle("Blinky exporter");
-    progressDialog->setLabelText("Saving pattern to Blinky...");
     progressDialog->setMinimum(0);
     progressDialog->setMaximum(150);
     progressDialog->setWindowModality(Qt::WindowModal);
@@ -480,8 +479,17 @@ void MainWindow::on_uploaderFinished(bool result)
     mode = Disconnected;
     uploader.clear();
 
-    qDebug() << "Uploader finished! Result:" << result;
     progressDialog->hide();
+
+    qDebug() << "Uploader finished! Result:" << result;
+    if(!result) {
+        // TODO: allow restarting the upload process if it failed
+        QMessageBox msgBox(this);
+        msgBox.setWindowModality(Qt::WindowModal);
+        msgBox.setText("Error updating blinky- please try again.");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        int ans = msgBox.exec();
+    }
 }
 
 void MainWindow::on_actionVisit_the_Blinkinlabs_forum_triggered()
@@ -528,26 +536,50 @@ void MainWindow::on_actionClear_Pattern_triggered()
 }
 
 void MainWindow::on_actionLoad_rainbow_sketch_triggered()
-{
+{   
+    // If the controller doesn't exist, create a new uploader based on the blinkytape
     if(controller.isNull()) {
-        return;
+        uploader = QPointer<PatternUploader>(new BlinkyTapeUploader(this));
+
+        connectUploader();
+
+        if(!uploader->upgradeFirmware(-1)) {
+            errorMessageDialog->setText(uploader->getErrorString());
+            errorMessageDialog->show();
+            return;
+        }
+
+        progressDialog->setWindowTitle("Firmware reset");
+        progressDialog->setLabelText(
+                    "Searching for a BlinkyTape bootloader...\n"
+                    "\n"
+                    "Please connect your blinkytape to the computer via USB,\n"
+                    "then perform the reset trick. As soon as the device\n"
+                    "restarts, the progress bar should start moving and the\n"
+                    "firmware will be restored.");
+    }
+    // Otherwise just grab it
+    else {
+        if (!controller->getUploader(uploader)) {
+            return;
+        }
+
+        if(uploader.isNull()) {
+            return;
+        }
+
+        connectUploader();
+
+        if(!uploader->upgradeFirmware(*controller)) {
+            errorMessageDialog->setText(uploader->getErrorString());
+            errorMessageDialog->show();
+            return;
+        }
+
+        progressDialog->setWindowTitle("Firmware reset");
+        progressDialog->setLabelText("Loading new firmware onto Blinky");
     }
 
-    if(!controller->getUploader(uploader)) {
-        return;
-    }
-
-    if(uploader.isNull()) {
-        return;
-    }
-
-    connectUploader();
-
-    if(!uploader->upgradeFirmware(*controller)) {
-        errorMessageDialog->setText(uploader->getErrorString());
-        errorMessageDialog->show();
-        return;
-    }
     mode = Uploading;
 
     progressDialog->setValue(progressDialog->minimum());
@@ -597,6 +629,9 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
         return;
     }
     mode = Uploading;
+
+    progressDialog->setWindowTitle("Blinky exporter");
+    progressDialog->setLabelText("Saving pattern to Blinky...");
 
     progressDialog->setValue(progressDialog->minimum());
     progressDialog->show();

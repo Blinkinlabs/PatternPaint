@@ -45,6 +45,7 @@ public:
 
     bool startUpload(BlinkyController& tape, std::vector<Pattern> patterns);
     bool upgradeFirmware(BlinkyController& tape);
+    bool upgradeFirmware(int timeout);
     QString getErrorString() const;
 
 private slots:
@@ -72,6 +73,8 @@ private:
 
     /// Timer used to poll for the bootloader device to show up
     QPointer<QTimer> bootloaderResetTimer;
+
+    qint64 bootloaderPollTimeout;
 
     /// Current upload progress, in command counts
     float progress;
