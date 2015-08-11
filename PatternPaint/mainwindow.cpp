@@ -82,6 +82,9 @@ MainWindow::MainWindow(QWidget *parent) :
     menuEdit->addAction(redoAction);
 
     // instruments
+    ColorpickerInstrument* cpi = new ColorpickerInstrument(this);
+    connect(cpi, SIGNAL(pickedColor(QColor)), SLOT(on_colorPicked(QColor)));
+
     connect(actionPen, SIGNAL(triggered(bool)), SLOT(on_instrumentSelected(bool)));
     connect(actionLine, SIGNAL(triggered(bool)), SLOT(on_instrumentSelected(bool)));
     connect(actionSpray, SIGNAL(triggered(bool)), SLOT(on_instrumentSelected(bool)));
@@ -91,6 +94,7 @@ MainWindow::MainWindow(QWidget *parent) :
     actionPen->setData(QVariant::fromValue(new PencilInstrument(this)));
     actionLine->setData(QVariant::fromValue(new LineInstrument(this)));
     actionSpray->setData(QVariant::fromValue(new SprayInstrument(this)));
+    actionPipette->setData(QVariant::fromValue(cpi));
     actionFill->setData(QVariant::fromValue(new FillInstrument(this)));
 
     colorChooser = new ColorChooser(COLOR_TOOL_DEFAULT, this);
@@ -757,6 +761,11 @@ void MainWindow::on_instrumentSelected(bool) {
 
     act->setChecked(true);
     patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(act->data()));
+}
+
+void MainWindow::on_colorPicked(QColor color) {
+    colorChooser->setColor(color);
+    patternEditor->setToolColor(color);
 }
 
 int MainWindow::promptForSave(PatternItem* patternItem) {

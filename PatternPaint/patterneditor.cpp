@@ -135,7 +135,7 @@ void PatternEditor::updateGridSize() {
 
 
 void PatternEditor::mousePressEvent(QMouseEvent *event) {
-    if(!deviceModel || !deviceModel->hasPatternItem()) {
+    if (!deviceModel || !deviceModel->hasPatternItem() || instrument.isNull()) {
         return;
     }
 
@@ -145,7 +145,7 @@ void PatternEditor::mousePressEvent(QMouseEvent *event) {
 }
 
 void PatternEditor::mouseMoveEvent(QMouseEvent *event){
-    if(!deviceModel || !deviceModel->hasPatternItem()) {
+    if (!deviceModel || !deviceModel->hasPatternItem() || instrument.isNull()) {
         return;
     }
 
