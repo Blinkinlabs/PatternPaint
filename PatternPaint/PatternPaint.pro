@@ -37,6 +37,17 @@ CONFIG(debug, debug|release) {
     DEFINES += DISABLE_UPDATE_CHECKS
 }
 
+# Workaround for lineinstrument tool in QT 5.2 - 5.4
+# See: https://github.com/Blinkinlabs/PatternPaint/issues/66
+# TODO: Test+remove me when updating to QT 5.5
+equals(QT_MAJOR_VERSION, 5){
+    greaterThan(QT_MINOR_VERSION,1) {
+        lessThan(QT_MINOR_VERSION,5) {
+            DEFINES += LINE_INSTRUMENT_WORKAROUND
+        }
+    }
+}
+
 SOURCES += main.cpp\
     mainwindow.cpp \
     systeminformation.cpp \

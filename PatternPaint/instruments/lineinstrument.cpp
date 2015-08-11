@@ -29,6 +29,7 @@
 #include <QPen>
 #include <QPainter>
 #include <QImage>
+#include <QDebug>
 
 LineInstrument::LineInstrument(QObject *parent) :
     AbstractInstrument(parent)
@@ -70,12 +71,41 @@ void LineInstrument::paint(PatternEditor& editor)
 {
     QPainter painter(&toolPreview);
 
+
     painter.setPen(QPen(editor.getPrimaryColor(), editor.getPenSize() ,
                             Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
 
     if(mStartPoint != mEndPoint) {
+
+#if defined(LINE_INSTRUMENT_WORKAROUND)
+        // Workaround for bug in Qt: see https://github.com/Blinkinlabs/PatternPaint/issues/66
+        QPoint newStartPoint(mStartPoint);
+        QPoint newEndPoint(mEndPoint);
+
+        int deltaX = (mEndPoint-mStartPoint).x();
+        int deltaY = (mEndPoint-mStartPoint).y();
+
+        qDebug() << "deltaX=" << deltaX << " deltaY=" << deltaY;
+
+        if((deltaX > 0 && deltaY < 0) || (deltaX < 0 && deltaY > 0)) {
+            if(abs(deltaX) >=abs(deltaY)) {
+                qDebug() << "A";
+                newStartPoint += QPoint(0,1);
+                newEndPoint += QPoint(0,1);
+            }
+            else {
+                qDebug() << "B";
+                newStartPoint += QPoint(1,0);
+                newEndPoint += QPoint(1,0);
+            }
+        }
+
+        painter.drawLine(newStartPoint, newEndPoint);
+#else
         painter.drawLine(mStartPoint, mEndPoint);
+#endif
+
     }
 
     if(mStartPoint == mEndPoint) {
