@@ -79,18 +79,6 @@ public:
     /// Apply changes to the pattern
     void applyInstrument(const QImage& update);
 
-    /// Delete the frame at the given index
-    /// @param frame Index of the frame to delete
-    void deleteFrame(int newFrame);
-
-    /// Insert a frame at the given index
-    /// @param frame Index that the frame should be inserted at
-    void addFrame(int newFrame);
-
-//    /// Get the number of frames in this pattern
-//    /// @return Frame count
-//    int getFrameCount() const;
-
     /// Test if the pattern has unsaved changes
     /// @return true if the pattern has unsaved changes
     bool getModified() const { return modified; }

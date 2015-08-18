@@ -43,6 +43,14 @@ public:
     /// @return an NxN QImage reperesenting the current frame data
     virtual const QImage& getFrameData() = 0;
 
+    /// Delete the frame at the given index
+    /// @param frame Index of the frame to delete
+    virtual void deleteFrame(int newFrame) = 0;
+
+    /// Insert a frame at the given index
+    /// @param frame Index that the frame should be inserted at
+    virtual void addFrame(int newFrame) = 0;
+
     /// Apply instrument data to the current frame
     /// @instrumentFrameData NxN QImage to be painted on top of the current frame data
     virtual void applyInstrument(const QImage& instrumentFrameData) = 0;

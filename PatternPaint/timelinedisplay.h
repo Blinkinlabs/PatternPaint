@@ -20,6 +20,9 @@ public:
     void setFrameIndex(int newFrame);
     int getFrameIndex() const;
 
+    void deleteFrame(int newFrame);
+    void addFrame(int newFrame);
+
     const QImage& getFrameData();
     void applyInstrument(const QImage& instrumentFrameData) ;
 

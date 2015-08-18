@@ -1160,24 +1160,22 @@ void MainWindow::on_actionMatrix_triggered()
 
 void MainWindow::on_actionAddFrame_triggered()
 {
-    if(patternCollection->currentItem() == NULL) {
+    if(!displayModel->hasPatternItem()) {
         return;
     }
 
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-    patternItem->addFrame(displayModel->getFrameIndex());
+    displayModel->addFrame(displayModel->getFrameIndex());
 
     setNewFrame(displayModel->getFrameIndex()+1);
 }
 
 void MainWindow::on_actionDeleteFrame_triggered()
 {
-    if(patternCollection->currentItem() == NULL) {
+    if(!displayModel->hasPatternItem()) {
         return;
     }
 
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-    patternItem->deleteFrame(displayModel->getFrameIndex());
+    displayModel->deleteFrame(displayModel->getFrameIndex());
 
     setNewFrame(displayModel->getFrameIndex()-1);
 }
