@@ -15,6 +15,8 @@ public:
 
     bool showPlaybackIndicator() const {return false;}
 
+    int getFrameCount() const;
+
     void setFrameIndex(int newFrame);
     int getFrameIndex() const;
 

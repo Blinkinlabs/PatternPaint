@@ -13,7 +13,18 @@ bool TimelineDisplay::hasPatternItem() const {
 }
 
 void TimelineDisplay::setFrameIndex(int newFrame) {
+    if(frame < 0) {
+        frame = 0;
+    }
+    if(frame > getFrameCount()) {
+        frame = getFrameCount()-1;
+    }
+
     frame = newFrame;
+}
+
+int TimelineDisplay::getFrameCount() const {
+    return patternItem->getImage().width();
 }
 
 int TimelineDisplay::getFrameIndex() const {

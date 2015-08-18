@@ -248,9 +248,9 @@ void PatternItem::addFrame(int newFrame) {
 }
 
 
-int PatternItem::getFrameCount() const {
-    return image.width();
-}
+//int PatternItem::getFrameCount() const {
+//    return image.width();
+//}
 
 void PatternItem::setModified(bool newModified)  {
     bool modifiedChanged = false;

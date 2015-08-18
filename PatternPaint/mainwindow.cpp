@@ -203,12 +203,11 @@ MainWindow::~MainWindow(){
 }
 
 void MainWindow::drawTimer_timeout() {
-    if(patternCollection->currentItem() == NULL) {
+    if(!displayModel->hasPatternItem()) {
         return;
     }
 
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-    setNewFrame((frame+1)%patternItem->getFrameCount());
+    setNewFrame((frame+1)%displayModel->getFrameCount());
 }
 
 
@@ -492,7 +491,7 @@ void MainWindow::on_uploaderFinished(bool result)
         msgBox.setWindowModality(Qt::WindowModal);
         msgBox.setText("Error updating blinky- please try again.");
         msgBox.setStandardButtons(QMessageBox::Ok);
-        int ans = msgBox.exec();
+        msgBox.exec();
     }
 }
 
@@ -892,9 +891,10 @@ void MainWindow::setDisplayMode(DisplayModel::Mode newDisplayMode)
         // then resize them
         for(int i = 0; i < patternCollection->count(); i++) {
             // Convert the current pattern into a Pattern
+            // TODO: Run this resizing through the display model
             PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->item(i));
             if(patternItem->getImage().height() != newDisplayModel->getFixedLedCount()) {
-                patternItem->resize(patternItem->getFrameCount(),newDisplayModel->getFixedLedCount(),true);
+                patternItem->resize(patternItem->getImage().width(),newDisplayModel->getFixedLedCount(),true);
             }
         }
     }
@@ -933,9 +933,8 @@ void MainWindow::setNewFrame(int newFrame)
 {
     int frameCount = 0;
 
-    if(!(patternCollection->currentItem() == NULL)) {
-        PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-        frameCount = patternItem->getFrameCount();
+    if(displayModel != NULL && displayModel->hasPatternItem()) {
+        frameCount = displayModel->getFrameCount();
     }
 
     if(newFrame >= frameCount) {
@@ -1098,12 +1097,12 @@ void MainWindow::on_patternDataUpdated()
 
 void MainWindow::on_patternSizeUpdated()
 {
-    // Reset the current frame, in case the new size is smaller than the old one
-    setNewFrame(frame);
-
     if(patternCollection->currentItem() == NULL) {
         return;
     }
+
+    // Reset the current frame, in case the new size is smaller than the old one
+    setNewFrame(frame);
 
     PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
 
@@ -1136,8 +1135,8 @@ void MainWindow::on_actionStepForward_triggered()
         return;
     }
 
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-    setNewFrame((frame+1)%patternItem->getFrameCount());
+
+    setNewFrame((frame+1)%displayModel->getFrameCount());
 }
 
 void MainWindow::on_actionStepBackward_triggered()
@@ -1146,8 +1145,7 @@ void MainWindow::on_actionStepBackward_triggered()
         return;
     }
 
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-    setNewFrame(frame<=0?patternItem->getFrameCount()-1:frame-1);
+    setNewFrame(frame<=0?displayModel->getFrameCount()-1:frame-1);
 }
 
 void MainWindow::on_actionTimeline_triggered()

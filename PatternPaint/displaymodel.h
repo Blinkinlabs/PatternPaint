@@ -24,7 +24,12 @@ public:
     virtual bool hasPatternItem() const = 0;
 
     /// True if the patternEditor should show a playback indication bar
+    /// @return True if the pattern editor should show a playback bar
     virtual bool showPlaybackIndicator() const = 0;
+
+    /// Get the number of frames contained in the animation
+    /// @return Frame count
+    virtual int getFrameCount() const = 0;
 
     /// Set the index of the active frame
     /// @param newFrame Frame index to interact with

@@ -28,11 +28,15 @@ void MatrixDisplay::setFrameIndex(int newFrame) {
     if(frame < 0) {
         frame = 0;
     }
-    if(frame > patternItem->getFrameCount()) {
-        frame = patternItem->getFrameCount()-1;
+    if(frame > getFrameCount()) {
+        frame = getFrameCount()-1;
     }
 
     frame = newFrame;
+}
+
+int MatrixDisplay::getFrameCount() const {
+    return patternItem->getImage().width();
 }
 
 int MatrixDisplay::getFrameIndex() const {

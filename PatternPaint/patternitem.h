@@ -57,7 +57,6 @@ public:
     /// @param newFileInfo URL of file to load
     bool load(const QFileInfo& newFileInfo);
 
-
     /// Save the pattern
     /// Note: The file must already have a filename, otherwise use saveAs
     bool save();
@@ -88,9 +87,9 @@ public:
     /// @param frame Index that the frame should be inserted at
     void addFrame(int newFrame);
 
-    /// Get the number of frames in this pattern
-    /// @return Frame count
-    int getFrameCount() const;
+//    /// Get the number of frames in this pattern
+//    /// @return Frame count
+//    int getFrameCount() const;
 
     /// Test if the pattern has unsaved changes
     /// @return true if the pattern has unsaved changes
