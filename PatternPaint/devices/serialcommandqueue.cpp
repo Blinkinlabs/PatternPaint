@@ -1,6 +1,6 @@
 #include "serialcommandqueue.h"
 
-#define COMMAND_TIMEOUT_TIME 1000
+#define COMMAND_TIMEOUT_TIME 20000
 
 SerialCommandQueue::SerialCommandQueue(QObject *parent) : QObject(parent)
 {

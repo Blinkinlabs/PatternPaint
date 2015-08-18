@@ -12,9 +12,12 @@ BlinkyPendantUploader::BlinkyPendantUploader(QObject *parent) :
 bool BlinkyPendantUploader::startUpload(BlinkyController& controller, std::vector<Pattern> patterns)
 {
     // TODO: push the image conversions into here so they are less awkward.
+    #define PIXEL_COUNT 100
 
 // TODO: Update blinkypendant firmware!
-#if defined BLINKY_PENDANT_2
+#define BLINKY_PENDANT_2
+
+#if defined(BLINKY_PENDANT_2)
 
     // Create the data structure to write to the device memory
     // Animation table
@@ -24,7 +27,7 @@ bool BlinkyPendantUploader::startUpload(BlinkyController& controller, std::vecto
     data.append((char)0x31);    // header
     data.append((char)0x23);
     data.append((char)patterns.size()); // Number of patterns in the table
-    data.append((char)10);            // Number of LEDs in the pattern
+    data.append((char)PIXEL_COUNT);     // Number of LEDs in the pattern
 
     for(std::vector<Pattern>::iterator pattern = patterns.begin();
         pattern != patterns.end();
@@ -33,7 +36,7 @@ bool BlinkyPendantUploader::startUpload(BlinkyController& controller, std::vecto
         // Make sure we have an image compatible with the BlinkyPendant
         QImage image = pattern->image;
         QImage croppedImage;
-        croppedImage = image.copy( 0, 0, image.width(), 10);
+        croppedImage = image.copy( 0, 0, image.width(), PIXEL_COUNT);
         Pattern croppedPattern(croppedImage, 0, Pattern::RGB24, Pattern::RGB);
 
         // Animation entry
@@ -57,7 +60,7 @@ bool BlinkyPendantUploader::startUpload(BlinkyController& controller, std::vecto
     // Make sure we have an image compatible with the BlinkyPendant
     QImage image = patterns.at(0).image;
     QImage croppedImage;
-    croppedImage = image.copy( 0, 0, image.width(), 10);
+    croppedImage = image.copy( 0, 0, image.width(), PIXEL_COUNT);
 
     Pattern pattern(croppedImage, 0, Pattern::RGB24, Pattern::RGB);
 

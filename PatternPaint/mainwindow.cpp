@@ -276,7 +276,7 @@ void MainWindow::on_actionLoad_File_triggered()
     }
 
     QString fileName = QFileDialog::getOpenFileName(this,
-        tr("Open Pattern"), lastDirectory, tr("Pattern Files (*.png *.jpg *.bmp)"));
+        tr("Open Pattern"), lastDirectory, tr("Pattern Files (*.png *.jpg *.bmp *.gif)"));
 
     if(fileName.length() == 0) {
         return;
