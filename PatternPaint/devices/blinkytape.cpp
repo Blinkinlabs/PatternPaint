@@ -9,7 +9,7 @@
 #define CONNECTION_SCANNER_INTERVAL 100
 
 // TODO: Put this somewhere better?
-#define PENDANT_MAX_PIXELS 100
+#define PENDANT_MAX_PIXELS 10
 
 #define RESET_TIMER_TIMEOUT 500
 

@@ -12,10 +12,10 @@ BlinkyPendantUploader::BlinkyPendantUploader(QObject *parent) :
 bool BlinkyPendantUploader::startUpload(BlinkyController& controller, std::vector<Pattern> patterns)
 {
     // TODO: push the image conversions into here so they are less awkward.
-    #define PIXEL_COUNT 100
+    #define PIXEL_COUNT 10
 
 // TODO: Update blinkypendant firmware!
-#define BLINKY_PENDANT_2
+//#define BLINKY_PENDANT_2
 
 #if defined(BLINKY_PENDANT_2)
 
