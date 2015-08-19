@@ -78,7 +78,7 @@ const QImage &PatternEditor::getPatternAsImage() const {
         return nullimage;
     }
 
-    return deviceModel->getFrameData();
+    return deviceModel->getFrame();
 }
 
 void PatternEditor::resizeEvent(QResizeEvent * )
@@ -93,7 +93,7 @@ void PatternEditor::updateGridSize() {
 
     // Base the widget size on the window height
     // cast float to int to save rounded scale
-    QSize frameSize = deviceModel->getFrameData().size();
+    QSize frameSize = deviceModel->getFrame().size();
 
     float scale = static_cast<int>(float(size().height() - 1)/frameSize.height()*10);
     scale /= 10;
@@ -205,7 +205,7 @@ void PatternEditor::setPatternItem(PatternItem* newPatternItem) {
         return;
     }
 
-    this->setBaseSize(deviceModel->getFrameData().size());
+    this->setBaseSize(deviceModel->getFrame().size());
 
     // Turn on mouse tracking so we can draw a preview
     setMouseTracking(true);
@@ -263,7 +263,7 @@ void PatternEditor::paintEvent(QPaintEvent*)
         return;
     }
 
-    QImage frameData = deviceModel->getFrameData();
+    QImage frameData = deviceModel->getFrame();
 
     // Draw the image and tool preview
     painter.drawImage(QRect(0,0,

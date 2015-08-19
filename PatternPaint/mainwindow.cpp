@@ -511,9 +511,9 @@ void MainWindow::on_actionFlip_Horizontal_triggered()
         return;
     }
 
-    QImage frameData = displayModel->getFrameData();
-    frameData = frameData.mirrored(true, false);
-    displayModel->applyInstrument(frameData);
+    QImage frame = displayModel->getFrame();
+    frame = frame.mirrored(true, false);
+    displayModel->applyInstrument(frame);
 }
 
 void MainWindow::on_actionFlip_Vertical_triggered()
@@ -522,9 +522,9 @@ void MainWindow::on_actionFlip_Vertical_triggered()
         return;
     }
 
-    QImage frameData = displayModel->getFrameData();
-    frameData = frameData.mirrored(false, true);
-    displayModel->applyInstrument(frameData);
+    QImage frame = displayModel->getFrame();
+    frame = frame.mirrored(false, true);
+    displayModel->applyInstrument(frame);
 }
 
 void MainWindow::on_actionClear_Pattern_triggered()
@@ -533,9 +533,9 @@ void MainWindow::on_actionClear_Pattern_triggered()
         return;
     }
 
-    QImage frameData = displayModel->getFrameData();
-    frameData.fill(COLOR_CANVAS_DEFAULT);
-    displayModel->applyInstrument(frameData);
+    QImage frame = displayModel->getFrame();
+    frame.fill(COLOR_CANVAS_DEFAULT);
+    displayModel->applyInstrument(frame);
 }
 
 void MainWindow::on_actionLoad_rainbow_sketch_triggered()

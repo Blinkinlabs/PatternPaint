@@ -31,7 +31,7 @@ int TimelineDisplay::getFrameIndex() const {
     return frame;
 }
 
-const QImage& TimelineDisplay::getFrameData() {
+const QImage& TimelineDisplay::getFrame() {
     return patternItem->getImage();
 }
 

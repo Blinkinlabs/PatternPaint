@@ -23,7 +23,7 @@ public:
     void deleteFrame(int newFrame);
     void addFrame(int newFrame);
 
-    const QImage& getFrameData();
+    const QImage& getFrame();
     void applyInstrument(const QImage& instrumentFrameData) ;
 
 private:
