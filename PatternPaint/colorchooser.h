@@ -27,13 +27,13 @@
 #define COLORCHOOSER_H
 
 #include <QLabel>
+#include <QColorDialog>
 
 QT_BEGIN_NAMESPACE
 class QColor;
 class QPixmap;
 class QPainter;
 class QMouseEvent;
-class QColorDialog;
 QT_END_NAMESPACE
 
 /// @brief Widget for selecting color.
@@ -52,10 +52,16 @@ private:
     QColor currentColor;
     QPixmap pixmap;
 
+    QColorDialog colorDialog;
+
 public slots:
-    /// Slot for set color to widget
-    /// @param Color to send
+    /// Set a new color for the widget, but don't re-emit sendColor()
+    /// @param color new color
     void setColor(const QColor &color);
+
+    /// Set a new color for the widget, and also emit sendColor()
+    /// @param color new color
+    void setAndSendColor(const QColor &color);
 
 signals:
     /// Signal for sending choosen color
