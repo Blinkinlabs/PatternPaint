@@ -152,7 +152,11 @@ private:
     void startPlayback();
     void stopPlayback();
 
-    int promptForSave(PatternItem* patternItem);
+    bool promptForSave(PatternItem* item);
+    bool promptForSave(std::vector<PatternItem*> item);
+
+    bool savePattern(PatternItem *item);
+    bool savePatternAs(PatternItem *item);
 
     void connectController();
     void connectUploader();

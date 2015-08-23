@@ -305,11 +305,8 @@ void MainWindow::on_actionLoad_File_triggered()
     patternCollection->setCurrentItem(patternItem);
 }
 
-void MainWindow::on_actionSave_File_as_triggered() {
-    if(patternCollection->currentItem() == NULL) {
-        return;
-    }
 
+bool MainWindow::savePatternAs(PatternItem* item) {
     QSettings settings;
     QString lastDirectory = settings.value("File/SaveDirectory").toString();
 
@@ -322,17 +319,39 @@ void MainWindow::on_actionSave_File_as_triggered() {
         tr("Save Pattern"), lastDirectory, tr("Pattern Files (*.png *.jpg *.bmp)"));
 
     if(fileName.length() == 0) {
-        return;
+        return false;
     }
 
     QFileInfo fileInfo(fileName);
     settings.setValue("File/SaveDirectory", fileInfo.absolutePath());
 
-    PatternItem* item = dynamic_cast<PatternItem*>(patternCollection->currentItem());
     if (!item->saveAs(fileInfo)) {
         QMessageBox::warning(this, tr("Error"), tr("Error saving pattern %1. Try saving it somewhere else?")
                        .arg(fileInfo.absolutePath()));
     }
+
+    return (!item->getModified());
+}
+
+bool MainWindow::savePattern(PatternItem* item) {
+    if(!item->hasValidFilename()) {
+        return savePatternAs(item);
+    } else {
+        if (!item->save()) {
+            QMessageBox::warning(this, tr("Error"), tr("Error saving pattern %1. Try saving it somewhere else?")
+                           .arg(item->getPatternName()));
+        }
+        return (!item->getModified());
+    }
+}
+
+void MainWindow::on_actionSave_File_as_triggered() {
+    if(patternCollection->currentItem() == NULL) {
+        return;
+    }
+
+    PatternItem* item = dynamic_cast<PatternItem*>(patternCollection->currentItem());
+    savePatternAs(item);
 }
 
 void MainWindow::on_actionSave_File_triggered() {
@@ -341,15 +360,7 @@ void MainWindow::on_actionSave_File_triggered() {
     }
 
     PatternItem* item = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-
-    if(!item->hasValidFilename()) {
-        on_actionSave_File_as_triggered();
-    } else {
-        if (!item->save()) {
-            QMessageBox::warning(this, tr("Error"), tr("Error saving pattern %1. Try saving it somewhere else?")
-                           .arg(item->getPatternName()));
-        }
-    }
+    savePattern(item);
 }
 
 void MainWindow::on_actionExit_triggered() {
@@ -608,7 +619,7 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
                 settings.value("Options/DisplayMode", LedDisplay::TIMELINE).toUInt()
                 );
 
-    // Create a new displaymodel if possible
+    // Create a new displaymodel to handle the conversions
     switch(displayMode) {
     case LedDisplay::TIMELINE:
         display = new TimelineDisplay();
@@ -742,13 +753,29 @@ void MainWindow::readSettings()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+
     // TODO: Combine all of these into one big 'save' message
+    std::vector<PatternItem*> unsaved;
 
     for(int i = 0; i < patternCollection->count(); i++) {
         // Convert the current pattern into a Pattern
         PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->item(i));
 
-        if(!promptForSave(patternItem)) {
+        if (patternItem->getModified() == true) {
+            unsaved.push_back(patternItem);
+        }
+    }
+
+    if(unsaved.size() == 1) {
+        // If we only have one pattern, show the regular prompt for save dialog
+        if(!promptForSave(unsaved.front())) {
+            event->ignore();
+            return;
+        }
+    }
+    else if(unsaved.size() > 1) {
+        // If we only have one pattern, show the regular prompt for save dialog
+        if(!promptForSave(unsaved)) {
             event->ignore();
             return;
         }
@@ -789,17 +816,17 @@ void MainWindow::on_colorPicked(QColor color) {
     patternEditor->setToolColor(color);
 }
 
-int MainWindow::promptForSave(PatternItem* patternItem) {
-    if (patternItem->getModified() == false) {
+bool MainWindow::promptForSave(PatternItem* item) {
+    if (item->getModified() == false) {
         return true;
     }
 
     QString messageText = QString("The pattern %1 has been modified.")
-            .arg(patternItem->getPatternName());
+            .arg(item->getPatternName());
 
     QMessageBox msgBox(this);
     msgBox.setWindowModality(Qt::WindowModal);
-    msgBox.setIconPixmap(QPixmap::fromImage(patternItem->getImage()));
+    msgBox.setIconPixmap(QPixmap::fromImage(item->getImage()));
     msgBox.setText(messageText);
     msgBox.setInformativeText("Do you want to save your changes?");
     msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
@@ -807,9 +834,7 @@ int MainWindow::promptForSave(PatternItem* patternItem) {
     int ans = msgBox.exec();
 
     if (ans == QMessageBox::Save) {
-        on_actionSave_File_triggered();
-
-        return (!patternItem->getModified());
+        return savePattern(item);
     }
 
     if (ans == QMessageBox::Cancel) {
@@ -821,6 +846,38 @@ int MainWindow::promptForSave(PatternItem* patternItem) {
     }
 
     return false;
+}
+
+bool MainWindow::promptForSave(std::vector<PatternItem*> patternItems) {
+    QString messageText = QString("The following patterns have been modified:\n");
+
+    for(std::size_t i = 0; i < patternItems.size(); i++) {
+        messageText += patternItems.at(i)->getPatternName();
+        messageText += "\n";
+    }
+
+    QMessageBox msgBox(this);
+    msgBox.setWindowModality(Qt::WindowModal);
+    msgBox.setText(messageText);
+    msgBox.setInformativeText("Do you want to save your changes?");
+    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Save);
+    int ans = msgBox.exec();
+
+    if (ans == QMessageBox::Save) {
+        for(std::size_t i = 0; i < patternItems.size(); i++) {
+            if(!savePattern(patternItems.at(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+    else if (ans == QMessageBox::Discard) {
+        return true;
+    }
+    else { // Cancel
+        return false;
+    }
 }
 
 void MainWindow::connectController()
@@ -868,6 +925,8 @@ void MainWindow::setDisplayMode(LedDisplay::Mode newDisplayMode)
 {
     LedDisplay* newDisplayModel;
 
+
+
     // Create a new displaymodel if possible
     switch(newDisplayMode) {
     case LedDisplay::TIMELINE:
@@ -882,6 +941,7 @@ void MainWindow::setDisplayMode(LedDisplay::Mode newDisplayMode)
     }
 
     // Check if any of the patterns need to be resized
+    // TODO: This doesn't make any sense.
     if(newDisplayModel->hasFixedLedCount()) {
         bool needToResize = false;
 
