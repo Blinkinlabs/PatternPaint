@@ -132,7 +132,6 @@ private:
     QTimer *connectionScannerTimer;
 
     QProgressDialog* progressDialog;
-    QMessageBox* errorMessageDialog;
 
     PatternUpdateNotifier patternUpdateNotifier;
 
@@ -145,6 +144,8 @@ private:
     QUndoGroup *undoGroup;
     QAction* undoAction;
     QAction* redoAction;
+
+    void showError(QString errorMessage);
 
     void writeSettings();
     void readSettings();

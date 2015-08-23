@@ -145,9 +145,6 @@ MainWindow::MainWindow(QWidget *parent) :
     progressDialog->setWindowModality(Qt::WindowModal);
     progressDialog->setAutoClose(false);
 
-    errorMessageDialog = new QMessageBox(this);
-    errorMessageDialog->setWindowModality(Qt::WindowModal);
-
     // The draw timer tells the pattern to advance
     connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
 
@@ -157,7 +154,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connectionScannerTimer->start();
 
 
-    penSizeSpin->setValue(1);      // TODO: Why aren't signals propegated from this?
+    penSizeSpin->setValue(1);
     patternEditor->setToolSize(1);
 
     actionPen->setChecked(true);
@@ -168,7 +165,6 @@ MainWindow::MainWindow(QWidget *parent) :
     setColorMode(static_cast<Pattern::ColorMode>(settings.value("Options/ColorOrder", Pattern::RGB).toUInt()));
 
     setDisplayMode(static_cast<LedDisplay::Mode>(settings.value("Options/DisplayMode", LedDisplay::TIMELINE).toUInt()));
-
 
     patternCollection->setItemDelegate(new PatternItemDelegate(this));
 
@@ -296,8 +292,9 @@ void MainWindow::on_actionLoad_File_triggered()
     PatternItem* patternItem = new PatternItem(1, ledCount);
 
     if(!patternItem->load(fileInfo)) {
-        errorMessageDialog->setText("Could not open file " + fileName + ". Perhaps it has a formatting problem?");
-        errorMessageDialog->show();
+        showError("Could not open file "
+                   + fileName
+                   + ". Perhaps it has a formatting problem?");
         return;
     }
 
@@ -549,6 +546,13 @@ void MainWindow::on_actionClear_Pattern_triggered()
     ledDisplay->applyInstrument(frame);
 }
 
+void MainWindow::showError(QString errorMessage) {
+    QMessageBox box(this);
+    box.setWindowModality(Qt::WindowModal);
+    box.setText(errorMessage);
+    box.show();
+}
+
 void MainWindow::on_actionLoad_rainbow_sketch_triggered()
 {   
     // If the controller doesn't exist, create a new uploader based on the blinkytape
@@ -558,8 +562,7 @@ void MainWindow::on_actionLoad_rainbow_sketch_triggered()
         connectUploader();
 
         if(!uploader->upgradeFirmware(-1)) {
-            errorMessageDialog->setText(uploader->getErrorString());
-            errorMessageDialog->show();
+            showError(uploader->getErrorString());
             return;
         }
 
@@ -585,8 +588,7 @@ void MainWindow::on_actionLoad_rainbow_sketch_triggered()
         connectUploader();
 
         if(!uploader->upgradeFirmware(*controller)) {
-            errorMessageDialog->setText(uploader->getErrorString());
-            errorMessageDialog->show();
+            showError(uploader->getErrorString());
             return;
         }
 
@@ -660,8 +662,7 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
     connectUploader();
 
     if(!uploader->startUpload(*controller, patterns)) {
-        errorMessageDialog->setText(uploader->getErrorString());
-        errorMessageDialog->show();
+        showError(uploader->getErrorString());
         return;
     }
     mode = Uploading;
