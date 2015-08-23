@@ -1,10 +1,10 @@
 #ifndef TIMELINEDISPLAY_H
 #define TIMELINEDISPLAY_H
 
-#include "displaymodel.h"
+#include "leddisplay.h"
 
 
-class TimelineDisplay : public DisplayModel {
+class TimelineDisplay : public LedDisplay {
 public:
 
     bool hasFixedLedCount() const { return false; }
@@ -25,6 +25,8 @@ public:
 
     const QImage& getFrame();
     void applyInstrument(const QImage& instrumentFrameData) ;
+
+    const QImage& getStreamImage();
 
 private:
     PatternItem* patternItem;

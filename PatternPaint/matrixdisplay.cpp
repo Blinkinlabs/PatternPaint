@@ -49,8 +49,6 @@ const QImage& MatrixDisplay::getFrame() {
     // TODO: This is an inefficient way of achieving this.
     for(int x = 0; x < frameData.width(); x++) {
         for(int y = 0; y < frameData.height(); y++) {
-//            frameData.setPixel(x, x%2?height-1-y:y,
-//                              patternItem->getImage().pixel(frame*width + x, y));
             frameData.setPixel(x, y,
                               patternItem->getImage().pixel(frame*width + x, y));
         }
@@ -97,8 +95,6 @@ void MatrixDisplay::deleteFrame(int newFrame) {
 }
 
 void MatrixDisplay::addFrame(int newFrame) {
-    // TODO: Design patternItem() around a QData() array instead of an image, drop this junk.
-
     if(newFrame > getFrameCount() || newFrame < 0) {
         return;
     }
@@ -141,4 +137,23 @@ void MatrixDisplay::applyInstrument(const QImage &instrumentFrameData) {
     }
 
     patternItem->applyInstrument(outputImage);
+}
+
+const QImage &MatrixDisplay::getStreamImage() {
+    streamImage = QImage(getFrameCount(),width*height,QImage::Format_ARGB32_Premultiplied);
+
+    // TODO: This is an inefficient way of achieving this.
+    for(int frame = 0; frame < getFrameCount(); frame++) {
+        for(int x = 0; x < width; x++) {
+            for(int y = 0; y < height; y++) {
+                streamImage.setPixel(
+                            frame,
+                            x*height+(x%2?height-1-y:y),
+                            patternItem->getImage().pixel(frame*width + x, y)
+                            );
+            }
+        }
+    }
+
+    return streamImage;
 }

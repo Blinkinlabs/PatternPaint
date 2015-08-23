@@ -82,9 +82,9 @@ HEADERS  += mainwindow.h \
     patternitem.h \
     patternupdatenotifier.h \
     patterncollection.h \
-    displaymodel.h \
     matrixdisplay.h \
-    timelinedisplay.h
+    timelinedisplay.h \
+    leddisplay.h
 
 mac {
 HEADERS  += \

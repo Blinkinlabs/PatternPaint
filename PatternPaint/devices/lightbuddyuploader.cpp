@@ -179,7 +179,7 @@ void LightBuddyUploader::handleProgrammerCommandFinished(QString command, QByteA
 
     // If it was a reload animation command, we might have more work, or might be done.
     if(command == "reloadAnimations") {
-        if(state = State_Done) {
+        if(state == State_Done) {
             programmer.close();
             emit(finished(true));
         }

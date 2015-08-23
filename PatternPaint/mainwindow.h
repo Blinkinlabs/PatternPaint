@@ -12,7 +12,7 @@
 
 #include "ui_mainwindow.h"
 
-#include "displaymodel.h"
+#include "leddisplay.h"
 
 #if defined Q_OS_MAC
 #include "appnap.h"
@@ -31,7 +31,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void setDisplayMode(DisplayModel::Mode newDisplayMode);
+    void setDisplayMode(LedDisplay::Mode newDisplayMode);
 public slots:
     void setPatternItem(QListWidgetItem *, QListWidgetItem *);
 
@@ -161,7 +161,7 @@ private:
 
     Pattern::ColorMode colorMode;
 
-    DisplayModel* displayModel;
+    LedDisplay* ledDisplay;
 
     int frame;      // Current frame we are drawing
     void setNewFrame(int newFrame);

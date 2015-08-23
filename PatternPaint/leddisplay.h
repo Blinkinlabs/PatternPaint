@@ -1,10 +1,10 @@
-#ifndef DISPLAYMODEL
-#define DISPLAYMODEL
+#ifndef LEDDISPLAY
+#define LEDDISPLAY
 
 #include <qimage.h>
 #include "patternitem.h"
 
-class DisplayModel
+class LedDisplay
 {
 public:
     enum Mode {
@@ -12,7 +12,7 @@ public:
         MATRIX8x8   = 1,     /// 8x8 Matrix mode
     };
 
-    virtual ~DisplayModel() {}
+    virtual ~LedDisplay() {}
 
     virtual bool hasFixedLedCount() const = 0;
     virtual int getFixedLedCount() const = 0;
@@ -54,7 +54,12 @@ public:
     /// Apply instrument data to the current frame
     /// @instrumentFrameData NxN QImage to be painted on top of the current frame data
     virtual void applyInstrument(const QImage& instrumentFrameData) = 0;
+
+    /// Get a 2d image that represents the byte stream to send to the LEDs,
+    /// where each column represents a frame, and each row an LED output.
+    /// @return stream image
+    virtual const QImage& getStreamImage() = 0;
 };
 
-#endif // DISPLAYMODEL
+#endif // LEDDISPLAY
 

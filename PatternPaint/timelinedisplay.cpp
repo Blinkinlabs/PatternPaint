@@ -103,3 +103,7 @@ void TimelineDisplay::addFrame(int newFrame) {
 void TimelineDisplay::applyInstrument(const QImage &instrumentFrameData) {
     patternItem->applyInstrument(instrumentFrameData);
 }
+
+const QImage &TimelineDisplay::getStreamImage() {
+    return patternItem->getImage();
+}

@@ -1,9 +1,9 @@
 #ifndef MATRIXDISPLAY_H
 #define MATRIXDISPLAY_H
 
-#include "displaymodel.h"
+#include "leddisplay.h"
 
-class MatrixDisplay : public DisplayModel {
+class MatrixDisplay : public LedDisplay {
 public:
     MatrixDisplay(int height, int width);
 
@@ -26,12 +26,15 @@ public:
     const QImage& getFrame();
     void applyInstrument(const QImage& instrumentFrameData) ;
 
+    const QImage& getStreamImage();
+
 private:
     const int height;
     const int width;
     PatternItem* patternItem;
     QImage frameData;
     int frame;
+    QImage streamImage;
 };
 
 #endif // MATRIXDISPLAY_H

@@ -30,7 +30,7 @@ PatternEditor::PatternEditor(QWidget *parent) :
 }
 
 
-void PatternEditor::setDisplayModel(DisplayModel *newDisplayModel)
+void PatternEditor::setDisplayModel(LedDisplay *newDisplayModel)
 {
     deviceModel = newDisplayModel;
     setPatternItem(patternItem);
