@@ -15,7 +15,7 @@ bool BlinkyPendantUploader::startUpload(BlinkyController& controller, std::vecto
     #define PIXEL_COUNT 10
 
 // TODO: Update blinkypendant firmware!
-//#define BLINKY_PENDANT_2
+#define BLINKY_PENDANT_2
 
 #if defined(BLINKY_PENDANT_2)
 
