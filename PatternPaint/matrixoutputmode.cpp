@@ -1,17 +1,17 @@
-#include "matrixdisplay.h"
+#include "matrixoutputmode.h"
 
 #include <QPainter>
 
 #define COLOR_CANVAS_DEFAULT    QColor(0,0,0,255)
 
-MatrixDisplay::MatrixDisplay(int height, int width) :
+MatrixOutputMode::MatrixOutputMode(int height, int width) :
     height(height),
     width(width),
     patternItem(NULL),
     frame(0)
 {}
 
-void MatrixDisplay::setSource(PatternItem *newPatternItem) {
+void MatrixOutputMode::setSource(PatternItem *newPatternItem) {
     patternItem = newPatternItem;
 
     if(patternItem != NULL) {
@@ -19,12 +19,12 @@ void MatrixDisplay::setSource(PatternItem *newPatternItem) {
     }
 }
 
-bool MatrixDisplay::hasPatternItem() const {
+bool MatrixOutputMode::hasPatternItem() const {
     return patternItem != NULL;
 }
 
 
-void MatrixDisplay::setFrameIndex(int newFrame) {
+void MatrixOutputMode::setFrameIndex(int newFrame) {
     if(frame < 0) {
         frame = 0;
     }
@@ -35,15 +35,15 @@ void MatrixDisplay::setFrameIndex(int newFrame) {
     frame = newFrame;
 }
 
-int MatrixDisplay::getFrameCount() const {
+int MatrixOutputMode::getFrameCount() const {
     return patternItem->getImage().width()/width;
 }
 
-int MatrixDisplay::getFrameIndex() const {
+int MatrixOutputMode::getFrameIndex() const {
     return frame;
 }
 
-const QImage& MatrixDisplay::getFrame() {
+const QImage& MatrixOutputMode::getFrame() {
     frameData = QImage(width,height,QImage::Format_ARGB32_Premultiplied);
 
     // TODO: This is an inefficient way of achieving this.
@@ -60,7 +60,7 @@ const QImage& MatrixDisplay::getFrame() {
 
 
 
-void MatrixDisplay::deleteFrame(int newFrame) {
+void MatrixOutputMode::deleteFrame(int newFrame) {
     if(getFrameCount() < 2) {
         return;
     }
@@ -94,7 +94,7 @@ void MatrixDisplay::deleteFrame(int newFrame) {
     patternItem->applyInstrument(newImage);
 }
 
-void MatrixDisplay::addFrame(int newFrame) {
+void MatrixOutputMode::addFrame(int newFrame) {
     if(newFrame > getFrameCount() || newFrame < 0) {
         return;
     }
@@ -123,7 +123,7 @@ void MatrixDisplay::addFrame(int newFrame) {
     patternItem->applyInstrument(newImage);
 }
 
-void MatrixDisplay::applyInstrument(const QImage &instrumentFrameData) {
+void MatrixOutputMode::applyInstrument(const QImage &instrumentFrameData) {
     QImage outputImage(patternItem->getImage());
 
     // TODO: This is an inefficient way of achieving this.
@@ -139,7 +139,7 @@ void MatrixDisplay::applyInstrument(const QImage &instrumentFrameData) {
     patternItem->applyInstrument(outputImage);
 }
 
-const QImage &MatrixDisplay::getStreamImage() {
+const QImage &MatrixOutputMode::getStreamImage() {
     streamImage = QImage(getFrameCount(),width*height,QImage::Format_ARGB32_Premultiplied);
 
     // TODO: This is an inefficient way of achieving this.

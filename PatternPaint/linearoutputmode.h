@@ -1,10 +1,10 @@
 #ifndef TIMELINEDISPLAY_H
 #define TIMELINEDISPLAY_H
 
-#include "leddisplay.h"
+#include "outputmode.h"
 
 
-class TimelineDisplay : public LedDisplay {
+class LinearOutputMode : public OutputMode {
 public:
 
     bool hasFixedLedCount() const { return false; }

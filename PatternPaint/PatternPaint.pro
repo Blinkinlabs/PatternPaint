@@ -64,8 +64,8 @@ SOURCES += main.cpp\
     patternitem.cpp \
     patternupdatenotifier.cpp \
     patterncollection.cpp \
-    matrixdisplay.cpp \
-    timelinedisplay.cpp
+    linearoutputmode.cpp \
+    matrixoutputmode.cpp
 
 HEADERS  += mainwindow.h \
     systeminformation.h \
@@ -82,9 +82,9 @@ HEADERS  += mainwindow.h \
     patternitem.h \
     patternupdatenotifier.h \
     patterncollection.h \
-    matrixdisplay.h \
-    timelinedisplay.h \
-    leddisplay.h
+    outputmode.h \
+    linearoutputmode.h \
+    matrixoutputmode.h
 
 mac {
 HEADERS  += \

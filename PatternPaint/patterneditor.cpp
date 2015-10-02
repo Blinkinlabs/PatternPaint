@@ -1,6 +1,6 @@
 #include "patterneditor.h"
 #include "abstractinstrument.h"
-#include "timelinedisplay.h"
+#include "linearoutputmode.h"
 
 #include <cmath>
 #include <QtWidgets>
@@ -30,7 +30,7 @@ PatternEditor::PatternEditor(QWidget *parent) :
 }
 
 
-void PatternEditor::setDisplayModel(LedDisplay *newDisplayModel)
+void PatternEditor::setDisplayModel(OutputMode *newDisplayModel)
 {
     deviceModel = newDisplayModel;
     setPatternItem(patternItem);

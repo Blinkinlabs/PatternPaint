@@ -17,8 +17,8 @@
 #include "patternitem.h"
 #include "patternitemdelegate.h"
 
-#include "matrixdisplay.h"
-#include "timelinedisplay.h"
+#include "matrixoutputmode.h"
+#include "linearoutputmode.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -50,7 +50,7 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ledDisplay(NULL),
+    outputMode(NULL),
     frame(0)
 {
     setupUi(this);
@@ -164,7 +164,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QSettings settings;
     setColorMode(static_cast<Pattern::ColorMode>(settings.value("Options/ColorOrder", Pattern::RGB).toUInt()));
 
-    setDisplayMode(static_cast<LedDisplay::Mode>(settings.value("Options/DisplayMode", LedDisplay::TIMELINE).toUInt()));
+    setDisplayMode(static_cast<OutputMode::Mode>(settings.value("Options/DisplayMode", OutputMode::TIMELINE).toUInt()));
 
     patternCollection->setItemDelegate(new PatternItemDelegate(this));
 
@@ -193,17 +193,17 @@ MainWindow::~MainWindow(){
     }
 #endif
 
-    if(ledDisplay != NULL) {
-        delete ledDisplay;
+    if(outputMode != NULL) {
+        delete outputMode;
     }
 }
 
 void MainWindow::drawTimer_timeout() {
-    if(!ledDisplay->hasPatternItem()) {
+    if(!outputMode->hasPatternItem()) {
         return;
     }
 
-    setNewFrame((frame+1)%ledDisplay->getFrameCount());
+    setNewFrame((frame+1)%outputMode->getFrameCount());
 }
 
 
@@ -281,8 +281,8 @@ void MainWindow::on_actionLoad_File_triggered()
     settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
 
     int ledCount = 0;
-    if((ledDisplay != NULL) && (ledDisplay->hasFixedLedCount())) {
-        ledCount = ledDisplay->getFixedLedCount();
+    if((outputMode != NULL) && (outputMode->hasFixedLedCount())) {
+        ledCount = outputMode->getFixedLedCount();
     }
     else {
         ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
@@ -515,35 +515,35 @@ void MainWindow::on_actionTroubleshooting_tips_triggered()
 
 void MainWindow::on_actionFlip_Horizontal_triggered()
 {
-    if (!ledDisplay->hasPatternItem()) {
+    if (!outputMode->hasPatternItem()) {
         return;
     }
 
-    QImage frame = ledDisplay->getFrame();
+    QImage frame = outputMode->getFrame();
     frame = frame.mirrored(true, false);
-    ledDisplay->applyInstrument(frame);
+    outputMode->applyInstrument(frame);
 }
 
 void MainWindow::on_actionFlip_Vertical_triggered()
 {
-    if (!ledDisplay->hasPatternItem()) {
+    if (!outputMode->hasPatternItem()) {
         return;
     }
 
-    QImage frame = ledDisplay->getFrame();
+    QImage frame = outputMode->getFrame();
     frame = frame.mirrored(false, true);
-    ledDisplay->applyInstrument(frame);
+    outputMode->applyInstrument(frame);
 }
 
 void MainWindow::on_actionClear_Pattern_triggered()
 {
-    if (!ledDisplay->hasPatternItem()) {
+    if (!outputMode->hasPatternItem()) {
         return;
     }
 
-    QImage frame = ledDisplay->getFrame();
+    QImage frame = outputMode->getFrame();
     frame.fill(COLOR_CANVAS_DEFAULT);
-    ledDisplay->applyInstrument(frame);
+    outputMode->applyInstrument(frame);
 }
 
 void MainWindow::showError(QString errorMessage) {
@@ -614,20 +614,20 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
 
 
     // Create a temporary displaymodel to interpret the patterns
-    LedDisplay* display;
+    OutputMode* display;
 
     QSettings settings;
-    LedDisplay::Mode displayMode = static_cast<LedDisplay::Mode>(
-                settings.value("Options/DisplayMode", LedDisplay::TIMELINE).toUInt()
+    OutputMode::Mode displayMode = static_cast<OutputMode::Mode>(
+                settings.value("Options/DisplayMode", OutputMode::TIMELINE).toUInt()
                 );
 
     // Create a new displaymodel to handle the conversions
     switch(displayMode) {
-    case LedDisplay::TIMELINE:
-        display = new TimelineDisplay();
+    case OutputMode::TIMELINE:
+        display = new LinearOutputMode();
         break;
-    case LedDisplay::MATRIX8x8:
-        display = new MatrixDisplay(8,8);
+    case OutputMode::MATRIX8x8:
+        display = new MatrixOutputMode(8,8);
         break;
     default:
         return;
@@ -677,20 +677,20 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
 
 void MainWindow::on_actionResize_Pattern_triggered()
 {
-    QSettings settings;
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-
-    if((ledDisplay == NULL) || (patternCollection->currentItem() == NULL)) {
+    if((outputMode == NULL) || !outputMode->hasPatternItem()) { //(patternCollection->currentItem() == NULL)) {
         return;
     }
+
+    QSettings settings;
+    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
 
     int patternLength = patternItem->getImage().width();
     int ledCount = patternItem->getImage().height();
 
-    bool fixedLedCount = ledDisplay->hasFixedLedCount();
+    bool fixedLedCount = outputMode->hasFixedLedCount();
 
     if(fixedLedCount) {
-        ledCount = ledDisplay->getFixedLedCount();
+        ledCount = outputMode->getFixedLedCount();
     }
 
     ResizePattern resizeDialog(this);
@@ -922,19 +922,19 @@ void MainWindow::setColorMode(Pattern::ColorMode newColorOrder)
     settings.setValue("Options/ColorOrder", static_cast<uint>(colorMode));
 }
 
-void MainWindow::setDisplayMode(LedDisplay::Mode newDisplayMode)
+void MainWindow::setDisplayMode(OutputMode::Mode newDisplayMode)
 {
-    LedDisplay* newDisplayModel;
+    OutputMode* newDisplayModel;
 
 
 
     // Create a new displaymodel if possible
     switch(newDisplayMode) {
-    case LedDisplay::TIMELINE:
-        newDisplayModel = new TimelineDisplay();
+    case OutputMode::TIMELINE:
+        newDisplayModel = new LinearOutputMode();
         break;
-    case LedDisplay::MATRIX8x8:
-        newDisplayModel = new MatrixDisplay(8,8);
+    case OutputMode::MATRIX8x8:
+        newDisplayModel = new MatrixOutputMode(8,8);
         break;
     default:
         return;
@@ -985,11 +985,11 @@ void MainWindow::setDisplayMode(LedDisplay::Mode newDisplayMode)
     // Finally, apply the new mode.
 
     switch(newDisplayMode) {
-    case LedDisplay::TIMELINE:
+    case OutputMode::TIMELINE:
         actionTimeline->setChecked(true);
         actionMatrix->setChecked(false);
         break;
-    case LedDisplay::MATRIX8x8:
+    case OutputMode::MATRIX8x8:
         actionTimeline->setChecked(false);
         actionMatrix->setChecked(true);
         break;
@@ -1000,13 +1000,13 @@ void MainWindow::setDisplayMode(LedDisplay::Mode newDisplayMode)
 
 
     // TODO: Smart pointer for this.
-    if(ledDisplay != NULL) {
-        delete ledDisplay;
+    if(outputMode != NULL) {
+        delete outputMode;
     }
-    ledDisplay = newDisplayModel;
+    outputMode = newDisplayModel;
 
-    ledDisplay->setSource(dynamic_cast<PatternItem*>(patternCollection->currentItem()));
-    patternEditor->setDisplayModel(ledDisplay);
+    outputMode->setSource(dynamic_cast<PatternItem*>(patternCollection->currentItem()));
+    patternEditor->setDisplayModel(outputMode);
 
     on_patternSizeUpdated();
     on_patternDataUpdated();
@@ -1016,8 +1016,8 @@ void MainWindow::setNewFrame(int newFrame)
 {
     int frameCount = 0;
 
-    if(ledDisplay != NULL && ledDisplay->hasPatternItem()) {
-        frameCount = ledDisplay->getFrameCount();
+    if(outputMode != NULL && outputMode->hasPatternItem()) {
+        frameCount = outputMode->getFrameCount();
     }
 
     if(newFrame >= frameCount) {
@@ -1046,7 +1046,7 @@ void MainWindow::updateBlinky()
 
     lastTime = newTime;
 
-    if((ledDisplay == NULL) || (patternCollection->currentItem() == NULL)) {
+    if((outputMode == NULL) || !outputMode->hasPatternItem()) { //patternCollection->currentItem() == NULL)) {
         return;
     }
 
@@ -1054,7 +1054,7 @@ void MainWindow::updateBlinky()
         return;
     }
 
-    QImage image = ledDisplay->getStreamImage();
+    QImage image = outputMode->getStreamImage();
 
     // TODO: Put this in a converter class.
     QByteArray ledData;
@@ -1094,8 +1094,8 @@ void MainWindow::on_actionNew_triggered()
     int patternLength = settings.value("Options/patternLength", DEFAULT_PATTERN_LENGTH).toUInt();
 
     int ledCount = 0;
-    if((ledDisplay != NULL) && (ledDisplay->hasFixedLedCount())) {
-        ledCount = ledDisplay->getFixedLedCount();
+    if((outputMode != NULL) && (outputMode->hasFixedLedCount())) {
+        ledCount = outputMode->getFixedLedCount();
     }
     else {
         ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
@@ -1217,7 +1217,7 @@ void MainWindow::on_actionStepForward_triggered()
     }
 
 
-    setNewFrame((frame+1)%ledDisplay->getFrameCount());
+    setNewFrame((frame+1)%outputMode->getFrameCount());
 }
 
 void MainWindow::on_actionStepBackward_triggered()
@@ -1226,39 +1226,39 @@ void MainWindow::on_actionStepBackward_triggered()
         return;
     }
 
-    setNewFrame(frame<=0?ledDisplay->getFrameCount()-1:frame-1);
+    setNewFrame(frame<=0?outputMode->getFrameCount()-1:frame-1);
 }
 
 void MainWindow::on_actionTimeline_triggered()
 {
-    setDisplayMode(LedDisplay::TIMELINE);
+    setDisplayMode(OutputMode::TIMELINE);
 }
 
 void MainWindow::on_actionMatrix_triggered()
 {
-    setDisplayMode(LedDisplay::MATRIX8x8);
+    setDisplayMode(OutputMode::MATRIX8x8);
 }
 
 void MainWindow::on_actionAddFrame_triggered()
 {
-    if(!ledDisplay->hasPatternItem()) {
+    if(!outputMode->hasPatternItem()) {
         return;
     }
 
-    ledDisplay->addFrame(ledDisplay->getFrameIndex());
+    outputMode->addFrame(outputMode->getFrameIndex());
 
-    setNewFrame(ledDisplay->getFrameIndex()+1);
+    setNewFrame(outputMode->getFrameIndex()+1);
 }
 
 void MainWindow::on_actionDeleteFrame_triggered()
 {
-    if(!ledDisplay->hasPatternItem()) {
+    if(!outputMode->hasPatternItem()) {
         return;
     }
 
-    ledDisplay->deleteFrame(ledDisplay->getFrameIndex());
+    outputMode->deleteFrame(outputMode->getFrameIndex());
 
-    setNewFrame(ledDisplay->getFrameIndex()-1);
+    setNewFrame(outputMode->getFrameIndex()-1);
 }
 
 void MainWindow::on_patternModifiedChanged()

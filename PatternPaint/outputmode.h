@@ -4,7 +4,7 @@
 #include <qimage.h>
 #include "patternitem.h"
 
-class LedDisplay
+class OutputMode
 {
 public:
     enum Mode {
@@ -12,7 +12,7 @@ public:
         MATRIX8x8   = 1,     /// 8x8 Matrix mode
     };
 
-    virtual ~LedDisplay() {}
+    virtual ~OutputMode() {}
 
     virtual bool hasFixedLedCount() const = 0;
     virtual int getFixedLedCount() const = 0;

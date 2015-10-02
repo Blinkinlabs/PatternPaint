@@ -1,11 +1,11 @@
 #ifndef MATRIXDISPLAY_H
 #define MATRIXDISPLAY_H
 
-#include "leddisplay.h"
+#include "outputmode.h"
 
-class MatrixDisplay : public LedDisplay {
+class MatrixOutputMode : public OutputMode {
 public:
-    MatrixDisplay(int height, int width);
+    MatrixOutputMode(int height, int width);
 
     bool hasFixedLedCount() const { return true; }
     int getFixedLedCount() const { return height*width; }

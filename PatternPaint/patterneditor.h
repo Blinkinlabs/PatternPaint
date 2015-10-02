@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QPointer>
 #include "patternitem.h"
-#include "leddisplay.h"
+#include "outputmode.h"
 
 class QUndoStack;
 class UndoCommand;
@@ -17,7 +17,7 @@ class PatternEditor : public QWidget
 public:
     explicit PatternEditor(QWidget *parent = 0);
 
-    void setDisplayModel(LedDisplay* newDisplayModel);
+    void setDisplayModel(OutputMode* newDisplayModel);
 
     /// Set the patternItem to edit
     /// @param newPatternItem Pattern
@@ -57,7 +57,7 @@ protected:
     void paintEvent(QPaintEvent *event);
 
 private:
-    LedDisplay* deviceModel;    ///< LED model we are interacting with
+    OutputMode* deviceModel;    ///< LED model we are interacting with
     PatternItem* patternItem;    ///< Pattern item we are interacting with
     QPointer<AbstractInstrument> instrument;
 

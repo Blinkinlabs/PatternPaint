@@ -1,18 +1,18 @@
-#include "timelinedisplay.h"
+#include "linearoutputmode.h"
 
 #include <QPainter>
 
 #define COLOR_CANVAS_DEFAULT    QColor(0,0,0,255)
 
-void TimelineDisplay::setSource(PatternItem *newPatternItem) {
+void LinearOutputMode::setSource(PatternItem *newPatternItem) {
     patternItem = newPatternItem;
 }
 
-bool TimelineDisplay::hasPatternItem() const {
+bool LinearOutputMode::hasPatternItem() const {
     return patternItem != NULL;
 }
 
-void TimelineDisplay::setFrameIndex(int newFrame) {
+void LinearOutputMode::setFrameIndex(int newFrame) {
     if(frame < 0) {
         frame = 0;
     }
@@ -23,19 +23,19 @@ void TimelineDisplay::setFrameIndex(int newFrame) {
     frame = newFrame;
 }
 
-int TimelineDisplay::getFrameCount() const {
+int LinearOutputMode::getFrameCount() const {
     return patternItem->getImage().width();
 }
 
-int TimelineDisplay::getFrameIndex() const {
+int LinearOutputMode::getFrameIndex() const {
     return frame;
 }
 
-const QImage& TimelineDisplay::getFrame() {
+const QImage& LinearOutputMode::getFrame() {
     return patternItem->getImage();
 }
 
-void TimelineDisplay::deleteFrame(int newFrame) {
+void LinearOutputMode::deleteFrame(int newFrame) {
     if(getFrameCount() < 2) {
         return;
     }
@@ -69,7 +69,7 @@ void TimelineDisplay::deleteFrame(int newFrame) {
     patternItem->applyInstrument(newImage);
 }
 
-void TimelineDisplay::addFrame(int newFrame) {
+void LinearOutputMode::addFrame(int newFrame) {
     // TODO: Design patternItem() around a QData() array instead of an image, drop this junk.
 
     if(newFrame > getFrameCount() || newFrame < 0) {
@@ -100,10 +100,10 @@ void TimelineDisplay::addFrame(int newFrame) {
     patternItem->applyInstrument(newImage);
 }
 
-void TimelineDisplay::applyInstrument(const QImage &instrumentFrameData) {
+void LinearOutputMode::applyInstrument(const QImage &instrumentFrameData) {
     patternItem->applyInstrument(instrumentFrameData);
 }
 
-const QImage &TimelineDisplay::getStreamImage() {
+const QImage &LinearOutputMode::getStreamImage() {
     return patternItem->getImage();
 }
