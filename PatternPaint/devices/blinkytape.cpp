@@ -2,8 +2,10 @@
 #include "blinkypendantuploader.h"
 #include "lightbuddyuploader.h"
 #include "blinkytape.h"
+
 #include <QDebug>
 #include <QTime>
+
 
 /// Interval between scans to see if the device is still connected
 #define CONNECTION_SCANNER_INTERVAL 100
@@ -14,6 +16,9 @@
 #define RESET_TIMER_TIMEOUT 500
 
 #define RESET_MAX_TRIES 3
+
+
+
 
 // TODO: Support a method for loading these from preferences file
 QList<QSerialPortInfo> BlinkyTape::probe()
