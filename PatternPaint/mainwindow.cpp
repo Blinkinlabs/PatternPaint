@@ -677,7 +677,7 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
 
 void MainWindow::on_actionResize_Pattern_triggered()
 {
-    if((outputMode == NULL) || !outputMode->hasPatternItem()) { //(patternCollection->currentItem() == NULL)) {
+    if((outputMode == NULL) || !outputMode->hasPatternItem()) {
         return;
     }
 
@@ -1046,7 +1046,7 @@ void MainWindow::updateBlinky()
 
     lastTime = newTime;
 
-    if((outputMode == NULL) || !outputMode->hasPatternItem()) { //patternCollection->currentItem() == NULL)) {
+    if((outputMode == NULL) || !outputMode->hasPatternItem()) {
         return;
     }
 
