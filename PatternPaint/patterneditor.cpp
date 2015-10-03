@@ -201,7 +201,8 @@ void PatternEditor::setPatternItem(PatternItem* newPatternItem) {
     deviceModel->setSource(newPatternItem);
 
     if(!deviceModel->hasPatternItem()) {
-        // TODO: Reset size to some default?
+        // TODO: Clear the image?
+        update();
         return;
     }
 
