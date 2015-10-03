@@ -31,17 +31,14 @@ SOURCES +=  $$PWD/avrprogrammer.cpp \
 
 # For libusb on OS X
 mac {
+    LIBUSB_PATH = $$PWD/../../thirdparty/libusb-1.0.20/osx-install
 
-
-    LIBUSB_PATH = $$PWD/../../thirdparty/libusb-1.0.20/libusb
-
-    #INCLUDEPATH += $$PWD/../../thirdparty/libusb-1.0.20/libusb
-    INCLUDEPATH += $$LIBUSB_PATH
-    QMAKE_LFLAGS += -L $$LIBUSB_PATH/.libs
+    INCLUDEPATH += $$LIBUSB_PATH/include
+    QMAKE_LFLAGS += -L $$LIBUSB_PATH/lib
     LIBS += -lusb-1.0
 
     # Copy libusb into the app bundle
-    libusb.files = $$LIBUSB_PATH/.libs/libusb-1.0.0.dylib
+    libusb.files = $$LIBUSB_PATH/lib/libusb-1.0.0.dylib
     libusb.path = Contents/Frameworks
     QMAKE_BUNDLE_DATA += libusb
 

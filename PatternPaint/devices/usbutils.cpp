@@ -1,5 +1,5 @@
 #include <QDebug>
-#include <libusb.h>
+#include <libusb-1.0/libusb.h>
 #include "usbutils.h"
 
 
