@@ -185,13 +185,16 @@ void SerialCommandQueue::handleReadData() {
 
 void SerialCommandQueue::handleSerialError(QSerialPort::SerialPortError serialError)
 {
+    // If we aren't supposed to be connected, discard resource errors
+    if(!serial->isOpen() && serialError == QSerialPort::ResourceError) {
+        return;
+    }
+
     if(serialError == QSerialPort::NoError) {
         // The serial library appears to emit an extraneous SerialPortError
         // when open() is called. Just ignore it.
         return;
     }
-
-    // TODO: If a reset instruction was just sent, don't emit an error if we get disconnected here
 
     emit(error(serial->errorString()));
 
