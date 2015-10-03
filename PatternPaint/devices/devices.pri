@@ -45,3 +45,15 @@ mac {
     # And add to the rpath so that the app can find the library
     QMAKE_RPATHDIR += @executable_path/../Frameworks
 }
+
+# For libusb on Windows
+win32 {
+    LIBUSB_DLL = $$PWD/../../thirdparty/libusb-1.0.20-win/MinGW32/dll/libusb-1.0.dll
+
+    INCLUDEPATH += $$PWD/../../thirdparty/libusb-1.0.20-win/include/
+    LIBS += $$PWD/../../thirdparty/libusb-1.0.20-win/MinGW32/dll/libusb-1.0.dll
+
+    # Copy the Sparkle DLL into the build directory so that it can be used
+    QMAKE_PRE_LINK += copy $$shell_path($$LIBUSB_DLL)  $$shell_path($$OUT_PWD) &
+}
+

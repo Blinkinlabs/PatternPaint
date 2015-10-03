@@ -42,10 +42,19 @@ Grab WinSparkle 1.4:
 ### Building
 No special steps need to be performed to use WinSparkle. The download contains a .dll that can be used directly.
 
-## LibUSB
-TODO
+
+## Libusb
+Pattern paint uses [libusb](libusb.info) for gathering information about each installed USB device. 
+
+### Obtaining
+
+We're using [libusb-1.0.20](http://sourceforge.net/projects/libusb/files/libusb-1.0/libusb-1.0.20/). Get the [release file](http://sourceforge.net/projects/libusb/files/libusb-1.0/libusb-1.0.20/libusb-1.0.20.7z/download), unzip it, then move it to thirdparty/libusb-1.0.20-win.
+
+### Building
+
+No special steps need to be performed to use libusb. The download contains a .dll that can be used directly.
 
 # Linux
 
 ## LibUSB
-TODO
+TODO: This should come with most distros, but might need to be installed?
