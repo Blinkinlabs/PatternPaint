@@ -30,7 +30,7 @@ BLINKYPENDANT='Blinkypendant/'
 WINSPARKLE=${PATTERNPAINT}'/thirdparty/WinSparkle-0.4/'
 
 # libusb library release
-LIBUSB=${PATTERNPAINT}'/thirdparty/libusb-1.0.20-win/"
+LIBUSB=${PATTERNPAINT}'/thirdparty/libusb-1.0.20-win/'
 
 # Staging directory for this release
 OUTDIR='PatternPaintWindows/'
