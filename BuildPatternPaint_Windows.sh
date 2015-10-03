@@ -29,6 +29,9 @@ BLINKYPENDANT='Blinkypendant/'
 # Winsparkle library release
 WINSPARKLE=${PATTERNPAINT}'/thirdparty/WinSparkle-0.4/'
 
+# libusb library release
+LIBUSB=${PATTERNPAINT}'/thirdparty/libusb-1.0.20-win/"
+
 # Staging directory for this release
 OUTDIR='PatternPaintWindows/'
 
@@ -137,6 +140,9 @@ cp ${QT_MINGW}/plugins/imageformats/qtiff.dll ${OUTDIR}imageformats/
 
 # Winsparkle Files
 cp ${WINSPARKLE}/release/WinSparkle.dll ${OUTDIR}
+
+# libusb Files
+cp ${LIBUSB}/MinGW32/dll/libusb-1.0.dll ${OUTDIR}
 
 # BlinkyTape Driver files
 cp ${BLINKYTAPE}avr/driver/blinkinlabs.inf ${OUTDIR}driver/blinkytape/
