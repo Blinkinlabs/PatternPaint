@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/resources">
-        <file>images/PatternPaintAbout.png</file>
         <file>images/redo.png</file>
         <file>images/undo.png</file>
         <file>images/patternpaint.icns</file>
