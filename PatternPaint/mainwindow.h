@@ -121,6 +121,8 @@ private slots:
 
     void on_patternModifiedChanged();
 
+    void on_ExampleSelected(QAction*);
+
 private:
     ColorChooser* colorChooser;
 
@@ -177,6 +179,7 @@ private:
     /// Object to inhibit app nap when connected to a blinky
     CAppNapInhibitor* appNap;
 #endif
+    void populateExamplesMenu(QString directory, QMenu* menu);
 };
 
 #endif // MAINWINDOW_H

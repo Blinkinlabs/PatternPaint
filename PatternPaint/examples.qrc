@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/">
+        <file>examples/blinkytape/laser_cat.jpg</file>
+        <file>examples/matrix/beer.png</file>
+        <file>examples/matrix/blink_flash.png</file>
+        <file>examples/matrix/fireworks.png</file>
+        <file>examples/matrix/go forward.png</file>
+        <file>examples/matrix/saturated_spin.png</file>
+        <file>examples/matrix/tunnel.png</file>
+        <file>examples/pendant/blinkinlabs.png</file>
+        <file>examples/pendant/heart.png</file>
+        <file>examples/pendant/iheartohs.png</file>
+        <file>examples/pendant/nyan-cat.png</file>
+        <file>examples/pendant/stars.png</file>
+    </qresource>
+</RCC>

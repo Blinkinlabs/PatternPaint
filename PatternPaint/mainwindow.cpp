@@ -180,8 +180,41 @@ MainWindow::MainWindow(QWidget *parent) :
     patternCollection->setNotifier(&patternUpdateNotifier);
     patternCollection->setUndoGroup(undoGroup);
 
+    // Fill the examples menu using the examples resource
+    populateExamplesMenu(":/examples", menuExamples);
+    connect(menuExamples, SIGNAL(triggered(QAction *)),
+            this, SLOT(on_ExampleSelected(QAction *)), Qt::UniqueConnection);
+
     // Create a pattern.
     on_actionNew_triggered();
+}
+
+void MainWindow::populateExamplesMenu(QString directory, QMenu* menu) {
+    qDebug() << "In resource: " << directory;
+
+    QDir examplesDir(directory);
+    QFileInfoList examplesList = examplesDir.entryInfoList();
+
+    for(int i = 0; i < examplesList.size(); ++i) {
+        if(examplesList.at(i).isDir()) {
+            qDebug() << "descending into: " << examplesList.at(i).fileName();
+            QMenu* submenu = new QMenu(this);
+            submenu->setTitle(examplesList.at(i).fileName());
+            menu->addMenu(submenu);
+            connect(submenu, SIGNAL(triggered(QAction *)),
+                    this, SLOT(on_ExampleSelected(QAction *)), Qt::UniqueConnection);
+
+            populateExamplesMenu(directory + "/" + examplesList.at(i).fileName(), submenu);
+        }
+        else {
+            qDebug() << examplesList.at(i).fileName();
+            QAction* action = new QAction(examplesList.at(i).baseName(), this);
+
+            action->setObjectName(directory + "/" + examplesList.at(i).fileName());
+
+            menu->addAction(action);
+        }
+    }
 }
 
 MainWindow::~MainWindow(){
@@ -1280,4 +1313,31 @@ void MainWindow::on_patternModifiedChanged()
     else {
         actionSave_File->setEnabled(false);
     }
+}
+
+void MainWindow::on_ExampleSelected(QAction* action) {
+    qDebug() << "Example selected:" << action->objectName();
+
+    // TODO: This is duplicated in on_actionLoad_file_triggered()
+    int ledCount = 0;
+    if((outputMode != NULL) && (outputMode->hasFixedLedCount())) {
+        ledCount = outputMode->getFixedLedCount();
+    }
+    else {
+        QSettings settings;
+        ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
+    }
+
+    // Create a patternItem, and attempt to load the file
+    PatternItem* patternItem = new PatternItem(1, ledCount);
+
+    if(!patternItem->load(action->objectName())) {
+        showError("Could not open file "
+                   + action->objectName()
+                   + ". Perhaps it has a formatting problem?");
+        return;
+    }
+
+    patternCollection->addItem(patternItem);
+    patternCollection->setCurrentItem(patternItem);
 }

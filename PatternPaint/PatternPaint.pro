@@ -121,7 +121,8 @@ win32 {
 }
 
 RESOURCES += \
-    images.qrc
+    images.qrc \
+    examples.qrc
 
 OTHER_FILES += \
     README.md
