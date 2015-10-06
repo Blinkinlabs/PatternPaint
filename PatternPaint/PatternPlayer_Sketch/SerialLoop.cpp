@@ -14,13 +14,6 @@ void serialLoop(CRGB* leds) {
   
   // Wait for serial data
   while(true) {
-    // Periodically check if we are still connected
-    if(++timeoutCounter == 0) {
-      if(!Serial) {
-        return;
-      }
-    }
-        
     if (Serial.available() > 0) {
       c = Serial.read();
       if (c == 255) {

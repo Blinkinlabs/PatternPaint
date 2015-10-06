@@ -754,8 +754,6 @@ void MainWindow::readSettings()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-
-    // TODO: Combine all of these into one big 'save' message
     std::vector<PatternItem*> unsaved;
 
     for(int i = 0; i < patternCollection->count(); i++) {
@@ -783,6 +781,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 
     writeSettings();
+
+    // If we are connected to a blinky, try to reset it so that it will start playing back its pattern
+    if(!controller.isNull()) {
+        qDebug() << "Attempting to reset blinky";
+        controller->reset();
+    }
+
     event->accept();
 }
 
