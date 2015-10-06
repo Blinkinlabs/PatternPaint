@@ -10,8 +10,17 @@ void serialLoop(CRGB* leds) {
   uint8_t bufferIndex = 0;  // Write index into the pixel buffer
   uint8_t c;
   
+  uint16_t timeoutCounter;
+  
   // Wait for serial data
   while(true) {
+    // Periodically check if we are still connected
+    if(++timeoutCounter == 0) {
+      if(!Serial) {
+        return;
+      }
+    }
+        
     if (Serial.available() > 0) {
       c = Serial.read();
       if (c == 255) {

@@ -32,7 +32,7 @@ int frameDelay = 30;          // Number of ms each frame should be displayed.
 
 #define BRIGHT_STEP_COUNT 8
 #define STARTING_BRIGHTNESS 4
-volatile uint8_t brightnesSteps[BRIGHT_STEP_COUNT] = {5,15,40,70,93, 70, 40, 15};
+volatile uint8_t brightnesSteps[BRIGHT_STEP_COUNT] = {5,15,40,70,93,70,40,15};
 
 uint8_t brightness = 4;
 uint8_t lastBrightness = 4;
