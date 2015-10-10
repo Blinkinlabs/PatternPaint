@@ -9,19 +9,24 @@ class OutputMode
 public:
     enum Mode {
         TIMELINE    = 0,     /// Timeline (classic) mode
-        MATRIX8x8   = 1,     /// 8x8 Matrix mode
+        MATRIX   = 1,     /// 8x8 Matrix mode
     };
 
     virtual ~OutputMode() {}
-
-    virtual bool hasFixedLedCount() const = 0;
-    virtual int getFixedLedCount() const = 0;
 
     /// Set the source pattern that we are interacting with
     virtual void setSource(PatternItem* newPatternItem) = 0;
 
     /// True if this model is attached to a pattern item
     virtual bool hasPatternItem() const = 0;
+
+    /// Get the display geometry
+    /// @return size of the display, in LEDs
+    virtual QSize getDisplaySize() const = 0;
+
+    /// Change the display geometry
+    /// @param size New display size, in LEDs
+    virtual void setDisplaySize(QSize size) = 0;
 
     /// True if the patternEditor should show a playback indication bar
     /// @return True if the pattern editor should show a playback bar
@@ -45,7 +50,7 @@ public:
 
     /// Delete the frame at the given index
     /// @param frame Index of the frame to delete
-    virtual void deleteFrame(int newFrame) = 0;
+    virtual void deleteFrame(int index) = 0;
 
     /// Insert a frame at the given index
     /// @param frame Index that the frame should be inserted at

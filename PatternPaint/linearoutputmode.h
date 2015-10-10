@@ -6,22 +6,23 @@
 
 class LinearOutputMode : public OutputMode {
 public:
-
-    bool hasFixedLedCount() const { return false; }
-    int getFixedLedCount() const { return 0; }
+    LinearOutputMode(QSize size);
 
     void setSource(PatternItem* newPatternItem);
     bool hasPatternItem() const;
 
-    bool showPlaybackIndicator() const { return true;}
+    QSize getDisplaySize() const;
+    void setDisplaySize(QSize newSize);
+
+    bool showPlaybackIndicator() const {return true;}
 
     int getFrameCount() const;
 
-    void setFrameIndex(int newFrame);
-    int getFrameIndex() const;
+    void setFrameIndex(int index);
+    int getFrameIndex() const {return frame;}
 
-    void deleteFrame(int newFrame);
-    void addFrame(int newFrame);
+    void deleteFrame(int index);
+    void addFrame(int index);
 
     const QImage& getFrame();
     void applyInstrument(const QImage& instrumentFrameData) ;
@@ -31,6 +32,7 @@ public:
 private:
     PatternItem* patternItem;
     int frame;
+    QSize size;
 };
 
 #endif // TIMELINEDISPLAY_H

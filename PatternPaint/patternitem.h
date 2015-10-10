@@ -19,15 +19,9 @@ public:
     };
 
     /// Constructor for an empty pattern item
-    /// @param patternLength Length of the pattern, in frames
-    /// @param ledCount Number of LEDs to play this pattern onto
-    explicit PatternItem(int patternLength, int ledCount, QListWidget* parent = 0);
-
-    /// Constructor for a pattern based on an image
-    /// @param ledCount Number of LEDs to play this pattern onto
-    /// @param newImage Image to load into this pattern. Note that the image
-    ///         will be resized to fit patternLength and ledCount
-    explicit PatternItem(int ledCount, QImage newImage, QListWidget *parent = 0);
+    /// @param size Size of the display, in pixels
+    /// @param frameCount Length of the pattern, in frames
+    PatternItem(QSize size, int frameCount, QListWidget* parent = 0);
 
     QVariant data(int role) const;
     void setData(int role, const QVariant& value);
@@ -71,10 +65,25 @@ public:
     bool replace(const QFileInfo& newFileInfo);
 
     /// Resize the image
-    /// @param patternLength new pattern length
-    /// @param ledCount new LED count
+    /// @param newSize New size of the pattern, in pixels
     /// @param scale If true, scale the image to fit the new size. Otherwise crop/expand the image.
-    void resize(int newPatternLength, int newLedCount, bool scale);
+    void resize(QSize newSize,  bool scale);
+
+    /// Get the number of frames contained in the animation
+    /// @return Frame count
+    int getFrameCount() const;
+
+    /// Get an image representing the current frame
+    /// @return an NxN QImage reperesenting the current frame data
+    const QImage& getFrame(int index);
+
+    /// Delete the frame at the given index
+    /// @param frame Index of the frame to delete
+    void deleteFrame(int index);
+
+    /// Insert a frame at the given index
+    /// @param frame Index that the frame should be inserted at
+    void addFrame(int newFrame);
 
     /// Apply changes to the pattern
     void applyInstrument(const QImage& update);
@@ -94,8 +103,11 @@ public:
 
 private:
     QUndoStack  undoStack;      ///< Undo stack for this pattern
-    QImage  image;              ///< Image representation of the pattern
+    QSize size;                 ///< Size of the display, in pixels
+    QImage image;               ///< Image representation of the pattern
     QFileInfo fileInfo;         ///< Image filename
+
+    QImage frameData;           // TODO: This is to avoid sending a temporary reference from getFrame, refactor?
 
     QPointer<PatternUpdateNotifier> notifier; ///< Callback to notify that the data has been updated.
 

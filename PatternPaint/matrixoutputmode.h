@@ -5,23 +5,23 @@
 
 class MatrixOutputMode : public OutputMode {
 public:
-    MatrixOutputMode(int height, int width);
-
-    bool hasFixedLedCount() const { return true; }
-    int getFixedLedCount() const { return height*width; }
+    MatrixOutputMode(QSize size);
 
     void setSource(PatternItem* newPatternItem);
     bool hasPatternItem() const;
+
+    QSize getDisplaySize() const;
+    void setDisplaySize(QSize size);
 
     bool showPlaybackIndicator() const {return false;}
 
     int getFrameCount() const;
 
-    void setFrameIndex(int newFrame);
-    int getFrameIndex() const;
+    void setFrameIndex(int index);
+    int getFrameIndex() const {return frame;}
 
-    void deleteFrame(int newFrame);
-    void addFrame(int newFrame);
+    void deleteFrame(int index);
+    void addFrame(int index);
 
     const QImage& getFrame();
     void applyInstrument(const QImage& instrumentFrameData) ;
@@ -29,10 +29,8 @@ public:
     const QImage& getStreamImage();
 
 private:
-    const int height;
-    const int width;
+    QSize matrixSize;
     PatternItem* patternItem;
-    QImage frameData;
     int frame;
     QImage streamImage;
 };

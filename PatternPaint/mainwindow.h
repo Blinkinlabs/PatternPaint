@@ -168,7 +168,7 @@ private:
 
     Pattern::ColorMode colorMode;
 
-    OutputMode* outputMode;
+    OutputMode* dispalyMode;
 
     int frame;      // Current frame we are drawing
     void setNewFrame(int newFrame);

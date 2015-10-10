@@ -4,6 +4,10 @@
 
 #define COLOR_CANVAS_DEFAULT    QColor(0,0,0,255)
 
+LinearOutputMode::LinearOutputMode(QSize size) :
+    size(size) {
+}
+
 void LinearOutputMode::setSource(PatternItem *newPatternItem) {
     patternItem = newPatternItem;
 }
@@ -12,7 +16,22 @@ bool LinearOutputMode::hasPatternItem() const {
     return patternItem != NULL;
 }
 
-void LinearOutputMode::setFrameIndex(int newFrame) {
+QSize LinearOutputMode::getDisplaySize() const
+{
+    return size;
+}
+
+void LinearOutputMode::setDisplaySize(QSize newSize)
+{
+    if(size == newSize) {
+        return;
+    }
+
+    size = newSize;
+    patternItem->resize(size, true);
+}
+
+void LinearOutputMode::setFrameIndex(int index) {
     if(frame < 0) {
         frame = 0;
     }
@@ -20,84 +39,24 @@ void LinearOutputMode::setFrameIndex(int newFrame) {
         frame = getFrameCount()-1;
     }
 
-    frame = newFrame;
+    frame = index;
 }
 
 int LinearOutputMode::getFrameCount() const {
-    return patternItem->getImage().width();
-}
-
-int LinearOutputMode::getFrameIndex() const {
-    return frame;
+    return patternItem->getFrameCount();
 }
 
 const QImage& LinearOutputMode::getFrame() {
     return patternItem->getImage();
+    // return patternItem->getFrame(frame);
 }
 
-void LinearOutputMode::deleteFrame(int newFrame) {
-    if(getFrameCount() < 2) {
-        return;
-    }
-
-    if(newFrame > getFrameCount() || newFrame < 0) {
-        return;
-    }
-
-    QImage newImage(patternItem->getImage().width()-1,
-                    patternItem->getImage().height(),
-                    QImage::Format_ARGB32_Premultiplied);
-
-    QPainter painter(&newImage);
-
-    if(newFrame == 0) {
-        // Crop the front from the original image
-        painter.drawImage(0,0,patternItem->getImage(),1,0,-1,-1);
-    }
-    else if(newFrame == patternItem->getImage().width()-1) {
-        // Crop the back from the original image
-        painter.drawImage(0,0,patternItem->getImage(),0,0,-1,-1);
-    }
-    else {
-        // Crop somewhere in the middle
-        painter.drawImage(0,0,patternItem->getImage(),0,0,newFrame,-1);
-        painter.drawImage(newFrame,0,patternItem->getImage(),newFrame+1,0,-1,-1);
-    }
-
-    // TODO: This pushes two undo operations...
-    patternItem->resize(newImage.width(), newImage.height(), false);
-    patternItem->applyInstrument(newImage);
+void LinearOutputMode::deleteFrame(int index) {
+    patternItem->deleteFrame(index);
 }
 
-void LinearOutputMode::addFrame(int newFrame) {
-    // TODO: Design patternItem() around a QData() array instead of an image, drop this junk.
-
-    if(newFrame > getFrameCount() || newFrame < 0) {
-        return;
-    }
-
-    QImage newImage(patternItem->getImage().width()+1,
-                    patternItem->getImage().height(),
-                    QImage::Format_ARGB32_Premultiplied);
-
-    // copy data from the original image over
-    // Initialize the pattern to a blank canvass
-    newImage.fill(COLOR_CANVAS_DEFAULT);
-    QPainter painter(&newImage);
-
-    if(newFrame == patternItem->getImage().width()-1) {
-        // Crop the back from the original image
-        painter.drawImage(0,0,patternItem->getImage(),0,0,-1,-1);
-    }
-    else {
-        // Crop somewhere in the middle
-        painter.drawImage(0,0,patternItem->getImage(),0,0,newFrame+1,-1);
-        painter.drawImage(newFrame+2,0,patternItem->getImage(),newFrame+1,0,-1,-1);
-    }
-
-    // TODO: This pushes two undo operations...
-    patternItem->resize(newImage.width(), newImage.height(), false);
-    patternItem->applyInstrument(newImage);
+void LinearOutputMode::addFrame(int index) {
+    patternItem->addFrame(index);
 }
 
 void LinearOutputMode::applyInstrument(const QImage &instrumentFrameData) {

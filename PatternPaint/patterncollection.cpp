@@ -3,7 +3,8 @@
 #include <QDebug>
 #include <QSettings>
 
-#define DEFAULT_LED_COUNT 60
+#define DEFAULT_DISPLAY_WIDTH 1
+#define DEFAULT_DISPLAY_HEIGHT 60
 
 PatternCollection::PatternCollection(QWidget *parent) :
     QListWidget(parent)
@@ -82,11 +83,13 @@ void PatternCollection::dropEvent(QDropEvent *event)
 
             if(fileInfo.isFile()) {
                 // Create a patternItem, and attempt to load the file
-                // TODO: are we leaking memory here?
+                // TODO: pass this to mainwindow for proper handling!
                 QSettings settings;
-                int ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
+                QSize displaySize;
+                displaySize.setWidth(settings.value("Options/displayWidth", DEFAULT_DISPLAY_WIDTH).toUInt());
+                displaySize.setHeight(settings.value("Options/displayHeight", DEFAULT_DISPLAY_HEIGHT).toUInt());
 
-                PatternItem* patternItem = new PatternItem(1, ledCount);
+                PatternItem* patternItem = new PatternItem(displaySize, 1);
 
                 if(!patternItem->load(fileInfo)) {
                     continue;

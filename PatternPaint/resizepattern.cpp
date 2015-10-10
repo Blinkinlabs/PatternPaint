@@ -9,8 +9,9 @@ ResizePattern::ResizePattern(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->patternLength->setValidator(new QIntValidator(1,std::numeric_limits<int>::max(),this));
-    ui->ledCount->setValidator(new QIntValidator(1,std::numeric_limits<int>::max(),this));
+    ui->frameCount->setValidator(new QIntValidator(1,std::numeric_limits<int>::max(),this));
+    ui->displayHeight->setValidator(new QIntValidator(1,std::numeric_limits<int>::max(),this));
+    ui->displayWidth->setValidator(new QIntValidator(1,std::numeric_limits<int>::max(),this));
 }
 
 ResizePattern::~ResizePattern()
@@ -18,24 +19,21 @@ ResizePattern::~ResizePattern()
     delete ui;
 }
 
-void ResizePattern::setLength(int length) {
-    ui->patternLength->setText(QString::number(length));
+void ResizePattern::setFrameCount(int length) {
+    ui->frameCount->setText(QString::number(length));
 }
 
-int ResizePattern::length()
+int ResizePattern::getFrameCount()
 {
-    return ui->patternLength->text().toInt();
+    return ui->frameCount->text().toInt();
 }
 
-void ResizePattern::setLedCount(int ledCount) {
-    ui->ledCount->setText(QString::number(ledCount));
+void ResizePattern::setOutputSize(QSize size) {
+    ui->displayHeight->setText(QString::number(size.height()));
+    ui->displayWidth->setText(QString::number(size.width()));
 }
 
-int ResizePattern::ledCount()
+QSize ResizePattern::getOutputSize()
 {
-    return ui->ledCount->text().toInt();
-}
-
-void ResizePattern::setFixedLedCount(bool fixed) {
-    ui->ledCount->setEnabled(!fixed);
+    return QSize(ui->displayWidth->text().toInt(), ui->displayHeight->text().toInt());
 }

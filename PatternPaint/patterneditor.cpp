@@ -283,18 +283,19 @@ void PatternEditor::paintEvent(QPaintEvent*)
     // TODO: How to do this more generically?
     if(deviceModel->showPlaybackIndicator()) {
         int playbackRow = deviceModel->getFrameIndex();
+        const float outputScale = deviceModel->getDisplaySize().width()*xScale;
 
         // Draw the playback indicator
         // Note that we need to compute the correct width based on the rounding error of
         // the current cell, otherwise it won't line up correctly with the actual image.
         painter.setPen(COLOR_PLAYBACK_EDGE);
-        painter.drawRect(playbackRow*xScale +.5,
+        painter.drawRect(playbackRow*outputScale +.5,
                          0,
-                         int((playbackRow+1)*xScale +.5) - int(playbackRow*xScale +.5),
+                         int((playbackRow+1)*outputScale +.5) - int(playbackRow*outputScale +.5),
                          frameData.height()*yScale);
-        painter.fillRect(playbackRow*xScale +.5,
+        painter.fillRect(playbackRow*outputScale +.5,
                          0,
-                         int((playbackRow+1)*xScale +.5) - int(playbackRow*xScale +.5),
+                         int((playbackRow+1)*outputScale +.5) - int(playbackRow*outputScale +.5),
                          frameData.height()*yScale,
                          COLOR_PLAYBACK_TOP);
     }

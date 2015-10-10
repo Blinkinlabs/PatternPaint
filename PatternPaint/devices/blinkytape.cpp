@@ -293,18 +293,20 @@ void BlinkyTape::sendUpdate(QByteArray ledData)
         }
         serial->flush();
 
+#if defined(OS_X_LARGE_SERIAL_WORKAROUND)
         // Pause a short amount of time to let the OS do anything else
         // TODO: Calling QCoreApplication::processEvents causes application hangups,
         // but sending too much data at once on OS X crashes the BlinkyTape.
         // Maybe we need to farm this out to a timer?
-//        if((chunk+1)*CHUNK_SIZE < ledData.length()) {
-//            int millisecondsToWait = 3;
-//            QTime dieTime = QTime::currentTime().addMSecs( millisecondsToWait );
-//            while( QTime::currentTime() < dieTime )
-//            {
-//                QCoreApplication::processEvents( QEventLoop::AllEvents, millisecondsToWait );
-//            }
-//        }
+        if((chunk+1)*CHUNK_SIZE < ledData.length()) {
+            int millisecondsToWait = 3;
+            QTime dieTime = QTime::currentTime().addMSecs( millisecondsToWait );
+            while( QTime::currentTime() < dieTime )
+            {
+                QCoreApplication::processEvents( QEventLoop::AllEvents, millisecondsToWait );
+            }
+        }
+#endif
     }
 
 }

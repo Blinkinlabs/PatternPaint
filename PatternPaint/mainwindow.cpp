@@ -41,7 +41,8 @@
 #define COLOR_CANVAS_DEFAULT    QColor(0,0,0,255)
 #define COLOR_TOOL_DEFAULT    QColor(255,255,255,255)
 
-#define DEFAULT_LED_COUNT 60
+#define DEFAULT_DISPLAY_WIDTH 1
+#define DEFAULT_DISPLAY_HEIGHT 60
 #define DEFAULT_PATTERN_LENGTH 100
 
 #define MIN_TIMER_INTERVAL 5  // minimum interval to wait between blinkytape updates
@@ -50,7 +51,7 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    outputMode(NULL),
+    dispalyMode(NULL),
     frame(0)
 {
     setupUi(this);
@@ -226,17 +227,17 @@ MainWindow::~MainWindow(){
     }
 #endif
 
-    if(outputMode != NULL) {
-        delete outputMode;
+    if(dispalyMode != NULL) {
+        delete dispalyMode;
     }
 }
 
 void MainWindow::drawTimer_timeout() {
-    if(!outputMode->hasPatternItem()) {
+    if(!dispalyMode->hasPatternItem()) {
         return;
     }
 
-    setNewFrame((frame+1)%outputMode->getFrameCount());
+    setNewFrame((frame+1)%dispalyMode->getFrameCount());
 }
 
 
@@ -313,16 +314,18 @@ void MainWindow::on_actionLoad_File_triggered()
     QFileInfo fileInfo(fileName);
     settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
 
-    int ledCount = 0;
-    if((outputMode != NULL) && (outputMode->hasFixedLedCount())) {
-        ledCount = outputMode->getFixedLedCount();
+    QSize displaySize;
+    if(dispalyMode != NULL) {
+        displaySize = dispalyMode->getDisplaySize();
     }
     else {
-        ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
+        displaySize.setWidth(settings.value("Options/displayWidth", DEFAULT_DISPLAY_WIDTH).toUInt());
+        displaySize.setHeight(settings.value("Options/displayHeight", DEFAULT_DISPLAY_HEIGHT).toUInt());
     }
 
     // Create a patternItem, and attempt to load the file
-    PatternItem* patternItem = new PatternItem(1, ledCount);
+    // TODO: Can't there be a constructor that accepts a file directly? This seems odd
+    PatternItem* patternItem = new PatternItem(displaySize,1);
 
     if(!patternItem->load(fileInfo)) {
         showError("Could not open file "
@@ -548,35 +551,35 @@ void MainWindow::on_actionTroubleshooting_tips_triggered()
 
 void MainWindow::on_actionFlip_Horizontal_triggered()
 {
-    if (!outputMode->hasPatternItem()) {
+    if (!dispalyMode->hasPatternItem()) {
         return;
     }
 
-    QImage frame = outputMode->getFrame();
+    QImage frame = dispalyMode->getFrame();
     frame = frame.mirrored(true, false);
-    outputMode->applyInstrument(frame);
+    dispalyMode->applyInstrument(frame);
 }
 
 void MainWindow::on_actionFlip_Vertical_triggered()
 {
-    if (!outputMode->hasPatternItem()) {
+    if (!dispalyMode->hasPatternItem()) {
         return;
     }
 
-    QImage frame = outputMode->getFrame();
+    QImage frame = dispalyMode->getFrame();
     frame = frame.mirrored(false, true);
-    outputMode->applyInstrument(frame);
+    dispalyMode->applyInstrument(frame);
 }
 
 void MainWindow::on_actionClear_Pattern_triggered()
 {
-    if (!outputMode->hasPatternItem()) {
+    if (!dispalyMode->hasPatternItem()) {
         return;
     }
 
-    QImage frame = outputMode->getFrame();
+    QImage frame = dispalyMode->getFrame();
     frame.fill(COLOR_CANVAS_DEFAULT);
-    outputMode->applyInstrument(frame);
+    dispalyMode->applyInstrument(frame);
 }
 
 void MainWindow::showError(QString errorMessage) {
@@ -645,7 +648,7 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
         return;
     }
 
-
+    // TODO: Don't do this!
     // Create a temporary displaymodel to interpret the patterns
     OutputMode* display;
 
@@ -657,10 +660,14 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
     // Create a new displaymodel to handle the conversions
     switch(displayMode) {
     case OutputMode::TIMELINE:
-        display = new LinearOutputMode();
+    {
+        int width = settings.value("Options/displayWidth", DEFAULT_DISPLAY_HEIGHT).toUInt();
+        int height = settings.value("Options/displayHeight", DEFAULT_DISPLAY_HEIGHT).toUInt();
+        display = new LinearOutputMode(QSize(width, height));
         break;
-    case OutputMode::MATRIX8x8:
-        display = new MatrixOutputMode(8,8);
+    }
+    case OutputMode::MATRIX:
+        display = new MatrixOutputMode(QSize(8,8));
         break;
     default:
         return;
@@ -710,27 +717,14 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
 
 void MainWindow::on_actionResize_Pattern_triggered()
 {
-    if((outputMode == NULL) || !outputMode->hasPatternItem()) {
+    if((dispalyMode == NULL) || !dispalyMode->hasPatternItem()) {
         return;
-    }
-
-    QSettings settings;
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-
-    int patternLength = patternItem->getImage().width();
-    int ledCount = patternItem->getImage().height();
-
-    bool fixedLedCount = outputMode->hasFixedLedCount();
-
-    if(fixedLedCount) {
-        ledCount = outputMode->getFixedLedCount();
     }
 
     ResizePattern resizeDialog(this);
     resizeDialog.setWindowModality(Qt::WindowModal);
-    resizeDialog.setLength(patternLength);
-    resizeDialog.setLedCount(ledCount);
-    resizeDialog.setFixedLedCount(fixedLedCount);
+    resizeDialog.setFrameCount(dispalyMode->getFrameCount());
+    resizeDialog.setOutputSize(dispalyMode->getDisplaySize());
 
     resizeDialog.exec();
 
@@ -738,24 +732,34 @@ void MainWindow::on_actionResize_Pattern_triggered()
         return;
     }
 
-    // Do a quick sanity check on the inputs, they should be validated by the resizer class.
-    if(resizeDialog.length() < 1 || resizeDialog.ledCount() < 1) {
-        qDebug() << "Resize pattern: data out of range, discarding";
-        return;
-    }
-    patternLength = resizeDialog.length();
-    ledCount = resizeDialog.ledCount();
+    int newFrameCount = resizeDialog.getFrameCount();
+    QSize newDisplaySize = resizeDialog.getOutputSize();
 
-    settings.setValue("Options/patternLength", static_cast<uint>(patternLength));
-    settings.setValue("Options/ledCount", static_cast<uint>(ledCount));
+    QSettings settings;
+    settings.setValue("Options/frameCount", static_cast<uint>(newFrameCount));
+    settings.setValue("Options/displayHeight", static_cast<uint>(newDisplaySize.height()));
+    settings.setValue("Options/displayWidth", static_cast<uint>(newDisplaySize.width()));
 
-    qDebug() << "Resizing patterns, length:"
-             << patternLength
+    qDebug() << "Resizing patterns, frame count:"
+             << newFrameCount
              << "height:"
-             << ledCount;
+             << newDisplaySize.height()
+             << "width:"
+             << newDisplaySize.width();
 
-    // Resize the selected pattern
-    patternItem->resize(patternLength, ledCount, true);
+    // Frame count only applies to the currently selected pattern
+    while(dispalyMode->getFrameCount() > newFrameCount) {
+        dispalyMode->deleteFrame(dispalyMode->getFrameCount()-1);
+    }
+    while(dispalyMode->getFrameCount() < newFrameCount) {
+        dispalyMode->addFrame(dispalyMode->getFrameCount());
+    }
+
+    // If we changed geometries, though, we need to resize all the source images
+    if(dispalyMode->getDisplaySize() != newDisplaySize) {
+        // TODO: resize all patterns
+        dispalyMode->setDisplaySize(newDisplaySize);
+    }
 }
 
 void MainWindow::on_actionAddress_programmer_triggered()
@@ -962,89 +966,45 @@ void MainWindow::setColorMode(Pattern::ColorMode newColorOrder)
 
 void MainWindow::setDisplayMode(OutputMode::Mode newDisplayMode)
 {
-    OutputMode* newDisplayModel;
+    // Get the old size from the displayMode
+    QSettings settings;
+    QSize displaySize;
+    if(dispalyMode != NULL) {
+        displaySize = dispalyMode->getDisplaySize();
+    }
+    else {
+        displaySize.setWidth(settings.value("Options/displayWidth", DEFAULT_DISPLAY_WIDTH).toUInt());
+        displaySize.setHeight(settings.value("Options/displayHeight", DEFAULT_DISPLAY_HEIGHT).toUInt());
+    }
 
-
+    // TODO: Smart pointer for this.
+    if(dispalyMode != NULL) {
+        delete dispalyMode;
+    }
 
     // Create a new displaymodel if possible
     switch(newDisplayMode) {
     case OutputMode::TIMELINE:
-        newDisplayModel = new LinearOutputMode();
+    {
+        dispalyMode = new LinearOutputMode(displaySize);
+        actionTimeline->setChecked(true);
+        actionMatrix->setChecked(false);
         break;
-    case OutputMode::MATRIX8x8:
-        newDisplayModel = new MatrixOutputMode(8,8);
+    }
+    case OutputMode::MATRIX:
+        dispalyMode = new MatrixOutputMode(displaySize);
+        actionTimeline->setChecked(false);
+        actionMatrix->setChecked(true);
         break;
     default:
         return;
         break;
     }
 
-    // Check if any of the patterns need to be resized
-    // TODO: This doesn't make any sense.
-    if(newDisplayModel->hasFixedLedCount()) {
-        bool needToResize = false;
-
-        for(int i = 0; i < patternCollection->count(); i++) {
-            // Convert the current pattern into a Pattern
-            PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->item(i));
-            if(patternItem->getImage().height() != newDisplayModel->getFixedLedCount()) {
-                needToResize = true;
-                break;
-            }
-        }
-
-        // ask about it
-        if(needToResize) {
-            QMessageBox msgBox(this);
-            msgBox.setWindowModality(Qt::WindowModal);
-            //msgBox.setText(messageText);
-            msgBox.setText("Some patterns need to be resized to use this mode. Ok to resize?");
-            msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-            msgBox.setDefaultButton(QMessageBox::Cancel);
-            int ans = msgBox.exec();
-
-            if (ans == QMessageBox::Cancel) {
-                delete newDisplayModel;
-                return;
-            }
-        }
-
-        // then resize them
-        for(int i = 0; i < patternCollection->count(); i++) {
-            // Convert the current pattern into a Pattern
-            // TODO: Run this resizing through the display model
-            PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->item(i));
-            if(patternItem->getImage().height() != newDisplayModel->getFixedLedCount()) {
-                patternItem->resize(patternItem->getImage().width(),newDisplayModel->getFixedLedCount(),true);
-            }
-        }
-    }
-
-    // Finally, apply the new mode.
-
-    switch(newDisplayMode) {
-    case OutputMode::TIMELINE:
-        actionTimeline->setChecked(true);
-        actionMatrix->setChecked(false);
-        break;
-    case OutputMode::MATRIX8x8:
-        actionTimeline->setChecked(false);
-        actionMatrix->setChecked(true);
-        break;
-    }
-
-    QSettings settings;
     settings.setValue("Options/DisplayMode", static_cast<uint>(newDisplayMode));
 
-
-    // TODO: Smart pointer for this.
-    if(outputMode != NULL) {
-        delete outputMode;
-    }
-    outputMode = newDisplayModel;
-
-    outputMode->setSource(dynamic_cast<PatternItem*>(patternCollection->currentItem()));
-    patternEditor->setDisplayModel(outputMode);
+    dispalyMode->setSource(dynamic_cast<PatternItem*>(patternCollection->currentItem()));
+    patternEditor->setDisplayModel(dispalyMode);
 
     on_patternSizeUpdated();
     on_patternDataUpdated();
@@ -1054,8 +1014,8 @@ void MainWindow::setNewFrame(int newFrame)
 {
     int frameCount = 0;
 
-    if(outputMode != NULL && outputMode->hasPatternItem()) {
-        frameCount = outputMode->getFrameCount();
+    if(dispalyMode != NULL && dispalyMode->hasPatternItem()) {
+        frameCount = dispalyMode->getFrameCount();
     }
 
     if(newFrame >= frameCount) {
@@ -1084,7 +1044,7 @@ void MainWindow::updateBlinky()
 
     lastTime = newTime;
 
-    if((outputMode == NULL) || !outputMode->hasPatternItem()) {
+    if((dispalyMode == NULL) || !dispalyMode->hasPatternItem()) {
         return;
     }
 
@@ -1092,7 +1052,7 @@ void MainWindow::updateBlinky()
         return;
     }
 
-    QImage image = outputMode->getStreamImage();
+    QImage image = dispalyMode->getStreamImage();
 
     // TODO: Put this in a converter class.
     QByteArray ledData;
@@ -1131,15 +1091,16 @@ void MainWindow::on_actionNew_triggered()
     QSettings settings;
     int patternLength = settings.value("Options/patternLength", DEFAULT_PATTERN_LENGTH).toUInt();
 
-    int ledCount = 0;
-    if((outputMode != NULL) && (outputMode->hasFixedLedCount())) {
-        ledCount = outputMode->getFixedLedCount();
+    QSize displaySize;
+    if(dispalyMode != NULL) {
+        displaySize = dispalyMode->getDisplaySize();
     }
     else {
-        ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
+        displaySize.setWidth(settings.value("Options/displayWidth", DEFAULT_DISPLAY_WIDTH).toUInt());
+        displaySize.setHeight(settings.value("Options/displayHeight", DEFAULT_DISPLAY_HEIGHT).toUInt());
     }
 
-    PatternItem* patternItem = new PatternItem(patternLength, ledCount);
+    PatternItem* patternItem = new PatternItem(displaySize,patternLength);
 
     patternCollection->addItem(patternItem);
     patternCollection->setCurrentItem(patternItem);
@@ -1255,7 +1216,7 @@ void MainWindow::on_actionStepForward_triggered()
     }
 
 
-    setNewFrame((frame+1)%outputMode->getFrameCount());
+    setNewFrame((frame+1)%dispalyMode->getFrameCount());
 }
 
 void MainWindow::on_actionStepBackward_triggered()
@@ -1264,7 +1225,7 @@ void MainWindow::on_actionStepBackward_triggered()
         return;
     }
 
-    setNewFrame(frame<=0?outputMode->getFrameCount()-1:frame-1);
+    setNewFrame(frame<=0?dispalyMode->getFrameCount()-1:frame-1);
 }
 
 void MainWindow::on_actionTimeline_triggered()
@@ -1274,29 +1235,29 @@ void MainWindow::on_actionTimeline_triggered()
 
 void MainWindow::on_actionMatrix_triggered()
 {
-    setDisplayMode(OutputMode::MATRIX8x8);
+    setDisplayMode(OutputMode::MATRIX);
 }
 
 void MainWindow::on_actionAddFrame_triggered()
 {
-    if(!outputMode->hasPatternItem()) {
+    if(!dispalyMode->hasPatternItem()) {
         return;
     }
 
-    outputMode->addFrame(outputMode->getFrameIndex());
+    dispalyMode->addFrame(dispalyMode->getFrameIndex());
 
-    setNewFrame(outputMode->getFrameIndex()+1);
+    setNewFrame(dispalyMode->getFrameIndex()+1);
 }
 
 void MainWindow::on_actionDeleteFrame_triggered()
 {
-    if(!outputMode->hasPatternItem()) {
+    if(!dispalyMode->hasPatternItem()) {
         return;
     }
 
-    outputMode->deleteFrame(outputMode->getFrameIndex());
+    dispalyMode->deleteFrame(dispalyMode->getFrameIndex());
 
-    setNewFrame(outputMode->getFrameIndex()-1);
+    setNewFrame(dispalyMode->getFrameIndex()-1);
 }
 
 void MainWindow::on_patternModifiedChanged()
@@ -1318,18 +1279,20 @@ void MainWindow::on_patternModifiedChanged()
 void MainWindow::on_ExampleSelected(QAction* action) {
     qDebug() << "Example selected:" << action->objectName();
 
-    // TODO: This is duplicated in on_actionLoad_file_triggered()
-    int ledCount = 0;
-    if((outputMode != NULL) && (outputMode->hasFixedLedCount())) {
-        ledCount = outputMode->getFixedLedCount();
+    QSettings settings;
+
+    // TODO: This is duplicated in on_actionLoad_file_triggered(), on_actionNew_triggered()
+    QSize displaySize;
+    if(dispalyMode != NULL) {
+        displaySize = dispalyMode->getDisplaySize();
     }
     else {
-        QSettings settings;
-        ledCount = settings.value("Options/ledCount", DEFAULT_LED_COUNT).toUInt();
+        displaySize.setWidth(settings.value("Options/displayWidth", DEFAULT_DISPLAY_WIDTH).toUInt());
+        displaySize.setHeight(settings.value("Options/displayHeight", DEFAULT_DISPLAY_HEIGHT).toUInt());
     }
 
     // Create a patternItem, and attempt to load the file
-    PatternItem* patternItem = new PatternItem(1, ledCount);
+    PatternItem* patternItem = new PatternItem(displaySize,1);
 
     if(!patternItem->load(action->objectName())) {
         showError("Could not open file "

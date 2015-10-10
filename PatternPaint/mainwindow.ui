@@ -192,6 +192,17 @@
          <property name="acceptDrops">
           <bool>false</bool>
          </property>
+         <widget class="QWidget" name="verticalLayoutWidget">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>10</y>
+            <width>160</width>
+            <height>80</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout"/>
+         </widget>
         </widget>
        </widget>
       </item>
@@ -266,7 +277,7 @@
     </widget>
     <widget class="QMenu" name="menuMode">
      <property name="title">
-      <string>Mode</string>
+      <string>Display Mode</string>
      </property>
      <addaction name="actionTimeline"/>
      <addaction name="actionMatrix"/>
@@ -696,7 +707,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>LED Strip</string>
+    <string>Timeline</string>
    </property>
   </action>
   <action name="actionMatrix">
@@ -704,7 +715,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>8x8 Matrix</string>
+    <string>Single frame</string>
    </property>
   </action>
   <action name="actionAddFrame">

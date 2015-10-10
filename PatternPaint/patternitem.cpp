@@ -6,24 +6,20 @@
 
 #define COLOR_CANVAS_DEFAULT    QColor(0,0,0,255)
 
-PatternItem::PatternItem(int patternLength, int ledCount, QListWidget* parent) :
+PatternItem::PatternItem(QSize patternSize, int frameCount, QListWidget* parent) :
     QListWidgetItem(parent, QListWidgetItem::UserType + 1),
+    size(patternSize),
     modified(false)
 {
     undoStack.setUndoLimit(50);
 
-    QImage newImage(patternLength, ledCount, QImage::Format_ARGB32_Premultiplied);
+    // Note: The pattern is stored in a big image, with all frames placed next to each other.
+
+    QImage newImage(size.width()*frameCount,
+                    size.height(),
+                    QImage::Format_ARGB32_Premultiplied);
     newImage.fill(COLOR_CANVAS_DEFAULT);
     applyUndoState(newImage);
-}
-
-PatternItem::PatternItem(int ledCount, QImage newImage, QListWidget* parent) :
-    QListWidgetItem(parent, QListWidgetItem::UserType + 1),
-    modified(false)
-{
-    undoStack.setUndoLimit(50);
-
-    image = newImage.scaledToHeight(ledCount);
 }
 
 void PatternItem::pushUndoState() {
@@ -97,8 +93,11 @@ bool PatternItem::replace(const QFileInfo &newFileInfo)
         return false;
     }
 
-    // Scale the image (TODO: present a dialog for this?)
-    image = newImage.scaledToHeight(image.height());
+    // TODO: Warn if the source image wasn't of the expected aperture?
+    image = newImage.scaledToHeight(size.height());
+    if(image.width()%size.width() != 0) {
+        // TODO: What?
+    }
 
     if(!notifier.isNull()) {
         notifier->signalSizeUpdated();
@@ -149,19 +148,24 @@ void PatternItem::setData(int role, const QVariant& value) {
     QListWidgetItem::setData(role, value);
 }
 
-void PatternItem::resize(int newPatternLength, int newLedCount, bool scale) {
+void PatternItem::resize(QSize newSize, bool scale) {
+    if(size == newSize) {
+        return;
+    }
+
     pushUndoState();
+
+    int frameCount = getFrameCount();
+    size = newSize;
 
     QImage originalImage = image;
 
-    if(scale && newLedCount != originalImage.height()) {
-        originalImage = originalImage.scaledToHeight(newLedCount);
-    }
+    // TODO: Proper scaling, need to crop/scale and copy each frame into the new image.
+    originalImage = originalImage.scaled(size.width()*frameCount, size.height());
 
     // Initialize the pattern to a blank canvass
-    image = QImage(newPatternLength,
-                     newLedCount,
-                     QImage::Format_ARGB32_Premultiplied);
+    image = QImage(size.width()*frameCount, size.height(),
+                   QImage::Format_ARGB32_Premultiplied);
     image.fill(COLOR_CANVAS_DEFAULT);
 
     QPainter painter(&image);
@@ -201,4 +205,88 @@ void PatternItem::setModified(bool newModified)  {
 
 void PatternItem::setNotifier(QPointer<PatternUpdateNotifier> newNotifier) {
     notifier = newNotifier;
+}
+
+
+const QImage& PatternItem::getFrame(int index) {
+    // TODO: Protections here?
+
+    frameData = QImage(size,QImage::Format_ARGB32_Premultiplied);
+
+    // TODO: This is an inefficient way of achieving this.
+    for(int x = 0; x < frameData.width(); x++) {
+        for(int y = 0; y < frameData.height(); y++) {
+            frameData.setPixel(x, y,
+                              image.pixel(index*size.width() + x, y));
+        }
+    }
+
+    return frameData;
+}
+
+
+int PatternItem::getFrameCount() const {
+    return image.width()/size.width();
+}
+
+
+void PatternItem::deleteFrame(int index) {
+    if(getFrameCount() < 2) {
+        return;
+    }
+
+    if(index > getFrameCount() || index < 0) {
+        return;
+    }
+
+    QImage newImage(image.width()-size.width(),
+                    image.height(),
+                    QImage::Format_ARGB32_Premultiplied);
+
+    QPainter painter(&newImage);
+
+    if(index == 0) {
+        // Crop the front from the original image
+        painter.drawImage(0,0,image,1,0,-1,-1);
+    }
+    else if(index == image.width()-1) {
+        // Crop the back from the original image
+        painter.drawImage(0,0,image,0,0,-1,-1);
+    }
+    else {
+        // Crop somewhere in the middle
+        painter.drawImage(0,0,image,0,0,index*size.width(),-1);
+        painter.drawImage(index*size.width(),0,image,(index+1)*size.width(),0,-1,-1);
+    }
+
+    image = newImage;
+    applyInstrument(newImage);
+}
+
+void PatternItem::addFrame(int index) {
+    if(index > getFrameCount() || index < 0) {
+        return;
+    }
+
+    QImage newImage(image.width()+size.width(),
+                    image.height(),
+                    QImage::Format_ARGB32_Premultiplied);
+
+    // copy data from the original image over
+    // Initialize the pattern to a blank canvass
+    newImage.fill(COLOR_CANVAS_DEFAULT);
+    QPainter painter(&newImage);
+
+    if(index == getFrameCount()-1) {
+        // Add to the end of the image
+        painter.drawImage(0,0,image,0,0,-1,-1);
+    }
+    else {
+        // Crop somewhere in the middle
+        painter.drawImage(0,0,image,0,0,(index+1)*size.width(),-1);
+        painter.drawImage((index+2)*size.width(),0,image,(index+1)*size.width(),0,-1,-1);
+    }
+
+    image=newImage;
+    applyInstrument(newImage);
 }
