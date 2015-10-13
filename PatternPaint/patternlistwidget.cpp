@@ -1,23 +1,22 @@
-#include "patterncollection.h"
-#include "pattern.h"
+#include "patternlistwidget.h"
 #include <QDebug>
 #include <QSettings>
 
 #define DEFAULT_DISPLAY_WIDTH 1
 #define DEFAULT_DISPLAY_HEIGHT 60
 
-PatternCollection::PatternCollection(QWidget *parent) :
+PatternListWidget::PatternListWidget(QWidget *parent) :
     QListWidget(parent)
 {
 
 }
 
-PatternCollection::~PatternCollection()
+PatternListWidget::~PatternListWidget()
 {
 
 }
 
-void PatternCollection::dragEnterEvent(QDragEnterEvent *event)
+void PatternListWidget::dragEnterEvent(QDragEnterEvent *event)
 {
     // If this drag is coming from inside, then it's a re-order
     if(event->source() == this) {
@@ -30,7 +29,7 @@ void PatternCollection::dragEnterEvent(QDragEnterEvent *event)
     }
 }
 
-void PatternCollection::dropEvent(QDropEvent *event)
+void PatternListWidget::dropEvent(QDropEvent *event)
 {
     if(event->source() == this) {
         // Note: Implement this by hand on Windows, to work around a bug in QT 5.4.1
@@ -110,7 +109,7 @@ void PatternCollection::dropEvent(QDropEvent *event)
 }
 
 
-void PatternCollection::addItem(QListWidgetItem* Item)
+void PatternListWidget::addItem(QListWidgetItem* Item)
 {
      Pattern* patternItem = dynamic_cast<Pattern*>(Item);
 
@@ -124,4 +123,14 @@ void PatternCollection::addItem(QListWidgetItem* Item)
     if(!updateNotifier.isNull()) {
         patternItem->setNotifier(updateNotifier);
     }
+}
+
+bool PatternListWidget::hasPattern() const
+{
+    return (currentItem() != NULL);
+}
+
+Pattern* PatternListWidget::pattern() const
+{
+    return dynamic_cast<Pattern*>(currentItem());
 }

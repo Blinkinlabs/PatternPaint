@@ -54,7 +54,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
-       <widget class="PatternCollection" name="patternCollection">
+       <widget class="PatternListWidget" name="patternCollection">
         <property name="minimumSize">
          <size>
           <width>150</width>
@@ -790,9 +790,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>PatternCollection</class>
+   <class>PatternListWidget</class>
    <extends>QListWidget</extends>
-   <header>patterncollection.h</header>
+   <header>patternlistwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

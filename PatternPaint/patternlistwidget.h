@@ -7,6 +7,7 @@
 #include <QPointer>
 #include <QUndoGroup>
 #include "patternupdatenotifier.h"
+#include "pattern.h"
 
 class PatternListWidget : public QListWidget
 {
@@ -24,6 +25,12 @@ public:
     // TODO: Reconsider ownership of these?
     void setUndoGroup(const QPointer<QUndoGroup> newUndoGroup) {undoGroup = newUndoGroup;}
     void setNotifier(const QPointer<PatternUpdateNotifier> newUpdateNotifier) {updateNotifier = newUpdateNotifier;}
+
+    /// True if there is a valid pattern selected
+    bool hasPattern() const;
+
+    /// Get the current pattern
+    Pattern *pattern() const;
 
 private:
     QPointer<QUndoGroup> undoGroup;

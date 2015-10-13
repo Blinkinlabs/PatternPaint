@@ -4,22 +4,21 @@
 #include <QMainWindow>
 #include <QProgressDialog>
 #include <QMessageBox>
+#include <QUndoGroup>
+#include <QToolButton>
+#include <QSpinBox>
 
 #include "blinkycontroller.h"
 #include "patternuploader.h"
 #include "patterneditor.h"
 #include "addressprogrammer.h"
+#include "colorchooser.h"
 
 #include "ui_mainwindow.h"
 
 #if defined Q_OS_MAC
 #include "appnap.h"
 #endif
-
-class QUndoGroup;
-class ColorChooser;
-class QToolButton;
-class QSpinBox;
 
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
@@ -37,6 +36,7 @@ public slots:
 
     void on_frameDataUpdated(int index, QImage update);
 
+    /// Set pattern frame is called whyen the
     void setPatternFrame(const QModelIndex &current, const QModelIndex &);
 protected:
     void closeEvent(QCloseEvent *event);
@@ -123,15 +123,20 @@ private slots:
 
     void on_ExampleSelected(QAction*);
 
+signals:
+
+    /// Signalled when an editable pattern is selected in the editor
+    /// @param status true if pattern available, false otherwise.
+    void patternStatusChanged(bool status);
+
 private:
     ColorChooser* colorChooser;
 
-    QTimer* drawTimer;
+    QTimer drawTimer;
+    QTimer connectionScannerTimer;
 
     QPointer<BlinkyController> controller;
     QPointer<PatternUploader> uploader;
-
-    QTimer *connectionScannerTimer;
 
     QProgressDialog* progressDialog;
 
@@ -143,9 +148,9 @@ private:
     enum Modes { Disconnected, Connected, Uploading };
     Modes mode;
 
-    QUndoGroup *undoGroup;
-    QAction* undoAction;
-    QAction* redoAction;
+    QUndoGroup undoGroup;
+
+    PatternOutput::ColorMode colorMode;
 
     void showError(QString errorMessage);
 
@@ -163,8 +168,6 @@ private:
 
     void setColorMode(PatternOutput::ColorMode newColorOrder);
 
-    PatternOutput::ColorMode colorMode;
-
     void setNewFrame(int newFrame);
 
     void updateBlinky();
@@ -176,7 +179,7 @@ private:
     void populateExamplesMenu(QString directory, QMenu* menu);
 
     // TODO: These don't belong here.
-    int getFrame();
+    int getFrameIndex();
     int getFrameCount();
 };
 

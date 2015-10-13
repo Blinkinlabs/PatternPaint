@@ -1,4 +1,3 @@
-#include "patternoutput.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "colormodel.h"
@@ -8,6 +7,7 @@
 #include "undocommand.h"
 #include "colorchooser.h"
 #include "blinkytape.h"
+#include "patternoutput.h"
 
 #include "pencilinstrument.h"
 #include "lineinstrument.h"
@@ -25,8 +25,7 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QtWidgets>
-#include <QUndoGroup>
-#include <QToolButton>
+
 #include <blinkytapeuploader.h>
 
 
@@ -64,18 +63,15 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowIcon(QIcon(":/resources/images/patternpaint.ico"));
 #endif
 
-    drawTimer = new QTimer(this);
-    connectionScannerTimer = new QTimer(this);
-
     // prepare undo/redo
     menuEdit->addSeparator();
-    undoGroup = new QUndoGroup(this);
-    undoAction = undoGroup->createUndoAction(this, tr("&Undo"));
+
+    QAction* undoAction = undoGroup.createUndoAction(this, tr("&Undo"));
     undoAction->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Z")));
     undoAction->setEnabled(false);
     menuEdit->addAction(undoAction);
 
-    redoAction = undoGroup->createRedoAction(this, tr("&Redo"));
+    QAction* redoAction = undoGroup.createRedoAction(this, tr("&Redo"));
     redoAction->setEnabled(false);
     redoAction->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Y")));
     menuEdit->addAction(redoAction);
@@ -126,6 +122,30 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(pFrame, SIGNAL(textEdited(QString)), this, SLOT(frameIndex_valueChanged(QString)));
     frameIndex_valueChanged("1");
 
+
+    connect(this, SIGNAL(patternStatusChanged(bool)),
+            actionClose, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(patternStatusChanged(bool)),
+            actionFlip_Horizontal, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(patternStatusChanged(bool)),
+            actionFlip_Vertical, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(patternStatusChanged(bool)),
+            actionClear_Pattern, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(patternStatusChanged(bool)),
+            actionAddFrame, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(patternStatusChanged(bool)),
+            actionDeleteFrame, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(patternStatusChanged(bool)),
+            actionPlay, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(patternStatusChanged(bool)),
+            actionStepForward, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(patternStatusChanged(bool)),
+            actionStepBackward, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(patternStatusChanged(bool)),
+            pSpeed, SLOT(setEnabled(bool)));
+
+
+
     mode = Disconnected;
 
     // Our pattern editor wants to get some notifications
@@ -133,11 +153,13 @@ MainWindow::MainWindow(QWidget *parent) :
             patternEditor, SLOT(setToolColor(QColor)));
     connect(penSizeSpin, SIGNAL(valueChanged(int)),
             patternEditor, SLOT(setToolSize(int)));
-    connect(patternCollection, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),
-            this, SLOT(setPatternItem(QListWidgetItem*, QListWidgetItem*)));
 
     connect(patternEditor, SIGNAL(frameDataUpdated(int, const QImage)),
             this, SLOT(on_frameDataUpdated(int, const QImage)));
+
+
+    connect(patternCollection, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),
+            this, SLOT(setPatternItem(QListWidgetItem*, QListWidgetItem*)));
 
 
     // Pre-set the upload progress dialog
@@ -148,13 +170,12 @@ MainWindow::MainWindow(QWidget *parent) :
     progressDialog->setAutoClose(false);
 
     // The draw timer tells the pattern to advance
-    connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
+    connect(&drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
 
     // Start a scanner to connect to a Blinky automatically
-    connect(connectionScannerTimer, SIGNAL(timeout()), this, SLOT(connectionScannerTimer_timeout()));
-    connectionScannerTimer->setInterval(CONNECTION_SCANNER_INTERVAL);
-    connectionScannerTimer->start();
-
+    connect(&connectionScannerTimer, SIGNAL(timeout()), this, SLOT(connectionScannerTimer_timeout()));
+    connectionScannerTimer.setInterval(CONNECTION_SCANNER_INTERVAL);
+    connectionScannerTimer.start();
 
     penSizeSpin->setValue(1);
     patternEditor->setToolSize(1);
@@ -187,7 +208,7 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(on_patternModifiedChanged()));  // TODO
 
     patternCollection->setNotifier(&patternUpdateNotifier);
-    patternCollection->setUndoGroup(undoGroup);
+    patternCollection->setUndoGroup(&undoGroup);
 
 
     // Set some example data in the timeline selector
@@ -232,7 +253,12 @@ MainWindow::~MainWindow(){
 
 }
 
-int MainWindow::getFrame() {
+int MainWindow::getFrameIndex() {
+    if(!timeline->currentIndex().isValid()) {
+        return 0;
+    }
+
+
     return timeline->currentIndex().row();
 }
 
@@ -245,9 +271,12 @@ int MainWindow::getFrameCount() {
 }
 
 
-
 void MainWindow::drawTimer_timeout() {
-    setNewFrame((getFrame()+1)%getFrameCount());
+    if(getFrameCount() == 0) {
+        return;
+    }
+
+    setNewFrame((getFrameIndex()+1)%getFrameCount());
 }
 
 
@@ -275,7 +304,7 @@ void MainWindow::connectionScannerTimer_timeout() {
 
 void MainWindow::patternSpeed_valueChanged(int value)
 {
-    drawTimer->setInterval(1000/value);
+    drawTimer.setInterval(1000/value);
 }
 
 void MainWindow::frameIndex_valueChanged(QString value)
@@ -285,7 +314,7 @@ void MainWindow::frameIndex_valueChanged(QString value)
 
 void MainWindow::on_actionPlay_triggered()
 {
-    if (drawTimer->isActive()) {
+    if (drawTimer.isActive()) {
         stopPlayback();
     } else {
         startPlayback();
@@ -293,13 +322,13 @@ void MainWindow::on_actionPlay_triggered()
 }
 
 void MainWindow::startPlayback() {
-    drawTimer->start();
+    drawTimer.start();
     actionPlay->setText(tr("Pause"));
     actionPlay->setIcon(QIcon(":/icons/images/icons/Pause-100.png"));
 }
 
 void MainWindow::stopPlayback() {
-    drawTimer->stop();
+    drawTimer.stop();
     actionPlay->setText(tr("Play"));
     actionPlay->setIcon(QIcon(":/icons/images/icons/Play-100.png"));
 }
@@ -384,7 +413,7 @@ bool MainWindow::savePattern(Pattern* item) {
 }
 
 void MainWindow::on_actionSave_File_as_triggered() {
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         return;
     }
 
@@ -393,7 +422,7 @@ void MainWindow::on_actionSave_File_as_triggered() {
 }
 
 void MainWindow::on_actionSave_File_triggered() {
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         return;
     }
 
@@ -406,7 +435,7 @@ void MainWindow::on_actionExit_triggered() {
 }
 
 void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         return;
     }
 
@@ -429,11 +458,10 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
     settings.setValue("File/ExportArduinoDirectory", fileInfo.absolutePath());
 
     // TODO: This only saves the first frame!
-    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
-    QImage image =  pattern->getFrame(0);
+    QImage image =  patternCollection->pattern()->getFrame(0);
 
     // Note: Converting frameRate to frame delay here.
-    PatternOutput patternOutput(image, drawTimer->interval(),
+    PatternOutput patternOutput(image, drawTimer.interval(),
                         PatternOutput::RGB24,
                         colorMode);
 
@@ -476,7 +504,7 @@ void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
         // TODO: Does this delete the serial object reliably?
         controller.clear();
 
-        connectionScannerTimer->start();
+        connectionScannerTimer.start();
 
 #if defined(Q_OS_MAC)
         // start the app nap inhibitor
@@ -557,41 +585,35 @@ void MainWindow::on_actionTroubleshooting_tips_triggered()
 
 void MainWindow::on_actionFlip_Horizontal_triggered()
 {
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         return;
     }
 
-    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
-
-    QImage frame = pattern->getFrame(getFrame());
+    QImage frame = patternCollection->pattern()->getFrame(getFrameIndex());
     frame = frame.mirrored(true, false);
-    pattern->applyInstrument(getFrame(),frame);
+    patternCollection->pattern()->applyInstrument(getFrameIndex(),frame);
 }
 
 void MainWindow::on_actionFlip_Vertical_triggered()
 {
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         return;
     }
 
-    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
-
-    QImage frame = pattern->getFrame(getFrame());
+    QImage frame = patternCollection->pattern()->getFrame(getFrameIndex());
     frame = frame.mirrored(false, true);
-    pattern->applyInstrument(getFrame(),frame);
+    patternCollection->pattern()->applyInstrument(getFrameIndex(),frame);
 }
 
 void MainWindow::on_actionClear_Pattern_triggered()
 {
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         return;
     }
 
-    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
-
-    QImage frame = pattern->getFrame(getFrame());
+    QImage frame = patternCollection->pattern()->getFrame(getFrameIndex());
     frame.fill(COLOR_CANVAS_DEFAULT);
-    pattern->applyInstrument(getFrame(),frame);
+    patternCollection->pattern()->applyInstrument(getFrameIndex(),frame);
 }
 
 void MainWindow::showError(QString errorMessage) {
@@ -656,7 +678,7 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
         return;
     }
 
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         return;
     }
 
@@ -669,7 +691,7 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
         // TODO: This needs to be run over all the patterns!
         // Rewrite me.
         PatternOutput patternOutput(pattern->getFrame(0),
-                        drawTimer->interval(),
+                        drawTimer.interval(),
                         //Pattern::RGB24,
                         PatternOutput::RGB565_RLE,
                         colorMode);
@@ -703,15 +725,13 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
 
 void MainWindow::on_actionResize_Pattern_triggered()
 {
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         return;
     }
 
     ResizePattern resizeDialog(this);
     resizeDialog.setWindowModality(Qt::WindowModal);
-
-    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
-    resizeDialog.setOutputSize(pattern->getFrame(0).size());
+    resizeDialog.setOutputSize(patternCollection->pattern()->getFrame(0).size());
 
     resizeDialog.exec();
 
@@ -920,7 +940,7 @@ void MainWindow::setColorMode(PatternOutput::ColorMode newColorOrder)
 
 void MainWindow::setNewFrame(int newFrame)
 {
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         return;
     }
 
@@ -937,9 +957,8 @@ void MainWindow::setNewFrame(int newFrame)
       timeline->setCurrentIndex(timeline->model()->index(newFrame,0));
     }
 
-    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
-    patternEditor->setFrameData(getFrame(),
-                                pattern->getFrame(newFrame));
+    patternEditor->setFrameData(getFrameIndex(),
+                                patternCollection->pattern()->getFrame(newFrame));
 
     pFrame->setText(QString::number(newFrame+1));
 
@@ -958,7 +977,7 @@ void MainWindow::updateBlinky()
 
     lastTime = newTime;
 
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         return;
     }
 
@@ -966,9 +985,7 @@ void MainWindow::updateBlinky()
         return;
     }
 
-    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
-
-    QImage frame = pattern->getFrame(getFrame());
+    QImage frame = patternCollection->pattern()->getFrame(getFrameIndex());
     QVector<QColor> pixels;
 
     for(int x = 0; x <frame.width(); x++) {
@@ -1015,13 +1032,13 @@ void MainWindow::on_actionNew_triggered()
     int patternLength = settings.value("Options/patternLength", DEFAULT_PATTERN_LENGTH).toUInt();
 
     QSize displaySize;
-    if(patternCollection->currentItem() != NULL) {
-        Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
-        displaySize =  pattern->getFrame(0).size();
-    }
-    else {
+    if(!patternCollection->hasPattern()) {
         displaySize.setWidth(settings.value("Options/displayWidth", DEFAULT_DISPLAY_WIDTH).toUInt());
         displaySize.setHeight(settings.value("Options/displayHeight", DEFAULT_DISPLAY_HEIGHT).toUInt());
+
+    }
+    else {
+        displaySize =  patternCollection->pattern()->getFrame(0).size();
     }
 
     Pattern* pattern = new Pattern(displaySize,patternLength);
@@ -1032,12 +1049,11 @@ void MainWindow::on_actionNew_triggered()
 
 void MainWindow::on_actionClose_triggered()
 {
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         return;
     }
 
-    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
-    if(!promptForSave(pattern)) {
+    if(!promptForSave(patternCollection->pattern())) {
         return;
     }
 
@@ -1048,41 +1064,21 @@ void MainWindow::on_actionClose_triggered()
 void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previous) {
     Q_UNUSED(previous);
 
+    emit(patternStatusChanged(current != NULL));
+
     on_patternNameUpdated();
     on_patternModifiedChanged();
     on_patternSizeUpdated();
 
     // TODO: we're going to have to unload our references, but for now skip that.
     if(current == NULL) {
-        actionClose->setEnabled(false);  // TODO: move me?
-        actionFlip_Horizontal->setEnabled(false);
-        actionFlip_Vertical->setEnabled(false);
-        actionClear_Pattern->setEnabled(false);
-        actionAddFrame->setEnabled(false);
-        actionDeleteFrame->setEnabled(false);
-        actionPlay->setEnabled(false);
-        actionStepForward->setEnabled(false);
-        actionStepBackward->setEnabled(false);
-
-        // TODO: better signal for an empty frame.
-//        QImage blank(0,0);
-//        patternEditor->setFrameData(0, blank);
-        undoGroup->setActiveStack(NULL);
+        undoGroup.setActiveStack(NULL);
         timeline->setModel(NULL);
         return;
     }
-    actionClose->setEnabled(true);      // TODO: Move me?
-    actionFlip_Horizontal->setEnabled(true);
-    actionFlip_Vertical->setEnabled(true);
-    actionClear_Pattern->setEnabled(true);
-    actionAddFrame->setEnabled(true);
-    actionDeleteFrame->setEnabled(true);
-    actionPlay->setEnabled(true);
-    actionStepForward->setEnabled(true);
-    actionStepBackward->setEnabled(true);
 
     Pattern* newpattern = dynamic_cast<Pattern*>(current);
-    undoGroup->setActiveStack(newpattern->getUndoStack());
+    undoGroup.setActiveStack(newpattern->getUndoStack());
 
     timeline->setModel(newpattern->getFrameModel());
     // TODO: Should we unregister these eventually?
@@ -1100,13 +1096,12 @@ void MainWindow::setPatternFrame(const QModelIndex &current, const QModelIndex &
 
 void MainWindow::on_patternDataUpdated()
 {
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         return;
     }
-    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
 
-    patternEditor->setFrameData(getFrame(),
-                                pattern->getFrame(getFrame()));
+    patternEditor->setFrameData(getFrameIndex(),
+                                patternCollection->pattern()->getFrame(getFrameIndex()));
 
     // Redraw the data-dependent views
     patternCollection->doItemsLayout();
@@ -1117,10 +1112,13 @@ void MainWindow::on_patternDataUpdated()
 
 void MainWindow::on_patternSizeUpdated()
 {
-    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
+    if(!patternCollection->hasPattern()) {
+        patternEditor->setFrameData(0, QImage());
+        return;
+    }
 
-    patternEditor->setFrameData(getFrame(),
-                                pattern->getFrame(getFrame()));
+    patternEditor->setFrameData(getFrameIndex(),
+                                patternCollection->pattern()->getFrame(getFrameIndex()));
 
     // And kick the scroll area so that it will size itself
     scrollArea->resize(scrollArea->width()+1, scrollArea->height());
@@ -1128,12 +1126,11 @@ void MainWindow::on_patternSizeUpdated()
 
 void MainWindow::on_frameDataUpdated(int index, QImage update)
 {
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         return;
     }
 
-    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
-    pattern->applyInstrument(index, update);
+    patternCollection->pattern()->applyInstrument(index, update);
 }
 
 
@@ -1141,12 +1138,11 @@ void MainWindow::on_patternNameUpdated()
 {
     QString name;
 
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         name = "()";
     }
     else {
-        Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
-        name = pattern->getPatternName();
+        name = patternCollection->pattern()->getPatternName();
     }
 
     this->setWindowTitle(name + " - Pattern Paint");
@@ -1154,20 +1150,20 @@ void MainWindow::on_patternNameUpdated()
 
 void MainWindow::on_actionStepForward_triggered()
 {
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         return;
     }
 
-    setNewFrame((getFrame()+1)%getFrameCount());
+    setNewFrame((getFrameIndex()+1)%getFrameCount());
 }
 
 void MainWindow::on_actionStepBackward_triggered()
 {
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         return;
     }
 
-    setNewFrame(getFrame()<=0?getFrameCount()-1:getFrame()-1);
+    setNewFrame(getFrameIndex()<=0?getFrameCount()-1:getFrameIndex()-1);
 }
 
 void MainWindow::on_actionTimeline_triggered()
@@ -1180,35 +1176,32 @@ void MainWindow::on_actionMatrix_triggered()
 
 void MainWindow::on_actionAddFrame_triggered()
 {
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         return;
     }
 
-    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
-    pattern->addFrame(getFrame());
-    setNewFrame(getFrame()-1);
+    patternCollection->pattern()->addFrame(getFrameIndex());
+    setNewFrame(getFrameIndex()-1);
 }
 
 void MainWindow::on_actionDeleteFrame_triggered()
 {
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         return;
     }
 
-    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
-    pattern->deleteFrame(getFrame());
-    setNewFrame(getFrame());
+    patternCollection->pattern()->deleteFrame(getFrameIndex());
+    setNewFrame(getFrameIndex());
 }
 
 void MainWindow::on_patternModifiedChanged()
 {
-    if(patternCollection->currentItem() == NULL) {
+    if(!patternCollection->hasPattern()) {
         actionSave_File->setEnabled(false);
         return;
     }
 
-    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
-    if(pattern->getModified() == true) {
+    if(patternCollection->pattern()->getModified() == true) {
         actionSave_File->setEnabled(true);
     }
     else {
