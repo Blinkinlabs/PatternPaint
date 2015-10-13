@@ -12,8 +12,6 @@
 
 #include "ui_mainwindow.h"
 
-#include "outputmode.h"
-
 #if defined Q_OS_MAC
 #include "appnap.h"
 #endif
@@ -31,13 +29,15 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void setDisplayMode(OutputMode::Mode newDisplayMode);
 public slots:
     void setPatternItem(QListWidgetItem *, QListWidgetItem *);
 
     void on_patternDataUpdated();
     void on_patternSizeUpdated();
 
+    void on_frameDataUpdated(int index, QImage update);
+
+    void setPatternFrame(const QModelIndex &current, const QModelIndex &);
 protected:
     void closeEvent(QCloseEvent *event);
 
@@ -149,28 +149,22 @@ private:
 
     void showError(QString errorMessage);
 
-    void writeSettings();
-    void readSettings();
-
     void startPlayback();
     void stopPlayback();
 
-    bool promptForSave(PatternItem* item);
-    bool promptForSave(std::vector<PatternItem*> item);
+    bool promptForSave(Pattern* item);
+    bool promptForSave(std::vector<Pattern*> item);
 
-    bool savePattern(PatternItem *item);
-    bool savePatternAs(PatternItem *item);
+    bool savePattern(Pattern *item);
+    bool savePatternAs(Pattern *item);
 
     void connectController();
     void connectUploader();
 
-    void setColorMode(Pattern::ColorMode newColorOrder);
+    void setColorMode(PatternOutput::ColorMode newColorOrder);
 
-    Pattern::ColorMode colorMode;
+    PatternOutput::ColorMode colorMode;
 
-    OutputMode* dispalyMode;
-
-    int frame;      // Current frame we are drawing
     void setNewFrame(int newFrame);
 
     void updateBlinky();
@@ -180,6 +174,10 @@ private:
     CAppNapInhibitor* appNap;
 #endif
     void populateExamplesMenu(QString directory, QMenu* menu);
+
+    // TODO: These don't belong here.
+    int getFrame();
+    int getFrameCount();
 };
 
 #endif // MAINWINDOW_H

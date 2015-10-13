@@ -9,7 +9,6 @@ ResizePattern::ResizePattern(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->frameCount->setValidator(new QIntValidator(1,std::numeric_limits<int>::max(),this));
     ui->displayHeight->setValidator(new QIntValidator(1,std::numeric_limits<int>::max(),this));
     ui->displayWidth->setValidator(new QIntValidator(1,std::numeric_limits<int>::max(),this));
 }
@@ -17,15 +16,6 @@ ResizePattern::ResizePattern(QWidget *parent) :
 ResizePattern::~ResizePattern()
 {
     delete ui;
-}
-
-void ResizePattern::setFrameCount(int length) {
-    ui->frameCount->setText(QString::number(length));
-}
-
-int ResizePattern::getFrameCount()
-{
-    return ui->frameCount->text().toInt();
 }
 
 void ResizePattern::setOutputSize(QSize size) {

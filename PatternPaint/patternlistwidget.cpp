@@ -1,5 +1,5 @@
 #include "patterncollection.h"
-#include "patternitem.h"
+#include "pattern.h"
 #include <QDebug>
 #include <QSettings>
 
@@ -89,7 +89,7 @@ void PatternCollection::dropEvent(QDropEvent *event)
                 displaySize.setWidth(settings.value("Options/displayWidth", DEFAULT_DISPLAY_WIDTH).toUInt());
                 displaySize.setHeight(settings.value("Options/displayHeight", DEFAULT_DISPLAY_HEIGHT).toUInt());
 
-                PatternItem* patternItem = new PatternItem(displaySize, 1);
+                Pattern* patternItem = new Pattern(displaySize, 1);
 
                 if(!patternItem->load(fileInfo)) {
                     continue;
@@ -112,7 +112,7 @@ void PatternCollection::dropEvent(QDropEvent *event)
 
 void PatternCollection::addItem(QListWidgetItem* Item)
 {
-     PatternItem* patternItem = dynamic_cast<PatternItem*>(Item);
+     Pattern* patternItem = dynamic_cast<Pattern*>(Item);
 
     // Add the item to the listwidget
     QListWidget::addItem(patternItem);

@@ -29,7 +29,7 @@
 #include <QUndoCommand>
 #include <QImage>
 
-class PatternItem;
+class Pattern;
 
 /**
  * @brief Class which provides undo/redo actions
@@ -39,13 +39,13 @@ class PatternItem;
 class UndoCommand : public QUndoCommand
 {
 public:
-    UndoCommand(const QImage& img, PatternItem* item,  QUndoCommand *parent = 0);
+    UndoCommand(const QImage& img, Pattern* item,  QUndoCommand *parent = 0);
     virtual void undo();
     virtual void redo();
 private:
     QImage previousImage;
     QImage currentImage;
-    PatternItem* patternItem;
+    Pattern* patternItem;
     bool firstRun;
 };
 

@@ -12,5 +12,6 @@
         <file>examples/pendant/iheartohs.png</file>
         <file>examples/pendant/nyan-cat.png</file>
         <file>examples/pendant/stars.png</file>
+        <file>examples/blinkytape/whitebeats.png</file>
     </qresource>
 </RCC>

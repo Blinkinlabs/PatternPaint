@@ -27,7 +27,7 @@
 #include "patterneditor.h"
 #include <QDebug>
 
-UndoCommand::UndoCommand(const QImage& img, PatternItem *item, QUndoCommand *parent)
+UndoCommand::UndoCommand(const QImage& img, Pattern *item, QUndoCommand *parent)
     : QUndoCommand(parent), previousImage(img), patternItem(item)
 {
     currentImage = previousImage;
@@ -35,8 +35,8 @@ UndoCommand::UndoCommand(const QImage& img, PatternItem *item, QUndoCommand *par
 }
 
 void UndoCommand::undo() {
-    currentImage = patternItem->getImage();
-    patternItem->applyUndoState(previousImage);
+//    currentImage = patternItem->getImage();
+//    patternItem->applyUndoState(previousImage);
     // TODO: Restore edited state?
 }
 

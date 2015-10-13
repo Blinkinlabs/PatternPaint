@@ -13,7 +13,7 @@
 #define FLASH_MEMORY_SKETCH_ADDRESS     0x0000  // Location of sketch
 #define FLASH_MEMORY_PATTERN_TABLE_ADDRESS (FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE) // Location of pattern table
 
-bool avrUploadData::init(std::vector<Pattern> patterns) {
+bool avrUploadData::init(std::vector<PatternOutput> patterns) {
     char buff[BUFF_LENGTH];
     QString errorString;
 
@@ -54,7 +54,7 @@ bool avrUploadData::init(std::vector<Pattern> patterns) {
     int dataOffset = sketch.length();
 
     // Now, for each pattern, append the image data to the sketch
-    for(std::vector<Pattern>::iterator pattern = patterns.begin();
+    for(std::vector<PatternOutput>::iterator pattern = patterns.begin();
         pattern != patterns.end();
         ++pattern) {
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>294</width>
-    <height>165</height>
+    <height>126</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>130</y>
+     <y>90</y>
      <width>261</width>
      <height>32</height>
     </rect>
@@ -35,44 +35,10 @@
      <x>10</x>
      <y>14</y>
      <width>271</width>
-     <height>111</height>
+     <height>71</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="2" column="1">
-     <widget class="QLineEdit" name="frameCount">
-      <property name="text">
-       <string>0</string>
-      </property>
-      <property name="maxLength">
-       <number>10</number>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QLineEdit" name="displayWidth">
-      <property name="text">
-       <string>0</string>
-      </property>
-      <property name="maxLength">
-       <number>10</number>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label_3">
-      <property name="text">
-       <string>Pattern Height:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Frame count:</string>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="0">
      <widget class="QLabel" name="label_6">
       <property name="text">
@@ -80,8 +46,8 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="QLineEdit" name="displayHeight">
+    <item row="1" column="1">
+     <widget class="QLineEdit" name="displayWidth">
       <property name="text">
        <string>0</string>
       </property>
@@ -104,16 +70,30 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="2">
-     <widget class="QLabel" name="label_2">
+    <item row="0" column="1">
+     <widget class="QLineEdit" name="displayHeight">
       <property name="text">
-       <string>Frames</string>
+       <string>0</string>
+      </property>
+      <property name="maxLength">
+       <number>10</number>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>Pattern Height:</string>
       </property>
      </widget>
     </item>
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>displayWidth</tabstop>
+  <tabstop>displayHeight</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

@@ -10,7 +10,7 @@ public:
     /// on a given color value. Note that it drops the alpha channel.
     /// @param uncorrected 32-bit RGB color value in screen space
     /// @return 32-bit RGB color value converted to LED space
-    static QRgb correctBrightness(QRgb uncorrected);
+    static QColor correctBrightness(QColor uncorrected);
 };
 
 #endif // COLORMODEL_H

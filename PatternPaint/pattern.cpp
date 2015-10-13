@@ -1,345 +1,186 @@
 #include "pattern.h"
-#include "colormodel.h"
+#include "undocommand.h"
 
-#include <QDebug>
-
-Pattern::Pattern(QImage image, int frameDelay, Encoding encoding, ColorMode colorMode) :
-    encoding(encoding),
-    image(image),
-    frameDelay(frameDelay),
-    colorMode(colorMode)
+Pattern::Pattern(QSize patternSize, int frameCount, QListWidget* parent) :
+    QListWidgetItem(parent, QListWidgetItem::UserType + 1),
+    frames(patternSize, parent),
+    modified(false)
 {
-    frameCount = image.width();
-    ledCount = image.height();
+    undoStack.setUndoLimit(50);
 
-    // Create a new encoder
-    switch(encoding) {
-    case RGB565_RLE:
-        encodeImageRGB16_RLE();
-        break;
-    case RGB24:
-        encodeImageRGB24();
-        break;
-    case INDEXED:
-        encodeImageIndexed();
-        break;
-    case INDEXED_RLE:
-        encodeImageIndexed_RLE();
-        break;
-    }
+    frames.insertRows(0, frameCount);
 }
 
-int Pattern::colorCount() const
+void Pattern::pushUndoState() {
+    //undoStack.push(new UndoCommand(image, this));
+}
+
+void Pattern::applyUndoState(const QImage& newImage) {
+
+    if(!notifier.isNull()) {
+        notifier->signalSizeUpdated();
+    }
+
+    setModified(modified);
+}
+
+QString Pattern::getPatternName() const
 {
-    // Brute force method for counting the number of unique colors in the image
-    QList<QRgb> colors;
-
-    for(int frame = 0; frame < image.width(); frame++) {
-        for(int pixel = 0; pixel < image.height(); pixel++) {
-            QRgb color = image.pixel(frame, pixel);
-            if(!colors.contains(color)) {
-                colors.append(color);
-            }
-        }
+    if(fileInfo.baseName() == "") {
+        return "Untitled";
     }
-
-    return colors.length();
+    return fileInfo.baseName();
 }
 
-int Pattern::QRgbTo565(QRgb color) {
-    switch(colorMode) {
-        case GRB:
-            return (((qGreen(color)   >> 3) & 0x1F)   << 11)
-                   | (((qRed(color) >> 2) & 0x3F) <<  5)
-                   | (((qBlue(color)  >> 3) & 0x1F)      );
-            break;
-        case RGB:
-        default:
-            return (((qRed(color)   >> 3) & 0x1F)   << 11)
-                   | (((qGreen(color) >> 2) & 0x3F) <<  5)
-                   | (((qBlue(color)  >> 3) & 0x1F)      );
-            break;
+bool Pattern::load(const QFileInfo &newFileInfo)
+{
+    // TODO: Fail if there is unsaved data?
+
+    // Attempt to load the iamge
+    if(!replace(newFileInfo)) {
+        return false;
     }
+
+    // If successful, record the filename and clear the undo stack.
+    fileInfo = newFileInfo;
+
+    undoStack.clear();
+
+    setModified(false);
+    return true;
 }
 
-void Pattern::encodeImageRGB16_RLE() {
-    // TODO: Do I work?
+bool Pattern::saveAs(const QFileInfo &newFileInfo) {
+    // Attempt to save to this location
+//    if(!image.save(newFileInfo.absoluteFilePath())) {
+//        return false;
+//    }
 
-    data.clear();
-    header.clear(); // TODO: Move the header builder somewhere else?
+    // If successful, update the filename
+    fileInfo = newFileInfo;
 
-    header.append("const uint8_t animationData[] PROGMEM = {\n");
+    // TODO: Notify the main window that the filename was updated!
+    //on_patternFilenameChanged(fileinfo);
 
-    for(int frame = 0; frame < image.width(); frame++) {
-        int currentColor;
-        int runCount = 0;
-
-        for(int pixel = 0; pixel < image.height(); pixel++) {
-            QRgb color = ColorModel::correctBrightness(image.pixel(frame, pixel));
-
-            int decimatedColor = QRgbTo565(color);
-
-            if(runCount == 0) {
-                currentColor = decimatedColor;
-            }
-
-            if(currentColor != decimatedColor) {
-                int highByte = (currentColor >> 8) & 0xFF;
-                int lowByte  = (currentColor)      & 0xFF;
-
-                data.append(runCount);
-                data.append(highByte);
-                data.append(lowByte);
-
-                header.append(QString("  %1, 0x%2, 0x%3,\n")
-                              .arg(runCount, 3)
-                              .arg(highByte, 2, 16, QLatin1Char('0'))
-                              .arg(lowByte,  2, 16, QLatin1Char('0')));
-
-                runCount = 1;
-                currentColor = decimatedColor;
-            }
-            else {
-                runCount++;
-            }
-        }
-
-        int highByte = (currentColor >> 8) & 0xFF;
-        int lowByte  = (currentColor)      & 0xFF;
-
-        data.append(runCount);
-        data.append(highByte);
-        data.append(lowByte);
-
-        header.append(QString("  %1, 0x%2, 0x%3,\n")
-                      .arg(runCount, 3)
-                      .arg(highByte, 2, 16, QLatin1Char('0'))
-                      .arg(lowByte,  2, 16, QLatin1Char('0')));
+    if(!notifier.isNull()) {
+        notifier->signalNameUpdated();
     }
 
-    header.append("};\n\n");
-    header.append(QString("Animation animation(%1, animationData, ENCODING_RGB565_RLE, %2);\n")
-                  .arg(image.width())
-                  .arg(image.height()));
+    setModified(false);
+    return true;
+}
+
+bool Pattern::replace(const QFileInfo &newFileInfo)
+{
+//    pushUndoState();
+
+//    QImage newImage;
+
+//    // Attempt to load the iamge
+//    if(!newImage.load(newFileInfo.absoluteFilePath())) {
+//        return false;
+//    }
+
+//    // TODO: Warn if the source image wasn't of the expected aperture?
+//    image = newImage.scaledToHeight(frames.getSize().height());
+//    if(image.width()%frames.getSize().width() != 0) {
+//        // TODO: What?
+//    }
+
+//    if(!notifier.isNull()) {
+//        notifier->signalSizeUpdated();
+//    }
+
+//    setModified(true);
+//    return true;
+    return false;
 }
 
 
-void Pattern::encodeImageRGB24() {
-    // TODO: build c++ header as well
+bool Pattern::save()
+{
+//    if(!image.save(fileInfo.absoluteFilePath())) {
+//        return false;
+//    }
 
-    header.clear();
-    data.clear();
-
-    for(int frame = 0; frame < image.width(); frame++) {
-        for(int pixel = 0; pixel < image.height(); pixel++) {
-            QRgb color = ColorModel::correctBrightness(image.pixel(frame, pixel));
-
-            switch(colorMode) {
-                case GRB:
-                    data.append(qGreen(color));
-                    data.append(qRed(color));
-                    data.append(qBlue(color));
-                    break;
-                case RGB:
-                default:
-                    data.append(qRed(color));
-                    data.append(qGreen(color));
-                    data.append(qBlue(color));
-                    break;
-            }
-        }
-    }
-
-    header.append("const uint8_t animationData[] PROGMEM = {\n");
-
-    for(int frame = 0; frame < image.width(); frame++) {
-        for(int pixel = 0; pixel < image.height(); pixel++) {
-            QRgb color = ColorModel::correctBrightness(image.pixel(frame, pixel));
-
-            switch(colorMode) {
-                case GRB:
-                    header.append(QString("    %1, %2, %3, // %4\n")
-                                  .arg(qGreen(color))
-                                  .arg(qRed(color))
-                                  .arg(qBlue(color))
-                                  .arg(pixel));
-                    break;
-                case RGB:
-                default:
-                header.append(QString("    %1, %2, %3, // %4\n")
-                              .arg(qRed(color))
-                              .arg(qGreen(color))
-                              .arg(qBlue(color))
-                              .arg(pixel));
-                   break;
-            }
-
-
-        }
-    }
-
-    header.append("};\n");
-    header.append("\n");
-    header.append(QString("Animation animation(%1, animationData, ENCODING_RGB24, %2);")
-                          .arg(image.width())
-                          .arg(image.height()));
+//    // TODO: Set new save point here
+//    setModified(false);
+//    return true;
+    return false;
 }
 
-void Pattern::encodeImageIndexed() {
-    // TODO: Add color mode support
+QVariant Pattern::data(int role) const {
+    switch(role) {
+        case PreviewImage: return frames.data(frames.index(0),Qt::DisplayRole);
+        case Modified: return modified;
+        case PatternSize: return frames.getSize();
+    };
 
-    header.clear();
-    data.clear();
-
-    // First, convert to an indexed format. This should be non-destructive
-    // if the image had fewer than 256 colors.
-    QImage indexed = image.convertToFormat(
-                QImage::Format_Indexed8,
-                Qt::AutoColor & Qt::AvoidDither);
-    qDebug() << "Original color count:" << colorCount();
-    qDebug() << "Indexed color count: " << indexed.colorCount();
-
-    header.append("const PROGMEM prog_uint8_t patternData[]  = {\n");
-
-    // Record the length of the color table
-    header.append("// Length of the color table - 1, in bytes. length: 1 byte\n");
-    header.append(QString(" %1,\n")
-                  .arg(indexed.colorCount() - 1, 3));
-
-    data.append(indexed.colorCount() - 1);
-
-    // Build the color table
-    header.append(QString("// Color table section. Each entry is 3 bytes. length: %1 bytes\n")
-                  .arg(indexed.colorCount()*3));
-
-    for (int index = 0; index < indexed.colorCount(); index++) {
-        QRgb color = ColorModel::correctBrightness(indexed.color(index));
-
-        header.append(QString(" %1, %2, %3,\n")
-                          .arg(qRed(color),   3)
-                          .arg(qGreen(color), 3)
-                          .arg(qBlue(color),  3));
-
-        /// Colors in the color table are stored in RGB24 format
-        data.append(qRed(color));
-        data.append(qGreen(color));
-        data.append(qBlue(color));
-    }
-
-
-    // Build the pixel table
-    header.append(QString("// Pixel table section. Each pixel is 1 byte. length: %1 bytes\n")
-                  .arg(image.width()*image.height()));
-
-    for(int frame = 0; frame < image.width(); frame++) {
-        for(int pixel = 0; pixel < image.height(); pixel++) {
-            int index = indexed.pixelIndex(frame, pixel);
-            header.append(QString(" %1,").arg(index, 3));
-
-            if (((pixel + frame*image.height()) % 10 == 9)) {
-                header.append("\n");
-            }
-
-            /// Pixel indexes are stired as 8-bit indexes
-            data.append(index);
-        }
-    }
-
-    header.append("\n};\n\n");
-    header.append(QString("Pattern pattern(%1, patternData, ENCODING_INDEXED, %2);\n")
-                  .arg(image.width())
-                  .arg(image.height()));
-
-    qDebug() << "Pattern size:" << data.length();
+    return QListWidgetItem::data(role);
 }
 
-void Pattern::encodeImageIndexed_RLE() {
-    // TODO: Add color mode support
-
-    header.clear();
-    data.clear();
-
-    // First, convert to an indexed format. This should be non-destructive
-    // if the image had fewer than 256 colors.
-    QImage indexed = image.convertToFormat(
-                QImage::Format_Indexed8,
-                Qt::AutoColor & Qt::AvoidDither);
-    qDebug() << "Original color count:" << colorCount();
-    qDebug() << "Indexed color count: " << indexed.colorCount();
-
-    header.append("const PROGMEM prog_uint8_t patternData[]  = {\n");
-
-    // Record the length of the color table
-    header.append("// Length of the color table - 1, in bytes. length: 1 byte\n");
-    header.append(QString(" %1,\n")
-                  .arg(indexed.colorCount() - 1, 3));
-
-    data.append(indexed.colorCount() - 1);
-
-    // Build the color table
-    header.append(QString("// Color table section. Each entry is 3 bytes. length: %1 bytes\n")
-                  .arg(indexed.colorCount()*3));
-
-    for (int index = 0; index < indexed.colorCount(); index++) {
-        // TODO: Brightness correction before pallete reduction?
-        QRgb color = ColorModel::correctBrightness(indexed.color(index));
-
-        header.append(QString(" %1, %2, %3,\n")
-                          .arg(qRed(color),   3)
-                          .arg(qGreen(color), 3)
-                          .arg(qBlue(color),  3));
-
-        /// Colors in the color table are stored in RGB24 format
-        data.append(qRed(color));
-        data.append(qGreen(color));
-        data.append(qBlue(color));
+void Pattern::setData(int role, const QVariant& value) {
+    switch(role)
+    {
+    case PreviewImage:
+        applyUndoState(qvariant_cast<QImage>(value));
+        break;
+    case Modified:
+        setModified(qvariant_cast<bool>(value));
+        break;
+    case PatternSize:
+        Q_ASSERT(false);    // never set size separated from image!
+        break;
+    default:
+        break;
     }
 
-
-    // Build the pixel table
-    header.append(QString("// Pixel runs section. Each pixel run is 2 bytes. length: %1 bytes\n")
-                  .arg(-1));
-
-    for(int frame = 0; frame < image.width(); frame++) {
-        int currentColor;
-        int runCount = 0;
-
-        for(int pixel = 0; pixel < image.height(); pixel++) {
-            int newColor = indexed.pixelIndex(frame, pixel);
-
-            if(runCount == 0) {
-                currentColor = newColor;
-            }
-
-            if(currentColor != newColor) {
-                header.append(QString(" %1, %2,\n")
-                              .arg(runCount, 3)
-                              .arg(currentColor, 3));
-
-                data.append(runCount);
-                data.append(currentColor);
-
-                runCount = 1;
-                currentColor = newColor;
-            }
-            else {
-                runCount++;
-            }
-        }
-
-        header.append(QString(" %1, %2,\n")
-                      .arg(runCount, 3)
-                      .arg(currentColor, 3));
-
-        data.append(runCount);
-        data.append(currentColor);
-    }
-
-    header.append("\n};\n\n");
-    header.append(QString("Pattern pattern(%1, patternData, ENCODING_INDEXED_RLE, %2);\n")
-                  .arg(image.width())
-                  .arg(image.height()));
-
-    qDebug() << "Pattern size:" << data.length();
+    QListWidgetItem::setData(role, value);
 }
 
+void Pattern::resize(QSize newSize, bool scale) {
+    frames.resize(newSize, scale);
+}
+
+void Pattern::applyInstrument(int index, const QImage &update)
+{
+    frames.setData(frames.index(index),QVariant(update));
+}
+
+void Pattern::setModified(bool newModified)  {
+    bool modifiedChanged = false;
+
+    if(modified != newModified) {
+        modifiedChanged = true;
+    }
+
+    modified = newModified;
+
+    if(!notifier.isNull()) {
+        notifier->signalDataUpdated();
+        if(modifiedChanged) {
+            notifier->signalModifiedChange();
+        }
+    }
+}
+
+void Pattern::setNotifier(QPointer<PatternUpdateNotifier> newNotifier) {
+    notifier = newNotifier;
+}
+
+const QImage Pattern::getFrame(int index) {
+    QModelIndex modelIndex = frames.index(index);
+    return modelIndex.data(Qt::DisplayRole).value<QImage>();
+}
+
+int Pattern::getFrameCount() const {
+    return frames.rowCount();
+}
+
+void Pattern::deleteFrame(int index) {
+    frames.removeRow(index);
+}
+
+void Pattern::addFrame(int index) {
+    frames.insertRow(index);
+}

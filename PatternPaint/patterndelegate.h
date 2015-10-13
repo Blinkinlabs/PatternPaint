@@ -6,12 +6,12 @@
 #include "QImage"
 
 
-class PatternItemDelegate : public QStyledItemDelegate
+class PatternDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
-    PatternItemDelegate(QObject* parent = 0);
-    virtual ~PatternItemDelegate();
+    PatternDelegate(QObject* parent = 0);
+    virtual ~PatternDelegate();
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex & index ) const;
     QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 };

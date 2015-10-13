@@ -1,5 +1,5 @@
-#include "patternitemdelegate.h"
-#include "patternitem.h"
+#include "patterndelegate.h"
+#include "pattern.h"
 
 #include <QDebug>
 
@@ -7,17 +7,17 @@
 #define ITEM_WIDTH 150
 #define ITEM_LETTERBOX 10
 
-PatternItemDelegate::PatternItemDelegate(QObject* parent) : QStyledItemDelegate(parent) {
+PatternDelegate::PatternDelegate(QObject* parent) : QStyledItemDelegate(parent) {
 }
 
-PatternItemDelegate::~PatternItemDelegate()
+PatternDelegate::~PatternDelegate()
 {
 
 }
 
-void PatternItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex & index ) const {
+void PatternDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex & index ) const {
     painter->save();
-    QImage img = qvariant_cast<QImage>(index.data(PatternItem::PreviewImage));
+    QImage img = qvariant_cast<QImage>(index.data(Pattern::PreviewImage));
 
     QImage scaled = img.scaled(ITEM_WIDTH - 2*ITEM_LETTERBOX, ITEM_HEIGHT - 2*ITEM_LETTERBOX);
 
@@ -42,7 +42,7 @@ void PatternItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
     painter->restore();
 }
 
-QSize PatternItemDelegate::sizeHint(const QStyleOptionViewItem &, const QModelIndex & ) const {
+QSize PatternDelegate::sizeHint(const QStyleOptionViewItem &, const QModelIndex & ) const {
     return QSize(ITEM_WIDTH, ITEM_HEIGHT);
 }
 

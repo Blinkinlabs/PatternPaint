@@ -1,4 +1,4 @@
-#include "pattern.h"
+#include "patternoutput.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "colormodel.h"
@@ -14,11 +14,11 @@
 #include "colorpickerinstrument.h"
 #include "sprayinstrument.h"
 #include "fillinstrument.h"
-#include "patternitem.h"
-#include "patternitemdelegate.h"
+#include "pattern.h"
+#include "patterndelegate.h"
 
-#include "matrixoutputmode.h"
-#include "linearoutputmode.h"
+#include "patternframemodel.h"
+#include "patternframedelegate.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -50,9 +50,7 @@
 #define CONNECTION_SCANNER_INTERVAL 1000
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    dispalyMode(NULL),
-    frame(0)
+    QMainWindow(parent)
 {
     setupUi(this);
 
@@ -138,6 +136,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(patternCollection, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),
             this, SLOT(setPatternItem(QListWidgetItem*, QListWidgetItem*)));
 
+    connect(patternEditor, SIGNAL(frameDataUpdated(int, const QImage)),
+            this, SLOT(on_frameDataUpdated(int, const QImage)));
+
 
     // Pre-set the upload progress dialog
     progressDialog = new QProgressDialog(this);
@@ -160,14 +161,21 @@ MainWindow::MainWindow(QWidget *parent) :
 
     actionPen->setChecked(true);
     patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(actionPen->data()));
-    readSettings();
 
     QSettings settings;
-    setColorMode(static_cast<Pattern::ColorMode>(settings.value("Options/ColorOrder", Pattern::RGB).toUInt()));
 
-    setDisplayMode(static_cast<OutputMode::Mode>(settings.value("Options/DisplayMode", OutputMode::TIMELINE).toUInt()));
+    resize(settings.value("MainWindow/size", QSize(880, 450)).toSize());
+    move(settings.value("MainWindow/pos", QPoint(100, 100)).toPoint());
 
-    patternCollection->setItemDelegate(new PatternItemDelegate(this));
+    setColorMode(static_cast<PatternOutput::ColorMode>(settings.value("Options/ColorOrder", PatternOutput::RGB).toUInt()));
+
+    // Fill the examples menu using the examples resource
+    populateExamplesMenu(":/examples", menuExamples);
+    connect(menuExamples, SIGNAL(triggered(QAction *)),
+            this, SLOT(on_ExampleSelected(QAction *)), Qt::UniqueConnection);
+
+
+    patternCollection->setItemDelegate(new PatternDelegate(this));
 
     connect(&patternUpdateNotifier, SIGNAL(patternSizeUpdated()),
             this, SLOT(on_patternSizeUpdated()));
@@ -181,24 +189,21 @@ MainWindow::MainWindow(QWidget *parent) :
     patternCollection->setNotifier(&patternUpdateNotifier);
     patternCollection->setUndoGroup(undoGroup);
 
-    // Fill the examples menu using the examples resource
-    populateExamplesMenu(":/examples", menuExamples);
-    connect(menuExamples, SIGNAL(triggered(QAction *)),
-            this, SLOT(on_ExampleSelected(QAction *)), Qt::UniqueConnection);
+
+    // Set some example data in the timeline selector
+    timeline->setItemDelegate(new PatternFrameDelegate(this));
 
     // Create a pattern.
     on_actionNew_triggered();
 }
 
 void MainWindow::populateExamplesMenu(QString directory, QMenu* menu) {
-    qDebug() << "In resource: " << directory;
-
     QDir examplesDir(directory);
     QFileInfoList examplesList = examplesDir.entryInfoList();
 
     for(int i = 0; i < examplesList.size(); ++i) {
+        // If we found a directory, create a submenu and call ourselves again to populate it
         if(examplesList.at(i).isDir()) {
-            qDebug() << "descending into: " << examplesList.at(i).fileName();
             QMenu* submenu = new QMenu(this);
             submenu->setTitle(examplesList.at(i).fileName());
             menu->addMenu(submenu);
@@ -207,12 +212,10 @@ void MainWindow::populateExamplesMenu(QString directory, QMenu* menu) {
 
             populateExamplesMenu(directory + "/" + examplesList.at(i).fileName(), submenu);
         }
+        // Otherwise this is a file, so add it to the examples menu.
         else {
-            qDebug() << examplesList.at(i).fileName();
             QAction* action = new QAction(examplesList.at(i).baseName(), this);
-
             action->setObjectName(directory + "/" + examplesList.at(i).fileName());
-
             menu->addAction(action);
         }
     }
@@ -227,17 +230,24 @@ MainWindow::~MainWindow(){
     }
 #endif
 
-    if(dispalyMode != NULL) {
-        delete dispalyMode;
-    }
 }
 
-void MainWindow::drawTimer_timeout() {
-    if(!dispalyMode->hasPatternItem()) {
-        return;
+int MainWindow::getFrame() {
+    return timeline->currentIndex().row();
+}
+
+int MainWindow::getFrameCount() {
+    if(timeline->model() == NULL) {
+        return 0;
     }
 
-    setNewFrame((frame+1)%dispalyMode->getFrameCount());
+    return timeline->model()->rowCount();
+}
+
+
+
+void MainWindow::drawTimer_timeout() {
+    setNewFrame((getFrame()+1)%getFrameCount());
 }
 
 
@@ -315,31 +325,26 @@ void MainWindow::on_actionLoad_File_triggered()
     settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
 
     QSize displaySize;
-    if(dispalyMode != NULL) {
-        displaySize = dispalyMode->getDisplaySize();
-    }
-    else {
-        displaySize.setWidth(settings.value("Options/displayWidth", DEFAULT_DISPLAY_WIDTH).toUInt());
-        displaySize.setHeight(settings.value("Options/displayHeight", DEFAULT_DISPLAY_HEIGHT).toUInt());
-    }
+    displaySize.setWidth(settings.value("Options/displayWidth", DEFAULT_DISPLAY_WIDTH).toUInt());
+    displaySize.setHeight(settings.value("Options/displayHeight", DEFAULT_DISPLAY_HEIGHT).toUInt());
 
-    // Create a patternItem, and attempt to load the file
+    // Create a pattern, and attempt to load the file
     // TODO: Can't there be a constructor that accepts a file directly? This seems odd
-    PatternItem* patternItem = new PatternItem(displaySize,1);
+    Pattern* pattern = new Pattern(displaySize,1);
 
-    if(!patternItem->load(fileInfo)) {
+    if(!pattern->load(fileInfo)) {
         showError("Could not open file "
                    + fileName
                    + ". Perhaps it has a formatting problem?");
         return;
     }
 
-    patternCollection->addItem(patternItem);
-    patternCollection->setCurrentItem(patternItem);
+    patternCollection->addItem(pattern);
+    patternCollection->setCurrentItem(pattern);
 }
 
 
-bool MainWindow::savePatternAs(PatternItem* item) {
+bool MainWindow::savePatternAs(Pattern* item) {
     QSettings settings;
     QString lastDirectory = settings.value("File/SaveDirectory").toString();
 
@@ -366,7 +371,7 @@ bool MainWindow::savePatternAs(PatternItem* item) {
     return (!item->getModified());
 }
 
-bool MainWindow::savePattern(PatternItem* item) {
+bool MainWindow::savePattern(Pattern* item) {
     if(!item->hasValidFilename()) {
         return savePatternAs(item);
     } else {
@@ -383,7 +388,7 @@ void MainWindow::on_actionSave_File_as_triggered() {
         return;
     }
 
-    PatternItem* item = dynamic_cast<PatternItem*>(patternCollection->currentItem());
+    Pattern* item = dynamic_cast<Pattern*>(patternCollection->currentItem());
     savePatternAs(item);
 }
 
@@ -392,7 +397,7 @@ void MainWindow::on_actionSave_File_triggered() {
         return;
     }
 
-    PatternItem* item = dynamic_cast<PatternItem*>(patternCollection->currentItem());
+    Pattern* item = dynamic_cast<Pattern*>(patternCollection->currentItem());
     savePattern(item);
 }
 
@@ -423,12 +428,13 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
     QFileInfo fileInfo(fileName);
     settings.setValue("File/ExportArduinoDirectory", fileInfo.absolutePath());
 
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-    QImage image =  patternItem->getImage();
+    // TODO: This only saves the first frame!
+    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
+    QImage image =  pattern->getFrame(0);
 
     // Note: Converting frameRate to frame delay here.
-    Pattern pattern(image, drawTimer->interval(),
-                        Pattern::RGB24,
+    PatternOutput patternOutput(image, drawTimer->interval(),
+                        PatternOutput::RGB24,
                         colorMode);
 
 
@@ -441,7 +447,7 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
     }
 
     QTextStream ts(&file);
-    ts << pattern.header;
+    ts << patternOutput.header;
     file.close();
 }
 
@@ -551,35 +557,41 @@ void MainWindow::on_actionTroubleshooting_tips_triggered()
 
 void MainWindow::on_actionFlip_Horizontal_triggered()
 {
-    if (!dispalyMode->hasPatternItem()) {
+    if(patternCollection->currentItem() == NULL) {
         return;
     }
 
-    QImage frame = dispalyMode->getFrame();
+    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
+
+    QImage frame = pattern->getFrame(getFrame());
     frame = frame.mirrored(true, false);
-    dispalyMode->applyInstrument(frame);
+    pattern->applyInstrument(getFrame(),frame);
 }
 
 void MainWindow::on_actionFlip_Vertical_triggered()
 {
-    if (!dispalyMode->hasPatternItem()) {
+    if(patternCollection->currentItem() == NULL) {
         return;
     }
 
-    QImage frame = dispalyMode->getFrame();
+    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
+
+    QImage frame = pattern->getFrame(getFrame());
     frame = frame.mirrored(false, true);
-    dispalyMode->applyInstrument(frame);
+    pattern->applyInstrument(getFrame(),frame);
 }
 
 void MainWindow::on_actionClear_Pattern_triggered()
 {
-    if (!dispalyMode->hasPatternItem()) {
+    if(patternCollection->currentItem() == NULL) {
         return;
     }
 
-    QImage frame = dispalyMode->getFrame();
+    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
+
+    QImage frame = pattern->getFrame(getFrame());
     frame.fill(COLOR_CANVAS_DEFAULT);
-    dispalyMode->applyInstrument(frame);
+    pattern->applyInstrument(getFrame(),frame);
 }
 
 void MainWindow::showError(QString errorMessage) {
@@ -648,47 +660,21 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
         return;
     }
 
-    // TODO: Don't do this!
-    // Create a temporary displaymodel to interpret the patterns
-    OutputMode* display;
-
-    QSettings settings;
-    OutputMode::Mode displayMode = static_cast<OutputMode::Mode>(
-                settings.value("Options/DisplayMode", OutputMode::TIMELINE).toUInt()
-                );
-
-    // Create a new displaymodel to handle the conversions
-    switch(displayMode) {
-    case OutputMode::TIMELINE:
-    {
-        int width = settings.value("Options/displayWidth", DEFAULT_DISPLAY_HEIGHT).toUInt();
-        int height = settings.value("Options/displayHeight", DEFAULT_DISPLAY_HEIGHT).toUInt();
-        display = new LinearOutputMode(QSize(width, height));
-        break;
-    }
-    case OutputMode::MATRIX:
-        display = new MatrixOutputMode(QSize(8,8));
-        break;
-    default:
-        return;
-        break;
-    }
-
-    std::vector<Pattern> patterns;
+    std::vector<PatternOutput> patterns;
 
     for(int i = 0; i < patternCollection->count(); i++) {
         // Convert the current pattern into a Pattern
-        PatternItem* p = dynamic_cast<PatternItem*>(patternCollection->item(i));
-        display->setSource(p);
+        Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->item(i));
 
-        // TODO: Attempt different compressions till one works.
-        Pattern pattern(display->getStreamImage(),
+        // TODO: This needs to be run over all the patterns!
+        // Rewrite me.
+        PatternOutput patternOutput(pattern->getFrame(0),
                         drawTimer->interval(),
                         //Pattern::RGB24,
-                        Pattern::RGB565_RLE,
+                        PatternOutput::RGB565_RLE,
                         colorMode);
 
-        patterns.push_back(pattern);
+        patterns.push_back(patternOutput);
     }
 
     if(!controller->getUploader(uploader)) {
@@ -717,14 +703,15 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
 
 void MainWindow::on_actionResize_Pattern_triggered()
 {
-    if((dispalyMode == NULL) || !dispalyMode->hasPatternItem()) {
+    if(patternCollection->currentItem() == NULL) {
         return;
     }
 
     ResizePattern resizeDialog(this);
     resizeDialog.setWindowModality(Qt::WindowModal);
-    resizeDialog.setFrameCount(dispalyMode->getFrameCount());
-    resizeDialog.setOutputSize(dispalyMode->getDisplaySize());
+
+    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
+    resizeDialog.setOutputSize(pattern->getFrame(0).size());
 
     resizeDialog.exec();
 
@@ -732,34 +719,18 @@ void MainWindow::on_actionResize_Pattern_triggered()
         return;
     }
 
-    int newFrameCount = resizeDialog.getFrameCount();
     QSize newDisplaySize = resizeDialog.getOutputSize();
 
     QSettings settings;
-    settings.setValue("Options/frameCount", static_cast<uint>(newFrameCount));
     settings.setValue("Options/displayHeight", static_cast<uint>(newDisplaySize.height()));
     settings.setValue("Options/displayWidth", static_cast<uint>(newDisplaySize.width()));
 
-    qDebug() << "Resizing patterns, frame count:"
-             << newFrameCount
-             << "height:"
+    qDebug() << "Resizing patterns, height:"
              << newDisplaySize.height()
              << "width:"
              << newDisplaySize.width();
 
-    // Frame count only applies to the currently selected pattern
-    while(dispalyMode->getFrameCount() > newFrameCount) {
-        dispalyMode->deleteFrame(dispalyMode->getFrameCount()-1);
-    }
-    while(dispalyMode->getFrameCount() < newFrameCount) {
-        dispalyMode->addFrame(dispalyMode->getFrameCount());
-    }
-
-    // If we changed geometries, though, we need to resize all the source images
-    if(dispalyMode->getDisplaySize() != newDisplaySize) {
-        // TODO: resize all patterns
-        dispalyMode->setDisplaySize(newDisplaySize);
-    }
+    // TODO: resize all the patterns
 }
 
 void MainWindow::on_actionAddress_programmer_triggered()
@@ -769,36 +740,17 @@ void MainWindow::on_actionAddress_programmer_triggered()
     programmer.exec();
 }
 
-void MainWindow::writeSettings()
-{
-    QSettings settings;
-
-    settings.beginGroup("MainWindow");
-    settings.setValue("size", size());
-    settings.setValue("pos", pos());
-    settings.endGroup();
-}
-
-void MainWindow::readSettings()
-{
-    QSettings settings;
-
-    settings.beginGroup("MainWindow");
-    resize(settings.value("size", QSize(880, 450)).toSize());
-    move(settings.value("pos", QPoint(100, 100)).toPoint());
-    settings.endGroup();
-}
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    std::vector<PatternItem*> unsaved;
+    std::vector<Pattern*> unsaved;
 
     for(int i = 0; i < patternCollection->count(); i++) {
         // Convert the current pattern into a Pattern
-        PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->item(i));
+        Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->item(i));
 
-        if (patternItem->getModified() == true) {
-            unsaved.push_back(patternItem);
+        if (pattern->getModified() == true) {
+            unsaved.push_back(pattern);
         }
     }
 
@@ -817,7 +769,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
         }
     }
 
-    writeSettings();
+    QSettings settings;
+    settings.setValue("MainWindow/size", size());
+    settings.setValue("MainWindow/pos", pos());
 
     // If we are connected to a blinky, try to reset it so that it will start playing back its pattern
     if(!controller.isNull()) {
@@ -859,7 +813,7 @@ void MainWindow::on_colorPicked(QColor color) {
     patternEditor->setToolColor(color);
 }
 
-bool MainWindow::promptForSave(PatternItem* item) {
+bool MainWindow::promptForSave(Pattern* item) {
     if (item->getModified() == false) {
         return true;
     }
@@ -869,7 +823,7 @@ bool MainWindow::promptForSave(PatternItem* item) {
 
     QMessageBox msgBox(this);
     msgBox.setWindowModality(Qt::WindowModal);
-    msgBox.setIconPixmap(QPixmap::fromImage(item->getImage()));
+    msgBox.setIconPixmap(QPixmap::fromImage(item->getFrame(0)));
     msgBox.setText(messageText);
     msgBox.setInformativeText("Do you want to save your changes?");
     msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
@@ -891,11 +845,11 @@ bool MainWindow::promptForSave(PatternItem* item) {
     return false;
 }
 
-bool MainWindow::promptForSave(std::vector<PatternItem*> patternItems) {
+bool MainWindow::promptForSave(std::vector<Pattern*> patterns) {
     QString messageText = QString("The following patterns have been modified:\n");
 
-    for(std::size_t i = 0; i < patternItems.size(); i++) {
-        messageText += patternItems.at(i)->getPatternName();
+    for(std::size_t i = 0; i < patterns.size(); i++) {
+        messageText += patterns.at(i)->getPatternName();
         messageText += "\n";
     }
 
@@ -908,8 +862,8 @@ bool MainWindow::promptForSave(std::vector<PatternItem*> patternItems) {
     int ans = msgBox.exec();
 
     if (ans == QMessageBox::Save) {
-        for(std::size_t i = 0; i < patternItems.size(); i++) {
-            if(!savePattern(patternItems.at(i))) {
+        for(std::size_t i = 0; i < patterns.size(); i++) {
+            if(!savePattern(patterns.at(i))) {
                 return false;
             }
         }
@@ -942,14 +896,14 @@ void MainWindow::connectUploader()
 
 }
 
-void MainWindow::setColorMode(Pattern::ColorMode newColorOrder)
+void MainWindow::setColorMode(PatternOutput::ColorMode newColorOrder)
 {
     switch(newColorOrder) {
-    case Pattern::RGB:
+    case PatternOutput::RGB:
         actionRGB->setChecked(true);
         actionGRB->setChecked(false);
         break;
-    case Pattern::GRB:
+    case PatternOutput::GRB:
         actionRGB->setChecked(false);
         actionGRB->setChecked(true);
         break;
@@ -964,71 +918,31 @@ void MainWindow::setColorMode(Pattern::ColorMode newColorOrder)
     settings.setValue("Options/ColorOrder", static_cast<uint>(colorMode));
 }
 
-void MainWindow::setDisplayMode(OutputMode::Mode newDisplayMode)
-{
-    // Get the old size from the displayMode
-    QSettings settings;
-    QSize displaySize;
-    if(dispalyMode != NULL) {
-        displaySize = dispalyMode->getDisplaySize();
-    }
-    else {
-        displaySize.setWidth(settings.value("Options/displayWidth", DEFAULT_DISPLAY_WIDTH).toUInt());
-        displaySize.setHeight(settings.value("Options/displayHeight", DEFAULT_DISPLAY_HEIGHT).toUInt());
-    }
-
-    // TODO: Smart pointer for this.
-    if(dispalyMode != NULL) {
-        delete dispalyMode;
-    }
-
-    // Create a new displaymodel if possible
-    switch(newDisplayMode) {
-    case OutputMode::TIMELINE:
-    {
-        dispalyMode = new LinearOutputMode(displaySize);
-        actionTimeline->setChecked(true);
-        actionMatrix->setChecked(false);
-        break;
-    }
-    case OutputMode::MATRIX:
-        dispalyMode = new MatrixOutputMode(displaySize);
-        actionTimeline->setChecked(false);
-        actionMatrix->setChecked(true);
-        break;
-    default:
-        return;
-        break;
-    }
-
-    settings.setValue("Options/DisplayMode", static_cast<uint>(newDisplayMode));
-
-    dispalyMode->setSource(dynamic_cast<PatternItem*>(patternCollection->currentItem()));
-    patternEditor->setDisplayModel(dispalyMode);
-
-    on_patternSizeUpdated();
-    on_patternDataUpdated();
-}
-
 void MainWindow::setNewFrame(int newFrame)
 {
-    int frameCount = 0;
-
-    if(dispalyMode != NULL && dispalyMode->hasPatternItem()) {
-        frameCount = dispalyMode->getFrameCount();
+    if(patternCollection->currentItem() == NULL) {
+        return;
     }
 
-    if(newFrame >= frameCount) {
-        newFrame = frameCount - 1;
+    // TODO: Detect if we changed frames and only continue if it's a new frame...
+
+    if(newFrame > getFrameCount()) {
+        newFrame = getFrameCount() - 1;
     }
     if(newFrame < 0) {
         newFrame = 0;
     }
 
-    frame = newFrame;
+    if(timeline->model() != NULL) {
+      timeline->setCurrentIndex(timeline->model()->index(newFrame,0));
+    }
 
-    pFrame->setText(QString("%1").arg(frame+1));
-    patternEditor->setPlaybackRow(frame);
+    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
+    patternEditor->setFrameData(getFrame(),
+                                pattern->getFrame(newFrame));
+
+    pFrame->setText(QString::number(newFrame+1));
+
     updateBlinky();
 }
 
@@ -1044,7 +958,7 @@ void MainWindow::updateBlinky()
 
     lastTime = newTime;
 
-    if((dispalyMode == NULL) || !dispalyMode->hasPatternItem()) {
+    if(patternCollection->currentItem() == NULL) {
         return;
     }
 
@@ -1052,38 +966,47 @@ void MainWindow::updateBlinky()
         return;
     }
 
-    QImage image = dispalyMode->getStreamImage();
+    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
 
-    // TODO: Put this in a converter class.
+    QImage frame = pattern->getFrame(getFrame());
+    QVector<QColor> pixels;
+
+    for(int x = 0; x <frame.width(); x++) {
+        for(int y = 0; y < frame.height(); y++) {
+            pixels.append(frame.pixel(x,x%2?frame.height()-1-y:y));
+        }
+    }
+
     QByteArray ledData;
-    for(int i = 0; i < image.height(); i++) {
-        QRgb color = ColorModel::correctBrightness(image.pixel(frame, i));
+    for(int i = 0; i < pixels.size(); i++) {
+        QColor color = ColorModel::correctBrightness(pixels[i]);
 
         switch(colorMode) {
-        case Pattern::GRB:
-            ledData.append(qGreen(color));
-            ledData.append(qRed(color));
-            ledData.append(qBlue(color));
+        case PatternOutput::GRB:
+            ledData.append(color.green());
+            ledData.append(color.red());
+            ledData.append(color.blue());
             break;
-        case Pattern::RGB:
+        case PatternOutput::RGB:
         default:
-            ledData.append(qRed(color));
-            ledData.append(qGreen(color));
-            ledData.append(qBlue(color));
+            ledData.append(color.red());
+            ledData.append(color.green());
+            ledData.append(color.blue());
             break;
         }
     }
+
     controller->sendUpdate(ledData);
 }
 
 void MainWindow::on_actionGRB_triggered()
 {
-    setColorMode(Pattern::GRB);
+    setColorMode(PatternOutput::GRB);
 }
 
 void MainWindow::on_actionRGB_triggered()
 {
-    setColorMode(Pattern::RGB);
+    setColorMode(PatternOutput::RGB);
 }
 
 void MainWindow::on_actionNew_triggered()
@@ -1092,18 +1015,19 @@ void MainWindow::on_actionNew_triggered()
     int patternLength = settings.value("Options/patternLength", DEFAULT_PATTERN_LENGTH).toUInt();
 
     QSize displaySize;
-    if(dispalyMode != NULL) {
-        displaySize = dispalyMode->getDisplaySize();
+    if(patternCollection->currentItem() != NULL) {
+        Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
+        displaySize =  pattern->getFrame(0).size();
     }
     else {
         displaySize.setWidth(settings.value("Options/displayWidth", DEFAULT_DISPLAY_WIDTH).toUInt());
         displaySize.setHeight(settings.value("Options/displayHeight", DEFAULT_DISPLAY_HEIGHT).toUInt());
     }
 
-    PatternItem* patternItem = new PatternItem(displaySize,patternLength);
+    Pattern* pattern = new Pattern(displaySize,patternLength);
 
-    patternCollection->addItem(patternItem);
-    patternCollection->setCurrentItem(patternItem);
+    patternCollection->addItem(pattern);
+    patternCollection->setCurrentItem(pattern);
 }
 
 void MainWindow::on_actionClose_triggered()
@@ -1112,8 +1036,8 @@ void MainWindow::on_actionClose_triggered()
         return;
     }
 
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-    if(!promptForSave(patternItem)) {
+    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
+    if(!promptForSave(pattern)) {
         return;
     }
 
@@ -1140,8 +1064,11 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
         actionStepForward->setEnabled(false);
         actionStepBackward->setEnabled(false);
 
-        patternEditor->setPatternItem(NULL);
+        // TODO: better signal for an empty frame.
+//        QImage blank(0,0);
+//        patternEditor->setFrameData(0, blank);
         undoGroup->setActiveStack(NULL);
+        timeline->setModel(NULL);
         return;
     }
     actionClose->setEnabled(true);      // TODO: Move me?
@@ -1154,10 +1081,21 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
     actionStepForward->setEnabled(true);
     actionStepBackward->setEnabled(true);
 
-    PatternItem* newPatternItem = dynamic_cast<PatternItem*>(current);
-    undoGroup->setActiveStack(newPatternItem->getUndoStack());
+    Pattern* newpattern = dynamic_cast<Pattern*>(current);
+    undoGroup->setActiveStack(newpattern->getUndoStack());
+
+    timeline->setModel(newpattern->getFrameModel());
+    // TODO: Should we unregister these eventually?
+    QItemSelectionModel *selectionModel = timeline->selectionModel();
+    qDebug() << "Selection model: " << selectionModel;
+    connect(selectionModel, SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
+            this, SLOT(setPatternFrame(const QModelIndex &, const QModelIndex &)));
 
     on_patternDataUpdated();
+}
+
+void MainWindow::setPatternFrame(const QModelIndex &current, const QModelIndex &) {
+    setNewFrame(current.row());
 }
 
 void MainWindow::on_patternDataUpdated()
@@ -1165,8 +1103,10 @@ void MainWindow::on_patternDataUpdated()
     if(patternCollection->currentItem() == NULL) {
         return;
     }
+    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
 
-    patternEditor->update();
+    patternEditor->setFrameData(getFrame(),
+                                pattern->getFrame(getFrame()));
 
     // Redraw the data-dependent views
     patternCollection->doItemsLayout();
@@ -1177,20 +1117,23 @@ void MainWindow::on_patternDataUpdated()
 
 void MainWindow::on_patternSizeUpdated()
 {
+    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
+
+    patternEditor->setFrameData(getFrame(),
+                                pattern->getFrame(getFrame()));
+
+    // And kick the scroll area so that it will size itself
+    scrollArea->resize(scrollArea->width()+1, scrollArea->height());
+}
+
+void MainWindow::on_frameDataUpdated(int index, QImage update)
+{
     if(patternCollection->currentItem() == NULL) {
         return;
     }
 
-    // Reset the current frame, in case the new size is smaller than the old one
-    setNewFrame(frame);
-
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-
-    // Re-load the patterneditor so that it can redraw its view
-    patternEditor->setPatternItem(patternItem);
-
-    // And kick the scroll area so that it will size itself
-    scrollArea->resize(scrollArea->width()+1, scrollArea->height());
+    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
+    pattern->applyInstrument(index, update);
 }
 
 
@@ -1202,8 +1145,8 @@ void MainWindow::on_patternNameUpdated()
         name = "()";
     }
     else {
-        PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-        name = patternItem->getPatternName();
+        Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
+        name = pattern->getPatternName();
     }
 
     this->setWindowTitle(name + " - Pattern Paint");
@@ -1215,8 +1158,7 @@ void MainWindow::on_actionStepForward_triggered()
         return;
     }
 
-
-    setNewFrame((frame+1)%dispalyMode->getFrameCount());
+    setNewFrame((getFrame()+1)%getFrameCount());
 }
 
 void MainWindow::on_actionStepBackward_triggered()
@@ -1225,39 +1167,37 @@ void MainWindow::on_actionStepBackward_triggered()
         return;
     }
 
-    setNewFrame(frame<=0?dispalyMode->getFrameCount()-1:frame-1);
+    setNewFrame(getFrame()<=0?getFrameCount()-1:getFrame()-1);
 }
 
 void MainWindow::on_actionTimeline_triggered()
 {
-    setDisplayMode(OutputMode::TIMELINE);
 }
 
 void MainWindow::on_actionMatrix_triggered()
 {
-    setDisplayMode(OutputMode::MATRIX);
 }
 
 void MainWindow::on_actionAddFrame_triggered()
 {
-    if(!dispalyMode->hasPatternItem()) {
+    if(patternCollection->currentItem() == NULL) {
         return;
     }
 
-    dispalyMode->addFrame(dispalyMode->getFrameIndex());
-
-    setNewFrame(dispalyMode->getFrameIndex()+1);
+    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
+    pattern->addFrame(getFrame());
+    setNewFrame(getFrame()-1);
 }
 
 void MainWindow::on_actionDeleteFrame_triggered()
 {
-    if(!dispalyMode->hasPatternItem()) {
+    if(patternCollection->currentItem() == NULL) {
         return;
     }
 
-    dispalyMode->deleteFrame(dispalyMode->getFrameIndex());
-
-    setNewFrame(dispalyMode->getFrameIndex()-1);
+    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
+    pattern->deleteFrame(getFrame());
+    setNewFrame(getFrame());
 }
 
 void MainWindow::on_patternModifiedChanged()
@@ -1267,8 +1207,8 @@ void MainWindow::on_patternModifiedChanged()
         return;
     }
 
-    PatternItem* patternItem = dynamic_cast<PatternItem*>(patternCollection->currentItem());
-    if(patternItem->getModified() == true) {
+    Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->currentItem());
+    if(pattern->getModified() == true) {
         actionSave_File->setEnabled(true);
     }
     else {
@@ -1283,24 +1223,19 @@ void MainWindow::on_ExampleSelected(QAction* action) {
 
     // TODO: This is duplicated in on_actionLoad_file_triggered(), on_actionNew_triggered()
     QSize displaySize;
-    if(dispalyMode != NULL) {
-        displaySize = dispalyMode->getDisplaySize();
-    }
-    else {
-        displaySize.setWidth(settings.value("Options/displayWidth", DEFAULT_DISPLAY_WIDTH).toUInt());
-        displaySize.setHeight(settings.value("Options/displayHeight", DEFAULT_DISPLAY_HEIGHT).toUInt());
-    }
+    displaySize.setWidth(settings.value("Options/displayWidth", DEFAULT_DISPLAY_WIDTH).toUInt());
+    displaySize.setHeight(settings.value("Options/displayHeight", DEFAULT_DISPLAY_HEIGHT).toUInt());
 
-    // Create a patternItem, and attempt to load the file
-    PatternItem* patternItem = new PatternItem(displaySize,1);
+    // Create a pattern, and attempt to load the file
+    Pattern* pattern = new Pattern(displaySize,1);
 
-    if(!patternItem->load(action->objectName())) {
+    if(!pattern->load(action->objectName())) {
         showError("Could not open file "
                    + action->objectName()
                    + ". Perhaps it has a formatting problem?");
         return;
     }
 
-    patternCollection->addItem(patternItem);
-    patternCollection->setCurrentItem(patternItem);
+    patternCollection->addItem(pattern);
+    patternCollection->setCurrentItem(pattern);
 }

@@ -1,6 +1,5 @@
 #include "patterneditor.h"
 #include "abstractinstrument.h"
-#include "linearoutputmode.h"
 
 #include <cmath>
 #include <QtWidgets>
@@ -23,22 +22,23 @@
 
 PatternEditor::PatternEditor(QWidget *parent) :
     QWidget(parent),
-    deviceModel(NULL),
-    patternItem(NULL)
+    frameIndex(0)
 {
     this->setAcceptDrops(true);
+
+
+    // Turn on mouse tracking so we can draw a preview
+    // TODO: DO we need to do this here, or just in the constructor?
+    setMouseTracking(true);
 }
 
-
-void PatternEditor::setDisplayModel(OutputMode *newDisplayModel)
-{
-    deviceModel = newDisplayModel;
-    setPatternItem(patternItem);
+bool PatternEditor::hasImage() {
+    return !frameData.isNull();
 }
 
 void PatternEditor::dragEnterEvent(QDragEnterEvent *event)
 {
-    if(patternItem == NULL) {
+    if(!hasImage()) {
         return;
     }
 
@@ -49,36 +49,33 @@ void PatternEditor::dragEnterEvent(QDragEnterEvent *event)
 
 void PatternEditor::dropEvent(QDropEvent *event)
 {
-    if(patternItem == NULL) {
-        return;
-    }
+// TODO: Attempt to load the file as a single frame image, to replace this frame?
 
-    // TODO: Pass this down for someone else to handle?
+//    if(patternData == NULL) {
+////    if(patternItem == NULL) {
+//        return;
+//    }
 
-    QList<QUrl> droppedUrls = event->mimeData()->urls();
-    int droppedUrlCnt = droppedUrls.size();
-    for(int i = 0; i < droppedUrlCnt; i++) {
-        QString localPath = droppedUrls[i].toLocalFile();
-        QFileInfo fileInfo(localPath);
+//    // TODO: Pass this down for someone else to handle?
 
-        // TODO: OS X Yosemite hack for /.file/id= references
+//    QList<QUrl> droppedUrls = event->mimeData()->urls();
+//    int droppedUrlCnt = droppedUrls.size();
+//    for(int i = 0; i < droppedUrlCnt; i++) {
+//        QString localPath = droppedUrls[i].toLocalFile();
+//        QFileInfo fileInfo(localPath);
 
-        if(fileInfo.isFile()) {
-            patternItem->replace(fileInfo.absoluteFilePath());
-            // And stop on the first one we've found.
-            return;
-        }
-    }
+//        // TODO: OS X Yosemite hack for /.file/id= references
+
+//        if(fileInfo.isFile()) {
+//            patternItem->replace(fileInfo.absoluteFilePath());
+//            // And stop on the first one we've found.
+//            return;
+//        }
+//    }
 }
 
 const QImage &PatternEditor::getPatternAsImage() const {
-    if(!deviceModel || !deviceModel->hasPatternItem()) {
-        // TODO: Refactor so we don't have to do this?
-        static QImage nullimage(1,1,QImage::Format_RGB32);
-        return nullimage;
-    }
-
-    return deviceModel->getFrame();
+    return frameData;
 }
 
 void PatternEditor::resizeEvent(QResizeEvent * )
@@ -87,13 +84,16 @@ void PatternEditor::resizeEvent(QResizeEvent * )
 }
 
 void PatternEditor::updateGridSize() {
-    if(!deviceModel || !deviceModel->hasPatternItem()) {
+    if(!hasImage()) {
         return;
     }
 
+    // Update the widget geometry so that it can be resized correctly
+    this->setBaseSize(frameData.size());
+
     // Base the widget size on the window height
     // cast float to int to save rounded scale
-    QSize frameSize = deviceModel->getFrame().size();
+    QSize frameSize = frameData.size();
 
     float scale = static_cast<int>(float(size().height() - 1)/frameSize.height()*10);
     scale /= 10;
@@ -135,7 +135,7 @@ void PatternEditor::updateGridSize() {
 
 
 void PatternEditor::mousePressEvent(QMouseEvent *event) {
-    if (!deviceModel || !deviceModel->hasPatternItem() || instrument.isNull()) {
+    if(!hasImage() || instrument.isNull()) {
         return;
     }
 
@@ -145,7 +145,7 @@ void PatternEditor::mousePressEvent(QMouseEvent *event) {
 }
 
 void PatternEditor::mouseMoveEvent(QMouseEvent *event){
-    if (!deviceModel || !deviceModel->hasPatternItem() || instrument.isNull()) {
+    if(!hasImage() || instrument.isNull()) {
         return;
     }
 
@@ -184,37 +184,12 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
 void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
     setCursor(Qt::ArrowCursor);
 
-    if (!deviceModel || !deviceModel->hasPatternItem() || instrument.isNull()) {
+    if(!hasImage() || instrument.isNull()) {
         return;
     }
 
     instrument->mouseReleaseEvent(event, *this, QPoint(event->x()/xScale, event->y()/yScale));
     lazyUpdate();
-}
-
-void PatternEditor::setPatternItem(PatternItem* newPatternItem) {
-    if(!deviceModel) {
-        return;
-    }
-
-    patternItem = newPatternItem;
-    deviceModel->setSource(newPatternItem);
-
-    if(!deviceModel->hasPatternItem()) {
-        // TODO: Clear the image?
-        update();
-        return;
-    }
-
-    this->setBaseSize(deviceModel->getFrame().size());
-
-    // Turn on mouse tracking so we can draw a preview
-    setMouseTracking(true);
-
-    updateGridSize();
-
-    // and force a screen update
-    update();
 }
 
 void PatternEditor::setToolColor(QColor color) {
@@ -225,18 +200,32 @@ void PatternEditor::setToolSize(int size) {
     toolSize = size;
 }
 
-void PatternEditor::setPlaybackRow(int row) {
-    if(!deviceModel || !deviceModel->hasPatternItem()) {
-        // TODO: Reset size to some default?
+void PatternEditor::setInstrument(AbstractInstrument* pi) {
+    instrument = pi;
+}
+
+void PatternEditor::setFrameData(int index, const QImage data)
+{
+    if(data.isNull()) {
+        frameData = data;
+        frameIndex = index;
+        this->setBaseSize(1,1);
+        update();
         return;
     }
 
-    deviceModel->setFrameIndex(row);
-    lazyUpdate();
-}
+    // TODO: Unclear logic
+    bool updateSize = (!hasImage() || (data.size() != frameData.size()));
 
-void PatternEditor::setInstrument(AbstractInstrument* pi) {
-    instrument = pi;
+    frameData = data;
+    frameIndex = index;
+
+    if(updateSize) {
+        updateGridSize();
+    }
+
+    // and force a screen update
+    update();
 }
 
 void PatternEditor::lazyUpdate() {
@@ -258,13 +247,11 @@ void PatternEditor::paintEvent(QPaintEvent*)
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter.setRenderHint(QPainter::Antialiasing, false);
 
-    // If we don't have a pattern item, show an empty view
-    if(!deviceModel || !deviceModel->hasPatternItem()) {
+    // If we don't have an image, show an empty view
+    if(!hasImage()) {
         painter.fillRect(0,0,this->width(),this->height(), QColor(0,0,0));
         return;
     }
-
-    QImage frameData = deviceModel->getFrame();
 
     // Draw the image and tool preview
     painter.drawImage(QRect(0,0,
@@ -280,33 +267,34 @@ void PatternEditor::paintEvent(QPaintEvent*)
         painter.drawImage(0,0,gridPattern);
     }
 
-    // TODO: How to do this more generically?
-    if(deviceModel->showPlaybackIndicator()) {
-        int playbackRow = deviceModel->getFrameIndex();
-        const float outputScale = deviceModel->getDisplaySize().width()*xScale;
+//    // TODO: How to do this more generically?
+//    if(deviceModel->showPlaybackIndicator()) {
+//        int playbackRow = deviceModel->getFrameIndex();
+//        const float outputScale = deviceModel->getDisplaySize().width()*xScale;
 
-        // Draw the playback indicator
-        // Note that we need to compute the correct width based on the rounding error of
-        // the current cell, otherwise it won't line up correctly with the actual image.
-        painter.setPen(COLOR_PLAYBACK_EDGE);
-        painter.drawRect(playbackRow*outputScale +.5,
-                         0,
-                         int((playbackRow+1)*outputScale +.5) - int(playbackRow*outputScale +.5),
-                         frameData.height()*yScale);
-        painter.fillRect(playbackRow*outputScale +.5,
-                         0,
-                         int((playbackRow+1)*outputScale +.5) - int(playbackRow*outputScale +.5),
-                         frameData.height()*yScale,
-                         COLOR_PLAYBACK_TOP);
-    }
+//        // Draw the playback indicator
+//        // Note that we need to compute the correct width based on the rounding error of
+//        // the current cell, otherwise it won't line up correctly with the actual image.
+//        painter.setPen(COLOR_PLAYBACK_EDGE);
+//        painter.drawRect(playbackRow*outputScale +.5,
+//                         0,
+//                         int((playbackRow+1)*outputScale +.5) - int(playbackRow*outputScale +.5),
+//                         frameData.height()*yScale);
+//        painter.fillRect(playbackRow*outputScale +.5,
+//                         0,
+//                         int((playbackRow+1)*outputScale +.5) - int(playbackRow*outputScale +.5),
+//                         frameData.height()*yScale,
+//                         COLOR_PLAYBACK_TOP);
+//    }
 
 }
 
 void PatternEditor::applyInstrument(QImage& update)
 {
-    if(!deviceModel || !deviceModel->hasPatternItem()) {
-        return;
-    }
+    QPainter painter;
+    painter.begin(&frameData);
+    painter.drawImage(0,0,update);
+    painter.end();
 
-    deviceModel->applyInstrument(update);
+    emit(frameDataUpdated(frameIndex, frameData));
 }

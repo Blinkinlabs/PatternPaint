@@ -16,9 +16,6 @@ public:
     explicit ResizePattern(QWidget *parent = 0);
     ~ResizePattern();
 
-    void setFrameCount(int getFrameCount);
-    int getFrameCount();
-
     void setOutputSize(QSize size);
     QSize getOutputSize();
 

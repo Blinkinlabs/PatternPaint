@@ -3,8 +3,7 @@
 
 #include <QWidget>
 #include <QPointer>
-#include "patternitem.h"
-#include "outputmode.h"
+#include "pattern.h"
 
 class QUndoStack;
 class UndoCommand;
@@ -17,15 +16,6 @@ class PatternEditor : public QWidget
 public:
     explicit PatternEditor(QWidget *parent = 0);
 
-    void setDisplayModel(OutputMode* newDisplayModel);
-
-    /// Set the patternItem to edit
-    /// @param newPatternItem Pattern
-    void setPatternItem(PatternItem* newPatternItem);
-
-    /// Clear the patternItem, if one was selected
-    void clearPatternItem();
-
     /// Get the image data for the current pattern
     /// @return QImage containing the current pattern
     const QImage& getPatternAsImage() const;
@@ -35,10 +25,9 @@ public:
     QColor getPrimaryColor() const { return toolColor; }
     int getPenSize() const { return toolSize; }
 
-    /// Update the pattern with the given changes. Pushes the undo state first.
+    /// Update the pattern with the given changes.
     /// @param update RGBA QImage to draw on top of the current
     void applyInstrument(QImage& update);
-
 
     /// Re-size the display grid and selector based on new widget geometery
     void resizeEvent(QResizeEvent * event);
@@ -57,15 +46,16 @@ protected:
     void paintEvent(QPaintEvent *event);
 
 private:
-    OutputMode* deviceModel;    ///< LED model we are interacting with
-    PatternItem* patternItem;    ///< Pattern item we are interacting with
+
+    QImage frameData;     ///< Frame image
+    int frameIndex;                 ///< Frame index
+
     QPointer<AbstractInstrument> instrument;
 
     QImage gridPattern;    ///< Holds the pre-rendered grid overlay
 
     float xScale;          ///< Number of pixels in the grid pattern per pattern pixel.
     float yScale;          ///< Number of pixels in the grid pattern per pattern pixel.
-
 
     QColor toolColor;      ///< Color of the current drawing tool (TODO: This should be a pointer to a tool)
     int toolSize;          ///< Size of the current drawing tool (TODO: This should be a pointer to a tool)
@@ -76,13 +66,18 @@ private:
     /// Update the screen, but only if we haven't done so in a while
     void lazyUpdate();
 
+    /// True if the editor has an image to edit
+    bool hasImage();
 signals:
+
+    void frameDataUpdated(int index, const QImage data);
 
 public slots:
     void setToolColor(QColor color);
     void setToolSize(int size);
-    void setPlaybackRow(int row);
     void setInstrument(AbstractInstrument*);
+
+    void setFrameData(int index, const QImage data);
 };
 
 #endif // PATTERNDITOR_H

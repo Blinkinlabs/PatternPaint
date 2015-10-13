@@ -2,11 +2,11 @@
 
 #include <cmath>
 
-QRgb ColorModel::correctBrightness(QRgb uncorrected)
+QColor ColorModel::correctBrightness(QColor uncorrected)
 {
-    return qRgb(
-        int(255*pow(qRed(  uncorrected)/255.0, 1.8)),
-        int(255*pow(qGreen(uncorrected)/255.0, 1.8)),
-        int(255*pow(qBlue( uncorrected)/255.0, 2.1))
+    return QColor(
+        int(255*pow(uncorrected.red()/255.0, 1.8)),
+        int(255*pow(uncorrected.green()/255.0, 1.8)),
+        int(255*pow(uncorrected.blue()/255.0, 2.1))
         );
 }

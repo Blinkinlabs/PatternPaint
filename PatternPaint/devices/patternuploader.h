@@ -2,7 +2,7 @@
 #define PATTERNUPLOADER_H
 
 #include <QObject>
-#include "pattern.h"
+#include "patternoutput.h"
 #include "blinkytape.h"
 
 /// This is an re-entreant version of an pattern uploader.
@@ -29,7 +29,7 @@ public:
     /// and will need to be reconnected manually afterwards.
     /// @param tape BlinkyTape to upload to (must already be connected)
     /// @param pattern Pattern to upload to the BlinkyTape
-    virtual bool startUpload(BlinkyController& controller, std::vector<Pattern> patterns) = 0;
+    virtual bool startUpload(BlinkyController& controller, std::vector<PatternOutput> patterns) = 0;
 
     /// Update/restore the firmware on the specificed device
     /// @param tape BlinkyTape to upload to (must already be connected)

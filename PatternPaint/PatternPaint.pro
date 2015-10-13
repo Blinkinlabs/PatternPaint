@@ -53,38 +53,37 @@ SOURCES += main.cpp\
     systeminformation.cpp \
     colormodel.cpp \
     aboutpatternpaint.cpp \
-    pattern.cpp \
     patterneditor.cpp \
     resizepattern.cpp \
     addressprogrammer.cpp \
     letterboxscrollarea.cpp \
     undocommand.cpp \
     colorchooser.cpp \
-    patternitemdelegate.cpp \
-    patternitem.cpp \
     patternupdatenotifier.cpp \
-    patterncollection.cpp \
-    linearoutputmode.cpp \
-    matrixoutputmode.cpp
+    patternframemodel.cpp \
+    patternframedelegate.cpp \
+    patternoutput.cpp \
+    pattern.cpp \
+    patterndelegate.cpp \
+    patternlistwidget.cpp
 
 HEADERS  += mainwindow.h \
     systeminformation.h \
     colormodel.h \
     aboutpatternpaint.h \
-    pattern.h \
     patterneditor.h \
     resizepattern.h \
     addressprogrammer.h \
     letterboxscrollarea.h \
     undocommand.h \
     colorchooser.h \
-    patternitemdelegate.h \
-    patternitem.h \
     patternupdatenotifier.h \
-    patterncollection.h \
-    outputmode.h \
-    linearoutputmode.h \
-    matrixoutputmode.h
+    patternframemodel.h \
+    patternframedelegate.h \
+    patternoutput.h \
+    pattern.h \
+    patterndelegate.h \
+    patternlistwidget.h
 
 mac {
 HEADERS  += \

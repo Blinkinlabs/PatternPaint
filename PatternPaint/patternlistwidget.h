@@ -1,5 +1,5 @@
-#ifndef PATTERNCOLLECTION_H
-#define PATTERNCOLLECTION_H
+#ifndef PATTERNLISTWIDGET_H
+#define PATTERNLISTWIDGET_H
 
 #include <QObject>
 #include <QtWidgets>
@@ -8,12 +8,12 @@
 #include <QUndoGroup>
 #include "patternupdatenotifier.h"
 
-class PatternCollection : public QListWidget
+class PatternListWidget : public QListWidget
 {
     Q_OBJECT
 public:
-    PatternCollection(QWidget* parent);
-    ~PatternCollection();
+    PatternListWidget(QWidget* parent);
+    ~PatternListWidget();
 
     // Handle re-ordering patterns by dragging, as well as file URLs dropped from other programs
     void dragEnterEvent(QDragEnterEvent *event);
@@ -24,9 +24,10 @@ public:
     // TODO: Reconsider ownership of these?
     void setUndoGroup(const QPointer<QUndoGroup> newUndoGroup) {undoGroup = newUndoGroup;}
     void setNotifier(const QPointer<PatternUpdateNotifier> newUpdateNotifier) {updateNotifier = newUpdateNotifier;}
+
 private:
     QPointer<QUndoGroup> undoGroup;
     QPointer<PatternUpdateNotifier> updateNotifier;
 };
 
-#endif // PATTERNCOLLECTION_H
+#endif // PATTERNLISTWIDGET_H
