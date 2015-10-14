@@ -3,7 +3,8 @@
 
 #include <QDebug>
 
-#define ITEM_LETTERBOX 5
+#define ITEM_LETTERBOX 2
+#define MINIMUM_WIDTH 2
 
 #define COLOR_BACKGROUND_UNCHECKED    QColor(50,50,50,255)
 #define COLOR_BACKGROUND_CHECKED    QColor(0,0,255,255)
@@ -13,11 +14,19 @@ PatternFrameDelegate::PatternFrameDelegate(QObject* parent) : QStyledItemDelegat
 
 QSize PatternFrameDelegate::getScaledImageSize(int height, QSize imageSize) const {
     int width = (height*imageSize.width())/imageSize.height();
+
+    if(width < ITEM_LETTERBOX*2+MINIMUM_WIDTH)
+        width = ITEM_LETTERBOX*2+MINIMUM_WIDTH;
+
     return QSize(width - ITEM_LETTERBOX*2, height - ITEM_LETTERBOX*2);
 }
 
 QSize PatternFrameDelegate::getScaledWidgetSize(int height, QSize imageSize) const {
     int width = (height*imageSize.width())/imageSize.height();
+
+    if(width < ITEM_LETTERBOX*2+MINIMUM_WIDTH)
+        width = ITEM_LETTERBOX*2+MINIMUM_WIDTH;
+
     return QSize(width, height);
 }
 
