@@ -27,18 +27,6 @@ void PatternDelegate::paint(QPainter* painter, const QStyleOptionViewItem& optio
     painter->fillRect(QRect(option.rect.x()+ITEM_LETTERBOX, option.rect.y()+ITEM_LETTERBOX, scaled.width(), scaled.height()), QColor(10,10,10));
     painter->drawImage(option.rect.x()+ITEM_LETTERBOX, option.rect.y()+ITEM_LETTERBOX, scaled);
 
-//    // Show modified indicator
-//    if (index.data(PatternItem::Modified).toBool()) {
-//        painter->drawImage(QRect(option.rect.x() + 2, option.rect.y() + 2, 16, 16), QImage(":/resources/images/modified.png"));
-//    }
-
-//    // Draw index
-//    if (index.data(Qt::DisplayRole).toInt() != -1) {
-//        painter->setPen(QColor::fromRgb(255,255,0));
-//        painter->drawText(option.rect.x(), option.rect.y() + scaled.height() + ITEM_LETTERBOX - 10,
-//                          QString::number(index.data(Qt::DisplayRole).toInt()));
-//    }
-
     painter->restore();
 }
 

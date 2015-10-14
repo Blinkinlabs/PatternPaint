@@ -25,7 +25,6 @@ public:
     Pattern(QSize size, int frameCount, QListWidget* parent = 0);
 
     QVariant data(int role) const;
-    void setData(int role, const QVariant& value);
 
     /// Set the pattern image directly without resizing or setting an undo state. This
     /// is used by the undocommand and should probably be refactored.
@@ -34,7 +33,7 @@ public:
 
     /// Get a pointer to the undo stack. This is used to wire the undo stack
     /// into the main window gui.
-    QUndoStack* getUndoStack() { return &undoStack; }
+    QUndoStack *getUndoStack();
 
 //    /// Get a reference to the current image
 //    /// @return Pattern image data
@@ -106,7 +105,6 @@ public:
     PatternFrameModel* getFrameModel() {return &frames;}
 
 private:
-    QUndoStack  undoStack;      ///< Undo stack for this pattern
     QFileInfo fileInfo;         ///< Image filename
 
     PatternFrameModel frames;   ///< New storage container for the images

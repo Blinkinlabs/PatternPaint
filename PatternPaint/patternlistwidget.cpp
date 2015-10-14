@@ -111,10 +111,10 @@ void PatternListWidget::dropEvent(QDropEvent *event)
 
 void PatternListWidget::addItem(QListWidgetItem* Item)
 {
-     Pattern* patternItem = dynamic_cast<Pattern*>(Item);
-
     // Add the item to the listwidget
-    QListWidget::addItem(patternItem);
+    QListWidget::addItem(Item);
+
+    Pattern* patternItem = static_cast<Pattern*>(Item);
 
     // And register it with the UndoStack and notifier
     if(!undoGroup.isNull()) {
@@ -132,10 +132,10 @@ bool PatternListWidget::hasPattern() const
 
 Pattern* PatternListWidget::pattern() const
 {
-    return dynamic_cast<Pattern*>(currentItem());
+    return static_cast<Pattern*>(currentItem());
 }
 
 Pattern* PatternListWidget::pattern(int i) const
 {
-    return dynamic_cast<Pattern*>(item(i));
+    return static_cast<Pattern*>(item(i));
 }

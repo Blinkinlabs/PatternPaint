@@ -35,9 +35,6 @@ public slots:
     void on_patternSizeUpdated();
 
     void on_frameDataUpdated(int index, QImage update);
-
-    /// Set pattern frame is called whyen the
-    void setPatternFrame(const QModelIndex &current, const QModelIndex &);
 protected:
     void closeEvent(QCloseEvent *event);
 
@@ -122,6 +119,10 @@ private slots:
     void on_patternModifiedChanged();
 
     void on_ExampleSelected(QAction*);
+
+    void setPatternFrame(const QModelIndex &current, const QModelIndex &);
+
+    void handleUpdatedData(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &);
 
 signals:
 

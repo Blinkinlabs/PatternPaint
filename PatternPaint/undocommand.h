@@ -29,23 +29,37 @@
 #include <QUndoCommand>
 #include <QImage>
 
-class Pattern;
+
+// TODO: Base this on actions, not blindly storing/restoring the state.
+
+class PatternFrameModel;
 
 /**
  * @brief Class which provides undo/redo actions
  *
- * In future it should be changed according to architecture changing
  */
 class UndoCommand : public QUndoCommand
 {
 public:
-    UndoCommand(const QImage& img, Pattern* item,  QUndoCommand *parent = 0);
+    /**
+     * @brief UndoCommand
+     * @param item
+     * @param frames
+     * @param size
+     * @param parent
+     */
+    UndoCommand(PatternFrameModel *item, const QList<QImage> &frames, const QSize size, QUndoCommand *parent = 0);
+
     virtual void undo();
     virtual void redo();
+
 private:
-    QImage previousImage;
-    QImage currentImage;
-    Pattern* patternItem;
+    QList<QImage> previousFrames;
+    QList<QImage> currentFrames;
+    QSize previousSize;
+    QSize currentSize;
+
+    PatternFrameModel* pattern;
     bool firstRun;
 };
 

@@ -27,26 +27,31 @@
 #include "patterneditor.h"
 #include <QDebug>
 
-UndoCommand::UndoCommand(const QImage& img, Pattern *item, QUndoCommand *parent)
-    : QUndoCommand(parent), previousImage(img), patternItem(item)
+
+UndoCommand::UndoCommand(PatternFrameModel *item,
+                         const QList<QImage> &frames,
+                         const QSize size,
+                         QUndoCommand *parent) :
+    QUndoCommand(parent),
+    previousFrames(frames),
+    pattern(item),
+    previousSize(size)
 {
-    currentImage = previousImage;
     firstRun = true;
 }
 
 void UndoCommand::undo() {
-//    currentImage = patternItem->getImage();
-//    patternItem->applyUndoState(previousImage);
-    // TODO: Restore edited state?
+    currentFrames = pattern->getFrames();
+    currentSize = pattern->getSize();
+    pattern->applyUndoState(previousFrames, previousSize);
 }
 
 void UndoCommand::redo() {
-    // TODO: Were likely not handling undo/redo correctly if we need this?
+    // TODO: We're likely not handling undo/redo correctly if we need this?
     if(firstRun) {
         firstRun = false;
         return;
     }
 
-    patternItem->applyUndoState(currentImage);
-    // TODO: Restore edited state?
+    pattern->applyUndoState(currentFrames, currentSize);
 }

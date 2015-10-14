@@ -256,7 +256,7 @@ void PatternEditor::paintEvent(QPaintEvent*)
     painter.drawImage(QRect(0,0,
                             frameData.width()*xScale+.5,
                             frameData.height()*yScale),
-                            frameData);
+                      frameData);
 
     if (!instrument.isNull() && instrument->showPreview()) {
         painter.drawImage(QRect(0,0,frameData.width()*xScale+.5,frameData.height()*yScale), (instrument->getPreview()));

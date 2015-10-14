@@ -1,4 +1,5 @@
 #include "patternframedelegate.h"
+#include "patternframemodel.h"
 
 #include <QDebug>
 
@@ -23,7 +24,7 @@ QSize PatternFrameDelegate::getScaledWidgetSize(int height, QSize imageSize) con
 void PatternFrameDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex & index ) const {
     painter->save();
 
-    QImage image = index.data(Qt::DisplayRole).value<QImage>();
+    QImage image = index.data(PatternFrameModel::FrameData).value<QImage>();
     QImage scaled = image.scaled(getScaledImageSize(option.rect.height(), image.size()), Qt::IgnoreAspectRatio);
 
     QColor backgroundColor = COLOR_BACKGROUND_UNCHECKED;
@@ -42,6 +43,6 @@ void PatternFrameDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 
 QSize PatternFrameDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex & modelIndex) const {
     return getScaledWidgetSize(option.rect.height()+option.decorationSize.height(),
-                               modelIndex.data(Qt::DisplayRole).value<QImage>().size());
+                               modelIndex.data(PatternFrameModel::FrameData).value<QImage>().size());
 }
 

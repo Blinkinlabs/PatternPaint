@@ -194,10 +194,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     patternCollection->setItemDelegate(new PatternDelegate(this));
 
-    connect(&patternUpdateNotifier, SIGNAL(patternSizeUpdated()),
-            this, SLOT(on_patternSizeUpdated()));
-    connect(&patternUpdateNotifier, SIGNAL(patternDataUpdated()),
-            this, SLOT(on_patternDataUpdated()));
     connect(&patternUpdateNotifier, SIGNAL(patternNameUpdated()),
             this, SLOT(on_patternNameUpdated()));
     connect(&patternUpdateNotifier, SIGNAL(patternModifiedChanged()),
@@ -207,7 +203,6 @@ MainWindow::MainWindow(QWidget *parent) :
     patternCollection->setUndoGroup(&undoGroup);
 
     timeline->setItemDelegate(new PatternFrameDelegate(this));
-    //timeline->setDragDropMode(QAbstractItemView::InternalMove);
 
     // Create a pattern.
     on_actionNew_triggered();
@@ -412,7 +407,7 @@ void MainWindow::on_actionSave_File_as_triggered() {
         return;
     }
 
-    Pattern* item = dynamic_cast<Pattern*>(patternCollection->currentItem());
+    Pattern* item = patternCollection->pattern();
     savePatternAs(item);
 }
 
@@ -421,7 +416,7 @@ void MainWindow::on_actionSave_File_triggered() {
         return;
     }
 
-    Pattern* item = dynamic_cast<Pattern*>(patternCollection->currentItem());
+    Pattern* item = patternCollection->pattern();
     savePattern(item);
 }
 
@@ -817,7 +812,7 @@ void MainWindow::on_actionConnect_triggered()
 }
 
 void MainWindow::on_instrumentSelected(bool) {
-    QAction* act = dynamic_cast<QAction*>(sender());
+    QAction* act = static_cast<QAction*>(sender());
     Q_ASSERT(act != NULL);
     foreach(QAction* a, instrumentToolbar->actions()) {
         a->setChecked(false);
@@ -1076,14 +1071,16 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
         return;
     }
 
-    Pattern* newpattern = dynamic_cast<Pattern*>(current);
+    Pattern* newpattern = static_cast<Pattern*>(current);
     undoGroup.setActiveStack(newpattern->getUndoStack());
 
     timeline->setModel(newpattern->getFrameModel());
+
     // TODO: Should we unregister these eventually?
-    QItemSelectionModel *selectionModel = timeline->selectionModel();
-    connect(selectionModel, SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
+    connect(timeline->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
             this, SLOT(setPatternFrame(const QModelIndex &, const QModelIndex &)));
+    connect(timeline->model(), SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &, const QVector<int> &)),
+            this, SLOT(handleUpdatedData(const QModelIndex &, const QModelIndex &, const QVector<int> &)));
 
     on_patternDataUpdated();
 }
@@ -1091,6 +1088,18 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
 void MainWindow::setPatternFrame(const QModelIndex &current, const QModelIndex &) {
     setNewFrame(current.row());
 }
+
+void MainWindow::handleUpdatedData(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &) {
+    int currentIndex = getFrameIndex();
+
+    // If the first index changed, refresh so that the patternCollection icon will be drawn correctly
+    // If the current selection changed, refresh so that the patternEditor contents will be redrawn
+    if(topLeft.row() == 0
+       || (currentIndex >= topLeft.row() && currentIndex <= bottomRight.row())) {
+        on_patternDataUpdated();
+    }
+}
+
 
 void MainWindow::on_patternDataUpdated()
 {
