@@ -130,7 +130,7 @@ signals:
     void patternStatusChanged(bool status);
 
 private:
-    ColorChooser* colorChooser;
+    ColorChooser colorChooser;
 
     QTimer drawTimer;
     QTimer connectionScannerTimer;
@@ -138,7 +138,7 @@ private:
     QPointer<BlinkyController> controller;
     QPointer<PatternUploader> uploader;
 
-    QProgressDialog* progressDialog;
+    QProgressDialog progressDialog;
 
     PatternUpdateNotifier patternUpdateNotifier;
 

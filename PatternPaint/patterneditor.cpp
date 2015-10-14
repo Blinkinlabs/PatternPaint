@@ -6,7 +6,6 @@
 #include <QDebug>
 
 #define COLOR_CLEAR             QColor(0,0,0,0)
-#define COLOR_CANVAS_DEFAULT    QColor(0,0,0,0)
 #define COLOR_GRID_LINES        QColor(30,30,30,200)
 
 #define COLOR_TOOL_DEFAULT      QColor(255,255,255)
@@ -249,7 +248,7 @@ void PatternEditor::paintEvent(QPaintEvent*)
 
     // If we don't have an image, show an empty view
     if(!hasImage()) {
-        painter.fillRect(0,0,this->width(),this->height(), QColor(0,0,0));
+        painter.fillRect(0,0,this->width(),this->height(), COLOR_CLEAR);
         return;
     }
 

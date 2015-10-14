@@ -8,13 +8,19 @@
 class PatternFrameDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
+
+private:
+
+    QSize getScaledWidgetSize(int height, QSize imageSize) const;
+    QSize getScaledImageSize(int height, QSize imageSize) const;
+
 public:
     PatternFrameDelegate(QObject* parent = 0);
 
     QWidget * createEditor(QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const { return NULL; }
 
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex & index ) const;
-    QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & modelIndex ) const;
 };
 
 

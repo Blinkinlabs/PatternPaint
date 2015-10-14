@@ -45,6 +45,8 @@ ColorChooser::ColorChooser(const QColor& color, QWidget *parent) :
     setColor(color);
     setPixmap(pixmap);
 
+    setToolTip(tr("Drawing color"));
+
     colorDialog.setOptions(QColorDialog::NoButtons);
 
     connect(&colorDialog, SIGNAL(currentColorChanged(const QColor &)),

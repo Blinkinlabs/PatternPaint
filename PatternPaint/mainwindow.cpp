@@ -42,14 +42,16 @@
 
 #define DEFAULT_DISPLAY_WIDTH 1
 #define DEFAULT_DISPLAY_HEIGHT 60
-#define DEFAULT_PATTERN_LENGTH 100
+#define DEFAULT_FRAME_COUNT 8
 
 #define MIN_TIMER_INTERVAL 5  // minimum interval to wait between blinkytape updates
 
 #define CONNECTION_SCANNER_INTERVAL 1000
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
+    QMainWindow(parent),
+    colorChooser(COLOR_TOOL_DEFAULT, this),
+    progressDialog(this)
 {
     setupUi(this);
 
@@ -92,9 +94,7 @@ MainWindow::MainWindow(QWidget *parent) :
     actionPipette->setData(QVariant::fromValue(cpi));
     actionFill->setData(QVariant::fromValue(new FillInstrument(this)));
 
-    colorChooser = new ColorChooser(COLOR_TOOL_DEFAULT, this);
-    colorChooser->setToolTip(tr("Drawing color"));
-    instrumentToolbar->addWidget(colorChooser);
+    instrumentToolbar->addWidget(&colorChooser);
     patternEditor->setToolColor(COLOR_TOOL_DEFAULT);
 
     QSpinBox *penSizeSpin = new QSpinBox(this);
@@ -144,12 +144,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(patternStatusChanged(bool)),
             pSpeed, SLOT(setEnabled(bool)));
 
-
-
     mode = Disconnected;
 
     // Our pattern editor wants to get some notifications
-    connect(colorChooser, SIGNAL(sendColor(QColor)),
+    connect(&colorChooser, SIGNAL(sendColor(QColor)),
             patternEditor, SLOT(setToolColor(QColor)));
     connect(penSizeSpin, SIGNAL(valueChanged(int)),
             patternEditor, SLOT(setToolSize(int)));
@@ -157,17 +155,18 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(patternEditor, SIGNAL(frameDataUpdated(int, const QImage)),
             this, SLOT(on_frameDataUpdated(int, const QImage)));
 
+    patternEditor->setToolSize(DRAWING_SIZE_MINIMUM_VALUE);
+
 
     connect(patternCollection, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),
             this, SLOT(setPatternItem(QListWidgetItem*, QListWidgetItem*)));
 
 
     // Pre-set the upload progress dialog
-    progressDialog = new QProgressDialog(this);
-    progressDialog->setMinimum(0);
-    progressDialog->setMaximum(150);
-    progressDialog->setWindowModality(Qt::WindowModal);
-    progressDialog->setAutoClose(false);
+    progressDialog.setMinimum(0);
+    progressDialog.setMaximum(150);
+    progressDialog.setWindowModality(Qt::WindowModal);
+    progressDialog.setAutoClose(false);
 
     // The draw timer tells the pattern to advance
     connect(&drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
@@ -176,9 +175,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&connectionScannerTimer, SIGNAL(timeout()), this, SLOT(connectionScannerTimer_timeout()));
     connectionScannerTimer.setInterval(CONNECTION_SCANNER_INTERVAL);
     connectionScannerTimer.start();
-
-    penSizeSpin->setValue(1);
-    patternEditor->setToolSize(1);
 
     actionPen->setChecked(true);
     patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(actionPen->data()));
@@ -210,8 +206,6 @@ MainWindow::MainWindow(QWidget *parent) :
     patternCollection->setNotifier(&patternUpdateNotifier);
     patternCollection->setUndoGroup(&undoGroup);
 
-
-    // Set some example data in the timeline selector
     timeline->setItemDelegate(new PatternFrameDelegate(this));
 
     // Create a pattern.
@@ -532,27 +526,27 @@ void MainWindow::on_actionSystem_Information_triggered()
 
 void MainWindow::on_uploaderMaxProgressChanged(int progressValue)
 {
-    if(progressDialog->isHidden()) {
+    if(progressDialog.isHidden()) {
         qDebug() << "Got a progress event while the progress dialog is hidden, event order problem?";
         return;
     }
 
-    progressDialog->setMaximum(progressValue);
+    progressDialog.setMaximum(progressValue);
 }
 
 void MainWindow::on_uploaderProgressChanged(int progressValue)
 {
-    if(progressDialog->isHidden()) {
+    if(progressDialog.isHidden()) {
         qDebug() << "Got a progress event while the progress dialog is hidden, event order problem?";
         return;
     }
 
     // Clip the progress to maximum, until we work out a better way to estimate it.
-    if(progressValue >= progressDialog->maximum()) {
-        progressValue = progressDialog->maximum() - 1;
+    if(progressValue >= progressDialog.maximum()) {
+        progressValue = progressDialog.maximum() - 1;
     }
 
-    progressDialog->setValue(progressValue);
+    progressDialog.setValue(progressValue);
 }
 
 void MainWindow::on_uploaderFinished(bool result)
@@ -560,7 +554,7 @@ void MainWindow::on_uploaderFinished(bool result)
     mode = Disconnected;
     uploader.clear();
 
-    progressDialog->hide();
+    progressDialog.hide();
 
     qDebug() << "Uploader finished! Result:" << result;
     if(!result) {
@@ -636,8 +630,8 @@ void MainWindow::on_actionLoad_rainbow_sketch_triggered()
             return;
         }
 
-        progressDialog->setWindowTitle("Firmware reset");
-        progressDialog->setLabelText(
+        progressDialog.setWindowTitle("Firmware reset");
+        progressDialog.setLabelText(
                     "Searching for a BlinkyTape bootloader...\n"
                     "\n"
                     "Please connect your blinkytape to the computer via USB,\n"
@@ -662,14 +656,14 @@ void MainWindow::on_actionLoad_rainbow_sketch_triggered()
             return;
         }
 
-        progressDialog->setWindowTitle("Firmware reset");
-        progressDialog->setLabelText("Loading new firmware onto Blinky");
+        progressDialog.setWindowTitle("Firmware reset");
+        progressDialog.setLabelText("Loading new firmware onto Blinky");
     }
 
     mode = Uploading;
 
-    progressDialog->setValue(progressDialog->minimum());
-    progressDialog->show();
+    progressDialog.setValue(progressDialog.minimum());
+    progressDialog.show();
 }
 
 void MainWindow::on_actionSave_to_Blinky_triggered()
@@ -715,11 +709,11 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
     }
     mode = Uploading;
 
-    progressDialog->setWindowTitle("Blinky exporter");
-    progressDialog->setLabelText("Saving pattern to Blinky...");
+    progressDialog.setWindowTitle("Blinky exporter");
+    progressDialog.setLabelText("Saving pattern to Blinky...");
 
-    progressDialog->setValue(progressDialog->minimum());
-    progressDialog->show();
+    progressDialog.setValue(progressDialog.minimum());
+    progressDialog.show();
 }
 
 
@@ -751,6 +745,11 @@ void MainWindow::on_actionResize_Pattern_triggered()
              << newDisplaySize.width();
 
     // TODO: resize all the patterns
+    for(int i = 0; i < patternCollection->count(); i++) {
+        // Convert the current pattern into a Pattern
+        Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->item(i));
+        pattern->resize(newDisplaySize,false);
+    }
 }
 
 void MainWindow::on_actionAddress_programmer_triggered()
@@ -829,7 +828,7 @@ void MainWindow::on_instrumentSelected(bool) {
 }
 
 void MainWindow::on_colorPicked(QColor color) {
-    colorChooser->setColor(color);
+    colorChooser.setColor(color);
     patternEditor->setToolColor(color);
 }
 
@@ -1029,7 +1028,7 @@ void MainWindow::on_actionRGB_triggered()
 void MainWindow::on_actionNew_triggered()
 {
     QSettings settings;
-    int patternLength = settings.value("Options/patternLength", DEFAULT_PATTERN_LENGTH).toUInt();
+    int patternLength = settings.value("Options/frameCount", DEFAULT_FRAME_COUNT).toUInt();
 
     QSize displaySize;
     if(!patternCollection->hasPattern()) {

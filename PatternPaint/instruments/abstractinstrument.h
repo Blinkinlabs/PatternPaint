@@ -33,8 +33,6 @@
 #include <QPixmap>
 #include <QCursor>
 
-#define COLOR_CLEAR             QColor(0,0,0,0)
-
 class PatternEditor;
 
 /// Abstract instrument class.

@@ -44,7 +44,7 @@ void LineInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& editor, 
         toolPreview = QImage(editor.getPatternAsImage().width(),
                              editor.getPatternAsImage().height(),
                              QImage::Format_ARGB32_Premultiplied);
-        toolPreview.fill(COLOR_CLEAR);
+        toolPreview.fill(QColor(0,0,0,0));
 
         mStartPoint = mEndPoint = pt;
         paint(editor);
@@ -56,7 +56,7 @@ void LineInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& editor, const Q
 {
     if(drawing) {
         mEndPoint = pt;
-        toolPreview.fill(COLOR_CLEAR);
+        toolPreview.fill(QColor(0,0,0,0));
         paint(editor);
     }
 }
