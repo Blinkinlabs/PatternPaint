@@ -32,6 +32,9 @@ public:
     /// Get the current pattern
     Pattern *pattern() const;
 
+    /// Get the specified pattern
+    Pattern *pattern(int i) const;
+
 private:
     QPointer<QUndoGroup> undoGroup;
     QPointer<PatternUpdateNotifier> updateNotifier;

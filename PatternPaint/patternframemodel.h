@@ -9,8 +9,6 @@ class PatternFrameModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    PatternFrameModel();
-
     PatternFrameModel(QSize size, QObject *parent = 0) :
         QAbstractListModel(parent),
         size(size) {}
@@ -19,11 +17,16 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
 
     Qt::ItemFlags flags(const QModelIndex &index) const;
+
+    Qt::DropActions supportedDropActions() const;
+
     bool setData(const QModelIndex &index, const QVariant &value,
                  int role = Qt::EditRole);
 
     bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex());
     bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex());
+
+    /// TODO: Move the specializations to a delegate?
 
     /// Get the size of the pattern frame
     const QSize getSize() const {return size;}

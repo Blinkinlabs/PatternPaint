@@ -27,16 +27,21 @@ QVariant PatternFrameModel::data(const QModelIndex &index, int role) const
 Qt::ItemFlags PatternFrameModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
-        return Qt::ItemIsEnabled;
+        return Qt::ItemIsEnabled | Qt::ItemIsDropEnabled;
 
-    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+
+    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable | Qt::ItemIsDragEnabled ;
+}
+
+Qt::DropActions PatternFrameModel::supportedDropActions() const
+{
+    return Qt::CopyAction | Qt::MoveAction;
 }
 
 bool PatternFrameModel::setData(const QModelIndex &index,
                               const QVariant &value, int role)
 {
-    if (index.isValid() && role == Qt::EditRole) {
-
+    if (index.isValid()) {
         frames.replace(index.row(), value.value<QImage>());
         emit dataChanged(index, index);
         return true;
@@ -47,6 +52,7 @@ bool PatternFrameModel::setData(const QModelIndex &index,
 bool PatternFrameModel::insertRows(int position, int rows, const QModelIndex &)
 {
     beginInsertRows(QModelIndex(), position, position+rows-1);
+    qDebug() << "Insert rows called";
 
     for (int row = 0; row < rows; ++row) {
         QImage newImage(size, QImage::Format_ARGB32_Premultiplied);
@@ -61,6 +67,7 @@ bool PatternFrameModel::insertRows(int position, int rows, const QModelIndex &)
 bool PatternFrameModel::removeRows(int position, int rows, const QModelIndex &)
 {
     beginRemoveRows(QModelIndex(), position, position+rows-1);
+    qDebug() << "Remove rows called";
 
     for (int row = 0; row < rows; ++row) {
         frames.removeAt(position);

@@ -134,3 +134,8 @@ Pattern* PatternListWidget::pattern() const
 {
     return dynamic_cast<Pattern*>(currentItem());
 }
+
+Pattern* PatternListWidget::pattern(int i) const
+{
+    return dynamic_cast<Pattern*>(item(i));
+}

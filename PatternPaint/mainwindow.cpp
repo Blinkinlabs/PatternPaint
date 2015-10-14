@@ -207,6 +207,7 @@ MainWindow::MainWindow(QWidget *parent) :
     patternCollection->setUndoGroup(&undoGroup);
 
     timeline->setItemDelegate(new PatternFrameDelegate(this));
+    //timeline->setDragDropMode(QAbstractItemView::InternalMove);
 
     // Create a pattern.
     on_actionNew_triggered();
@@ -680,7 +681,7 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
 
     for(int i = 0; i < patternCollection->count(); i++) {
         // Convert the current pattern into a Pattern
-        Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->item(i));
+        Pattern* pattern = patternCollection->pattern(i);
 
         // TODO: This needs to be run over all the patterns!
         // Rewrite me.
@@ -744,10 +745,9 @@ void MainWindow::on_actionResize_Pattern_triggered()
              << "width:"
              << newDisplaySize.width();
 
-    // TODO: resize all the patterns
     for(int i = 0; i < patternCollection->count(); i++) {
         // Convert the current pattern into a Pattern
-        Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->item(i));
+        Pattern* pattern = patternCollection->pattern(i);
         pattern->resize(newDisplaySize,false);
     }
 }
@@ -766,7 +766,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
     for(int i = 0; i < patternCollection->count(); i++) {
         // Convert the current pattern into a Pattern
-        Pattern* pattern = dynamic_cast<Pattern*>(patternCollection->item(i));
+        Pattern* pattern = patternCollection->pattern(i);
 
         if (pattern->getModified() == true) {
             unsaved.push_back(pattern);
@@ -1082,7 +1082,6 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
     timeline->setModel(newpattern->getFrameModel());
     // TODO: Should we unregister these eventually?
     QItemSelectionModel *selectionModel = timeline->selectionModel();
-    qDebug() << "Selection model: " << selectionModel;
     connect(selectionModel, SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
             this, SLOT(setPatternFrame(const QModelIndex &, const QModelIndex &)));
 
