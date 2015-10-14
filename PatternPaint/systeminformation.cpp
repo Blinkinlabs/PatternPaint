@@ -13,9 +13,18 @@ SystemInformation::SystemInformation(QWidget *parent) :
     ui(new Ui::SystemInformation)
 {
     ui->setupUi(this);
-    QString report;
 
-    QString osName;
+    on_refresh_clicked();
+}
+
+SystemInformation::~SystemInformation()
+{
+    delete ui;
+}
+
+void SystemInformation::on_refresh_clicked()
+{
+    QString report;
 
     report.append("Pattern Paint ");
     report.append(VERSION_STRING);
@@ -26,67 +35,9 @@ SystemInformation::SystemInformation(QWidget *parent) :
     report.append(__TIME__);
     report.append("\r");
 
-#if defined(Q_OS_WIN)
-    switch(QSysInfo::windowsVersion()) {
-    case QSysInfo::WV_2000:
-        osName = "Windows 2000";
-        break;
-    case QSysInfo::WV_2003:
-        osName = "Windows 2003";
-        break;
-    case QSysInfo::WV_VISTA:
-        osName = "Windows Vista";
-        break;
-    case QSysInfo::WV_WINDOWS7:
-        osName = "Windows 7";
-        break;
-    case QSysInfo::WV_WINDOWS8:
-        osName = "Windows 8";
-        break;
-    case QSysInfo::WV_WINDOWS8_1:
-        osName = "Windows 8.1";
-        break;
-//    case QSysInfo::WV_WINDOWS10:
-//        osName = "Windows 10";
-//        break;
-    default:
-        osName = "Windows (Unknown Version)";
-        break;
-    }
-#elif defined(Q_OS_MAC)
-    switch(QSysInfo::macVersion()) {
-    case QSysInfo::MV_10_6:
-        osName = "OS X 10.6 (Snow Leopard)";
-        break;
-    case QSysInfo::MV_10_7:
-        osName = "OS X 10.7 (Lion)";
-        break;
-    case QSysInfo::MV_10_8:
-        osName = "OS X 10.8 (Mountain Lion)";
-        break;
-    case QSysInfo::MV_10_9:
-        osName = "OS X 10.9 (Mavericks)";
-        break;
-    case QSysInfo::MV_10_10:
-        osName = "OS X 10.10 (Yosemite)";
-        break;
-//    case QSysInfo::MV_10_11:
-//        osName = "OS X 10.11 (El Capitan)";
-//        break;
-    default:
-        osName = "OS X (Unknown version)";
-        break;
-    }
-#else
-    osName = "Unknown";
-#endif
-    report.append("Operating system: " + osName + "\r");
+    report.append("Operating system: " + QSysInfo::prettyProductName() + "\r");
 
-    report.append("QT information:\r");
-    report.append("  Build Date: " + QLibraryInfo::buildDate().toString() + "\r");
-    report.append("  Path: " + QLibraryInfo::location(QLibraryInfo::LibrariesPath) + "\r");
-
-    report.append("Detected devices: \r");
+    report.append("Detected Blinkies: \r");
     foreach (const QSerialPortInfo &info, BlinkyTape::probe()) {
         report.append("  BlinkyTape:" + info.portName() + "\r");
     }
@@ -101,14 +52,10 @@ SystemInformation::SystemInformation(QWidget *parent) :
         report.append("    Description: " + info.description() + "\r");
         report.append("    VID: 0x" + QString::number(info.vendorIdentifier(),16) + "\r");
         report.append("    PID: 0x" + QString::number(info.productIdentifier(),16) + "\r");
+        report.append("    Serial: " + info.serialNumber() + "\r");
     }
 
     ui->infoBrowser->setText(report);
-}
-
-SystemInformation::~SystemInformation()
-{
-    delete ui;
 }
 
 void SystemInformation::on_copyToClipboard_clicked()

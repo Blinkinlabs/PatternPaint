@@ -21,6 +21,7 @@ private slots:
 
     void on_sendToSupport_clicked();
 
+    void on_refresh_clicked();
 private:
     Ui::SystemInformation *ui;
 };
