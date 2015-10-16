@@ -17,7 +17,9 @@
 
 #define RESET_MAX_TRIES 3
 
-
+#define WRITE_BUSY_DELAY 1
+#define WRITE_CHUNK_DELAY 4
+#define CHUNK_SIZE 300
 
 
 // TODO: Support a method for loading these from preferences file
@@ -90,16 +92,20 @@ BlinkyTape::BlinkyTape(QObject *parent) :
             this, SLOT(handleBaudRateChanged(qint32, QSerialPort::Directions)));
 
 
-    resetTimer = new QTimer(this);
-    resetTimer->setSingleShot(true);
-    connect(resetTimer, SIGNAL(timeout()), this, SLOT(resetTimer_timeout()));
+    resetTimer.setSingleShot(true);
+    connect(&resetTimer, SIGNAL(timeout()), this, SLOT(resetTimer_timeout()));
 
-    // Windows doesn't notify us if the tape was disconnected, so we have to check peroidically
-    #if defined(Q_OS_WIN)
-    connectionScannerTimer = new QTimer(this);
-    connectionScannerTimer->setInterval(CONNECTION_SCANNER_INTERVAL);
-    connect(connectionScannerTimer, SIGNAL(timeout()), this, SLOT(connectionScannerTimer_timeout()));
-    #endif
+    // On OS X, we can't send data too quickly, so we use a timer to send small chunks
+#if defined(Q_OS_MAC)
+    serialWriteTimer.setSingleShot(true);
+    connect(&serialWriteTimer, SIGNAL(timeout()), this, SLOT(sendChunk()));
+#endif
+
+    // On Windows, we don't get notified if the tape was disconnected, so we have to check peroidically
+#if defined(Q_OS_WIN)
+    connectionScannerTimer.setInterval(CONNECTION_SCANNER_INTERVAL);
+    connect(&connectionScannerTimer, SIGNAL(timeout()), this, SLOT(connectionScannerTimer_timeout()));
+#endif
 }
 
 void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
@@ -139,16 +145,47 @@ void BlinkyTape::resetTimer_timeout() {
 
     // setBaudRate() doesn't seem to be reliable if called too quickly after the port
     // is opened. In this case,
-    resetTimer->start(RESET_TIMER_TIMEOUT);
+    resetTimer.start(RESET_TIMER_TIMEOUT);
 
     resetTriesRemaining--;
+}
+
+void BlinkyTape::sendChunk()
+{
+    // If the last bit didn't get written yet, try again shortly.
+    if(serial->bytesToWrite() > 0) {
+        qDebug() << "Busy, trying again shortly";
+        serialWriteTimer.start(WRITE_BUSY_DELAY);
+        return;
+    }
+
+    while(!chunks.isEmpty()) {
+        QByteArray chunk = chunks.takeFirst();
+
+        int writeLength = serial->write(chunk);
+        if(writeLength != chunk.length()) {
+            qCritical() << "Error writing all the data out, expected:" << chunk.length()
+                        << ", wrote:" << writeLength;
+        }
+        serial->flush();
+
+        // On OS X, we can't send too much data at once, or it will hang the blinkytape.
+        // In this case, set a timer to call this function again.
+
+#if defined(Q_OS_MAC)
+        if(!chunks.isEmpty()) {
+            serialWriteTimer.start(WRITE_CHUNK_DELAY);
+            return;
+        }
+#endif
+    }
 }
 
 #if defined(Q_OS_WIN)
 void BlinkyTape::connectionScannerTimer_timeout() {
     // If we are already disconnected, disregard.
     if(!isConnected()) {
-        connectionScannerTimer->stop();
+        connectionScannerTimer.stop();
         return;
     }
 
@@ -199,7 +236,7 @@ bool BlinkyTape::open(QSerialPortInfo info) {
 
 #if defined(Q_OS_WIN)
     // Schedule the connection scanner
-    connectionScannerTimer->start();
+    connectionScannerTimer.start();
 #endif
     return true;
 }
@@ -216,7 +253,6 @@ void BlinkyTape::close() {
 
 void BlinkyTape::handleSerialReadData()
 {
-//    qDebug() << "Got data from BlinkyTape, discarding.";
     // Discard any data we get back from the BlinkyTape
     serial->readAll();
 }
@@ -229,7 +265,7 @@ void BlinkyTape::handleBaudRateChanged(qint32 baudRate, QSerialPort::Directions)
     else if(baudRate == QSerialPort::Baud1200 && resetTriesRemaining > 0) {
         qDebug() << "Baud rate updated to 1200bps, closing!";
 
-        resetTimer->stop();
+        resetTimer.stop();
         close();
     }
     else if(baudRate == QSerialPort::Baud1200) {
@@ -250,7 +286,7 @@ void BlinkyTape::sendUpdate(QByteArray ledData)
 
     // If there is data pending to send, skip this update to prevent overflowing
     // the buffer.
-    if(serial->bytesToWrite() > 0) {
+    if(!chunks.isEmpty()) {
         qDebug() << "Output data still in buffer, dropping this update frame";
         return;
     }
@@ -271,9 +307,6 @@ void BlinkyTape::sendUpdate(QByteArray ledData)
     // Append an 0xFF to signal the flip command
     ledData.append(0xFF);
 
-    // Write chunks of data?
-    #define CHUNK_SIZE 300
-
     for(int chunk = 0; chunk*CHUNK_SIZE < ledData.length(); chunk++) {
 
         int chunkLength = CHUNK_SIZE;
@@ -282,33 +315,14 @@ void BlinkyTape::sendUpdate(QByteArray ledData)
         }
 
         QByteArray chunkData = ledData.mid(chunk*CHUNK_SIZE,chunkLength);
+        chunks.append(chunkData);
 
 //        qDebug() << "size=" << ledData.length() << " chunk=" << chunk << " position=" << chunk*CHUNK_SIZE << " length=" << chunkLength;
 //        qDebug() << chunkData.toHex();
-
-        int writeLength = serial->write(chunkData);
-        if(writeLength != chunkData.length()) {
-            qCritical() << "Error writing all the data out, expected:" << chunkLength
-                        << ", wrote:" << writeLength;
-        }
-        serial->flush();
-
-#if defined(OS_X_LARGE_SERIAL_WORKAROUND)
-        // Pause a short amount of time to let the OS do anything else
-        // TODO: Calling QCoreApplication::processEvents causes application hangups,
-        // but sending too much data at once on OS X crashes the BlinkyTape.
-        // Maybe we need to farm this out to a timer?
-        if((chunk+1)*CHUNK_SIZE < ledData.length()) {
-            int millisecondsToWait = 3;
-            QTime dieTime = QTime::currentTime().addMSecs( millisecondsToWait );
-            while( QTime::currentTime() < dieTime )
-            {
-                QCoreApplication::processEvents( QEventLoop::AllEvents, millisecondsToWait );
-            }
-        }
-#endif
     }
 
+//    qDebug() << "Total chunks:" << chunks.size();
+    sendChunk();
 }
 
 bool BlinkyTape::getPortInfo(QSerialPortInfo& info)

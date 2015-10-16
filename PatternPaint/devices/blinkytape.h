@@ -72,6 +72,11 @@ private:
     QTimer *connectionScannerTimer;
 #endif
 
+#if defined(Q_OS_MAC)
+    QTimer serialWriteTimer;
+    QVector<QByteArray> chunks;
+#endif
+
 signals:
     void connectionStatusChanged(bool status);
 
@@ -87,6 +92,8 @@ private slots:
 #if defined(Q_OS_WIN)
     void connectionScannerTimer_timeout();
 #endif
+
+    void sendChunk();
 };
 
 #endif // BLINKYTAPE_H
