@@ -160,7 +160,7 @@ void Pattern::setNotifier(QPointer<PatternUpdateNotifier> newNotifier) {
     notifier = newNotifier;
 }
 
-const QImage Pattern::getFrame(int index) {
+const QImage Pattern::getFrame(int index) const {
     return frames.index(index).data(PatternFrameModel::FrameData).value<QImage>();
 }
 

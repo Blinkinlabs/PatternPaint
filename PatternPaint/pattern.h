@@ -75,7 +75,7 @@ public:
 
     /// Get an image representing the current frame
     /// @return an NxN QImage reperesenting the current frame data
-    const QImage getFrame(int index);
+    const QImage getFrame(int index) const;
 
     /// Delete the frame at the given index
     /// @param frame Index of the frame to delete

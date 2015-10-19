@@ -59,7 +59,7 @@ private:
 
     QSerialPortInfo serialInfo;
 
-    QTimer* resetTimer;
+    QTimer resetTimer;
 
     int resetTriesRemaining;
 
@@ -69,7 +69,7 @@ private:
     // Handle this by periodically scanning for available BlinkyTapes, and
     // close this one if it no longer in the list
     // TODO: Pull the latest QtSerialPort, it seems to have a fix for this
-    QTimer *connectionScannerTimer;
+    QTimer connectionScannerTimer;
 #endif
 
 #if defined(Q_OS_MAC)

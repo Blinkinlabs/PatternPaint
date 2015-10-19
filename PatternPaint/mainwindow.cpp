@@ -105,21 +105,19 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     // tools
-    pSpeed = new QSpinBox(this);
-    pSpeed->setRange(PATTERN_SPEED_MINIMUM_VALUE, PATTERN_SPEED_MAXIMUM_VALUE);
-    pSpeed->setValue(PATTERN_SPEED_DEFAULT_VALUE);
-    pSpeed->setToolTip(tr("Pattern speed"));
-    playbackToolbar->addWidget(pSpeed);
-    connect(pSpeed, SIGNAL(valueChanged(int)), this, SLOT(patternSpeed_valueChanged(int)));
+    pSpeed.setRange(PATTERN_SPEED_MINIMUM_VALUE, PATTERN_SPEED_MAXIMUM_VALUE);
+    pSpeed.setValue(PATTERN_SPEED_DEFAULT_VALUE);
+    pSpeed.setToolTip(tr("Pattern speed"));
+    playbackToolbar->addWidget(&pSpeed);
+    connect(&pSpeed, SIGNAL(valueChanged(int)), this, SLOT(patternSpeed_valueChanged(int)));
     patternSpeed_valueChanged(PATTERN_SPEED_DEFAULT_VALUE);
 
-    pFrame = new QLineEdit(this);
-    pFrame->setMaximumWidth(30);
-    pFrame->setMinimumWidth(30);
-    pFrame->setValidator(new QIntValidator(1,std::numeric_limits<int>::max(),this));
-    pFrame->setToolTip(tr("Current frame"));
-    playbackToolbar->insertWidget(actionStepForward, pFrame);
-    connect(pFrame, SIGNAL(textEdited(QString)), this, SLOT(frameIndex_valueChanged(QString)));
+    pFrame.setMaximumWidth(30);
+    pFrame.setMinimumWidth(30);
+    pFrame.setValidator(new QIntValidator(1,std::numeric_limits<int>::max(),this));
+    pFrame.setToolTip(tr("Current frame"));
+    playbackToolbar->insertWidget(actionStepForward, &pFrame);
+    connect(&pFrame, SIGNAL(textEdited(QString)), this, SLOT(frameIndex_valueChanged(QString)));
     frameIndex_valueChanged("1");
 
 
@@ -142,7 +140,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(patternStatusChanged(bool)),
             actionStepBackward, SLOT(setEnabled(bool)));
     connect(this, SIGNAL(patternStatusChanged(bool)),
-            pSpeed, SLOT(setEnabled(bool)));
+            &pSpeed, SLOT(setEnabled(bool)));
 
     mode = Disconnected;
 
@@ -190,7 +188,6 @@ MainWindow::MainWindow(QWidget *parent) :
     populateExamplesMenu(":/examples", menuExamples);
     connect(menuExamples, SIGNAL(triggered(QAction *)),
             this, SLOT(on_ExampleSelected(QAction *)), Qt::UniqueConnection);
-
 
     patternCollection->setItemDelegate(new PatternDelegate(this));
 
@@ -947,20 +944,22 @@ void MainWindow::setNewFrame(int newFrame)
         newFrame = 0;
     }
 
-    if(timeline->model() != NULL) {
-      timeline->setCurrentIndex(timeline->model()->index(newFrame,0));
-    }
+    timeline->setCurrentIndex(timeline->model()->index(newFrame,0));
 
     patternEditor->setFrameData(getFrameIndex(),
                                 patternCollection->pattern()->getFrame(newFrame));
 
-    pFrame->setText(QString::number(newFrame+1));
+    pFrame.setText(QString::number(newFrame+1));
 
     updateBlinky();
 }
 
 void MainWindow::updateBlinky()
 {
+    if(controller.isNull()) {
+        return;
+    }
+
     // Ignore the timeout if it came too quickly, so that we don't overload the blinky
     static qint64 lastTime = 0;
     qint64 newTime = QDateTime::currentMSecsSinceEpoch();
@@ -972,10 +971,6 @@ void MainWindow::updateBlinky()
     lastTime = newTime;
 
     if(!patternCollection->hasPattern()) {
-        return;
-    }
-
-    if(controller.isNull()) {
         return;
     }
 
@@ -1078,14 +1073,14 @@ void MainWindow::setPatternItem(QListWidgetItem* current, QListWidgetItem* previ
 
     // TODO: Should we unregister these eventually?
     connect(timeline->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
-            this, SLOT(setPatternFrame(const QModelIndex &, const QModelIndex &)));
+            this, SLOT(on_patternFrameSelected(const QModelIndex &, const QModelIndex &)));
     connect(timeline->model(), SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &, const QVector<int> &)),
             this, SLOT(handleUpdatedData(const QModelIndex &, const QModelIndex &, const QVector<int> &)));
 
     on_patternDataUpdated();
 }
 
-void MainWindow::setPatternFrame(const QModelIndex &current, const QModelIndex &) {
+void MainWindow::on_patternFrameSelected(const QModelIndex &current, const QModelIndex &) {
     setNewFrame(current.row());
 }
 

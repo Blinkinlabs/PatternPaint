@@ -120,7 +120,7 @@ private slots:
 
     void on_ExampleSelected(QAction*);
 
-    void setPatternFrame(const QModelIndex &current, const QModelIndex &);
+    void on_patternFrameSelected(const QModelIndex &current, const QModelIndex &);
 
     void handleUpdatedData(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &);
 
@@ -143,8 +143,8 @@ private:
 
     PatternUpdateNotifier patternUpdateNotifier;
 
-    QSpinBox* pSpeed;
-    QLineEdit* pFrame;
+    QSpinBox pSpeed;
+    QLineEdit pFrame;
 
     enum Modes { Disconnected, Connected, Uploading };
     Modes mode;
@@ -152,6 +152,8 @@ private:
     QUndoGroup undoGroup;
 
     PatternOutput::ColorMode colorMode;
+
+    void populateExamplesMenu(QString directory, QMenu* menu);
 
     void showError(QString errorMessage);
 
@@ -177,7 +179,6 @@ private:
     /// Object to inhibit app nap when connected to a blinky
     CAppNapInhibitor* appNap;
 #endif
-    void populateExamplesMenu(QString directory, QMenu* menu);
 
     // TODO: These don't belong here.
     int getFrameIndex();
