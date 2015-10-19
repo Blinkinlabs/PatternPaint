@@ -13,6 +13,7 @@
 #include "patterneditor.h"
 #include "addressprogrammer.h"
 #include "colorchooser.h"
+#include "patterncollection.h"
 
 #include "ui_mainwindow.h"
 
@@ -29,12 +30,12 @@ public:
     ~MainWindow();
 
 public slots:
-    void setPatternItem(QListWidgetItem *, QListWidgetItem *);
 
     void on_patternDataUpdated();
     void on_patternSizeUpdated();
 
     void on_frameDataUpdated(int index, QImage update);
+
 protected:
     void closeEvent(QCloseEvent *event);
 
@@ -120,6 +121,8 @@ private slots:
 
     void on_ExampleSelected(QAction*);
 
+    void on_patternSelected(const QModelIndex &current, const QModelIndex &);
+
     void on_patternFrameSelected(const QModelIndex &current, const QModelIndex &);
 
     void handleUpdatedData(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &);
@@ -141,6 +144,7 @@ private:
 
     QProgressDialog progressDialog;
 
+    PatternCollection patternCollection;
     PatternUpdateNotifier patternUpdateNotifier;
 
     QSpinBox pSpeed;
@@ -160,7 +164,7 @@ private:
     void startPlayback();
     void stopPlayback();
 
-    bool promptForSave(Pattern* item);
+    bool promptForSave(Pattern *item);
     bool promptForSave(std::vector<Pattern*> item);
 
     bool savePattern(Pattern *item);
@@ -181,8 +185,9 @@ private:
 #endif
 
     // TODO: These don't belong here.
-    int getFrameIndex();
+    int getCurrentFrameIndex();
     int getFrameCount();
+    int getCurrentPatternIndex();
 };
 
 #endif // MAINWINDOW_H

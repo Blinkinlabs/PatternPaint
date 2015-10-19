@@ -52,7 +52,7 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="PatternListWidget" name="patternCollection">
+     <widget class="PatternCollectionListView" name="patternCollectionListView">
       <property name="minimumSize">
        <size>
         <width>150</width>
@@ -170,7 +170,6 @@
         <property name="acceptDrops">
          <bool>false</bool>
         </property>
-        <zorder>timeline</zorder>
        </widget>
       </widget>
       <widget class="QListView" name="timeline">
@@ -762,9 +761,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>PatternListWidget</class>
+   <class>PatternCollectionListView</class>
    <extends>QListWidget</extends>
-   <header>patternlistwidget.h</header>
+   <header>patterncollectionlistview.h</header>
   </customwidget>
  </customwidgets>
  <resources>

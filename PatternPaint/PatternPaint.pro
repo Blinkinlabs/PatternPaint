@@ -64,9 +64,10 @@ SOURCES += main.cpp\
     patternframedelegate.cpp \
     patternoutput.cpp \
     pattern.cpp \
-    patterndelegate.cpp \
-    patternlistwidget.cpp \
-    patterncollectionmodel.cpp
+    patterncollectionmodel.cpp \
+    patterncollectionlistview.cpp \
+    patterncollectiondelegate.cpp \
+    patterncollection.cpp
 
 HEADERS  += mainwindow.h \
     systeminformation.h \
@@ -83,9 +84,10 @@ HEADERS  += mainwindow.h \
     patternframedelegate.h \
     patternoutput.h \
     pattern.h \
-    patterndelegate.h \
-    patternlistwidget.h \
-    patterncollectionmodel.h
+    patterncollectionmodel.h \
+    patterncollectionlistview.h \
+    patterncollectiondelegate.h \
+    patterncollection.h
 
 mac {
 HEADERS  += \

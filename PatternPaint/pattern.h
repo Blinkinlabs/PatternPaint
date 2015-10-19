@@ -10,7 +10,7 @@
 
 /// patternItem is a combination of data storage and some simple operators for a
 /// pattern. There is one patternItem per open pattern.
-class Pattern : public QListWidgetItem
+class Pattern
 {
 public:
     enum Roles {
@@ -24,7 +24,7 @@ public:
     /// @param frameCount Length of the pattern, in frames
     Pattern(QSize size, int frameCount, QListWidget* parent = 0);
 
-    QVariant data(int role) const;
+//    QVariant data(int role) const;
 
     /// Set the pattern image directly without resizing or setting an undo state. This
     /// is used by the undocommand and should probably be refactored.
@@ -117,5 +117,6 @@ private:
 
     void pushUndoState();
 };
+
 
 #endif // PATTERNITEM_H

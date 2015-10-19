@@ -6,7 +6,6 @@
 #include <QPainter>
 
 Pattern::Pattern(QSize patternSize, int frameCount, QListWidget* parent) :
-    QListWidgetItem(parent, QListWidgetItem::UserType + 1),
     frames(patternSize, parent),
     modified(false)
 {
@@ -123,13 +122,13 @@ bool Pattern::replace(const QFileInfo &newFileInfo)
 }
 
 
-QVariant Pattern::data(int role) const {
-    switch(role) {
-        case PreviewImage: return frames.data(frames.index(0),PatternFrameModel::FrameData);
-    };
+//QVariant Pattern::data(int role) const {
+//    switch(role) {
+//        case PreviewImage: return frames.data(frames.index(0),PatternFrameModel::FrameData);
+//    };
 
-    return QListWidgetItem::data(role);
-}
+//    return QListWidgetItem::data(role);
+//}
 
 void Pattern::resize(QSize newSize, bool scale) {
     frames.resize(newSize, scale);

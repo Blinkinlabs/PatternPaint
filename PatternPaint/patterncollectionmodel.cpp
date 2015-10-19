@@ -1,4 +1,12 @@
 #include "patterncollectionmodel.h"
+#include <QDebug>
+
+PatternCollectionModel::PatternCollectionModel(QObject *parent) :
+    QAbstractListModel(parent)
+{
+
+}
+
 
 int PatternCollectionModel::rowCount(const QModelIndex &) const
 {
@@ -13,8 +21,12 @@ QVariant PatternCollectionModel::data(const QModelIndex &index, int role) const
     if (index.row() >= patterns.count() || index.row() < 0)
         return QVariant();
 
-    if (role == PreviewImage || role == Qt::EditRole)
-        return patterns.at(index.row()).getFrame(0);
+    if (role == PreviewImage)
+        return patterns.at(index.row())->getFrame(0);
+
+    else if (role == PatternPointer)
+        return qVariantFromValue((void *) patterns.at(index.row()));
+
     else
         return QVariant();
 }
@@ -40,9 +52,8 @@ bool PatternCollectionModel::setData(const QModelIndex &index,
 
 //    pushUndoState();
 
-    if(role == Qt::EditRole || role == PreviewImage) {
-        static_cast<Pattern>(value);
-        patterns.replace(index.row(), value.value<Pattern>());
+    if(role == PatternPointer) {
+        patterns.replace(index.row(), (Pattern *) value.value<void *>());
         QVector<int> roles;
         roles.push_back(role);
         emit dataChanged(index, index, roles);
@@ -57,9 +68,10 @@ bool PatternCollectionModel::insertRows(int position, int rows, const QModelInde
     beginInsertRows(QModelIndex(), position, position+rows-1);
 
     for (int row = 0; row < rows; ++row) {
-        // TODO: Add the size to PatternFrame model, so we don't have to make fake values here.
-        Pattern newPattern(QSize(1,1),1);
-        patterns.insert(position, newPattern);
+        // TODO: Add the size to PatternCollectionModel model, so we don't have to make fake values here.
+        patterns.insert(position, new Pattern(QSize(1,1),1));
+
+        // TODO: connect DataChanged() here so we can redraw ourselves?
     }
 
     endInsertRows();

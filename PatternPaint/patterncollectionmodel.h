@@ -5,6 +5,7 @@
 
 #include <QAbstractListModel>
 #include <QObject>
+#include <QUndoGroup>
 
 class PatternCollectionModel : public QAbstractListModel
 {
@@ -12,12 +13,10 @@ class PatternCollectionModel : public QAbstractListModel
 public:
     enum Roles {
         PreviewImage = Qt::UserRole,
+        PatternPointer,
     };
 
-    PatternCollectionModel(QObject *parent = 0) :
-        QAbstractListModel(parent) {}
-
-    PatternCollectionModel(QSize size, QObject *parent = 0);
+    PatternCollectionModel(QObject *parent = 0);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;
@@ -33,7 +32,7 @@ public:
     bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex());
 
 private:
-    QList<Pattern> patterns;
+    QList<Pattern *> patterns;
 };
 
 #endif // PATTERNCOLLECTIONMODEL_H
