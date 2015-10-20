@@ -13,11 +13,13 @@ PatternCollection::~PatternCollection()
 
 void PatternCollection::addPattern(Pattern* newPattern)
 {
-    patterns.insertRow(count());
-    patterns.setData(patterns.index(count()-1),
+    int index = count();
+    patterns.insertRow(index);
+    patterns.setData(patterns.index(index),
                      qVariantFromValue((void *) newPattern),
                      PatternCollectionModel::PatternPointer);
 }
+
 
 void PatternCollection::removePattern(int index)
 {

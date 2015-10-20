@@ -34,16 +34,16 @@ UndoCommand::UndoCommand(PatternFrameModel *item,
                          QUndoCommand *parent) :
     QUndoCommand(parent),
     previousFrames(frames),
-    pattern(item),
-    previousSize(size)
+    previousSize(size),
+    patternFrameModel(item)
 {
     firstRun = true;
 }
 
 void UndoCommand::undo() {
-    currentFrames = pattern->getFrames();
-    currentSize = pattern->getSize();
-    pattern->applyUndoState(previousFrames, previousSize);
+    currentFrames = patternFrameModel->getFrames();
+    currentSize = patternFrameModel->data(patternFrameModel->index(0),PatternFrameModel::FrameSize).toSize();
+    patternFrameModel->applyUndoState(previousFrames, previousSize);
 }
 
 void UndoCommand::redo() {
@@ -53,5 +53,5 @@ void UndoCommand::redo() {
         return;
     }
 
-    pattern->applyUndoState(currentFrames, currentSize);
+    patternFrameModel->applyUndoState(currentFrames, currentSize);
 }

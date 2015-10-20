@@ -33,6 +33,11 @@ public:
 
 private:
     QList<Pattern *> patterns;
+    void disconnectPattern(Pattern *pattern);
+    void connectPattern(Pattern *pattern);
+
+private slots:
+    void on_patternDataChanged(QModelIndex begin, QModelIndex end, QVector<int> roles);
 };
 
 #endif // PATTERNCOLLECTIONMODEL_H

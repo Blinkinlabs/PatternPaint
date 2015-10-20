@@ -36,21 +36,23 @@ bool Pattern::load(const QFileInfo &newFileInfo)
         return false;
     }
 
-    // TODO: Warn if the source image wasn't of the expected aperture?
-    sourceImage = sourceImage.scaledToHeight(frames.getSize().height());
-    int newFrameCount = sourceImage.width()/frames.getSize().width();
+    QSize frameSize = frames.data(frames.index(0),PatternFrameModel::FrameSize).toSize();
 
-    frames.removeRows(0,frames.getFrameCount());
+    // TODO: Warn if the source image wasn't of the expected aperture?
+    sourceImage = sourceImage.scaledToHeight(frameSize.height());
+    int newFrameCount = sourceImage.width()/frameSize.width();
+
+    frames.removeRows(0,frames.rowCount());
     frames.insertRows(0,newFrameCount);
 
     QPainter painter;
     for(int i = 0; i < newFrameCount; i++) {
-        QImage newFrameData(frames.getSize(), QImage::Format_ARGB32_Premultiplied);
+        QImage newFrameData(frameSize, QImage::Format_ARGB32_Premultiplied);
         painter.begin(&newFrameData);
         painter.drawImage(QPoint(0,0), sourceImage,
-                          QRect(frames.getSize().width()*i, 0, frames.getSize().width(),frames.getSize().height()));
+                          QRect(frameSize.width()*i, 0, frameSize.width(),frameSize.height()));
         painter.end();
-        frames.setData(frames.index(i,0),newFrameData,PatternFrameModel::FrameData);
+        frames.setData(frames.index(i),newFrameData,PatternFrameModel::FrameData);
     }
 
     // If successful, record the filename and clear the undo stack.
@@ -63,15 +65,17 @@ bool Pattern::load(const QFileInfo &newFileInfo)
 bool Pattern::saveAs(const QFileInfo &newFileInfo) {
     // Attempt to save to this location
 
+    QSize frameSize = frames.data(frames.index(0),PatternFrameModel::FrameSize).toSize();
+
     // Create a big image consisting of all the frames side-by-side
-    QImage output(frames.getSize().width()*getFrameCount(), frames.getSize().height(),
+    QImage output(frameSize.width()*getFrameCount(), frameSize.height(),
                   QImage::Format_ARGB32_Premultiplied);
 
     // And copy the frames into it
     QPainter painter;
     painter.begin(&output);
     for(int i = 0; i < getFrameCount(); i++) {
-        painter.drawImage(QPoint(frames.getSize().width()*i, 0),
+        painter.drawImage(QPoint(frameSize.width()*i, 0),
                           getFrame(i));
     }
     painter.end();
@@ -80,10 +84,6 @@ bool Pattern::saveAs(const QFileInfo &newFileInfo) {
         return false;
     }
 
-    // If successful, update the filename
-    if(fileInfo != newFileInfo && !notifier.isNull()) {
-        notifier->signalNameUpdated();
-    }
     fileInfo = newFileInfo;
 
 //    setModified(false);
@@ -122,21 +122,13 @@ bool Pattern::replace(const QFileInfo &newFileInfo)
 }
 
 
-//QVariant Pattern::data(int role) const {
-//    switch(role) {
-//        case PreviewImage: return frames.data(frames.index(0),PatternFrameModel::FrameData);
-//    };
-
-//    return QListWidgetItem::data(role);
-//}
-
 void Pattern::resize(QSize newSize, bool scale) {
-    frames.resize(newSize, scale);
+    frames.setData(frames.index(0),newSize, PatternFrameModel::FrameSize);
 }
 
-void Pattern::applyInstrument(int index, const QImage &update)
+void Pattern::replaceFrame(int index, const QImage &update)
 {
-    frames.setData(frames.index(index),QVariant(update));
+    frames.setData(frames.index(index),QVariant(update), PatternFrameModel::FrameData);
 }
 
 void Pattern::setModified(bool newModified)  {
@@ -147,16 +139,6 @@ void Pattern::setModified(bool newModified)  {
     }
 
     modified = newModified;
-
-    if(!notifier.isNull()) {
-        if(modifiedChanged) {
-            notifier->signalModifiedChange();
-        }
-    }
-}
-
-void Pattern::setNotifier(QPointer<PatternUpdateNotifier> newNotifier) {
-    notifier = newNotifier;
 }
 
 const QImage Pattern::getFrame(int index) const {

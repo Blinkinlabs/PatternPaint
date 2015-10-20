@@ -6,7 +6,6 @@
 #include <QListWidget>
 #include <QPointer>
 #include <QUndoGroup>
-#include "patternupdatenotifier.h"
 #include "pattern.h"
 
 class PatternCollectionListView : public QListView

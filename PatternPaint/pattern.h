@@ -5,26 +5,16 @@
 #include <QListWidgetItem>
 #include <QUndoStack>
 #include <QPointer>
-#include "patternupdatenotifier.h"
 #include "patternframemodel.h"
 
-/// patternItem is a combination of data storage and some simple operators for a
-/// pattern. There is one patternItem per open pattern.
+/// Representation of a pattern based on a frame model.
 class Pattern
 {
 public:
-    enum Roles {
-        PreviewImage = Qt::UserRole + 1,
-        Modified,
-        PatternSize
-    };
-
     /// Constructor for an empty pattern item
     /// @param size Size of the display, in pixels
     /// @param frameCount Length of the pattern, in frames
     Pattern(QSize size, int frameCount, QListWidget* parent = 0);
-
-//    QVariant data(int role) const;
 
     /// Set the pattern image directly without resizing or setting an undo state. This
     /// is used by the undocommand and should probably be refactored.
@@ -34,10 +24,6 @@ public:
     /// Get a pointer to the undo stack. This is used to wire the undo stack
     /// into the main window gui.
     QUndoStack *getUndoStack();
-
-//    /// Get a reference to the current image
-//    /// @return Pattern image data
-//    const QImage& getImage() const { return image; }
 
     /// Check if the animation has a valid filename
     /// @return true if the animation filename has been set
@@ -86,7 +72,7 @@ public:
     void addFrame(int newFrame);
 
     /// Apply changes to the pattern
-    void applyInstrument(int index, const QImage& update);
+    void replaceFrame(int index, const QImage& update);
 
     /// Test if the pattern has unsaved changes
     /// @return true if the pattern has unsaved changes
@@ -97,11 +83,7 @@ public:
     /// @param newModified New modified state.
     void setModified(bool newModified);
 
-    /// Register a callback function to be notified when
-    /// this data has changed
-    void setNotifier(QPointer<PatternUpdateNotifier> newNotifier);
-
-    /// TODO: Delete me
+    /// Get the underlying data model (for connection to a view)
     PatternFrameModel* getFrameModel() {return &frames;}
 
 private:
@@ -109,13 +91,7 @@ private:
 
     PatternFrameModel frames;   ///< New storage container for the images
 
-    QImage frameData;           // TODO: This is to avoid sending a temporary reference from getFrame, refactor?
-
-    QPointer<PatternUpdateNotifier> notifier; ///< Callback to notify that the data has been updated.
-
     bool modified;              ///< True if the image has been modified since last save
-
-    void pushUndoState();
 };
 
 

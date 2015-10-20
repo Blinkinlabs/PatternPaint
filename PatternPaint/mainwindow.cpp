@@ -192,11 +192,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(patternCollectionListView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
             this, SLOT(on_patternSelected(const QModelIndex &, const QModelIndex &)));
 
-//    connect(timeline->model(), SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &, const QVector<int> &)),
-//            this, SLOT(handleUpdatedData(const QModelIndex &, const QModelIndex &, const QVector<int> &)));
-
     timeline->setItemDelegate(new PatternFrameDelegate(this));
-
 
     // Create a pattern.
     on_actionNew_triggered();
@@ -578,7 +574,7 @@ void MainWindow::on_actionFlip_Horizontal_triggered()
 
     QImage frame = patternCollection.getPattern(getCurrentPatternIndex())->getFrame(getCurrentFrameIndex());
     frame = frame.mirrored(true, false);
-    patternCollection.getPattern(getCurrentPatternIndex())->applyInstrument(getCurrentFrameIndex(),frame);
+    patternCollection.getPattern(getCurrentPatternIndex())->replaceFrame(getCurrentFrameIndex(),frame);
 }
 
 void MainWindow::on_actionFlip_Vertical_triggered()
@@ -589,7 +585,7 @@ void MainWindow::on_actionFlip_Vertical_triggered()
 
     QImage frame = patternCollection.getPattern(getCurrentPatternIndex())->getFrame(getCurrentFrameIndex());
     frame = frame.mirrored(false, true);
-    patternCollection.getPattern(getCurrentPatternIndex())->applyInstrument(getCurrentFrameIndex(),frame);
+    patternCollection.getPattern(getCurrentPatternIndex())->replaceFrame(getCurrentFrameIndex(),frame);
 }
 
 void MainWindow::on_actionClear_Pattern_triggered()
@@ -600,7 +596,7 @@ void MainWindow::on_actionClear_Pattern_triggered()
 
     QImage frame = patternCollection.getPattern(getCurrentPatternIndex())->getFrame(getCurrentFrameIndex());
     frame.fill(COLOR_CANVAS_DEFAULT);
-    patternCollection.getPattern(getCurrentPatternIndex())->applyInstrument(getCurrentFrameIndex(),frame);
+    patternCollection.getPattern(getCurrentPatternIndex())->replaceFrame(getCurrentFrameIndex(),frame);
 }
 
 void MainWindow::showError(QString errorMessage) {
@@ -1101,10 +1097,6 @@ void MainWindow::on_patternDataUpdated()
     patternEditor->setFrameData(getCurrentFrameIndex(),
                                 patternCollection.getPattern(getCurrentPatternIndex())->getFrame(getCurrentFrameIndex()));
 
-    // Redraw the data-dependent views
-    patternCollectionListView->update();
-//    patternCollectionListView->doItemsLayout();
-
     // Update the LED output
     updateBlinky();
 }
@@ -1129,7 +1121,7 @@ void MainWindow::on_frameDataUpdated(int index, QImage update)
         return;
     }
 
-    patternCollection.getPattern(getCurrentPatternIndex())->applyInstrument(index, update);
+    patternCollection.getPattern(getCurrentPatternIndex())->replaceFrame(index, update);
 }
 
 

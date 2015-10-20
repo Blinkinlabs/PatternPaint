@@ -145,7 +145,6 @@ private:
     QProgressDialog progressDialog;
 
     PatternCollection patternCollection;
-    PatternUpdateNotifier patternUpdateNotifier;
 
     QSpinBox pSpeed;
     QLineEdit pFrame;

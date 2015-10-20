@@ -59,7 +59,7 @@ private:
     QSize previousSize;
     QSize currentSize;
 
-    PatternFrameModel* pattern;
+    PatternFrameModel* patternFrameModel;
     bool firstRun;
 };
 

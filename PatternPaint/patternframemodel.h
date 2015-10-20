@@ -12,6 +12,7 @@ class PatternFrameModel : public QAbstractListModel
 public:
     enum Roles {
         FrameData = Qt::UserRole,
+        FrameSize,
     };
 
     PatternFrameModel(QSize size, QObject *parent = 0);
@@ -34,23 +35,15 @@ public:
     QUndoStack* getUndoStack() {return &undoStack;}
     void applyUndoState(QList<QImage> &newFrames, QSize newSize);
 
-    /// Get the size of the pattern frame
-    const QSize getSize() const {return size;}
-
-    /// Change the pattern frame size
-    void resize(QSize newSize, bool scale);
-
+    // TODO: Delete me!
     QList<QImage> getFrames() const {return frames;}
-    int getFrameCount() const {return frames.size();}
 
 private:
     QList<QImage> frames;
     QUndoStack  undoStack;      ///< Undo stack for this pattern
     QSize size;                 ///< Resolution of this pattern, in pixels
-    void pushUndoState();
-    bool pushUndo;
 
-    void setPushUndo(bool enable) {pushUndo = enable;}
+    void pushUndoState();
 };
 
 #endif // PATTERNFRAMEMODEL_H

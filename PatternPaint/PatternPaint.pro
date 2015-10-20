@@ -59,7 +59,6 @@ SOURCES += main.cpp\
     letterboxscrollarea.cpp \
     undocommand.cpp \
     colorchooser.cpp \
-    patternupdatenotifier.cpp \
     patternframemodel.cpp \
     patternframedelegate.cpp \
     patternoutput.cpp \
@@ -79,7 +78,6 @@ HEADERS  += mainwindow.h \
     letterboxscrollarea.h \
     undocommand.h \
     colorchooser.h \
-    patternupdatenotifier.h \
     patternframemodel.h \
     patternframedelegate.h \
     patternoutput.h \
