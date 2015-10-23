@@ -74,7 +74,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QSplitter" name="splitter">
+     <widget class="QSplitter" name="patternsplitter">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>

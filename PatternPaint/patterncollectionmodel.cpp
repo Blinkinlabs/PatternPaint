@@ -82,7 +82,7 @@ bool PatternCollectionModel::setData(const QModelIndex &index,
         connectPattern(patterns.at(index.row()));
 
         QVector<int> roles;
-        roles.push_back(role);
+        roles.append(role);
         emit dataChanged(index, index, roles);
         return true;
     }

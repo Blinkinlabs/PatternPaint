@@ -39,8 +39,8 @@ void PatternFrameModel::pushUndoState()
         modified = true;
 
         QVector<int> roles;
-        roles.push_back(Modified);
-        emit dataChanged(this->index(0), this->index(rowCount()), roles);
+        roles.append(Modified);
+        emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
     }
 }
 
@@ -53,10 +53,10 @@ void PatternFrameModel::applyUndoState(QList<QImage> &newFrames, QSize newSize)
     modified = true;
 
     QVector<int> roles;
-    roles.push_back(FrameSize);
-    roles.push_back(FrameData);
-    roles.push_back(Modified);
-    emit dataChanged(this->index(0), this->index(rowCount()), roles);
+    roles.append(FrameSize);
+    roles.append(FrameData);
+    roles.append(Modified);
+    emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
 }
 
 QVariant PatternFrameModel::data(const QModelIndex &index, int role) const
@@ -90,7 +90,7 @@ bool PatternFrameModel::setData(const QModelIndex &index,
         //TODO: enforce size scaling here?
         frames.replace(index.row(), value.value<QImage>());
         QVector<int> roles;
-        roles.push_back(FrameData);
+        roles.append(FrameData);
         emit dataChanged(index, index, roles);
         return true;
     }
@@ -115,25 +115,27 @@ bool PatternFrameModel::setData(const QModelIndex &index,
         }
 
         QVector<int> roles;
-        roles.push_back(FrameSize);
-        roles.push_back(FrameData);
+        roles.append(FrameSize);
+        roles.append(FrameData);
 
-        emit dataChanged(this->index(0), this->index(rowCount()), roles);
+        emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
         return true;
     }
     else if(role == FileName) {
         fileInfo = value.toString();
 
         QVector<int> roles;
-        roles.push_back(FileName);
-        emit dataChanged(this->index(0), this->index(rowCount()), roles);
+        roles.append(FileName);
+        emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
+        return true;
     }
     else if(role == Modified) {
         modified = value.toBool();
 
         QVector<int> roles;
-        roles.push_back(Modified);
-        emit dataChanged(this->index(0), this->index(rowCount()), roles);
+        roles.append(Modified);
+        emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
+        return true;
     }
 
     return false;
@@ -154,8 +156,8 @@ bool PatternFrameModel::insertRows(int position, int rows, const QModelIndex &)
 
     // TODO: what does 'data changed' mean in these circumstances?
     QVector<int> roles;
-    roles.push_back(FrameData);
-    emit dataChanged(this->index(0), this->index(rowCount()), roles);
+    roles.append(FrameData);
+    emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
     return true;
 }
 
@@ -172,7 +174,7 @@ bool PatternFrameModel::removeRows(int position, int rows, const QModelIndex &)
 
     // TODO: what does 'data changed' mean in these circumstances?
     QVector<int> roles;
-    roles.push_back(FrameData);
-    emit dataChanged(this->index(0), this->index(rowCount()), roles);
+    roles.append(FrameData);
+    emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
     return true;
 }

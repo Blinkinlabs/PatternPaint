@@ -1048,6 +1048,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
     on_patternNameUpdated();
     on_patternModifiedChanged();
     on_patternSizeUpdated();
+    on_patternDataUpdated();
 
     // TODO: we're going to have to unload our references, but for now skip that.
     if(!current.isValid()) {
@@ -1067,8 +1068,6 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
             this, SLOT(on_timelineSelectedChanged(const QModelIndex &, const QModelIndex &)));
     connect(timeline->model(), SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &, const QVector<int> &)),
             this, SLOT(on_timelineDataChanged(const QModelIndex &, const QModelIndex &, const QVector<int> &)));
-
-    on_patternDataUpdated();
 }
 
 
@@ -1098,13 +1097,13 @@ void MainWindow::on_timelineDataChanged(const QModelIndex &topLeft, const QModel
 void MainWindow::on_patternDataUpdated()
 {
     if(!patternCollection.hasPattern()) {
+        patternEditor->setFrameData(0,QImage());
         return;
     }
 
     patternEditor->setFrameData(getCurrentFrameIndex(),
                                 patternCollection.getPattern(getCurrentPatternIndex())->getFrame(getCurrentFrameIndex()));
 
-    // Update the LED output
     updateBlinky();
 }
 
@@ -1119,7 +1118,8 @@ void MainWindow::on_patternSizeUpdated()
                                 patternCollection.getPattern(getCurrentPatternIndex())->getFrame(getCurrentFrameIndex()));
 
     // And kick the scroll area so that it will size itself
-    scrollArea->resize(scrollArea->width()+1, scrollArea->height());
+    //scrollArea->resize(scrollArea->width()+1, scrollArea->height());
+    //this->patternsplitter->refresh();
 }
 
 void MainWindow::on_frameDataEdited(int index, QImage update)

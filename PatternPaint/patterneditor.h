@@ -30,7 +30,7 @@ public:
     void applyInstrument(QImage& update);
 
     /// Re-size the display grid and selector based on new widget geometery
-    void resizeEvent(QResizeEvent * event);
+    void resizeEvent(QResizeEvent * resizeEvent);
 
     // Pass messages to the selected instrument
     void mousePressEvent(QMouseEvent * event);

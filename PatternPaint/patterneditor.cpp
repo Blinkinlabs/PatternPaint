@@ -77,9 +77,11 @@ const QImage &PatternEditor::getPatternAsImage() const {
     return frameData;
 }
 
-void PatternEditor::resizeEvent(QResizeEvent * )
+void PatternEditor::resizeEvent(QResizeEvent * resizeEvent)
 {
     updateGridSize();
+
+    QWidget::resizeEvent(resizeEvent);
 }
 
 void PatternEditor::updateGridSize() {
@@ -221,6 +223,7 @@ void PatternEditor::setFrameData(int index, const QImage data)
 
     if(updateSize) {
         updateGridSize();
+//        resizeEvent(new QResizeEvent(QSize(),QSize()));
     }
 
     // and force a screen update
