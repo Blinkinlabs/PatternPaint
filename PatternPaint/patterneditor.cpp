@@ -295,5 +295,5 @@ void PatternEditor::applyInstrument(QImage& update)
     painter.drawImage(0,0,update);
     painter.end();
 
-    emit(frameDataUpdated(frameIndex, frameData));
+    emit(dataEdited(frameIndex, frameData));
 }

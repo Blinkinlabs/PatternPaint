@@ -34,7 +34,7 @@ public slots:
     void on_patternDataUpdated();
     void on_patternSizeUpdated();
 
-    void on_frameDataUpdated(int index, QImage update);
+    void on_frameDataEdited(int index, QImage update);
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -121,11 +121,11 @@ private slots:
 
     void on_ExampleSelected(QAction*);
 
-    void on_patternSelected(const QModelIndex &current, const QModelIndex &);
+    void on_patternCollectionCurrentChanged(const QModelIndex &current, const QModelIndex &);
 
-    void on_patternFrameSelected(const QModelIndex &current, const QModelIndex &);
+    void on_timelineSelectedChanged(const QModelIndex &current, const QModelIndex &);
 
-    void handleUpdatedData(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &);
+    void on_timelineDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
 
 signals:
 

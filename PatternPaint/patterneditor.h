@@ -68,9 +68,9 @@ private:
 
     /// True if the editor has an image to edit
     bool hasImage();
-signals:
 
-    void frameDataUpdated(int index, const QImage data);
+signals:
+    void dataEdited(int index, const QImage data);
 
 public slots:
     void setToolColor(QColor color);

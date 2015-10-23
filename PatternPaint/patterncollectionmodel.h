@@ -37,7 +37,7 @@ private:
     void connectPattern(Pattern *pattern);
 
 private slots:
-    void on_patternDataChanged(QModelIndex begin, QModelIndex end, QVector<int> roles);
+    void on_patternDataChanged(QModelIndex begin, QModelIndex, QVector<int>);
 };
 
 #endif // PATTERNCOLLECTIONMODEL_H

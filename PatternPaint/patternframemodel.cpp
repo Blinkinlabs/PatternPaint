@@ -55,11 +55,12 @@ QVariant PatternFrameModel::data(const QModelIndex &index, int role) const
 
     if (index.row() >= frames.count() || index.row() < 0)
         return QVariant();
-
-    if (role == FrameData || Qt::EditRole)
+    if (role == FrameData || role == Qt::EditRole)
         return frames.at(index.row());
-    else if(role == FrameSize)
+    else if (role == FrameSize)
         return size;
+    else if (role == FileName)
+        return fileInfo;
     else
         return QVariant();
 }
@@ -72,7 +73,7 @@ bool PatternFrameModel::setData(const QModelIndex &index,
 
     pushUndoState();
 
-    if(role == FrameData || Qt::EditRole) {
+    if(role == FrameData || role == Qt::EditRole) {
         //TODO: enforce size scaling here?
         frames.replace(index.row(), value.value<QImage>());
         QVector<int> roles;
@@ -81,7 +82,6 @@ bool PatternFrameModel::setData(const QModelIndex &index,
         return true;
     }
     else if(role == FrameSize) {
-        qDebug() << "here";
         for(int row = 0; row < rowCount(); row++) {
             QImage newImage;
             bool scale = true;      // Enforce scaling...
@@ -107,6 +107,13 @@ bool PatternFrameModel::setData(const QModelIndex &index,
 
         emit dataChanged(this->index(0), this->index(rowCount()), roles);
         return true;
+    }
+    else if(role == FileName) {
+        fileInfo = value.toString();
+
+        QVector<int> roles;
+        roles.push_back(FileName);
+        emit dataChanged(this->index(0), this->index(rowCount()), roles);
     }
 
     return false;

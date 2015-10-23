@@ -7,6 +7,7 @@
 #include <QPointer>
 #include "patternframemodel.h"
 
+
 /// Representation of a pattern based on a frame model.
 class Pattern
 {
@@ -27,7 +28,7 @@ public:
 
     /// Check if the animation has a valid filename
     /// @return true if the animation filename has been set
-    bool hasValidFilename() const { return fileInfo.baseName() != "";}
+    bool hasValidFilename() const;
 
     /// Get the pattern filename, or a default if one is not set
     /// @return Pattern name
@@ -35,7 +36,7 @@ public:
 
     /// Initialize the pattern from an image file
     /// @param newFileInfo URL of file to load
-    bool load(const QFileInfo& newFileInfo);
+    bool load(const QString &newFileName);
 
     /// Save the pattern
     /// Note: The file must already have a filename, otherwise use saveAs
@@ -43,12 +44,12 @@ public:
 
     /// Save the pattern to a new file
     /// newFileInfo URL of the new file to save to.
-    bool saveAs(const QFileInfo& newFileInfo);
+    bool saveAs(const QString newFileName);
 
     /// Replace the current image with one from a new file, but don't
     /// change the filename (for drag&drop operations)
     /// @param newFileInfo URL of file to load
-    bool replace(const QFileInfo& newFileInfo);
+    bool replace(const QString newFileInfo);
 
     /// Resize the image
     /// @param newSize New size of the pattern, in pixels
@@ -87,8 +88,6 @@ public:
     PatternFrameModel* getFrameModel() {return &frames;}
 
 private:
-    QFileInfo fileInfo;         ///< Image filename
-
     PatternFrameModel frames;   ///< New storage container for the images
 
     bool modified;              ///< True if the image has been modified since last save

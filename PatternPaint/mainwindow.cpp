@@ -151,8 +151,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(penSizeSpin, SIGNAL(valueChanged(int)),
             patternEditor, SLOT(setToolSize(int)));
 
-    connect(patternEditor, SIGNAL(frameDataUpdated(int, const QImage)),
-            this, SLOT(on_frameDataUpdated(int, const QImage)));
+    connect(patternEditor, SIGNAL(dataEdited(int, const QImage)),
+            this, SLOT(on_frameDataEdited(int, const QImage)));
 
     patternEditor->setToolSize(DRAWING_SIZE_MINIMUM_VALUE);
 
@@ -190,7 +190,7 @@ MainWindow::MainWindow(QWidget *parent) :
     patternCollectionListView->setModel(patternCollection.getModel());
 
     connect(patternCollectionListView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
-            this, SLOT(on_patternSelected(const QModelIndex &, const QModelIndex &)));
+            this, SLOT(on_patternCollectionCurrentChanged(const QModelIndex &, const QModelIndex &)));
 
     timeline->setItemDelegate(new PatternFrameDelegate(this));
 
@@ -349,7 +349,7 @@ void MainWindow::on_actionLoad_File_triggered()
     // TODO: Can't there be a constructor that accepts a file directly? This seems odd
     Pattern * pattern = new Pattern(displaySize,1);
 
-    if(!pattern->load(fileInfo)) {
+    if(!pattern->load(fileInfo.absoluteFilePath())) {
         showError("Could not open file "
                    + fileName
                    + ". Perhaps it has a formatting problem?");
@@ -379,7 +379,7 @@ bool MainWindow::savePatternAs(Pattern *item) {
     QFileInfo fileInfo(fileName);
     settings.setValue("File/SaveDirectory", fileInfo.absolutePath());
 
-    if (!item->saveAs(fileInfo)) {
+    if (!item->saveAs(fileInfo.absoluteFilePath())) {
         QMessageBox::warning(this, tr("Error"), tr("Error saving pattern %1. Try saving it somewhere else?")
                        .arg(fileInfo.absolutePath()));
     }
@@ -927,6 +927,9 @@ void MainWindow::setNewFrame(int newFrame)
         return;
     }
 
+
+    qDebug() << "Here" << newFrame;
+
     // TODO: Detect if we changed frames and only continue if it's a new frame...
 
     if(newFrame > getFrameCount()) {
@@ -941,7 +944,7 @@ void MainWindow::setNewFrame(int newFrame)
     patternEditor->setFrameData(getCurrentFrameIndex(),
                                 patternCollection.getPattern(getCurrentPatternIndex())->getFrame(newFrame));
 
-    pFrame.setText(QString::number(newFrame+1));
+    pFrame.setText(QString::number(getCurrentFrameIndex()+1));
 
     updateBlinky();
 }
@@ -1041,7 +1044,7 @@ void MainWindow::on_actionClose_triggered()
     patternCollection.removePattern(getCurrentPatternIndex());
 }
 
-void MainWindow::on_patternSelected(const QModelIndex &current, const QModelIndex &) {
+void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, const QModelIndex &) {
 
     emit(patternStatusChanged(current.isValid()));
 
@@ -1064,25 +1067,28 @@ void MainWindow::on_patternSelected(const QModelIndex &current, const QModelInde
 
     // TODO: Should we unregister these eventually?
     connect(timeline->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
-            this, SLOT(on_patternFrameSelected(const QModelIndex &, const QModelIndex &)));
+            this, SLOT(on_timelineSelectedChanged(const QModelIndex &, const QModelIndex &)));
     connect(timeline->model(), SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &, const QVector<int> &)),
-            this, SLOT(handleUpdatedData(const QModelIndex &, const QModelIndex &, const QVector<int> &)));
+            this, SLOT(on_timelineDataChanged(const QModelIndex &, const QModelIndex &, const QVector<int> &)));
 
     on_patternDataUpdated();
 }
 
 
-void MainWindow::on_patternFrameSelected(const QModelIndex &current, const QModelIndex &) {
+void MainWindow::on_timelineSelectedChanged(const QModelIndex &current, const QModelIndex &) {
     setNewFrame(current.row());
 }
 
-void MainWindow::handleUpdatedData(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &) {
+void MainWindow::on_timelineDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles) {
     int currentIndex = getCurrentFrameIndex();
 
-    // If the first index changed, refresh so that the patternCollection icon will be drawn correctly
+    if(roles[0] == PatternFrameModel::FileName) {
+        on_patternNameUpdated();
+        return;
+    }
+
     // If the current selection changed, refresh so that the patternEditor contents will be redrawn
-    if(topLeft.row() == 0
-       || (currentIndex >= topLeft.row() && currentIndex <= bottomRight.row())) {
+    if(currentIndex >= topLeft.row() && currentIndex <= bottomRight.row()) {
         on_patternDataUpdated();
     }
 }
@@ -1115,7 +1121,7 @@ void MainWindow::on_patternSizeUpdated()
     scrollArea->resize(scrollArea->width()+1, scrollArea->height());
 }
 
-void MainWindow::on_frameDataUpdated(int index, QImage update)
+void MainWindow::on_frameDataEdited(int index, QImage update)
 {
     if(!patternCollection.hasPattern()) {
         return;

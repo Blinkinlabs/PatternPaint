@@ -39,7 +39,7 @@ void PatternCollectionModel::disconnectPattern(Pattern *pattern)
 }
 
 
-void PatternCollectionModel::on_patternDataChanged(QModelIndex begin, QModelIndex end , QVector<int> roles)
+void PatternCollectionModel::on_patternDataChanged(QModelIndex begin, QModelIndex, QVector<int>)
 {
     // If the first row was modified, emit a data changed notification so the views will know to redraw.
     if(begin.row() == 0) {
@@ -61,7 +61,7 @@ QVariant PatternCollectionModel::data(const QModelIndex &index, int role) const
     if (role == PreviewImage)
         return patterns.at(index.row())->getFrame(0);
 
-    else if (role == PatternPointer || Qt::EditRole)
+    else if (role == PatternPointer || role == Qt::EditRole)
         return qVariantFromValue((void *) patterns.at(index.row()));
 
     else
@@ -76,7 +76,7 @@ bool PatternCollectionModel::setData(const QModelIndex &index,
 
 //    pushUndoState();
 
-    if(role == PatternPointer || Qt::EditRole) {
+    if(role == PatternPointer || role == Qt::EditRole) {
         disconnectPattern(patterns.at(index.row()));
         patterns.replace(index.row(), (Pattern *) value.value<void *>());
         connectPattern(patterns.at(index.row()));

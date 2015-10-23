@@ -19,20 +19,27 @@ QUndoStack *Pattern::getUndoStack()
     return frames.getUndoStack();
 }
 
+bool Pattern::hasValidFilename() const
+{
+    return !frames.data(frames.index(0),PatternFrameModel::FileName).toString().isEmpty();
+}
+
 QString Pattern::getPatternName() const
 {
+    QFileInfo fileInfo(frames.data(frames.index(0),PatternFrameModel::FileName).toString());
+
     if(fileInfo.baseName() == "") {
         return "Untitled";
     }
     return fileInfo.baseName();
 }
 
-bool Pattern::load(const QFileInfo &newFileInfo)
+bool Pattern::load(const QString &newFileName)
 {
     QImage sourceImage;
 
     // Attempt to load the iamge
-    if(!sourceImage.load(newFileInfo.absoluteFilePath())) {
+    if(!sourceImage.load(newFileName)) {
         return false;
     }
 
@@ -56,13 +63,13 @@ bool Pattern::load(const QFileInfo &newFileInfo)
     }
 
     // If successful, record the filename and clear the undo stack.
-    fileInfo = newFileInfo;
+    frames.setData(frames.index(0), newFileName, PatternFrameModel::FileName);
 
     setModified(false);
     return true;
 }
 
-bool Pattern::saveAs(const QFileInfo &newFileInfo) {
+bool Pattern::saveAs(const QString newFileName) {
     // Attempt to save to this location
 
     QSize frameSize = frames.data(frames.index(0),PatternFrameModel::FrameSize).toSize();
@@ -80,22 +87,22 @@ bool Pattern::saveAs(const QFileInfo &newFileInfo) {
     }
     painter.end();
 
-    if(!output.save(newFileInfo.absoluteFilePath())) {
+    if(!output.save(newFileName)) {
         return false;
     }
 
-    fileInfo = newFileInfo;
+    frames.setData(frames.index(0), newFileName, PatternFrameModel::FileName);
 
-//    setModified(false);
+    setModified(false);
     return true;
 }
 
 bool Pattern::save()
 {
-    return saveAs(fileInfo.absoluteFilePath());
+    return saveAs(frames.data(frames.index(0),PatternFrameModel::FileName).toString());
 }
 
-bool Pattern::replace(const QFileInfo &newFileInfo)
+bool Pattern::replace(const QString newFileName)
 {
 //    pushUndoState();
 

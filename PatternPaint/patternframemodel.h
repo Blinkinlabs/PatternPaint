@@ -2,6 +2,7 @@
 #define PATTERNFRAMEMODEL_H
 
 #include <QAbstractListModel>
+#include <QFileInfo>
 #include <QImage>
 #include <QUndoStack>
 
@@ -13,6 +14,7 @@ public:
     enum Roles {
         FrameData = Qt::UserRole,
         FrameSize,
+        FileName,
     };
 
     PatternFrameModel(QSize size, QObject *parent = 0);
@@ -42,6 +44,7 @@ private:
     QList<QImage> frames;
     QUndoStack  undoStack;      ///< Undo stack for this pattern
     QSize size;                 ///< Resolution of this pattern, in pixels
+    QString fileInfo;           ///< Filename for the pattern
 
     void pushUndoState();
 };
