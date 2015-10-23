@@ -56,6 +56,7 @@ bool Pattern::load(const QString &newFileName)
     for(int i = 0; i < newFrameCount; i++) {
         QImage newFrameData(frameSize, QImage::Format_ARGB32_Premultiplied);
         painter.begin(&newFrameData);
+        painter.fillRect(newFrameData.rect(),QColor(0,0,0));
         painter.drawImage(QPoint(0,0), sourceImage,
                           QRect(frameSize.width()*i, 0, frameSize.width(),frameSize.height()));
         painter.end();
@@ -84,6 +85,7 @@ bool Pattern::saveAs(const QString newFileName) {
     // And copy the frames into it
     QPainter painter;
     painter.begin(&output);
+    painter.fillRect(output.rect(),QColor(0,0,0));
     for(int i = 0; i < getFrameCount(); i++) {
         painter.drawImage(QPoint(frameSize.width()*i, 0),
                           getFrame(i));
