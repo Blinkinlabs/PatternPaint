@@ -6,12 +6,12 @@
 #include <QPainter>
 
 Pattern::Pattern(QSize patternSize, int frameCount, QListWidget* parent) :
-    frames(patternSize, parent),
-    modified(false)
+    frames(patternSize, parent)
 {
     frames.insertRows(0, frameCount);
-
-    setModified(true);
+    frames.setData(frames.index(0),false, PatternFrameModel::Modified);
+    // TODO: MVC way of handling this?
+    getUndoStack()->clear();
 }
 
 QUndoStack *Pattern::getUndoStack()
@@ -64,8 +64,11 @@ bool Pattern::load(const QString &newFileName)
 
     // If successful, record the filename and clear the undo stack.
     frames.setData(frames.index(0), newFileName, PatternFrameModel::FileName);
+    frames.setData(frames.index(0),false, PatternFrameModel::Modified);
 
-    setModified(false);
+    // TODO: MVC way of handling this?
+    getUndoStack()->clear();
+
     return true;
 }
 
@@ -92,8 +95,8 @@ bool Pattern::saveAs(const QString newFileName) {
     }
 
     frames.setData(frames.index(0), newFileName, PatternFrameModel::FileName);
+    frames.setData(frames.index(0), false, PatternFrameModel::Modified);
 
-    setModified(false);
     return true;
 }
 
@@ -128,6 +131,10 @@ bool Pattern::replace(const QString newFileName)
     return false;
 }
 
+bool Pattern::getModified() const
+{
+    return frames.data(frames.index(0),PatternFrameModel::Modified).toBool();
+}
 
 void Pattern::resize(QSize newSize, bool scale) {
     frames.setData(frames.index(0),newSize, PatternFrameModel::FrameSize);
@@ -136,16 +143,6 @@ void Pattern::resize(QSize newSize, bool scale) {
 void Pattern::replaceFrame(int index, const QImage &update)
 {
     frames.setData(frames.index(index),QVariant(update), PatternFrameModel::FrameData);
-}
-
-void Pattern::setModified(bool newModified)  {
-    bool modifiedChanged = false;
-
-    if(modified != newModified) {
-        modifiedChanged = true;
-    }
-
-    modified = newModified;
 }
 
 const QImage Pattern::getFrame(int index) const {

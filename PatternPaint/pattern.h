@@ -77,12 +77,7 @@ public:
 
     /// Test if the pattern has unsaved changes
     /// @return true if the pattern has unsaved changes
-    bool getModified() const { return modified; }
-
-    /// Set the unsaved pattern state
-    /// TODO: Delete me
-    /// @param newModified New modified state.
-    void setModified(bool newModified);
+    bool getModified() const;
 
     /// Get the underlying data model (for connection to a view)
     PatternFrameModel* getFrameModel() {return &frames;}

@@ -34,6 +34,14 @@ Qt::DropActions PatternFrameModel::supportedDropActions() const
 void PatternFrameModel::pushUndoState()
 {
     undoStack.push(new UndoCommand(this, frames, size));
+
+    if(modified != true) {
+        modified = true;
+
+        QVector<int> roles;
+        roles.push_back(Modified);
+        emit dataChanged(this->index(0), this->index(rowCount()), roles);
+    }
 }
 
 void PatternFrameModel::applyUndoState(QList<QImage> &newFrames, QSize newSize)
@@ -42,9 +50,12 @@ void PatternFrameModel::applyUndoState(QList<QImage> &newFrames, QSize newSize)
     frames = newFrames;
     size = newSize;
 
+    modified = true;
+
     QVector<int> roles;
     roles.push_back(FrameSize);
     roles.push_back(FrameData);
+    roles.push_back(Modified);
     emit dataChanged(this->index(0), this->index(rowCount()), roles);
 }
 
@@ -61,6 +72,8 @@ QVariant PatternFrameModel::data(const QModelIndex &index, int role) const
         return size;
     else if (role == FileName)
         return fileInfo;
+    else if (role == Modified)
+        return modified;
     else
         return QVariant();
 }
@@ -77,7 +90,7 @@ bool PatternFrameModel::setData(const QModelIndex &index,
         //TODO: enforce size scaling here?
         frames.replace(index.row(), value.value<QImage>());
         QVector<int> roles;
-        roles.push_back(role);
+        roles.push_back(FrameData);
         emit dataChanged(index, index, roles);
         return true;
     }
@@ -113,6 +126,13 @@ bool PatternFrameModel::setData(const QModelIndex &index,
 
         QVector<int> roles;
         roles.push_back(FileName);
+        emit dataChanged(this->index(0), this->index(rowCount()), roles);
+    }
+    else if(role == Modified) {
+        modified = value.toBool();
+
+        QVector<int> roles;
+        roles.push_back(Modified);
         emit dataChanged(this->index(0), this->index(rowCount()), roles);
     }
 

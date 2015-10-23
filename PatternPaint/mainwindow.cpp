@@ -927,9 +927,6 @@ void MainWindow::setNewFrame(int newFrame)
         return;
     }
 
-
-    qDebug() << "Here" << newFrame;
-
     // TODO: Detect if we changed frames and only continue if it's a new frame...
 
     if(newFrame > getFrameCount()) {
@@ -1082,17 +1079,21 @@ void MainWindow::on_timelineSelectedChanged(const QModelIndex &current, const QM
 void MainWindow::on_timelineDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles) {
     int currentIndex = getCurrentFrameIndex();
 
-    if(roles[0] == PatternFrameModel::FileName) {
-        on_patternNameUpdated();
-        return;
-    }
+    for(int i = 0; i < roles.count(); i++) {
+        if(roles[i] == PatternFrameModel::FileName)
+            on_patternNameUpdated();
 
-    // If the current selection changed, refresh so that the patternEditor contents will be redrawn
-    if(currentIndex >= topLeft.row() && currentIndex <= bottomRight.row()) {
-        on_patternDataUpdated();
+        else if(roles[i] == PatternFrameModel::Modified)
+            on_patternModifiedChanged();
+
+        else if(roles[i] == PatternFrameModel::FrameData) {
+            // If the current selection changed, refresh so that the patternEditor contents will be redrawn
+            if(currentIndex >= topLeft.row() && currentIndex <= bottomRight.row()) {
+                on_patternDataUpdated();
+            }
+        }
     }
 }
-
 
 void MainWindow::on_patternDataUpdated()
 {
@@ -1135,12 +1136,10 @@ void MainWindow::on_patternNameUpdated()
 {
     QString name;
 
-    if(!patternCollection.hasPattern()) {
+    if(!patternCollection.hasPattern())
         name = "()";
-    }
-    else {
+    else
         name = patternCollection.getPattern(getCurrentPatternIndex())->getPatternName();
-    }
 
     this->setWindowTitle(name + " - Pattern Paint");
 }

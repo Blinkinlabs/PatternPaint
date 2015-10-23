@@ -15,6 +15,7 @@ public:
         FrameData = Qt::UserRole,
         FrameSize,
         FileName,
+        Modified,
     };
 
     PatternFrameModel(QSize size, QObject *parent = 0);
@@ -45,6 +46,7 @@ private:
     QUndoStack  undoStack;      ///< Undo stack for this pattern
     QSize size;                 ///< Resolution of this pattern, in pixels
     QString fileInfo;           ///< Filename for the pattern
+    bool modified;              ///< True if the pattern has been changed since last save
 
     void pushUndoState();
 };
