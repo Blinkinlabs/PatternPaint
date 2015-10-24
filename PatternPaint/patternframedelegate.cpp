@@ -9,7 +9,9 @@
 #define COLOR_BACKGROUND_UNCHECKED    QColor(50,50,50,255)
 #define COLOR_BACKGROUND_CHECKED    QColor(0,0,255,255)
 
-PatternFrameDelegate::PatternFrameDelegate(QObject* parent) : QStyledItemDelegate(parent) {
+PatternFrameDelegate::PatternFrameDelegate(QObject* parent) :
+    QStyledItemDelegate(parent)
+{
 }
 
 QSize PatternFrameDelegate::getScaledImageSize(int height, QSize imageSize) const {

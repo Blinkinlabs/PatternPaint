@@ -32,9 +32,9 @@ public:
     bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex());
 
 private:
-    QList<Pattern *> patterns;
-    void disconnectPattern(Pattern *pattern);
-    void connectPattern(Pattern *pattern);
+    QList<QPointer<Pattern> > patterns;
+    void disconnectPattern(QPointer<Pattern> pattern);
+    void connectPattern(QPointer<Pattern> pattern);
 
 private slots:
     void on_patternDataChanged(QModelIndex begin, QModelIndex, QVector<int>);

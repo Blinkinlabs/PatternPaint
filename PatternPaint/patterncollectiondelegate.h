@@ -11,7 +11,9 @@ class PatternCollectionDelegate : public QStyledItemDelegate
     Q_OBJECT
 public:
     PatternCollectionDelegate(QObject* parent = 0);
-    virtual ~PatternCollectionDelegate();
+
+    QWidget * createEditor(QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const { return NULL; }
+
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex & index ) const;
     QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index ) const;
 };

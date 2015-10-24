@@ -11,11 +11,11 @@ public:
 
     PatternCollectionModel* getModel() {return &patterns;}
 
-    void addPattern(Pattern * newPattern);
+    void addPattern(QPointer<Pattern> newPattern);
 
     void removePattern(int index);
 
-    Pattern * getPattern(int index);
+    QPointer<Pattern> getPattern(int index);
 
     int count() const;
     bool hasPattern() const;

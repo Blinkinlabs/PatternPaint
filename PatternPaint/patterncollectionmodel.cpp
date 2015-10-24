@@ -23,16 +23,16 @@ Qt::ItemFlags PatternCollectionModel::flags(const QModelIndex &index) const
 
 Qt::DropActions PatternCollectionModel::supportedDropActions() const
 {
-    return Qt::CopyAction | Qt::MoveAction;
+    return Qt::MoveAction;
 }
 
-void PatternCollectionModel::connectPattern(Pattern *pattern)
+void PatternCollectionModel::connectPattern(QPointer<Pattern> pattern)
 {
     connect(pattern->getFrameModel(), SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
             this, SLOT(on_patternDataChanged(QModelIndex,QModelIndex,QVector<int>)));
 }
 
-void PatternCollectionModel::disconnectPattern(Pattern *pattern)
+void PatternCollectionModel::disconnectPattern(QPointer<Pattern> pattern)
 {
     disconnect(pattern->getFrameModel(), SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
                this, SLOT(on_patternDataChanged(QModelIndex,QModelIndex,QVector<int>)));
@@ -58,14 +58,22 @@ QVariant PatternCollectionModel::data(const QModelIndex &index, int role) const
     if (index.row() >= patterns.count() || index.row() < 0)
         return QVariant();
 
-    if (role == PreviewImage)
+    if (role == PatternPointer) {
+        return QVariant::fromValue(patterns.at(index.row()));
+    }
+
+    if (role == Qt::EditRole) {
+        qDebug() << index.internalId();
+        return patterns.at(index.row())->getUuid();
+    }
+
+//    else if (role == Qt::ToolTipRole)
+//        return patterns.at(index.row())->getPatternName();
+
+    else if (role == PreviewImage)
         return patterns.at(index.row())->getFrame(0);
 
-    else if (role == PatternPointer || role == Qt::EditRole)
-        return qVariantFromValue((void *) patterns.at(index.row()));
-
-    else
-        return QVariant();
+    return QVariant();
 }
 
 bool PatternCollectionModel::setData(const QModelIndex &index,
@@ -76,9 +84,9 @@ bool PatternCollectionModel::setData(const QModelIndex &index,
 
 //    pushUndoState();
 
-    if(role == PatternPointer || role == Qt::EditRole) {
-        disconnectPattern(patterns.at(index.row()));
-        patterns.replace(index.row(), (Pattern *) value.value<void *>());
+    if(role == PatternPointer) {
+        //disconnectPattern(patterns.at(index.row()));
+        patterns.replace(index.row(), qvariant_cast<QPointer<Pattern> >(value));
         connectPattern(patterns.at(index.row()));
 
         QVector<int> roles;
@@ -86,6 +94,30 @@ bool PatternCollectionModel::setData(const QModelIndex &index,
         emit dataChanged(index, index, roles);
         return true;
     }
+
+    else if(role == Qt::EditRole) {
+        // Find the UUID
+        QPointer<Pattern> source;
+        for(int i = 0; i < patterns.count(); i++) {
+            if(patterns.at(i)->getUuid() == value.toUuid()) {
+                source = patterns.at(i);
+                break;
+            }
+        }
+
+        if(source.isNull())
+            return false;
+
+        //disconnectPattern(patterns.at(index.row()));
+        patterns.replace(index.row(), source);
+        //connectPattern(patterns.at(index.row()));
+
+        QVector<int> roles;
+        roles.append(role);
+        emit dataChanged(index, index, roles);
+        return true;
+    }
+
     return false;
 }
 
@@ -110,7 +142,7 @@ bool PatternCollectionModel::removeRows(int position, int rows, const QModelInde
     beginRemoveRows(QModelIndex(), position, position+rows-1);
 
     for (int row = 0; row < rows; ++row) {
-        disconnectPattern(patterns.at(position));
+        //disconnectPattern(patterns.at(position));
         patterns.removeAt(position);
     }
 

@@ -8,6 +8,8 @@
 Pattern::Pattern(QSize patternSize, int frameCount, QListWidget* parent) :
     frames(patternSize, parent)
 {
+    uuid = QUuid::createUuid();
+
     frames.insertRows(0, frameCount);
     frames.setData(frames.index(0),false, PatternFrameModel::Modified);
     // TODO: MVC way of handling this?

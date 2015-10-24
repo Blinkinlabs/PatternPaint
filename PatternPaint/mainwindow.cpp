@@ -952,16 +952,6 @@ void MainWindow::updateBlinky()
         return;
     }
 
-    // Ignore the timeout if it came too quickly, so that we don't overload the blinky
-    static qint64 lastTime = 0;
-    qint64 newTime = QDateTime::currentMSecsSinceEpoch();
-    if (newTime - lastTime < MIN_TIMER_INTERVAL) {
-        qDebug() << "Skipping update due to rate limiting. Last update " << newTime - lastTime << "ms ago";
-        return;
-    }
-
-    lastTime = newTime;
-
     if(!patternCollection.hasPattern()) {
         return;
     }

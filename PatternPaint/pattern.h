@@ -5,12 +5,15 @@
 #include <QListWidgetItem>
 #include <QUndoStack>
 #include <QPointer>
+#include <QUuid>
 #include "patternframemodel.h"
 
 
 /// Representation of a pattern based on a frame model.
-class Pattern
+class Pattern : public QObject
 {
+Q_OBJECT
+
 public:
     /// Constructor for an empty pattern item
     /// @param size Size of the display, in pixels
@@ -82,10 +85,16 @@ public:
     /// Get the underlying data model (for connection to a view)
     PatternFrameModel* getFrameModel() {return &frames;}
 
+    /// Get the UUID for this pattern
+    const QUuid getUuid() const { return uuid; }
+
 private:
     PatternFrameModel frames;   ///< New storage container for the images
 
-    bool modified;              ///< True if the image has been modified since last save
+    // TODO: Figure out a better way to store/copy patterns?
+    // Difficult to do so now because they have to be tied into
+    // the undo and event notification stacks.
+    QUuid uuid;
 };
 
 

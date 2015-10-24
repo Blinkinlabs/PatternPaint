@@ -7,6 +7,7 @@
 #include <QUndoGroup>
 #include <QToolButton>
 #include <QSpinBox>
+#include <QLineEdit>
 
 #include "blinkycontroller.h"
 #include "patternuploader.h"

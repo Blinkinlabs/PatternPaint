@@ -66,16 +66,20 @@ QVariant PatternFrameModel::data(const QModelIndex &index, int role) const
 
     if (index.row() >= frames.count() || index.row() < 0)
         return QVariant();
+
     if (role == FrameData || role == Qt::EditRole)
         return frames.at(index.row());
+
     else if (role == FrameSize)
         return size;
+
     else if (role == FileName)
         return fileInfo;
+
     else if (role == Modified)
         return modified;
-    else
-        return QVariant();
+
+    return QVariant();
 }
 
 bool PatternFrameModel::setData(const QModelIndex &index,
@@ -96,14 +100,15 @@ bool PatternFrameModel::setData(const QModelIndex &index,
     }
     else if(role == FrameSize) {
         for(int row = 0; row < rowCount(); row++) {
+            size = value.toSize();
             QImage newImage;
             bool scale = true;      // Enforce scaling...
 
             if(scale) {
-                newImage = frames.at(row).scaled(value.toSize());
+                newImage = frames.at(row).scaled(size);
             }
             else {
-                newImage = QImage(value.toSize(),
+                newImage = QImage(size,
                                QImage::Format_ARGB32_Premultiplied);
                 newImage.fill(FRAME_COLOR_DEFAULT);
 
@@ -157,7 +162,7 @@ bool PatternFrameModel::insertRows(int position, int rows, const QModelIndex &)
     // TODO: what does 'data changed' mean in these circumstances?
     QVector<int> roles;
     roles.append(FrameData);
-    emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
+    emit dataChanged(this->index(position), this->index(position+rows), roles);
     return true;
 }
 

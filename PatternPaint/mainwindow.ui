@@ -52,7 +52,7 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="PatternCollectionListView" name="patternCollectionListView">
+     <widget class="QListView" name="patternCollectionListView">
       <property name="minimumSize">
        <size>
         <width>150</width>
@@ -759,11 +759,6 @@
    <extends>QScrollArea</extends>
    <header>letterboxscrollarea.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>PatternCollectionListView</class>
-   <extends>QListWidget</extends>
-   <header>patterncollectionlistview.h</header>
   </customwidget>
  </customwidgets>
  <resources>
