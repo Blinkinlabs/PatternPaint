@@ -24,7 +24,7 @@
  */
 
 #include "fillinstrument.h"
-#include "patterneditor.h"
+#include "frameeditor.h"
 
 #include <QPen>
 #include <QPainter>
@@ -36,7 +36,7 @@ FillInstrument::FillInstrument(QObject *parent) :
     drawing = false;
 }
 
-void FillInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& editor, const QPoint& pt)
+void FillInstrument::mousePressEvent(QMouseEvent *event, FrameEditor& editor, const QPoint& pt)
 {
     if(event->button() == Qt::LeftButton)
     {
@@ -48,16 +48,16 @@ void FillInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& editor, 
     }
 }
 
-void FillInstrument::mouseMoveEvent(QMouseEvent *, PatternEditor&, const QPoint&) {
+void FillInstrument::mouseMoveEvent(QMouseEvent *, FrameEditor&, const QPoint&) {
 }
 
-void FillInstrument::mouseReleaseEvent(QMouseEvent*, PatternEditor& editor, const QPoint&)
+void FillInstrument::mouseReleaseEvent(QMouseEvent*, FrameEditor& editor, const QPoint&)
 {
     editor.applyInstrument(toolPreview);
     drawing = false;
 }
 
-void FillInstrument::paint(PatternEditor& editor)
+void FillInstrument::paint(FrameEditor& editor)
 {
     // Make a copy of the image
     toolPreview = editor.getPatternAsImage();

@@ -24,7 +24,7 @@
  */
 
 #include "lineinstrument.h"
-#include "patterneditor.h"
+#include "frameeditor.h"
 
 #include <QPen>
 #include <QPainter>
@@ -37,7 +37,7 @@ LineInstrument::LineInstrument(QObject *parent) :
     drawing = false;
 }
 
-void LineInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& editor, const QPoint& pt)
+void LineInstrument::mousePressEvent(QMouseEvent *event, FrameEditor& editor, const QPoint& pt)
 {
     if(event->button() == Qt::LeftButton)
     {
@@ -52,7 +52,7 @@ void LineInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& editor, 
     }
 }
 
-void LineInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& editor, const QPoint& pt)
+void LineInstrument::mouseMoveEvent(QMouseEvent*, FrameEditor& editor, const QPoint& pt)
 {
     if(drawing) {
         mEndPoint = pt;
@@ -61,13 +61,13 @@ void LineInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& editor, const Q
     }
 }
 
-void LineInstrument::mouseReleaseEvent(QMouseEvent *, PatternEditor& editor, const QPoint&)
+void LineInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor& editor, const QPoint&)
 {
     editor.applyInstrument(toolPreview);
     drawing = false;
 }
 
-void LineInstrument::paint(PatternEditor& editor)
+void LineInstrument::paint(FrameEditor& editor)
 {
     QPainter painter(&toolPreview);
 

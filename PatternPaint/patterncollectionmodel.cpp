@@ -58,14 +58,11 @@ QVariant PatternCollectionModel::data(const QModelIndex &index, int role) const
     if (index.row() >= patterns.count() || index.row() < 0)
         return QVariant();
 
-    if (role == PatternPointer) {
+    if (role == PatternPointer)
         return QVariant::fromValue(patterns.at(index.row()));
-    }
 
-    if (role == Qt::EditRole) {
-        qDebug() << index.internalId();
+    if (role == Qt::EditRole)
         return patterns.at(index.row())->getUuid();
-    }
 
 //    else if (role == Qt::ToolTipRole)
 //        return patterns.at(index.row())->getPatternName();

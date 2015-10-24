@@ -11,7 +11,7 @@
 
 #include "blinkycontroller.h"
 #include "patternuploader.h"
-#include "patterneditor.h"
+#include "frameeditor.h"
 #include "addressprogrammer.h"
 #include "colorchooser.h"
 #include "patterncollection.h"

@@ -53,7 +53,6 @@ SOURCES += main.cpp\
     systeminformation.cpp \
     colormodel.cpp \
     aboutpatternpaint.cpp \
-    patterneditor.cpp \
     resizepattern.cpp \
     addressprogrammer.cpp \
     letterboxscrollarea.cpp \
@@ -66,13 +65,13 @@ SOURCES += main.cpp\
     patterncollectionmodel.cpp \
     patterncollectionlistview.cpp \
     patterncollectiondelegate.cpp \
-    patterncollection.cpp
+    patterncollection.cpp \
+    frameeditor.cpp
 
 HEADERS  += mainwindow.h \
     systeminformation.h \
     colormodel.h \
     aboutpatternpaint.h \
-    patterneditor.h \
     resizepattern.h \
     addressprogrammer.h \
     letterboxscrollarea.h \
@@ -85,7 +84,8 @@ HEADERS  += mainwindow.h \
     patterncollectionmodel.h \
     patterncollectionlistview.h \
     patterncollectiondelegate.h \
-    patterncollection.h
+    patterncollection.h \
+    frameeditor.h
 
 mac {
 HEADERS  += \

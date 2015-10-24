@@ -41,13 +41,13 @@ class ColorpickerInstrument : public CustomCursorInstrument
 public:
     explicit ColorpickerInstrument(QObject *parent = 0);
     
-    void mousePressEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
-    void mouseMoveEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
-    void mouseReleaseEvent(QMouseEvent *event, PatternEditor&, const QPoint&);
+    void mousePressEvent(QMouseEvent *event, FrameEditor&, const QPoint&);
+    void mouseMoveEvent(QMouseEvent *event, FrameEditor&, const QPoint&);
+    void mouseReleaseEvent(QMouseEvent *event, FrameEditor&, const QPoint&);
     bool showPreview() const { return false; }
 
 protected:
-    void paint(PatternEditor&);
+    void paint(FrameEditor&);
 
 signals:
     void pickedColor(QColor);

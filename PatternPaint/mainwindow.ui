@@ -134,7 +134,7 @@
        <property name="widgetResizable">
         <bool>true</bool>
        </property>
-       <widget class="PatternEditor" name="patternEditor">
+       <widget class="FrameEditor" name="frameEditor">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -749,15 +749,15 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>PatternEditor</class>
-   <extends>QWidget</extends>
-   <header>patterneditor.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>LetterboxScrollArea</class>
    <extends>QScrollArea</extends>
    <header>letterboxscrollarea.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>FrameEditor</class>
+   <extends>QWidget</extends>
+   <header>frameeditor.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

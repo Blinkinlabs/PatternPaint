@@ -11,7 +11,7 @@ Here is a brief list of each file/class in PatternPaint:
 - colorswirl_sketch: byte data of the default blinkytape firmware
 - mainwindow: UI and logic for running the program
 - pattern: Utility class to compress an pattern file into byte data
-- patterneditor: UI widget for drawing an pattern
+- FrameEditor: UI widget for drawing an pattern
 - patternuploader: Manage the upload of an pattern using the avr programmer
 - patternplayer_sketch: byte data of the Arduino firmware for displaying patterns
 - resizepattern: Utility class to resize an pattern

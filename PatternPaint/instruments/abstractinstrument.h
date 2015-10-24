@@ -33,7 +33,7 @@
 #include <QPixmap>
 #include <QCursor>
 
-class PatternEditor;
+class FrameEditor;
 
 /// Abstract instrument class.
 class AbstractInstrument : public QObject
@@ -46,21 +46,21 @@ public:
 
     /// mousePressEvent
     /// @param event - mouse event
-    /// @param PatternEditor - editor
+    /// @param FrameEditor - editor
     /// @param QPoint - logical position on image
-    virtual void mousePressEvent(QMouseEvent *event, PatternEditor&, const QPoint&) = 0;
+    virtual void mousePressEvent(QMouseEvent *event, FrameEditor&, const QPoint&) = 0;
 
     /// mousePressEvent
     /// @param event - mouse event
-    /// @param PatternEditor - editor
+    /// @param FrameEditor - editor
     /// @param QPoint - logical position on image
-    virtual void mouseMoveEvent(QMouseEvent *event, PatternEditor&, const QPoint& pt) = 0;
+    virtual void mouseMoveEvent(QMouseEvent *event, FrameEditor&, const QPoint& pt) = 0;
 
     /// mousePressEvent
     /// @param event - mouse event
-    /// @param PatternEditor - editor
+    /// @param FrameEditor - editor
     /// @param QPoint - logical position on image
-    virtual void mouseReleaseEvent(QMouseEvent *event, PatternEditor&, const QPoint& pt) = 0;
+    virtual void mouseReleaseEvent(QMouseEvent *event, FrameEditor&, const QPoint& pt) = 0;
 
     /// Get the mouse cursor for this instrument
     /// @return cursor for this tool
@@ -78,7 +78,7 @@ protected:
     QImage toolPreview; ///< Scratch space to draw tool output onto
     bool drawing;       ///< True if we have an unsaved
 
-    virtual void paint(PatternEditor&) = 0;
+    virtual void paint(FrameEditor&) = 0;
 };
 
 

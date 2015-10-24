@@ -24,7 +24,7 @@
  */
 
 #include "undocommand.h"
-#include "patterneditor.h"
+#include "frameeditor.h"
 #include <QDebug>
 
 

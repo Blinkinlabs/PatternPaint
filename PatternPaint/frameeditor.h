@@ -10,11 +10,11 @@ class UndoCommand;
 class AbstractInstrument;
 
 
-class PatternEditor : public QWidget
+class FrameEditor : public QWidget
 {
     Q_OBJECT
 public:
-    explicit PatternEditor(QWidget *parent = 0);
+    explicit FrameEditor(QWidget *parent = 0);
 
     /// Get the image data for the current pattern
     /// @return QImage containing the current pattern

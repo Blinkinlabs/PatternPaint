@@ -24,7 +24,7 @@
  */
 
 #include "colorpickerinstrument.h"
-#include "patterneditor.h"
+#include "frameeditor.h"
 
 ColorpickerInstrument::ColorpickerInstrument(QObject *parent) :
     CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_pipette.png", parent)
@@ -32,7 +32,7 @@ ColorpickerInstrument::ColorpickerInstrument(QObject *parent) :
     drawing = false;
 }
 
-void ColorpickerInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& editor, const QPoint& pt)
+void ColorpickerInstrument::mousePressEvent(QMouseEvent *event, FrameEditor& editor, const QPoint& pt)
 {
     if(event->button() == Qt::LeftButton) {
         mStartPoint = mEndPoint = pt;
@@ -41,7 +41,7 @@ void ColorpickerInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& e
     }
 }
 
-void ColorpickerInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& editor, const QPoint& pt)
+void ColorpickerInstrument::mouseMoveEvent(QMouseEvent*, FrameEditor& editor, const QPoint& pt)
 {
     if(drawing) {
         mStartPoint = mEndPoint = pt;
@@ -49,12 +49,12 @@ void ColorpickerInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& editor, 
     }
 }
 
-void ColorpickerInstrument::mouseReleaseEvent(QMouseEvent *, PatternEditor&, const QPoint&)
+void ColorpickerInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor&, const QPoint&)
 {
     drawing = false;
 }
 
-void ColorpickerInstrument::paint(PatternEditor& editor)
+void ColorpickerInstrument::paint(FrameEditor& editor)
 {
     bool inArea = true;
 

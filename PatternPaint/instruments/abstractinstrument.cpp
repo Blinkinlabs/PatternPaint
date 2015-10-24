@@ -24,7 +24,7 @@
  */
 
 #include "abstractinstrument.h"
-#include "patterneditor.h"
+#include "frameeditor.h"
 #include "undocommand.h"
 
 AbstractInstrument::AbstractInstrument(QObject *parent) :

@@ -24,7 +24,7 @@
  */
 
 #include "sprayinstrument.h"
-#include "patterneditor.h"
+#include "frameeditor.h"
 
 #include <QPen>
 #include <QPainter>
@@ -36,7 +36,7 @@ SprayInstrument::SprayInstrument(QObject *parent) :
     drawing = false;
 }
 
-void SprayInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& editor, const QPoint& pt)
+void SprayInstrument::mousePressEvent(QMouseEvent *event, FrameEditor& editor, const QPoint& pt)
 {
     if(event->button() == Qt::LeftButton)
     {
@@ -51,7 +51,7 @@ void SprayInstrument::mousePressEvent(QMouseEvent *event, PatternEditor& editor,
     }
 }
 
-void SprayInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& editor, const QPoint& pt)
+void SprayInstrument::mouseMoveEvent(QMouseEvent*, FrameEditor& editor, const QPoint& pt)
 {
     if(drawing) {
         mEndPoint = pt;
@@ -60,13 +60,13 @@ void SprayInstrument::mouseMoveEvent(QMouseEvent*, PatternEditor& editor, const 
     }
 }
 
-void SprayInstrument::mouseReleaseEvent(QMouseEvent*, PatternEditor& editor, const QPoint&)
+void SprayInstrument::mouseReleaseEvent(QMouseEvent*, FrameEditor& editor, const QPoint&)
 {
     editor.applyInstrument(toolPreview);
     drawing = false;
 }
 
-void SprayInstrument::paint(PatternEditor& editor)
+void SprayInstrument::paint(FrameEditor& editor)
 {
     QPainter painter(&toolPreview);
 

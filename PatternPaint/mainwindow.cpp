@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent) :
     actionFill->setData(QVariant::fromValue(new FillInstrument(this)));
 
     instrumentToolbar->addWidget(&colorChooser);
-    patternEditor->setToolColor(COLOR_TOOL_DEFAULT);
+    frameEditor->setToolColor(COLOR_TOOL_DEFAULT);
 
     QSpinBox *penSizeSpin = new QSpinBox(this);
     penSizeSpin->setRange(DRAWING_SIZE_MINIMUM_VALUE, DRAWING_SIZE_MAXIMUM_VALUE);
@@ -147,14 +147,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Our pattern editor wants to get some notifications
     connect(&colorChooser, SIGNAL(sendColor(QColor)),
-            patternEditor, SLOT(setToolColor(QColor)));
+            frameEditor, SLOT(setToolColor(QColor)));
     connect(penSizeSpin, SIGNAL(valueChanged(int)),
-            patternEditor, SLOT(setToolSize(int)));
+            frameEditor, SLOT(setToolSize(int)));
 
-    connect(patternEditor, SIGNAL(dataEdited(int, const QImage)),
+    connect(frameEditor, SIGNAL(dataEdited(int, const QImage)),
             this, SLOT(on_frameDataEdited(int, const QImage)));
 
-    patternEditor->setToolSize(DRAWING_SIZE_MINIMUM_VALUE);
+    frameEditor->setToolSize(DRAWING_SIZE_MINIMUM_VALUE);
 
     // Pre-set the upload progress dialog
     progressDialog.setMinimum(0);
@@ -171,7 +171,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connectionScannerTimer.start();
 
     actionPen->setChecked(true);
-    patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(actionPen->data()));
+    frameEditor->setInstrument(qvariant_cast<AbstractInstrument*>(actionPen->data()));
 
     QSettings settings;
 
@@ -808,12 +808,12 @@ void MainWindow::on_instrumentSelected(bool) {
     }
 
     act->setChecked(true);
-    patternEditor->setInstrument(qvariant_cast<AbstractInstrument*>(act->data()));
+    frameEditor->setInstrument(qvariant_cast<AbstractInstrument*>(act->data()));
 }
 
 void MainWindow::on_colorPicked(QColor color) {
     colorChooser.setColor(color);
-    patternEditor->setToolColor(color);
+    frameEditor->setToolColor(color);
 }
 
 bool MainWindow::promptForSave(Pattern * item) {
@@ -938,7 +938,7 @@ void MainWindow::setNewFrame(int newFrame)
 
     timeline->setCurrentIndex(timeline->model()->index(newFrame,0));
 
-    patternEditor->setFrameData(getCurrentFrameIndex(),
+    frameEditor->setFrameData(getCurrentFrameIndex(),
                                 patternCollection.getPattern(getCurrentPatternIndex())->getFrame(newFrame));
 
     pFrame.setText(QString::number(getCurrentFrameIndex()+1));
@@ -1076,7 +1076,7 @@ void MainWindow::on_timelineDataChanged(const QModelIndex &topLeft, const QModel
             on_patternModifiedChanged();
 
         else if(roles[i] == PatternFrameModel::FrameData) {
-            // If the current selection changed, refresh so that the patternEditor contents will be redrawn
+            // If the current selection changed, refresh so that the FrameEditor contents will be redrawn
             if(currentIndex >= topLeft.row() && currentIndex <= bottomRight.row()) {
                 on_patternDataUpdated();
             }
@@ -1087,11 +1087,11 @@ void MainWindow::on_timelineDataChanged(const QModelIndex &topLeft, const QModel
 void MainWindow::on_patternDataUpdated()
 {
     if(!patternCollection.hasPattern()) {
-        patternEditor->setFrameData(0,QImage());
+        frameEditor->setFrameData(0,QImage());
         return;
     }
 
-    patternEditor->setFrameData(getCurrentFrameIndex(),
+    frameEditor->setFrameData(getCurrentFrameIndex(),
                                 patternCollection.getPattern(getCurrentPatternIndex())->getFrame(getCurrentFrameIndex()));
 
     updateBlinky();
@@ -1100,11 +1100,11 @@ void MainWindow::on_patternDataUpdated()
 void MainWindow::on_patternSizeUpdated()
 {
     if(!patternCollection.hasPattern()) {
-        patternEditor->setFrameData(0, QImage());
+        frameEditor->setFrameData(0, QImage());
         return;
     }
 
-    patternEditor->setFrameData(getCurrentFrameIndex(),
+    frameEditor->setFrameData(getCurrentFrameIndex(),
                                 patternCollection.getPattern(getCurrentPatternIndex())->getFrame(getCurrentFrameIndex()));
 
     // And kick the scroll area so that it will size itself

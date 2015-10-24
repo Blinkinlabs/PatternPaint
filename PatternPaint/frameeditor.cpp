@@ -1,4 +1,4 @@
-#include "patterneditor.h"
+#include "frameeditor.h"
 #include "abstractinstrument.h"
 
 #include <cmath>
@@ -19,7 +19,7 @@
 #define GRID_MIN_Y_SCALE        6   // Minimum scale that the image needs to scale to before the grid is displayed
 
 
-PatternEditor::PatternEditor(QWidget *parent) :
+FrameEditor::FrameEditor(QWidget *parent) :
     QWidget(parent),
     frameIndex(0)
 {
@@ -31,11 +31,11 @@ PatternEditor::PatternEditor(QWidget *parent) :
     setMouseTracking(true);
 }
 
-bool PatternEditor::hasImage() {
+bool FrameEditor::hasImage() {
     return !frameData.isNull();
 }
 
-void PatternEditor::dragEnterEvent(QDragEnterEvent *event)
+void FrameEditor::dragEnterEvent(QDragEnterEvent *event)
 {
     if(!hasImage()) {
         return;
@@ -46,7 +46,7 @@ void PatternEditor::dragEnterEvent(QDragEnterEvent *event)
     }
 }
 
-void PatternEditor::dropEvent(QDropEvent *event)
+void FrameEditor::dropEvent(QDropEvent *event)
 {
 // TODO: Attempt to load the file as a single frame image, to replace this frame?
 
@@ -73,18 +73,18 @@ void PatternEditor::dropEvent(QDropEvent *event)
 //    }
 }
 
-const QImage &PatternEditor::getPatternAsImage() const {
+const QImage &FrameEditor::getPatternAsImage() const {
     return frameData;
 }
 
-void PatternEditor::resizeEvent(QResizeEvent * resizeEvent)
+void FrameEditor::resizeEvent(QResizeEvent * resizeEvent)
 {
     updateGridSize();
 
     QWidget::resizeEvent(resizeEvent);
 }
 
-void PatternEditor::updateGridSize() {
+void FrameEditor::updateGridSize() {
     if(!hasImage()) {
         return;
     }
@@ -135,7 +135,7 @@ void PatternEditor::updateGridSize() {
 }
 
 
-void PatternEditor::mousePressEvent(QMouseEvent *event) {
+void FrameEditor::mousePressEvent(QMouseEvent *event) {
     if(!hasImage() || instrument.isNull()) {
         return;
     }
@@ -145,7 +145,7 @@ void PatternEditor::mousePressEvent(QMouseEvent *event) {
     lazyUpdate();
 }
 
-void PatternEditor::mouseMoveEvent(QMouseEvent *event){
+void FrameEditor::mouseMoveEvent(QMouseEvent *event){
     if(!hasImage() || instrument.isNull()) {
         return;
     }
@@ -182,7 +182,7 @@ void PatternEditor::mouseMoveEvent(QMouseEvent *event){
     lazyUpdate();
 }
 
-void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
+void FrameEditor::mouseReleaseEvent(QMouseEvent* event) {
     setCursor(Qt::ArrowCursor);
 
     if(!hasImage() || instrument.isNull()) {
@@ -193,19 +193,19 @@ void PatternEditor::mouseReleaseEvent(QMouseEvent* event) {
     lazyUpdate();
 }
 
-void PatternEditor::setToolColor(QColor color) {
+void FrameEditor::setToolColor(QColor color) {
     toolColor = color;
 }
 
-void PatternEditor::setToolSize(int size) {
+void FrameEditor::setToolSize(int size) {
     toolSize = size;
 }
 
-void PatternEditor::setInstrument(AbstractInstrument* pi) {
+void FrameEditor::setInstrument(AbstractInstrument* pi) {
     instrument = pi;
 }
 
-void PatternEditor::setFrameData(int index, const QImage data)
+void FrameEditor::setFrameData(int index, const QImage data)
 {
     if(data.isNull()) {
         frameData = data;
@@ -230,7 +230,7 @@ void PatternEditor::setFrameData(int index, const QImage data)
     update();
 }
 
-void PatternEditor::lazyUpdate() {
+void FrameEditor::lazyUpdate() {
     // Ignore the update request if it came too quickly
     static qint64 lastTime = 0;
     qint64 newTime = QDateTime::currentMSecsSinceEpoch();
@@ -243,7 +243,7 @@ void PatternEditor::lazyUpdate() {
     update();
 }
 
-void PatternEditor::paintEvent(QPaintEvent*)
+void FrameEditor::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
@@ -291,7 +291,7 @@ void PatternEditor::paintEvent(QPaintEvent*)
 
 }
 
-void PatternEditor::applyInstrument(QImage& update)
+void FrameEditor::applyInstrument(QImage& update)
 {
     QPainter painter;
     painter.begin(&frameData);
