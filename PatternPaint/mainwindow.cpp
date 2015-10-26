@@ -3,7 +3,7 @@
 #include "colormodel.h"
 #include "systeminformation.h"
 #include "aboutpatternpaint.h"
-#include "resizepattern.h"
+#include "resizedialog.h"
 #include "undocommand.h"
 #include "colorchooser.h"
 #include "blinkytape.h"
@@ -709,7 +709,7 @@ void MainWindow::on_actionResize_Pattern_triggered()
         return;
     }
 
-    ResizePattern resizeDialog(this);
+    ResizeDialog resizeDialog(this);
     resizeDialog.setWindowModality(Qt::WindowModal);
     resizeDialog.setOutputSize(patternCollection.getPattern(getCurrentPatternIndex())->getFrame(0).size());
 

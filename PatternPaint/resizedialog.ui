@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ResizePattern</class>
- <widget class="QDialog" name="ResizePattern">
+ <class>ResizeDialog</class>
+ <widget class="QDialog" name="ResizeDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -99,7 +99,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>ResizePattern</receiver>
+   <receiver>ResizeDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -115,7 +115,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>ResizePattern</receiver>
+   <receiver>ResizeDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

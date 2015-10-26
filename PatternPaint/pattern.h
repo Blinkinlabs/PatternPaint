@@ -49,11 +49,6 @@ public:
     /// newFileInfo URL of the new file to save to.
     bool saveAs(const QString newFileName);
 
-    /// Replace the current image with one from a new file, but don't
-    /// change the filename (for drag&drop operations)
-    /// @param newFileInfo URL of file to load
-    bool replace(const QString newFileInfo);
-
     /// Resize the image
     /// @param newSize New size of the pattern, in pixels
     /// @param scale If true, scale the image to fit the new size. Otherwise crop/expand the image.

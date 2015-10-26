@@ -53,7 +53,6 @@ SOURCES += main.cpp\
     systeminformation.cpp \
     colormodel.cpp \
     aboutpatternpaint.cpp \
-    resizepattern.cpp \
     addressprogrammer.cpp \
     letterboxscrollarea.cpp \
     undocommand.cpp \
@@ -66,13 +65,13 @@ SOURCES += main.cpp\
     patterncollectionlistview.cpp \
     patterncollectiondelegate.cpp \
     patterncollection.cpp \
-    frameeditor.cpp
+    frameeditor.cpp \
+    resizedialog.cpp
 
 HEADERS  += mainwindow.h \
     systeminformation.h \
     colormodel.h \
     aboutpatternpaint.h \
-    resizepattern.h \
     addressprogrammer.h \
     letterboxscrollarea.h \
     undocommand.h \
@@ -85,7 +84,8 @@ HEADERS  += mainwindow.h \
     patterncollectionlistview.h \
     patterncollectiondelegate.h \
     patterncollection.h \
-    frameeditor.h
+    frameeditor.h \
+    resizedialog.h
 
 mac {
 HEADERS  += \
@@ -98,8 +98,8 @@ OBJECTIVE_SOURCES += \
 FORMS    += mainwindow.ui \
     systeminformation.ui \
     aboutpatternpaint.ui \
-    resizepattern.ui \
-    addressprogrammer.ui
+    addressprogrammer.ui \
+    resizedialog.ui
 
 include(instruments/instruments.pri)
 include(devices/devices.pri)

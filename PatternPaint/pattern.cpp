@@ -109,32 +109,6 @@ bool Pattern::save()
     return saveAs(frames.data(frames.index(0),PatternFrameModel::FileName).toString());
 }
 
-bool Pattern::replace(const QString newFileName)
-{
-//    pushUndoState();
-
-//    QImage newImage;
-
-//    // Attempt to load the iamge
-//    if(!newImage.load(newFileInfo.absoluteFilePath())) {
-//        return false;
-//    }
-
-//    // TODO: Warn if the source image wasn't of the expected aperture?
-//    image = newImage.scaledToHeight(frames.getSize().height());
-//    if(image.width()%frames.getSize().width() != 0) {
-//        // TODO: What?
-//    }
-
-//    if(!notifier.isNull()) {
-//        notifier->signalSizeUpdated();
-//    }
-
-//    setModified(true);
-//    return true;
-    return false;
-}
-
 bool Pattern::getModified() const
 {
     return frames.data(frames.index(0),PatternFrameModel::Modified).toBool();

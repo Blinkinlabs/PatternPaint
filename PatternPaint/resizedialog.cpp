@@ -1,11 +1,11 @@
-#include "resizepattern.h"
-#include "ui_resizepattern.h"
+#include "resizedialog.h"
+#include "ui_resizedialog.h"
 
 #include <limits>
 
-ResizePattern::ResizePattern(QWidget *parent) :
+ResizeDialog::ResizeDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::ResizePattern)
+    ui(new Ui::ResizeDialog)
 {
     ui->setupUi(this);
 
@@ -13,17 +13,17 @@ ResizePattern::ResizePattern(QWidget *parent) :
     ui->displayWidth->setValidator(new QIntValidator(1,std::numeric_limits<int>::max(),this));
 }
 
-ResizePattern::~ResizePattern()
+ResizeDialog::~ResizeDialog()
 {
     delete ui;
 }
 
-void ResizePattern::setOutputSize(QSize size) {
+void ResizeDialog::setOutputSize(QSize size) {
     ui->displayHeight->setText(QString::number(size.height()));
     ui->displayWidth->setText(QString::number(size.width()));
 }
 
-QSize ResizePattern::getOutputSize()
+QSize ResizeDialog::getOutputSize()
 {
     return QSize(ui->displayWidth->text().toInt(), ui->displayHeight->text().toInt());
 }
