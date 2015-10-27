@@ -1023,23 +1023,29 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
 
     emit(patternStatusChanged(current.isValid()));
 
-    on_patternNameUpdated();
-    on_patternModifiedChanged();
     on_patternSizeUpdated();
-    on_patternDataUpdated();
 
     // TODO: we're going to have to unload our references, but for now skip that.
     if(!current.isValid()) {
         undoGroup.setActiveStack(NULL);
         timeline->setModel(NULL);
+
+        setPatternName("()");
+        setPatternModified(false);
+        setPatternData(0, QImage());
         return;
     }
 
     Pattern* newpattern = patternCollection.getPattern(current.row());
 
     undoGroup.setActiveStack(newpattern->getUndoStack());
-
     timeline->setModel(newpattern->getFrameModel());
+
+
+    setPatternName(newpattern->getPatternName());
+    setPatternModified(newpattern->getModified());
+    setPatternData(getCurrentFrameIndex(), newpattern->getFrame(getCurrentPatternIndex()));
+
 
     // TODO: Should we unregister these eventually?
     connect(timeline->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
@@ -1058,29 +1064,24 @@ void MainWindow::on_timelineDataChanged(const QModelIndex &topLeft, const QModel
 
     for(int i = 0; i < roles.count(); i++) {
         if(roles[i] == PatternFrameModel::FileName)
-            on_patternNameUpdated();
+            setPatternName(patternCollection.getPattern(getCurrentPatternIndex())->getPatternName());
 
         else if(roles[i] == PatternFrameModel::Modified)
-            on_patternModifiedChanged();
+            setPatternModified(patternCollection.getPattern(getCurrentPatternIndex())->getModified());
 
         else if(roles[i] == PatternFrameModel::FrameData) {
             // If the current selection changed, refresh so that the FrameEditor contents will be redrawn
             if(currentIndex >= topLeft.row() && currentIndex <= bottomRight.row()) {
-                on_patternDataUpdated();
+                setPatternData(getCurrentFrameIndex(),
+                               patternCollection.getPattern(getCurrentPatternIndex())->getFrame(getCurrentFrameIndex()));
             }
         }
     }
 }
 
-void MainWindow::on_patternDataUpdated()
+void MainWindow::setPatternData(int index, QImage data)
 {
-    if(!patternCollection.hasPattern()) {
-        frameEditor->setFrameData(0,QImage());
-        return;
-    }
-
-    frameEditor->setFrameData(getCurrentFrameIndex(),
-                                patternCollection.getPattern(getCurrentPatternIndex())->getFrame(getCurrentFrameIndex()));
+    frameEditor->setFrameData(index, data);
 
     updateBlinky();
 }
@@ -1110,15 +1111,8 @@ void MainWindow::on_frameDataEdited(int index, QImage update)
 }
 
 
-void MainWindow::on_patternNameUpdated()
+void MainWindow::setPatternName(QString name)
 {
-    QString name;
-
-    if(!patternCollection.hasPattern())
-        name = "()";
-    else
-        name = patternCollection.getPattern(getCurrentPatternIndex())->getPatternName();
-
     this->setWindowTitle(name + " - Pattern Paint");
 }
 
@@ -1168,19 +1162,9 @@ void MainWindow::on_actionDeleteFrame_triggered()
     setNewFrame(getCurrentFrameIndex());
 }
 
-void MainWindow::on_patternModifiedChanged()
+void MainWindow::setPatternModified(bool modified)
 {
-    if(!patternCollection.hasPattern()) {
-        actionSave_File->setEnabled(false);
-        return;
-    }
-
-    if(patternCollection.getPattern(getCurrentPatternIndex())->getModified() == true) {
-        actionSave_File->setEnabled(true);
-    }
-    else {
-        actionSave_File->setEnabled(false);
-    }
+    actionSave_File->setEnabled(modified);
 }
 
 void MainWindow::on_ExampleSelected(QAction* action) {

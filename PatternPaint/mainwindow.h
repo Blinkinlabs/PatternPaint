@@ -32,7 +32,6 @@ public:
 
 public slots:
 
-    void on_patternDataUpdated();
     void on_patternSizeUpdated();
 
     void on_frameDataEdited(int index, QImage update);
@@ -96,8 +95,6 @@ private slots:
 
     void on_colorPicked(QColor);
 
-    void on_patternNameUpdated();
-
     void on_actionGRB_triggered();
 
     void on_actionRGB_triggered();
@@ -117,8 +114,6 @@ private slots:
     void on_actionAddFrame_triggered();
 
     void on_actionDeleteFrame_triggered();
-
-    void on_patternModifiedChanged();
 
     void on_ExampleSelected(QAction*);
 
@@ -174,6 +169,12 @@ private:
     void connectUploader();
 
     void setColorMode(PatternWriter::ColorMode newColorOrder);
+
+    void setPatternName(QString name);
+
+    void setPatternData(int index, QImage data);
+
+    void setPatternModified(bool modified);
 
     void setNewFrame(int newFrame);
 
