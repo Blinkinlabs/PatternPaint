@@ -11,7 +11,7 @@ public:
 
     PatternCollectionModel* getModel() {return &patterns;}
 
-    void addPattern(QPointer<Pattern> newPattern);
+    void addPattern(QPointer<Pattern> newPattern, int index);
 
     void removePattern(int index);
 

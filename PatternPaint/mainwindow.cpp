@@ -242,6 +242,15 @@ int MainWindow::getCurrentPatternIndex() {
     return patternCollectionListView->currentIndex().row();
 }
 
+int MainWindow::getPatternCount() {
+    if(patternCollectionListView->model() == NULL) {
+        return 0;
+    }
+
+    return patternCollectionListView->model()->rowCount();
+}
+
+
 int MainWindow::getCurrentFrameIndex() {
     if(!timeline->currentIndex().isValid()) {
         return 0;
@@ -342,21 +351,11 @@ void MainWindow::on_actionLoad_File_triggered()
     QFileInfo fileInfo(fileName);
     settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
 
-    QSize displaySize;
-    displaySize = settings.value("Options/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize();
-
-    // Create a pattern, and attempt to load the file
-    // TODO: Can't there be a constructor that accepts a file directly? This seems odd
-    Pattern * pattern = new Pattern(displaySize,1);
-
-    if(!pattern->load(fileInfo.absoluteFilePath())) {
-        showError("Could not open file "
-                   + fileName
-                   + ". Perhaps it has a formatting problem?");
+    if(!loadPattern(fileName)) {
+        showError(tr("Could not open file %1. Perhaps it has a formatting problem?")
+                  .arg(fileName));
         return;
     }
-
-    patternCollection.addPattern(pattern);
 }
 
 
@@ -372,17 +371,15 @@ bool MainWindow::savePatternAs(Pattern *item) {
     QString fileName = QFileDialog::getSaveFileName(this,
         tr("Save Pattern"), lastDirectory, tr("Pattern Files (*.png *.jpg *.bmp)"));
 
-    if(fileName.length() == 0) {
+    if(fileName.length() == 0)
         return false;
-    }
 
     QFileInfo fileInfo(fileName);
     settings.setValue("File/SaveDirectory", fileInfo.absolutePath());
 
-    if (!item->saveAs(fileInfo.absoluteFilePath())) {
-        QMessageBox::warning(this, tr("Error"), tr("Error saving pattern %1. Try saving it somewhere else?")
+    if (!item->saveAs(fileInfo.absoluteFilePath()))
+        showError(tr("Error saving pattern %1. Try saving it somewhere else?")
                        .arg(fileInfo.absolutePath()));
-    }
 
     return (!item->getModified());
 }
@@ -392,8 +389,8 @@ bool MainWindow::savePattern(Pattern *item) {
         return savePatternAs(item);
     } else {
         if (!item->save()) {
-            QMessageBox::warning(this, tr("Error"), tr("Error saving pattern %1. Try saving it somewhere else?")
-                           .arg(item->getPatternName()));
+            showError(tr("Error saving pattern %1. Try saving it somewhere else?")
+                      .arg(item->getPatternName()));
         }
         return (!item->getModified());
     }
@@ -452,8 +449,8 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
     // Attempt to open the specified file
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        QMessageBox::warning(this, tr("Error"), tr("Error, cannot write file %1.")
-                       .arg(fileName));
+        showError(tr("Error, cannot write file %1.")
+                  .arg(fileName));
         return;
     }
 
@@ -603,7 +600,8 @@ void MainWindow::showError(QString errorMessage) {
     QMessageBox box(this);
     box.setWindowModality(Qt::WindowModal);
     box.setText(errorMessage);
-    box.show();
+    box.setStandardButtons(QMessageBox::Ok);
+    box.exec();
 }
 
 void MainWindow::on_actionLoad_rainbow_sketch_triggered()
@@ -815,14 +813,14 @@ bool MainWindow::promptForSave(Pattern * item) {
         return true;
     }
 
-    QString messageText = QString("The pattern %1 has been modified.")
+    QString messageText = tr("The pattern %1 has been modified.")
             .arg(item->getPatternName());
 
     QMessageBox msgBox(this);
     msgBox.setWindowModality(Qt::WindowModal);
     msgBox.setIconPixmap(QPixmap::fromImage(item->getFrame(0)));
     msgBox.setText(messageText);
-    msgBox.setInformativeText("Do you want to save your changes?");
+    msgBox.setInformativeText(tr("Do you want to save your changes?"));
     msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Save);
     int ans = msgBox.exec();
@@ -843,7 +841,7 @@ bool MainWindow::promptForSave(Pattern * item) {
 }
 
 bool MainWindow::promptForSave(std::vector<Pattern*> patterns) {
-    QString messageText = QString("The following patterns have been modified:\n");
+    QString messageText = tr("The following patterns have been modified:\n");
 
     for(std::size_t i = 0; i < patterns.size(); i++) {
         messageText += patterns.at(i)->getPatternName();
@@ -891,6 +889,34 @@ void MainWindow::connectUploader()
     connect(uploader, SIGNAL(finished(bool)),
             this, SLOT(on_uploaderFinished(bool)));
 
+}
+
+bool MainWindow::loadPattern(const QString fileName)
+{
+    QSettings settings;
+    int frameCount = settings.value("Options/FrameCount", DEFAULT_FRAME_COUNT).toUInt();
+
+    QSize displaySize;
+    if(!patternCollection.hasPattern()) {
+        displaySize = settings.value("Options/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize();
+    }
+    else {
+        displaySize =  patternCollection.getPattern(getCurrentPatternIndex())->getFrame(0).size();
+    }
+
+    Pattern *pattern = new Pattern(displaySize, frameCount);
+
+    if(!fileName.isEmpty())
+        if(!pattern->load(fileName))
+            return false;
+
+    int newPosition = 0;
+    if(getPatternCount() > 0)
+        newPosition = getCurrentPatternIndex()+1;
+
+    patternCollection.addPattern(pattern, newPosition);
+    patternCollectionListView->setCurrentIndex(patternCollectionListView->model()->index(newPosition,0));
+    return true;
 }
 
 void MainWindow::setColorMode(PatternWriter::ColorMode newColorOrder)
@@ -989,20 +1015,7 @@ void MainWindow::on_actionRGB_triggered()
 
 void MainWindow::on_actionNew_triggered()
 {
-    QSettings settings;
-    int frameCount = settings.value("Options/FrameCount", DEFAULT_FRAME_COUNT).toUInt();
-
-    QSize displaySize;
-    if(!patternCollection.hasPattern()) {
-        displaySize = settings.value("Options/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize();
-    }
-    else {
-        displaySize =  patternCollection.getPattern(getCurrentPatternIndex())->getFrame(0).size();
-    }
-
-    Pattern *pattern = new Pattern(displaySize, frameCount);
-
-    patternCollection.addPattern(pattern);
+    loadPattern(QString());
 }
 
 void MainWindow::on_actionClose_triggered()
@@ -1170,21 +1183,10 @@ void MainWindow::setPatternModified(bool modified)
 void MainWindow::on_ExampleSelected(QAction* action) {
     qDebug() << "Example selected:" << action->objectName();
 
-    QSettings settings;
-
-    // TODO: This is duplicated in on_actionLoad_file_triggered(), on_actionNew_triggered()
-    QSize displaySize;
-    displaySize = settings.value("Options/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize();
-
-    // Create a pattern, and attempt to load the file
-    Pattern *pattern = new Pattern(displaySize,1);
-
-    if(!pattern->load(action->objectName())) {
+    if(!loadPattern(action->objectName())) {
         showError("Could not open file "
                    + action->objectName()
                    + ". Perhaps it has a formatting problem?");
         return;
     }
-
-    patternCollection.addPattern(pattern);
 }

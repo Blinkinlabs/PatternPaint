@@ -168,6 +168,8 @@ private:
     void connectController();
     void connectUploader();
 
+    bool loadPattern(const QString fileName);
+
     void setColorMode(PatternWriter::ColorMode newColorOrder);
 
     void setPatternName(QString name);
@@ -189,6 +191,7 @@ private:
     int getCurrentFrameIndex();
     int getFrameCount();
     int getCurrentPatternIndex();
+    int getPatternCount();
 };
 
 #endif // MAINWINDOW_H

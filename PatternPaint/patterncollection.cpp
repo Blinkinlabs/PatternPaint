@@ -11,9 +11,8 @@ PatternCollection::~PatternCollection()
 
 }
 
-void PatternCollection::addPattern(QPointer<Pattern> newPattern)
+void PatternCollection::addPattern(QPointer<Pattern> newPattern, int index)
 {
-    int index = count();
     patterns.insertRow(index);
     patterns.setData(patterns.index(index),
                      //qVariantFromValue((void *) newPattern),
