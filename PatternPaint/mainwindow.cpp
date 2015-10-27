@@ -7,7 +7,7 @@
 #include "undocommand.h"
 #include "colorchooser.h"
 #include "blinkytape.h"
-#include "patternoutput.h"
+#include "patternwriter.h"
 
 #include "pencilinstrument.h"
 #include "lineinstrument.h"
@@ -20,6 +20,7 @@
 #include "patternframemodel.h"
 #include "patternframedelegate.h"
 #include "patternCollection.h"
+#include "fixture.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -178,7 +179,7 @@ MainWindow::MainWindow(QWidget *parent) :
     resize(settings.value("MainWindow/size", QSize(880, 450)).toSize());
     move(settings.value("MainWindow/pos", QPoint(100, 100)).toPoint());
 
-    setColorMode(static_cast<PatternOutput::ColorMode>(settings.value("Options/ColorOrder", PatternOutput::RGB).toUInt()));
+    setColorMode(static_cast<PatternWriter::ColorMode>(settings.value("Options/ColorOrder", PatternWriter::RGB).toUInt()));
 
     // Fill the examples menu using the examples resource
     populateExamplesMenu(":/examples", menuExamples);
@@ -417,6 +418,8 @@ void MainWindow::on_actionExit_triggered() {
 }
 
 void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
+    // TODO: Merge this with save
+
     if(!patternCollection.hasPattern()) {
         return;
     }
@@ -439,13 +442,11 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
     QFileInfo fileInfo(fileName);
     settings.setValue("File/ExportArduinoDirectory", fileInfo.absolutePath());
 
-    // TODO: This only saves the first frame!
-    QImage image =  patternCollection.getPattern(getCurrentPatternIndex())->getFrame(0);
-
     // Note: Converting frameRate to frame delay here.
-    PatternOutput patternOutput(image, drawTimer.interval(),
-                        PatternOutput::RGB24,
-                        colorMode);
+    PatternWriter patternOutput(patternCollection.getPattern(getCurrentPatternIndex()),
+                                drawTimer.interval(),
+                                PatternWriter::RGB24,
+                                colorMode);
 
 
     // Attempt to open the specified file
@@ -457,7 +458,7 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
     }
 
     QTextStream ts(&file);
-    ts << patternOutput.header;
+    ts << patternOutput.getHeader();
     file.close();
 }
 
@@ -664,15 +665,15 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
         return;
     }
 
-    std::vector<PatternOutput> patterns;
+    std::vector<PatternWriter> patterns;
 
     for(int i = 0; i < patternCollection.count(); i++) {
         // TODO: This needs to be run over all the frames!
         // Rewrite me.
-        PatternOutput patternOutput(patternCollection.getPattern(i)->getFrame(0),
+        PatternWriter patternOutput(patternCollection.getPattern(getCurrentPatternIndex()),
                         drawTimer.interval(),
                         //Pattern::RGB24,
-                        PatternOutput::RGB565_RLE,
+                        PatternWriter::RGB565_RLE,
                         colorMode);
 
         patterns.push_back(patternOutput);
@@ -897,14 +898,14 @@ void MainWindow::connectUploader()
 
 }
 
-void MainWindow::setColorMode(PatternOutput::ColorMode newColorOrder)
+void MainWindow::setColorMode(PatternWriter::ColorMode newColorOrder)
 {
     switch(newColorOrder) {
-    case PatternOutput::RGB:
+    case PatternWriter::RGB:
         actionRGB->setChecked(true);
         actionGRB->setChecked(false);
         break;
-    case PatternOutput::GRB:
+    case PatternWriter::GRB:
         actionRGB->setChecked(false);
         actionGRB->setChecked(true);
         break;
@@ -955,25 +956,21 @@ void MainWindow::updateBlinky()
     }
 
     QImage frame = patternCollection.getPattern(getCurrentPatternIndex())->getFrame(getCurrentFrameIndex());
-    QVector<QColor> pixels;
+    MatrixFixture fixture(patternCollection.getPattern(getCurrentPatternIndex())->getSize());
 
-    for(int x = 0; x <frame.width(); x++) {
-        for(int y = 0; y < frame.height(); y++) {
-            pixels.append(frame.pixel(x,x%2?frame.height()-1-y:y));
-        }
-    }
+    QList<QColor> pixels = fixture.getColorStreamForFrame(frame);
 
     QByteArray ledData;
     for(int i = 0; i < pixels.size(); i++) {
         QColor color = ColorModel::correctBrightness(pixels[i]);
 
         switch(colorMode) {
-        case PatternOutput::GRB:
+        case PatternWriter::GRB:
             ledData.append(color.green());
             ledData.append(color.red());
             ledData.append(color.blue());
             break;
-        case PatternOutput::RGB:
+        case PatternWriter::RGB:
         default:
             ledData.append(color.red());
             ledData.append(color.green());
@@ -987,12 +984,12 @@ void MainWindow::updateBlinky()
 
 void MainWindow::on_actionGRB_triggered()
 {
-    setColorMode(PatternOutput::GRB);
+    setColorMode(PatternWriter::GRB);
 }
 
 void MainWindow::on_actionRGB_triggered()
 {
-    setColorMode(PatternOutput::RGB);
+    setColorMode(PatternWriter::RGB);
 }
 
 void MainWindow::on_actionNew_triggered()

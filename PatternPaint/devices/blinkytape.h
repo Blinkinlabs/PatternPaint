@@ -74,7 +74,7 @@ private:
 
 #if defined(Q_OS_MAC)
     QTimer serialWriteTimer;
-    QVector<QByteArray> chunks;
+    QList<QByteArray> chunks;
 #endif
 
 signals:

@@ -59,14 +59,15 @@ SOURCES += main.cpp\
     colorchooser.cpp \
     patternframemodel.cpp \
     patternframedelegate.cpp \
-    patternoutput.cpp \
     pattern.cpp \
     patterncollectionmodel.cpp \
     patterncollectionlistview.cpp \
     patterncollectiondelegate.cpp \
     patterncollection.cpp \
     frameeditor.cpp \
-    resizedialog.cpp
+    resizedialog.cpp \
+    patternwriter.cpp \
+    fixture.cpp
 
 HEADERS  += mainwindow.h \
     systeminformation.h \
@@ -78,14 +79,15 @@ HEADERS  += mainwindow.h \
     colorchooser.h \
     patternframemodel.h \
     patternframedelegate.h \
-    patternoutput.h \
     pattern.h \
     patterncollectionmodel.h \
     patterncollectionlistview.h \
     patterncollectiondelegate.h \
     patterncollection.h \
     frameeditor.h \
-    resizedialog.h
+    resizedialog.h \
+    patternwriter.h \
+    fixture.h
 
 mac {
 HEADERS  += \

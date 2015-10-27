@@ -155,7 +155,7 @@ private:
 
     QUndoGroup undoGroup;
 
-    PatternOutput::ColorMode colorMode;
+    PatternWriter::ColorMode colorMode;
 
     void populateExamplesMenu(QString directory, QMenu* menu);
 
@@ -173,7 +173,7 @@ private:
     void connectController();
     void connectUploader();
 
-    void setColorMode(PatternOutput::ColorMode newColorOrder);
+    void setColorMode(PatternWriter::ColorMode newColorOrder);
 
     void setNewFrame(int newFrame);
 

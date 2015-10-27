@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QTimer>
 #include <iostream>
-#include "patternoutput.h"
+#include "patternwriter.h"
 #include "avrprogrammer.h"
 #include "blinkytape.h"
 #include "patternuploader.h"
@@ -43,7 +43,7 @@ class BlinkyTapeUploader : public PatternUploader
 public:
     BlinkyTapeUploader(QObject *parent=0);
 
-    bool startUpload(BlinkyController& tape, std::vector<PatternOutput> patterns);
+    bool startUpload(BlinkyController& tape, std::vector<PatternWriter> patterns);
     bool upgradeFirmware(BlinkyController& tape);
     bool upgradeFirmware(int timeout);
     QString getErrorString() const;

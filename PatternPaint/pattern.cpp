@@ -118,6 +118,11 @@ void Pattern::resize(QSize newSize, bool scale) {
     frames.setData(frames.index(0),newSize, PatternFrameModel::FrameSize);
 }
 
+QSize Pattern::getSize() const
+{
+    return frames.data(frames.index(0),PatternFrameModel::FrameSize).toSize();
+}
+
 void Pattern::replaceFrame(int index, const QImage &update)
 {
     frames.setData(frames.index(index),QVariant(update), PatternFrameModel::FrameData);

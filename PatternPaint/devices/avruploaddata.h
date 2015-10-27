@@ -3,12 +3,12 @@
 
 #include <QByteArray>
 #include <vector>
-#include "patternoutput.h"
+#include "patternwriter.h"
 
 /// Memory class to
 class avrUploadData {
 public:
-    bool init(std::vector<PatternOutput> patterns);
+    bool init(std::vector<PatternWriter> patterns);
 
     QByteArray sketch;
     QByteArray patternData;

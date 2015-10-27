@@ -13,7 +13,7 @@ class LightBuddyUploader : public PatternUploader
 public:
     LightBuddyUploader(QObject *parent=0);
 
-    bool startUpload(BlinkyController& controller, std::vector<PatternOutput> patterns);
+    bool startUpload(BlinkyController& controller, std::vector<PatternWriter> patterns);
     bool upgradeFirmware(BlinkyController& controller);
     bool upgradeFirmware(int timeout);
     QString getErrorString() const;

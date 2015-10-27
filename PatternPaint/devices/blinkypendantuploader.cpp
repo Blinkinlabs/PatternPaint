@@ -13,7 +13,7 @@ BlinkyPendantUploader::BlinkyPendantUploader(QObject *parent) :
             this,SLOT(handleProgrammerCommandFinished(QString,QByteArray)));
 }
 
-bool BlinkyPendantUploader::startUpload(BlinkyController& controller, std::vector<PatternOutput> patterns)
+bool BlinkyPendantUploader::startUpload(BlinkyController& controller, std::vector<PatternWriter> patterns)
 {
     // TODO: push the image conversions into here so they are less awkward.
     #define PIXEL_COUNT 10
@@ -34,17 +34,20 @@ bool BlinkyPendantUploader::startUpload(BlinkyController& controller, std::vecto
         qDebug() << "Using version 1 upload mechanism, please update firmware!";
 
         // Make sure we have an image compatible with the BlinkyPendant
-        QImage image = patterns.at(0).image;
-        QImage croppedImage;
-        croppedImage = image.copy( 0, 0, image.width(), PIXEL_COUNT);
-
-        PatternOutput pattern(croppedImage, 0, PatternOutput::RGB24, PatternOutput::RGB);
+        if(patterns.at(0).getLedCount() != 10) {
+            errorString = "Wrong pattern size- must be 10 pixels high!";
+            return false;
+        }
+        if(patterns.at(0).getEncoding() != PatternWriter::RGB24) {
+            errorString = "Wrong encoding type- must be RGB24!";
+            return false;
+        }
 
         // Create the data structure to write to the device memory
         data.append((char)0x13);    // header
         data.append((char)0x37);
-        data.append((char)pattern.frameCount);  // frame count
-        data += pattern.data;       // image data (RGB24, uncompressed)
+        data.append((char)patterns.at(0).getFrameCount());  // frame count
+        data += patterns.at(0).getData();       // image data (RGB24, uncompressed)
     }
     else {
         // Create the data structure to write to the device memory
@@ -57,15 +60,19 @@ bool BlinkyPendantUploader::startUpload(BlinkyController& controller, std::vecto
         data.append((char)patterns.size()); // Number of patterns in the table
         data.append((char)PIXEL_COUNT);     // Number of LEDs in the pattern
 
-        for(std::vector<PatternOutput>::iterator pattern = patterns.begin();
+        for(std::vector<PatternWriter>::iterator pattern = patterns.begin();
             pattern != patterns.end();
             ++pattern) {
 
             // Make sure we have an image compatible with the BlinkyPendant
-            QImage image = pattern->image;
-            QImage croppedImage;
-            croppedImage = image.copy( 0, 0, image.width(), PIXEL_COUNT);
-            PatternOutput croppedPattern(croppedImage, 0, PatternOutput::RGB24, PatternOutput::RGB);
+            if(pattern->getLedCount() != 10) {
+                errorString = "Wrong pattern size- must be 10 pixels high!";
+                return false;
+            }
+            if(pattern->getEncoding() != PatternWriter::RGB24) {
+                errorString = "Wrong encoding type- must be RGB24!";
+                return false;
+            }
 
             // Animation entry
             data.append((char)0);             // Encoding type (1 byte) (RGB24, uncompressed) (TODO)
@@ -73,13 +80,13 @@ bool BlinkyPendantUploader::startUpload(BlinkyController& controller, std::vecto
             data.append((char)((patternData.length() >> 16) &0xFF));
             data.append((char)((patternData.length() >>  8) &0xFF));
             data.append((char)((patternData.length() >>  0) &0xFF));
-            data.append((char)((croppedPattern.frameCount >> 8)&0xFF));   // Frame count (2 bytes)
-            data.append((char)((croppedPattern.frameCount     )&0xFF));
+            data.append((char)((pattern->getFrameCount() >> 8)&0xFF));   // Frame count (2 bytes)
+            data.append((char)((pattern->getFrameCount()     )&0xFF));
             data.append((char)0);             // Frame delay (2 bytes) TODO
             data.append((char)0);
 
             // Make sure we have an image compatible with the BlinkyPendant
-            patternData += croppedPattern.data;       // image data (RGB24, uncompressed)
+            patternData += pattern->getData();       // image data (RGB24, uncompressed)
         }
 
         data += patternData;

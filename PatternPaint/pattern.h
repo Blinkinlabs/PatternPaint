@@ -54,6 +54,10 @@ public:
     /// @param scale If true, scale the image to fit the new size. Otherwise crop/expand the image.
     void resize(QSize newSize,  bool scale);
 
+    /// Get the image size
+    /// @return Frame size, in pixels
+    QSize getSize() const;
+
     /// Get the number of frames contained in the animation
     /// @return Frame count
     int getFrameCount() const;

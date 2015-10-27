@@ -13,7 +13,7 @@
 #define FLASH_MEMORY_SKETCH_ADDRESS     0x0000  // Location of sketch
 #define FLASH_MEMORY_PATTERN_TABLE_ADDRESS (FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE) // Location of pattern table
 
-bool avrUploadData::init(std::vector<PatternOutput> patterns) {
+bool avrUploadData::init(std::vector<PatternWriter> patterns) {
     char buff[BUFF_LENGTH];
     QString errorString;
 
@@ -44,40 +44,40 @@ bool avrUploadData::init(std::vector<PatternOutput> patterns) {
 
     snprintf(buff, BUFF_LENGTH, "Building pattern array. Pattern Count: %zu, led count: %i",
              patterns.size(),
-             patterns[0].ledCount);
+             patterns[0].getLedCount());
     qDebug() << buff;
 
     patternTable.append(static_cast<char>(patterns.size()));       // First byte of the metadata is how many patterns there are
-    patternTable.append(static_cast<char>(patterns[0].ledCount));  // Second byte is the length of the LED strip
+    patternTable.append(static_cast<char>(patterns[0].getLedCount()));  // Second byte is the length of the LED strip
     // TODO: make the LED count to a separate, explicit parameter?
 
     int dataOffset = sketch.length();
 
     // Now, for each pattern, append the image data to the sketch
-    for(std::vector<PatternOutput>::iterator pattern = patterns.begin();
+    for(std::vector<PatternWriter>::iterator pattern = patterns.begin();
         pattern != patterns.end();
         ++pattern) {
 
         snprintf(buff, BUFF_LENGTH, "Adding pattern. Encoding: %x, framecount: %i, frameDelay: %i, size: %iB, offset: %iB",
-                 pattern->encoding,
-                 pattern->frameCount,
-                 pattern->frameDelay,
-                 pattern->data.length(),
+                 pattern->getEncoding(),
+                 pattern->getFrameCount(),
+                 pattern->getFrameDelay(),
+                 pattern->getData().length(),
                  dataOffset);
         qDebug() << buff;
 
         // Build the table entry for this pattern
-        patternTable.append(static_cast<char>((pattern->encoding) & 0xFF));             // Offset 0: encoding (1 byte)
+        patternTable.append(static_cast<char>((pattern->getEncoding()) & 0xFF));             // Offset 0: encoding (1 byte)
         patternTable.append(static_cast<char>((dataOffset >> 8) & 0xFF));               // Offset 1: memory location (2 bytes)
         patternTable.append(static_cast<char>((dataOffset     ) & 0xFF));
-        patternTable.append(static_cast<char>((pattern->frameCount >> 8  ) & 0xFF));    // Offset 3: frame count (2 bytes)
-        patternTable.append(static_cast<char>((pattern->frameCount       ) & 0xFF));
-        patternTable.append(static_cast<char>((pattern->frameDelay >> 8  ) & 0xFF));    // Offset 5: frame delay (2 bytes)
-        patternTable.append(static_cast<char>((pattern->frameDelay       ) & 0xFF));
+        patternTable.append(static_cast<char>((pattern->getFrameCount() >> 8  ) & 0xFF));    // Offset 3: frame count (2 bytes)
+        patternTable.append(static_cast<char>((pattern->getFrameCount()       ) & 0xFF));
+        patternTable.append(static_cast<char>((pattern->getFrameDelay() >> 8  ) & 0xFF));    // Offset 5: frame delay (2 bytes)
+        patternTable.append(static_cast<char>((pattern->getFrameDelay()       ) & 0xFF));
 
         // and append the image data
-        patternData += pattern->data;
-        dataOffset += pattern->data.length();
+        patternData += pattern->getData();
+        dataOffset += pattern->getData().length();
     }
 
     // Pad pattern table to FLASH_MEMORY_PAGE_SIZE bytes.

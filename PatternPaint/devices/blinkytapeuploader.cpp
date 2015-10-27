@@ -73,7 +73,7 @@ void BlinkyTapeUploader::setMaxProgress(int newMaxProgress) {
     emit(maxProgressChanged(newMaxProgress));
 }
 
-bool BlinkyTapeUploader::startUpload(BlinkyController& tape, std::vector<PatternOutput> patterns) {
+bool BlinkyTapeUploader::startUpload(BlinkyController& tape, std::vector<PatternWriter> patterns) {
     /// Create the compressed image and check if it will fit into the device memory
     avrUploadData data;
     if(!data.init(patterns)) {

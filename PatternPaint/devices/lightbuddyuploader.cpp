@@ -12,7 +12,7 @@ LightBuddyUploader::LightBuddyUploader(QObject *parent) :
 }
 
 
-bool LightBuddyUploader::startUpload(BlinkyController& controller, std::vector<PatternOutput> patterns)
+bool LightBuddyUploader::startUpload(BlinkyController& controller, std::vector<PatternWriter> patterns)
 {
     Q_UNUSED(controller);
     Q_UNUSED(patterns);
