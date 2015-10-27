@@ -42,8 +42,8 @@
 #define COLOR_CANVAS_DEFAULT    QColor(0,0,0,255)
 #define COLOR_TOOL_DEFAULT    QColor(255,255,255,255)
 
-#define DEFAULT_FIXTURE_WIDTH 1
-#define DEFAULT_FIXTURE_HEIGHT 60
+#define DEFAULT_DISPLAY_WIDTH 1
+#define DEFAULT_DISPLAY_HEIGHT 60
 #define DEFAULT_FRAME_COUNT 8
 
 #define MIN_TIMER_INTERVAL 5  // minimum interval to wait between blinkytape updates
@@ -342,12 +342,12 @@ void MainWindow::on_actionLoad_File_triggered()
     QFileInfo fileInfo(fileName);
     settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
 
-    QSize fixtureSize;
-    fixtureSize = settings.value("Options/fixtureSize", QSize(DEFAULT_FIXTURE_WIDTH, DEFAULT_FIXTURE_HEIGHT)).toSize();
+    QSize displaySize;
+    displaySize = settings.value("Options/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize();
 
     // Create a pattern, and attempt to load the file
     // TODO: Can't there be a constructor that accepts a file directly? This seems odd
-    Pattern * pattern = new Pattern(fixtureSize,1);
+    Pattern * pattern = new Pattern(displaySize,1);
 
     if(!pattern->load(fileInfo.absoluteFilePath())) {
         showError("Could not open file "
@@ -722,12 +722,7 @@ void MainWindow::on_actionResize_Pattern_triggered()
     QSize newDisplaySize = resizeDialog.getOutputSize();
 
     QSettings settings;
-    settings.setValue("options/fixtureSize", newDisplaySize);
-
-    qDebug() << "Resizing patterns, height:"
-             << newDisplaySize.height()
-             << "width:"
-             << newDisplaySize.width();
+    settings.setValue("Options/DisplaySize", newDisplaySize);
 
     for(int i = 0; i < patternCollection.count(); i++) {
         // Resize the pattern
@@ -995,17 +990,17 @@ void MainWindow::on_actionRGB_triggered()
 void MainWindow::on_actionNew_triggered()
 {
     QSettings settings;
-    int patternLength = settings.value("Options/frameCount", DEFAULT_FRAME_COUNT).toUInt();
+    int frameCount = settings.value("Options/FrameCount", DEFAULT_FRAME_COUNT).toUInt();
 
-    QSize fixtureSize;
+    QSize displaySize;
     if(!patternCollection.hasPattern()) {
-        fixtureSize = settings.value("Options/fixtureSize", QSize(DEFAULT_FIXTURE_WIDTH, DEFAULT_FIXTURE_HEIGHT)).toSize();
+        displaySize = settings.value("Options/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize();
     }
     else {
-        fixtureSize =  patternCollection.getPattern(getCurrentPatternIndex())->getFrame(0).size();
+        displaySize =  patternCollection.getPattern(getCurrentPatternIndex())->getFrame(0).size();
     }
 
-    Pattern *pattern = new Pattern(fixtureSize, patternLength);
+    Pattern *pattern = new Pattern(displaySize, frameCount);
 
     patternCollection.addPattern(pattern);
 }
@@ -1194,11 +1189,11 @@ void MainWindow::on_ExampleSelected(QAction* action) {
     QSettings settings;
 
     // TODO: This is duplicated in on_actionLoad_file_triggered(), on_actionNew_triggered()
-    QSize fixtureSize;
-    fixtureSize = settings.value("Options/fixtureSize", QSize(DEFAULT_FIXTURE_WIDTH, DEFAULT_FIXTURE_HEIGHT)).toSize();
+    QSize displaySize;
+    displaySize = settings.value("Options/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize();
 
     // Create a pattern, and attempt to load the file
-    Pattern *pattern = new Pattern(fixtureSize,1);
+    Pattern *pattern = new Pattern(displaySize,1);
 
     if(!pattern->load(action->objectName())) {
         showError("Could not open file "
