@@ -6,8 +6,7 @@
 #include <QUndoStack>
 #include <QPointer>
 #include <QUuid>
-#include "patternframemodel.h"
-
+#include "patternmodel.h"
 
 /// Representation of a pattern based on a frame model.
 class Pattern : public QObject
@@ -54,9 +53,9 @@ public:
     /// @param scale If true, scale the image to fit the new size. Otherwise crop/expand the image.
     void resize(QSize newSize,  bool scale);
 
-    /// Get the image size
+    /// Get the size of an individual frame
     /// @return Frame size, in pixels
-    QSize getSize() const;
+    QSize getFrameSize() const;
 
     /// Get the number of frames contained in the animation
     /// @return Frame count
@@ -64,7 +63,17 @@ public:
 
     /// Get an image representing the current frame
     /// @return an NxN QImage reperesenting the current frame data
-    const QImage getFrame(int index) const;
+    const QImage getFrameImage(int index) const;
+
+    /// Apply changes to the pattern
+    void setFrameImage(int index, const QImage& update);
+
+    /// Get an image representing the current image
+    /// @return an NxN QImage reperesenting the current frame data
+    const QImage getEditImage(int index) const;
+
+    /// Apply changes to the pattern
+    void setEditImage(int index, const QImage& update);
 
     /// Delete the frame at the given index
     /// @param frame Index of the frame to delete
@@ -74,21 +83,18 @@ public:
     /// @param frame Index that the frame should be inserted at
     void addFrame(int newFrame);
 
-    /// Apply changes to the pattern
-    void replaceFrame(int index, const QImage& update);
-
     /// Test if the pattern has unsaved changes
     /// @return true if the pattern has unsaved changes
     bool getModified() const;
 
     /// Get the underlying data model (for connection to a view)
-    PatternFrameModel* getFrameModel() {return &frames;}
+    PatternModel* getModel() const {return frames;}
 
     /// Get the UUID for this pattern
     const QUuid getUuid() const { return uuid; }
 
 private:
-    PatternFrameModel frames;   ///< New storage container for the images
+    QPointer<PatternModel> frames;   ///< Storage container for the images
 
     // TODO: Figure out a better way to store/copy patterns?
     // Difficult to do so now because they have to be tied into

@@ -28,13 +28,13 @@ Qt::DropActions PatternCollectionModel::supportedDropActions() const
 
 void PatternCollectionModel::connectPattern(QPointer<Pattern> pattern)
 {
-    connect(pattern->getFrameModel(), SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
+    connect(pattern->getModel(), SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
             this, SLOT(on_patternDataChanged(QModelIndex,QModelIndex,QVector<int>)));
 }
 
 void PatternCollectionModel::disconnectPattern(QPointer<Pattern> pattern)
 {
-    disconnect(pattern->getFrameModel(), SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
+    disconnect(pattern->getModel(), SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
                this, SLOT(on_patternDataChanged(QModelIndex,QModelIndex,QVector<int>)));
 }
 
@@ -68,7 +68,7 @@ QVariant PatternCollectionModel::data(const QModelIndex &index, int role) const
 //        return patterns.at(index.row())->getPatternName();
 
     else if (role == PreviewImage)
-        return patterns.at(index.row())->getFrame(0);
+        return patterns.at(index.row())->getEditImage(0);
 
     return QVariant();
 }

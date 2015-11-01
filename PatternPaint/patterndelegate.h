@@ -5,7 +5,7 @@
 #include "QPainter"
 #include "QImage"
 
-class PatternFrameDelegate : public QStyledItemDelegate
+class PatternDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 
@@ -15,7 +15,7 @@ private:
     QSize getScaledImageSize(int height, QSize imageSize) const;
 
 public:
-    PatternFrameDelegate(QObject* parent = 0);
+    PatternDelegate(QObject* parent = 0);
 
     QWidget * createEditor(QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const { return NULL; }
 

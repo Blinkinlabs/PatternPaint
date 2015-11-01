@@ -58,7 +58,6 @@ SOURCES += main.cpp\
     undocommand.cpp \
     colorchooser.cpp \
     patternframemodel.cpp \
-    patternframedelegate.cpp \
     pattern.cpp \
     patterncollectionmodel.cpp \
     patterncollectionlistview.cpp \
@@ -67,7 +66,9 @@ SOURCES += main.cpp\
     frameeditor.cpp \
     resizedialog.cpp \
     patternwriter.cpp \
-    fixture.cpp
+    fixture.cpp \
+    patternscrollmodel.cpp \
+    patterndelegate.cpp
 
 HEADERS  += mainwindow.h \
     systeminformation.h \
@@ -78,7 +79,6 @@ HEADERS  += mainwindow.h \
     undocommand.h \
     colorchooser.h \
     patternframemodel.h \
-    patternframedelegate.h \
     pattern.h \
     patterncollectionmodel.h \
     patterncollectionlistview.h \
@@ -87,7 +87,11 @@ HEADERS  += mainwindow.h \
     frameeditor.h \
     resizedialog.h \
     patternwriter.h \
-    fixture.h
+    fixture.h \
+    patternscrollmodel.h \
+    patternmodel.h \
+    patterndelegate.h \
+    colors.h
 
 mac {
 HEADERS  += \

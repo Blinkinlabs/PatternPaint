@@ -1,34 +1,39 @@
 #include "pattern.h"
 #include "undocommand.h"
 #include "patternframemodel.h"
+#include "patternscrollmodel.h"
 
 #include <QDebug>
 #include <QPainter>
 
 Pattern::Pattern(QSize patternSize, int frameCount, QListWidget* parent) :
-    frames(patternSize, parent)
+    QObject(parent)
 {
+
     uuid = QUuid::createUuid();
 
-    frames.insertRows(0, frameCount);
-    frames.setData(frames.index(0),false, PatternFrameModel::Modified);
+    // TODO: Choose a pattern type!
+    frames = new PatternScrollModel(patternSize, this);
+
+    frames->insertRows(0, frameCount);
+    frames->setData(frames->index(0),false, PatternModel::Modified);
     // TODO: MVC way of handling this?
     getUndoStack()->clear();
 }
 
 QUndoStack *Pattern::getUndoStack()
 {
-    return frames.getUndoStack();
+    return frames->getUndoStack();
 }
 
 bool Pattern::hasValidFilename() const
 {
-    return !frames.data(frames.index(0),PatternFrameModel::FileName).toString().isEmpty();
+    return !frames->data(frames->index(0),PatternModel::FileName).toString().isEmpty();
 }
 
 QString Pattern::getPatternName() const
 {
-    QFileInfo fileInfo(frames.data(frames.index(0),PatternFrameModel::FileName).toString());
+    QFileInfo fileInfo(frames->data(frames->index(0),PatternModel::FileName).toString());
 
     if(fileInfo.baseName() == "") {
         return "Untitled";
@@ -45,14 +50,14 @@ bool Pattern::load(const QString &newFileName)
         return false;
     }
 
-    QSize frameSize = frames.data(frames.index(0),PatternFrameModel::FrameSize).toSize();
+    QSize frameSize = frames->data(frames->index(0),PatternModel::FrameSize).toSize();
 
     // TODO: Warn if the source image wasn't of the expected aperture?
     sourceImage = sourceImage.scaledToHeight(frameSize.height());
     int newFrameCount = sourceImage.width()/frameSize.width();
 
-    frames.removeRows(0,frames.rowCount());
-    frames.insertRows(0,newFrameCount);
+    frames->removeRows(0,frames->rowCount());
+    frames->insertRows(0,newFrameCount);
 
     QPainter painter;
     for(int i = 0; i < newFrameCount; i++) {
@@ -62,12 +67,12 @@ bool Pattern::load(const QString &newFileName)
         painter.drawImage(QPoint(0,0), sourceImage,
                           QRect(frameSize.width()*i, 0, frameSize.width(),frameSize.height()));
         painter.end();
-        frames.setData(frames.index(i),newFrameData,PatternFrameModel::FrameData);
+        frames->setData(frames->index(i),newFrameData,PatternModel::FrameImage);
     }
 
     // If successful, record the filename and clear the undo stack.
-    frames.setData(frames.index(0), newFileName, PatternFrameModel::FileName);
-    frames.setData(frames.index(0),false, PatternFrameModel::Modified);
+    frames->setData(frames->index(0), newFileName, PatternModel::FileName);
+    frames->setData(frames->index(0),false, PatternModel::Modified);
 
     // TODO: MVC way of handling this?
     getUndoStack()->clear();
@@ -78,7 +83,7 @@ bool Pattern::load(const QString &newFileName)
 bool Pattern::saveAs(const QString newFileName) {
     // Attempt to save to this location
 
-    QSize frameSize = frames.data(frames.index(0),PatternFrameModel::FrameSize).toSize();
+    QSize frameSize = frames->data(frames->index(0),PatternModel::FrameSize).toSize();
 
     // Create a big image consisting of all the frames side-by-side
     QImage output(frameSize.width()*getFrameCount(), frameSize.height(),
@@ -90,7 +95,7 @@ bool Pattern::saveAs(const QString newFileName) {
     painter.fillRect(output.rect(),QColor(0,0,0));
     for(int i = 0; i < getFrameCount(); i++) {
         painter.drawImage(QPoint(frameSize.width()*i, 0),
-                          getFrame(i));
+                          getFrameImage(i));
     }
     painter.end();
 
@@ -98,48 +103,57 @@ bool Pattern::saveAs(const QString newFileName) {
         return false;
     }
 
-    frames.setData(frames.index(0), newFileName, PatternFrameModel::FileName);
-    frames.setData(frames.index(0), false, PatternFrameModel::Modified);
+    frames->setData(frames->index(0), newFileName, PatternModel::FileName);
+    frames->setData(frames->index(0), false, PatternModel::Modified);
 
     return true;
 }
 
 bool Pattern::save()
 {
-    return saveAs(frames.data(frames.index(0),PatternFrameModel::FileName).toString());
+    return saveAs(frames->data(frames->index(0),PatternModel::FileName).toString());
 }
 
 bool Pattern::getModified() const
 {
-    return frames.data(frames.index(0),PatternFrameModel::Modified).toBool();
+    return frames->data(frames->index(0),PatternModel::Modified).toBool();
 }
 
 void Pattern::resize(QSize newSize, bool scale) {
-    frames.setData(frames.index(0),newSize, PatternFrameModel::FrameSize);
+    frames->setData(frames->index(0),newSize, PatternModel::FrameSize);
 }
 
-QSize Pattern::getSize() const
+QSize Pattern::getFrameSize() const
 {
-    return frames.data(frames.index(0),PatternFrameModel::FrameSize).toSize();
+    return frames->data(frames->index(0),PatternModel::FrameSize).toSize();
 }
 
-void Pattern::replaceFrame(int index, const QImage &update)
+const QImage Pattern::getFrameImage(int index) const {
+    return frames->index(index).data(PatternModel::FrameImage).value<QImage>();
+}
+
+void Pattern::setFrameImage(int index, const QImage &update)
 {
-    frames.setData(frames.index(index),QVariant(update), PatternFrameModel::FrameData);
+    frames->setData(frames->index(index),QVariant(update), PatternModel::FrameImage);
 }
 
-const QImage Pattern::getFrame(int index) const {
-    return frames.index(index).data(PatternFrameModel::FrameData).value<QImage>();
+const QImage Pattern::getEditImage(int index) const {
+    return frames->index(index).data(PatternModel::EditImage).value<QImage>();
+}
+
+void Pattern::setEditImage(int index, const QImage &update)
+{
+    frames->setData(frames->index(index),QVariant(update), PatternModel::EditImage);
 }
 
 int Pattern::getFrameCount() const {
-    return frames.rowCount();
+    return frames->rowCount();
 }
 
 void Pattern::deleteFrame(int index) {
-    frames.removeRow(index);
+    frames->removeRow(index);
 }
 
 void Pattern::addFrame(int index) {
-    frames.insertRow(index);
+    frames->insertRow(index);
 }

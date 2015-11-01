@@ -1,14 +1,14 @@
 #include "patterncollectiondelegate.h"
 #include "patterncollectionmodel.h"
 
+#include "colors.h"
+
 #include <QDebug>
 
 #define ITEM_HEIGHT 120
 #define ITEM_WIDTH 150
 #define ITEM_LETTERBOX 10
-
-#define COLOR_BACKGROUND_UNCHECKED    QColor(50,50,50,255)
-#define COLOR_BACKGROUND_CHECKED    QColor(0,0,255,255)
+#define FRAME_SIZE 2
 
 PatternCollectionDelegate::PatternCollectionDelegate(QObject* parent) :
     QStyledItemDelegate(parent)
@@ -23,16 +23,24 @@ void PatternCollectionDelegate::paint(QPainter* painter, const QStyleOptionViewI
 
 //    QStyledItemDelegate::paint(painter, option, index);
 
-    QColor backgroundColor = COLOR_BACKGROUND_UNCHECKED;
+
+    // If this pattern is active, draw it as selected
+
+    QColor frameColor = COLOR_FRAME_UNSELECTED;
+
     if(option.state & QStyle::State_Selected) {
-        backgroundColor = COLOR_BACKGROUND_CHECKED;
+        painter->fillRect(option.rect, COLOR_BACKGROUND_CHECKED);
+        frameColor = COLOR_FRAME_SELECTED;
     }
 
-    // Draw the surrounding box
-    painter->fillRect(option.rect, backgroundColor);
+    // Draw the frame
+    painter->fillRect(QRect(option.rect.x()+ITEM_LETTERBOX-FRAME_SIZE,
+                            option.rect.y()+ITEM_LETTERBOX-FRAME_SIZE,
+                            scaled.width()+2*FRAME_SIZE,
+                            scaled.height()+2*FRAME_SIZE), frameColor);
+
 
     // Draw the image
-    painter->fillRect(QRect(option.rect.x()+ITEM_LETTERBOX, option.rect.y()+ITEM_LETTERBOX, scaled.width(), scaled.height()), QColor(10,10,10));
     painter->drawImage(option.rect.x()+ITEM_LETTERBOX, option.rect.y()+ITEM_LETTERBOX, scaled);
 
     painter->restore();

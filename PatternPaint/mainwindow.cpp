@@ -18,7 +18,7 @@
 #include "patterncollectiondelegate.h"
 
 #include "patternframemodel.h"
-#include "patternframedelegate.h"
+#include "patterndelegate.h"
 #include "patternCollection.h"
 #include "fixture.h"
 
@@ -193,7 +193,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(patternCollectionListView->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
             this, SLOT(on_patternCollectionCurrentChanged(const QModelIndex &, const QModelIndex &)));
 
-    timeline->setItemDelegate(new PatternFrameDelegate(this));
+    timeline->setItemDelegate(new PatternDelegate(this));
 
     // Create a pattern.
     on_actionNew_triggered();
@@ -569,9 +569,9 @@ void MainWindow::on_actionFlip_Horizontal_triggered()
         return;
     }
 
-    QImage frame = patternCollection.getPattern(getCurrentPatternIndex())->getFrame(getCurrentFrameIndex());
+    QImage frame = patternCollection.getPattern(getCurrentPatternIndex())->getEditImage(getCurrentFrameIndex());
     frame = frame.mirrored(true, false);
-    patternCollection.getPattern(getCurrentPatternIndex())->replaceFrame(getCurrentFrameIndex(),frame);
+    patternCollection.getPattern(getCurrentPatternIndex())->setEditImage(getCurrentFrameIndex(),frame);
 }
 
 void MainWindow::on_actionFlip_Vertical_triggered()
@@ -580,9 +580,9 @@ void MainWindow::on_actionFlip_Vertical_triggered()
         return;
     }
 
-    QImage frame = patternCollection.getPattern(getCurrentPatternIndex())->getFrame(getCurrentFrameIndex());
+    QImage frame = patternCollection.getPattern(getCurrentPatternIndex())->getEditImage(getCurrentFrameIndex());
     frame = frame.mirrored(false, true);
-    patternCollection.getPattern(getCurrentPatternIndex())->replaceFrame(getCurrentFrameIndex(),frame);
+    patternCollection.getPattern(getCurrentPatternIndex())->setEditImage(getCurrentFrameIndex(),frame);
 }
 
 void MainWindow::on_actionClear_Pattern_triggered()
@@ -591,9 +591,9 @@ void MainWindow::on_actionClear_Pattern_triggered()
         return;
     }
 
-    QImage frame = patternCollection.getPattern(getCurrentPatternIndex())->getFrame(getCurrentFrameIndex());
+    QImage frame = patternCollection.getPattern(getCurrentPatternIndex())->getEditImage(getCurrentFrameIndex());
     frame.fill(COLOR_CANVAS_DEFAULT);
-    patternCollection.getPattern(getCurrentPatternIndex())->replaceFrame(getCurrentFrameIndex(),frame);
+    patternCollection.getPattern(getCurrentPatternIndex())->setEditImage(getCurrentFrameIndex(),frame);
 }
 
 void MainWindow::showError(QString errorMessage) {
@@ -707,7 +707,7 @@ void MainWindow::on_actionResize_Pattern_triggered()
 
     ResizeDialog resizeDialog(this);
     resizeDialog.setWindowModality(Qt::WindowModal);
-    resizeDialog.setOutputSize(patternCollection.getPattern(getCurrentPatternIndex())->getFrame(0).size());
+    resizeDialog.setOutputSize(patternCollection.getPattern(getCurrentPatternIndex())->getEditImage(0).size());
 
     resizeDialog.exec();
 
@@ -816,7 +816,7 @@ bool MainWindow::promptForSave(Pattern * item) {
 
     QMessageBox msgBox(this);
     msgBox.setWindowModality(Qt::WindowModal);
-    msgBox.setIconPixmap(QPixmap::fromImage(item->getFrame(0)));
+    msgBox.setIconPixmap(QPixmap::fromImage(item->getEditImage(0)));
     msgBox.setText(messageText);
     msgBox.setInformativeText(tr("Do you want to save your changes?"));
     msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
@@ -899,7 +899,7 @@ bool MainWindow::loadPattern(const QString fileName)
         displaySize = settings.value("Options/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize();
     }
     else {
-        displaySize =  patternCollection.getPattern(getCurrentPatternIndex())->getFrame(0).size();
+        displaySize =  patternCollection.getPattern(getCurrentPatternIndex())->getFrameSize();
     }
 
     Pattern *pattern = new Pattern(displaySize, frameCount);
@@ -956,12 +956,10 @@ void MainWindow::setNewFrame(int newFrame)
 
     timeline->setCurrentIndex(timeline->model()->index(newFrame,0));
 
-    frameEditor->setFrameData(getCurrentFrameIndex(),
-                                patternCollection.getPattern(getCurrentPatternIndex())->getFrame(newFrame));
-
     pFrame.setText(QString::number(getCurrentFrameIndex()+1));
 
-    updateBlinky();
+    setPatternData(getCurrentFrameIndex(),
+                   patternCollection.getPattern(getCurrentPatternIndex())->getEditImage(newFrame));
 }
 
 void MainWindow::updateBlinky()
@@ -974,8 +972,8 @@ void MainWindow::updateBlinky()
         return;
     }
 
-    QImage frame = patternCollection.getPattern(getCurrentPatternIndex())->getFrame(getCurrentFrameIndex());
-    MatrixFixture fixture(patternCollection.getPattern(getCurrentPatternIndex())->getSize());
+    QImage frame = patternCollection.getPattern(getCurrentPatternIndex())->getFrameImage(getCurrentFrameIndex());
+    MatrixFixture fixture(patternCollection.getPattern(getCurrentPatternIndex())->getFrameSize());
 
     QList<QColor> pixels = fixture.getColorStreamForFrame(frame);
 
@@ -1050,12 +1048,12 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
     Pattern* newpattern = patternCollection.getPattern(current.row());
 
     undoGroup.setActiveStack(newpattern->getUndoStack());
-    timeline->setModel(newpattern->getFrameModel());
+    timeline->setModel(newpattern->getModel());
 
 
     setPatternName(newpattern->getPatternName());
     setPatternModified(newpattern->getModified());
-    setPatternData(getCurrentFrameIndex(), newpattern->getFrame(getCurrentPatternIndex()));
+    setPatternData(getCurrentFrameIndex(), newpattern->getEditImage(getCurrentPatternIndex()));
 
 
     // TODO: Should we unregister these eventually?
@@ -1080,11 +1078,11 @@ void MainWindow::on_timelineDataChanged(const QModelIndex &topLeft, const QModel
         else if(roles[i] == PatternFrameModel::Modified)
             setPatternModified(patternCollection.getPattern(getCurrentPatternIndex())->getModified());
 
-        else if(roles[i] == PatternFrameModel::FrameData) {
+        else if(roles[i] == PatternFrameModel::FrameImage) {
             // If the current selection changed, refresh so that the FrameEditor contents will be redrawn
             if(currentIndex >= topLeft.row() && currentIndex <= bottomRight.row()) {
                 setPatternData(getCurrentFrameIndex(),
-                               patternCollection.getPattern(getCurrentPatternIndex())->getFrame(getCurrentFrameIndex()));
+                               patternCollection.getPattern(getCurrentPatternIndex())->getEditImage(getCurrentFrameIndex()));
             }
         }
     }
@@ -1100,12 +1098,12 @@ void MainWindow::setPatternData(int index, QImage data)
 void MainWindow::on_patternSizeUpdated()
 {
     if(!patternCollection.hasPattern()) {
-        frameEditor->setFrameData(0, QImage());
+        setPatternData(0, QImage());
         return;
     }
 
-    frameEditor->setFrameData(getCurrentFrameIndex(),
-                                patternCollection.getPattern(getCurrentPatternIndex())->getFrame(getCurrentFrameIndex()));
+    setPatternData(getCurrentFrameIndex(),
+                   patternCollection.getPattern(getCurrentPatternIndex())->getEditImage(getCurrentFrameIndex()));
 
     // And kick the scroll area so that it will size itself
     //scrollArea->resize(scrollArea->width()+1, scrollArea->height());
@@ -1118,7 +1116,7 @@ void MainWindow::on_frameDataEdited(int index, QImage update)
         return;
     }
 
-    patternCollection.getPattern(getCurrentPatternIndex())->replaceFrame(index, update);
+    patternCollection.getPattern(getCurrentPatternIndex())->setEditImage(index, update);
 }
 
 

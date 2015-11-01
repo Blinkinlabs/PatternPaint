@@ -13,7 +13,7 @@ PatternWriter::PatternWriter(const Pattern *pattern,
     colorMode(colorMode)
 {
     frameCount = pattern->getFrameCount();
-    ledCount = pattern->getSize().width()*pattern->getSize().height(); // TODO: Integrate a fixture here.
+    ledCount = pattern->getFrameSize().width()*pattern->getFrameSize().height(); // TODO: Integrate a fixture here.
 
     // Create a new encoder
     switch(encoding) {
@@ -69,7 +69,7 @@ int PatternWriter::QRgbTo565(QColor color) {
 }
 
 void PatternWriter::encodeImageRGB16_RLE(const Pattern *pattern) {
-    MatrixFixture fixture(pattern->getSize());
+    MatrixFixture fixture(pattern->getFrameSize());
 
     data.clear();
     header.clear(); // TODO: Move the header builder somewhere else?
@@ -79,7 +79,7 @@ void PatternWriter::encodeImageRGB16_RLE(const Pattern *pattern) {
     for(int frame = 0; frame < pattern->getFrameCount(); frame++) {
         header.append(QString("// Frame: %1\n").arg(frame));
 
-        QList<QColor> colorStream = fixture.getColorStreamForFrame(pattern->getFrame(frame));
+        QList<QColor> colorStream = fixture.getColorStreamForFrame(pattern->getFrameImage(frame));
 
         int currentColor;
         int runCount = 0;
@@ -135,13 +135,13 @@ void PatternWriter::encodeImageRGB16_RLE(const Pattern *pattern) {
 
 
 void PatternWriter::encodeImageRGB24(const Pattern *pattern) {
-    MatrixFixture fixture(pattern->getSize());
+    MatrixFixture fixture(pattern->getFrameSize());
 
     header.clear();
     data.clear();
 
     for(int frame = 0; frame < pattern->getFrameCount(); frame++) {
-        QList<QColor> colorStream = fixture.getColorStreamForFrame(pattern->getFrame(frame));
+        QList<QColor> colorStream = fixture.getColorStreamForFrame(pattern->getFrameImage(frame));
 
         for(int pixel = 0; pixel < colorStream.count(); pixel++) {
             QColor color = ColorModel::correctBrightness(colorStream.at(pixel));
@@ -167,7 +167,7 @@ void PatternWriter::encodeImageRGB24(const Pattern *pattern) {
     for(int frame = 0; frame < pattern->getFrameCount(); frame++) {
         header.append(QString("// Frame: %1\n").arg(frame));
 
-        QList<QColor> colorStream = fixture.getColorStreamForFrame(pattern->getFrame(frame));
+        QList<QColor> colorStream = fixture.getColorStreamForFrame(pattern->getFrameImage(frame));
 
         for(int pixel = 0; pixel < colorStream.count(); pixel++) {
             QColor color = ColorModel::correctBrightness(colorStream.at(pixel));

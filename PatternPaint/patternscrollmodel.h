@@ -1,5 +1,5 @@
-#ifndef PATTERNFRAMEMODEL_H
-#define PATTERNFRAMEMODEL_H
+#ifndef PATTERNSCROLLMODEL_H
+#define PATTERNSCROLLMODEL_H
 
 #include <QAbstractListModel>
 #include <QFileInfo>
@@ -7,13 +7,13 @@
 #include <QUndoStack>
 #include "patternmodel.h"
 
-/// Model for a pattern made from a list of QImage frames
-class PatternFrameModel : public PatternModel
+/// Model for a pattern made from a single QImage that the fixture scrolls across
+class PatternScrollModel : public PatternModel
 {
     Q_OBJECT
 public:
 
-    PatternFrameModel(QSize frameSize, QObject *parent = 0);
+    PatternScrollModel(QSize frameSize, QObject *parent = 0);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;
@@ -33,11 +33,9 @@ public:
     QUndoStack* getUndoStack() {return &undoStack;}
     void applyUndoState(QList<QImage> &newFrames, QSize newSize);
 
-    // TODO: Delete me!
-    QList<QImage> getFrames() const {return frames;}
-
 private:
-    QList<QImage> frames;
+    QImage image;
+
     QUndoStack  undoStack;      ///< Undo stack for this pattern
     QSize frameSize;            ///< Resolution of this pattern, in pixels
     QString fileInfo;           ///< Filename for the pattern
@@ -46,4 +44,4 @@ private:
     void pushUndoState();
 };
 
-#endif // PATTERNFRAMEMODEL_H
+#endif // PATTERNSCROLLMODEL_H

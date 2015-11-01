@@ -65,6 +65,12 @@
         <height>16777215</height>
        </size>
       </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background:qlineargradient(spread:pad, x1:1, y1:1, x2:1, y2:0, stop:0 rgba(233, 230, 233, 255), stop:1 rgba(207, 206, 207, 255))</string>
+      </property>
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
       </property>
@@ -85,42 +91,8 @@
          <verstretch>1</verstretch>
         </sizepolicy>
        </property>
-       <property name="palette">
-        <palette>
-         <active>
-          <colorrole role="Window">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>50</red>
-             <green>50</green>
-             <blue>50</blue>
-            </color>
-           </brush>
-          </colorrole>
-         </active>
-         <inactive>
-          <colorrole role="Window">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>50</red>
-             <green>50</green>
-             <blue>50</blue>
-            </color>
-           </brush>
-          </colorrole>
-         </inactive>
-         <disabled>
-          <colorrole role="Window">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>50</red>
-             <green>50</green>
-             <blue>50</blue>
-            </color>
-           </brush>
-          </colorrole>
-         </disabled>
-        </palette>
+       <property name="styleSheet">
+        <string notr="true">background:qlineargradient(spread:pad, x1:1, y1:1, x2:1, y2:0, stop:0 rgba(186, 194, 204, 255), stop:1 rgba(186, 194, 204, 255))</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
@@ -184,6 +156,9 @@
          <width>0</width>
          <height>100</height>
         </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background:qlineargradient(spread:pad, x1:1, y1:1, x2:1, y2:0, stop:0 rgba(233, 230, 233, 255), stop:1 rgba(207, 206, 207, 255))</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>

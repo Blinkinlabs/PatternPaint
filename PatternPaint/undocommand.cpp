@@ -26,6 +26,7 @@
 #include "undocommand.h"
 #include "frameeditor.h"
 #include <QDebug>
+#include "patternframemodel.h"
 
 
 UndoCommand::UndoCommand(PatternFrameModel *item,
