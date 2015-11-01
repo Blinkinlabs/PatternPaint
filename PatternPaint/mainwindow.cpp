@@ -440,7 +440,7 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
     settings.setValue("File/ExportArduinoDirectory", fileInfo.absolutePath());
 
     // Note: Converting frameRate to frame delay here.
-    PatternWriter patternOutput(patternCollection.getPattern(getCurrentPatternIndex()),
+    PatternWriter patternWriter(patternCollection.getPattern(getCurrentPatternIndex()),
                                 drawTimer.interval(),
                                 PatternWriter::RGB24,
                                 colorMode);
@@ -455,7 +455,7 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
     }
 
     QTextStream ts(&file);
-    ts << patternOutput.getHeader();
+    ts << patternWriter.getHeader();
     file.close();
 }
 
@@ -666,15 +666,13 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
     std::vector<PatternWriter> patterns;
 
     for(int i = 0; i < patternCollection.count(); i++) {
-        // TODO: This needs to be run over all the frames!
-        // Rewrite me.
-        PatternWriter patternOutput(patternCollection.getPattern(getCurrentPatternIndex()),
+        PatternWriter patternWriter(patternCollection.getPattern(i),
                         drawTimer.interval(),
-                        //Pattern::RGB24,
+                        //PatternWriter::RGB24,
                         PatternWriter::RGB565_RLE,
                         colorMode);
 
-        patterns.push_back(patternOutput);
+        patterns.push_back(patternWriter);
     }
 
     if(!controller->getUploader(uploader)) {

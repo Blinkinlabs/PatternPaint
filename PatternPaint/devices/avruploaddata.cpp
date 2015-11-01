@@ -32,7 +32,7 @@ bool avrUploadData::init(std::vector<PatternWriter> patterns) {
     }
 
 
-    // Test for the minimum/maximum patterns size
+    // Test for the minimum/maximum patterns count
     if(patterns.size() == 0) {
         errorString = QString("No Patterns detected!");
         return false;
@@ -58,7 +58,7 @@ bool avrUploadData::init(std::vector<PatternWriter> patterns) {
         pattern != patterns.end();
         ++pattern) {
 
-        snprintf(buff, BUFF_LENGTH, "Adding pattern. Encoding: %x, framecount: %i, frameDelay: %i, size: %iB, offset: %iB",
+        snprintf(buff, BUFF_LENGTH, "Adding pattern. Encoding: %x, framecount: %i, frameDelay: %i, count: %iB, offset: %iB",
                  pattern->getEncoding(),
                  pattern->getFrameCount(),
                  pattern->getFrameDelay(),
