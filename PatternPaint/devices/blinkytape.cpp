@@ -17,7 +17,7 @@
 
 #define RESET_MAX_TRIES 3
 
-#define WRITE_BUSY_DELAY 1
+#define WRITE_BUSY_DELAY 2
 #define WRITE_CHUNK_DELAY 4
 #define CHUNK_SIZE 300
 
