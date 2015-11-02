@@ -72,10 +72,11 @@ private:
     QTimer connectionScannerTimer;
 #endif
 
-#if defined(Q_OS_MAC)
+    /// serialWrite timer is used to limit the amount of data that can be
+    /// transmitted to the device at one time. Chunks are sent one at a time,
+    /// with a pause in between.
     QTimer serialWriteTimer;
     QList<QByteArray> chunks;
-#endif
 
 signals:
     void connectionStatusChanged(bool status);

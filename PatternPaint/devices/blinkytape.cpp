@@ -17,6 +17,8 @@
 
 #define RESET_MAX_TRIES 3
 
+#define MIN_UPDATE_INTERVAL 3
+
 #define WRITE_BUSY_DELAY 2
 #define WRITE_CHUNK_DELAY 4
 #define CHUNK_SIZE 300
@@ -95,11 +97,8 @@ BlinkyTape::BlinkyTape(QObject *parent) :
     resetTimer.setSingleShot(true);
     connect(&resetTimer, SIGNAL(timeout()), this, SLOT(resetTimer_timeout()));
 
-    // On OS X, we can't send data too quickly, so we use a timer to send small chunks
-#if defined(Q_OS_MAC)
     serialWriteTimer.setSingleShot(true);
     connect(&serialWriteTimer, SIGNAL(timeout()), this, SLOT(sendChunk()));
-#endif
 
     // On Windows, we don't get notified if the tape was disconnected, so we have to check peroidically
 #if defined(Q_OS_WIN)
@@ -169,15 +168,10 @@ void BlinkyTape::sendChunk()
         }
         serial->flush();
 
-        // On OS X, we can't send too much data at once, or it will hang the blinkytape.
-        // In this case, set a timer to call this function again.
-
-#if defined(Q_OS_MAC)
         if(!chunks.isEmpty()) {
             serialWriteTimer.start(WRITE_CHUNK_DELAY);
             return;
         }
-#endif
     }
 }
 
@@ -279,6 +273,14 @@ bool BlinkyTape::isConnected() {
 
 void BlinkyTape::sendUpdate(QByteArray ledData)
 {
+    // Ignore the update request if it came too quickly
+    static qint64 lastTime = 0;
+    qint64 newTime = QDateTime::currentMSecsSinceEpoch();
+    if (newTime - lastTime < MIN_UPDATE_INTERVAL) {
+        return;
+    }
+    lastTime = newTime;
+
     if(!isConnected()) {
         qCritical() << "Strip not connected, not sending update!";
         return;
