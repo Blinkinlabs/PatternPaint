@@ -19,20 +19,21 @@ PatternScrollModel::PatternScrollModel(QSize size, QObject *parent) :
 
 int PatternScrollModel::rowCount(const QModelIndex &) const
 {
-    return image.width()-frameSize.width();
+//    return image.width()-frameSize.width();
+    return image.width();
 }
 
 Qt::ItemFlags PatternScrollModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
-        return Qt::ItemIsEnabled | Qt::ItemIsDropEnabled;
+        return Qt::ItemIsEnabled;
 
-    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable | Qt::ItemIsDragEnabled ;
+    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
 }
 
 Qt::DropActions PatternScrollModel::supportedDropActions() const
 {
-    return Qt::CopyAction | Qt::MoveAction;
+    return 0;
 }
 
 void PatternScrollModel::pushUndoState()
@@ -73,16 +74,31 @@ QVariant PatternScrollModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     if (role == FrameImage || role == Qt::EditRole) {
+        // TODO: Handle splits!
         QImage frame(frameSize, QImage::Format_ARGB32_Premultiplied);
         QPainter painter;
         painter.begin(&frame);
-        painter.drawImage(0,0,image,index.row(),0,frameSize.width(),frameSize.height());
+
+        if(index.row() < image.width() - frameSize.width())
+            painter.drawImage(0,0,image,index.row(),0,frameSize.width(),frameSize.height());
+
+        else {
+            painter.drawImage(0,0,
+                              image,
+                              index.row(),0,
+                              image.width() - index.row(), frameSize.height());
+            painter.drawImage(image.width() - index.row(),0,
+                              image,
+                              0,0,
+                              frameSize.width() - image.width() + index.row(), frameSize.height());
+        }
+
         painter.end();
         return frame;
     }
-    else if (role == EditImage) {
+
+    else if (role == EditImage)
         return image;
-    }
 
     else if (role == FrameSize)
         return frameSize;
@@ -106,17 +122,36 @@ bool PatternScrollModel::setData(const QModelIndex &index,
     pushUndoState();
 
     if(role == FrameImage || role == Qt::EditRole) {
-        //TODO: enforce size scaling here?
+//        //TODO: enforce size scaling here?
 
-        QPainter painter;
-        painter.begin(&image);
-        painter.drawImage(index.row(),0, value.value<QImage>(),0,0,frameSize.width(),frameSize.height());
-        painter.end();
+//        QPainter painter;
+//        painter.begin(&image);
 
-        QVector<int> roles;
-        roles.append(FrameImage);
-        emit dataChanged(index, index, roles);
-        return true;
+//        if(index.row() < image.width() - frameSize.width())
+//            painter.drawImage(index.row(),0,
+//                              value.value<QImage>(),
+//                              0,0,
+//                              frameSize.width(),frameSize.height());
+
+//        else {
+//            painter.drawImage(index.row(),0,
+//                              value.value<QImage>(),
+//                              0,0,
+//                              image.width() - index.row(),frameSize.height());
+
+//            painter.drawImage(0,0,
+//                              value.value<QImage>(),
+//                              image.width()-index.row(),0,
+//                              frameSize.width() - image.width() + index.row(),frameSize.height());
+//        }
+
+//        painter.end();
+
+//        QVector<int> roles;
+//        roles.append(FrameImage);
+//        emit dataChanged(index, index, roles);
+//        return true;
+        return false;
     }
     else if(role == EditImage) {
         //TODO: enforce size scaling here?
@@ -134,31 +169,30 @@ bool PatternScrollModel::setData(const QModelIndex &index,
     else if(role == FrameSize) {
         // TODO: Implement me
 
-//        for(int row = 0; row < rowCount(); row++) {
-//            frameSize = value.toSize();
-//            QImage newImage;
-//            bool scale = true;      // Enforce scaling...
+        frameSize = value.toSize();
+        QImage newImage;
+        bool scale = true;      // Enforce scaling...
 
-//            if(scale) {
-//                newImage = frames.at(row).scaled(frameSize);
-//            }
-//            else {
-//                newImage = QImage(frameSize,
-//                               QImage::Format_ARGB32_Premultiplied);
-//                newImage.fill(FRAME_COLOR_DEFAULT);
+        if(scale) {
+            newImage = image.scaled(image.width(), frameSize.height());
+        }
+        else {
+            newImage = QImage(image.width(), frameSize.height(),
+                           QImage::Format_ARGB32_Premultiplied);
+            newImage.fill(FRAME_COLOR_DEFAULT);
 
-//                QPainter painter(&newImage);
-//                painter.drawImage(0,0,frames.at(row));
-//            }
+            QPainter painter(&newImage);
+            painter.drawImage(0,0,image);
+        }
 
-//            frames.replace(row,newImage);
-//        }
+        image = newImage;
 
-//        QVector<int> roles;
-//        roles.append(FrameSize);
-//        roles.append(FrameData);
+        QVector<int> roles;
+        roles.append(FrameSize);
+        roles.append(FrameImage);
+        roles.append(EditImage);
 
-//        emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
+        emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
         return true;
     }
     else if(role == FileName) {

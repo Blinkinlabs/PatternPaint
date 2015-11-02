@@ -122,6 +122,7 @@ bool PatternFrameModel::setData(const QModelIndex &index,
         QVector<int> roles;
         roles.append(FrameSize);
         roles.append(FrameImage);
+        roles.append(EditImage);
 
         emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
         return true;
