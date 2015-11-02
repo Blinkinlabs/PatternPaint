@@ -11,17 +11,18 @@
 class PatternWriter
 {
 public:
+    // TODO: Move me to a converter class
+    enum ColorMode {
+        RGB,
+        GRB,
+        RGBW,
+    };
+
     enum Encoding {
         RGB24       = 0,     /// RGB24 mode (uncompressed 24 bit)
         RGB565_RLE  = 1,     /// RGB 565 + RLE mode (compressed 16 bit)
 //        INDEXED     = 2,     /// 8-bit indexed mode (pallated 8 bit)
 //        INDEXED_RLE = 3,     /// 8-bit indexed mode + RLE (pallated 8 bit)
-    };
-
-    // TODO: Move me to a converter class
-    enum ColorMode {
-        RGB = 0,
-        GRB = 1
     };
 
     // Create an pattern from a QImage
@@ -63,4 +64,16 @@ private:
 };
 
 
-#endif // PATTERN_H
+
+//struct ColorModes {
+//    PatternWriter::ColorMode colorMode;
+//    QString name;
+//};
+
+//ColorModes colorModes[] =
+//{
+//    {PatternWriter::RGB, "RGB"},
+//    {PatternWriter::GRB, "GRB"},
+//};
+
+#endif // PATTERN_WRITER_H

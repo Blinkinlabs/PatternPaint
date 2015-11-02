@@ -982,16 +982,16 @@ void MainWindow::updateBlinky()
     for(int i = 0; i < pixels.size(); i++) {
         QColor color = ColorModel::correctBrightness(pixels[i]);
 
-        switch(colorMode) {
+        //switch(colorMode) {
+        switch(PatternWriter::RGBW) {
+        case PatternWriter::RGB:
+            ledData.append(color.red());
+            ledData.append(color.green());
+            ledData.append(color.blue());
+            break;
         case PatternWriter::GRB:
             ledData.append(color.green());
             ledData.append(color.red());
-            ledData.append(color.blue());
-            break;
-        case PatternWriter::RGB:
-        default:
-            ledData.append(color.red());
-            ledData.append(color.green());
             ledData.append(color.blue());
             break;
         }

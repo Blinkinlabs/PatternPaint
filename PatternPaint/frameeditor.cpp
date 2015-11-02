@@ -269,25 +269,41 @@ void FrameEditor::paintEvent(QPaintEvent*)
         painter.drawImage(0,0,gridPattern);
     }
 
-//    // TODO: How to do this more generically?
+    // TODO: How to do this more generically?
 //    if(deviceModel->showPlaybackIndicator()) {
+    if(true) {
 //        int playbackRow = deviceModel->getFrameIndex();
 //        const float outputScale = deviceModel->getDisplaySize().width()*xScale;
 
-//        // Draw the playback indicator
-//        // Note that we need to compute the correct width based on the rounding error of
-//        // the current cell, otherwise it won't line up correctly with the actual image.
-//        painter.setPen(COLOR_PLAYBACK_EDGE);
-//        painter.drawRect(playbackRow*outputScale +.5,
-//                         0,
-//                         int((playbackRow+1)*outputScale +.5) - int(playbackRow*outputScale +.5),
-//                         frameData.height()*yScale);
-//        painter.fillRect(playbackRow*outputScale +.5,
-//                         0,
-//                         int((playbackRow+1)*outputScale +.5) - int(playbackRow*outputScale +.5),
-//                         frameData.height()*yScale,
-//                         COLOR_PLAYBACK_TOP);
-//    }
+        int playbackRow = frameIndex;
+        int fixtureWidth = 1;
+
+        // Draw the playback indicator
+        // Note that we need to compute the correct width based on the rounding error of
+        // the current cell, otherwise it won't line up correctly with the actual image.
+        painter.setPen(COLOR_PLAYBACK_EDGE);
+        painter.drawRect(playbackRow*xScale +.5,
+                         0,
+                         int((playbackRow+fixtureWidth)*xScale +.5) - int(playbackRow*xScale +.5),
+                         frameData.height()*yScale);
+        painter.fillRect(playbackRow*xScale +.5,
+                         0,
+                         int((playbackRow+fixtureWidth)*xScale +.5) - int(playbackRow*xScale +.5),
+                         frameData.height()*yScale,
+                         COLOR_PLAYBACK_TOP);
+
+        // TODO: only if playback is far enough out..
+
+        painter.drawRect((playbackRow-frameData.width())*xScale +.5,
+                         0,
+                         int((playbackRow+fixtureWidth)*xScale +.5) - int(playbackRow*xScale +.5),
+                         frameData.height()*yScale);
+        painter.fillRect((playbackRow-frameData.width())*xScale +.5,
+                         0,
+                         int((playbackRow+fixtureWidth)*xScale +.5) - int(playbackRow*xScale +.5),
+                         frameData.height()*yScale,
+                         COLOR_PLAYBACK_TOP);
+    }
 
 }
 
