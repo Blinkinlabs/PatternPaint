@@ -4,7 +4,6 @@
 #include "systeminformation.h"
 #include "aboutpatternpaint.h"
 #include "resizedialog.h"
-#include "undocommand.h"
 #include "colorchooser.h"
 #include "blinkytape.h"
 #include "patternwriter.h"
@@ -351,7 +350,8 @@ void MainWindow::on_actionLoad_File_triggered()
     QFileInfo fileInfo(fileName);
     settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
 
-    if(!loadPattern(fileName)) {
+    // TODO: choose scrolling/frame-based
+    if(!loadPattern(Pattern::Scrolling, fileName)) {
         showError(tr("Could not open file %1. Perhaps it has a formatting problem?")
                   .arg(fileName));
         return;
@@ -889,7 +889,7 @@ void MainWindow::connectUploader()
 
 }
 
-bool MainWindow::loadPattern(const QString fileName)
+bool MainWindow::loadPattern(Pattern::PatternType type, const QString fileName)
 {
     QSettings settings;
     int frameCount = settings.value("Options/FrameCount", DEFAULT_FRAME_COUNT).toUInt();
@@ -902,8 +902,9 @@ bool MainWindow::loadPattern(const QString fileName)
         displaySize =  patternCollection.getPattern(getCurrentPatternIndex())->getFrameSize();
     }
 
-    Pattern *pattern = new Pattern(displaySize, frameCount);
+    Pattern *pattern = new Pattern(type, displaySize, frameCount);
 
+    // TODO: Fix load procedure fit the pattern type
     if(!fileName.isEmpty())
         if(!pattern->load(fileName))
             return false;
@@ -1011,7 +1012,7 @@ void MainWindow::on_actionRGB_triggered()
 
 void MainWindow::on_actionNew_triggered()
 {
-    loadPattern(QString());
+    loadPattern(Pattern::Scrolling, QString());
 }
 
 void MainWindow::on_actionClose_triggered()
@@ -1179,10 +1180,21 @@ void MainWindow::setPatternModified(bool modified)
 void MainWindow::on_ExampleSelected(QAction* action) {
     qDebug() << "Example selected:" << action->objectName();
 
-    if(!loadPattern(action->objectName())) {
+    // TODO: Choose scrolling/frame based
+    if(!loadPattern(Pattern::Scrolling, action->objectName())) {
         showError("Could not open file "
                    + action->objectName()
                    + ". Perhaps it has a formatting problem?");
         return;
     }
+}
+
+void MainWindow::on_actionNew_ScrollingPattern_triggered()
+{
+    loadPattern(Pattern::Scrolling, QString());
+}
+
+void MainWindow::on_actionNew_FramePattern_triggered()
+{
+    loadPattern(Pattern::FrameBased, QString());
 }

@@ -38,7 +38,6 @@ public:
 
     /// TODO: Move the specializations to a delegate?
     virtual QUndoStack* getUndoStack() = 0;
-    virtual void applyUndoState(QList<QImage> &newFrames, QSize newSize) = 0;
 };
 
 

@@ -7,6 +7,8 @@
 #include <QUndoStack>
 #include "patternmodel.h"
 
+class PatternScrollUndoCommand;
+
 /// Model for a pattern made from a single QImage that the fixture scrolls across
 class PatternScrollModel : public PatternModel
 {
@@ -28,10 +30,9 @@ public:
     bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex());
     bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex());
 
-    /// TODO: Move the specializations to a delegate?
-
     QUndoStack* getUndoStack() {return &undoStack;}
-    void applyUndoState(QList<QImage> &newFrames, QSize newSize);
+
+    friend class PatternScrollUndoCommand;
 
 private:
     QImage image;
@@ -42,6 +43,8 @@ private:
     bool modified;              ///< True if the pattern has been changed since last save
 
     void pushUndoState();
+
+    void applyUndoState(QImage newImage, QSize newSize);
 };
 
 #endif // PATTERNSCROLLMODEL_H

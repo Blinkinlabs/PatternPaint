@@ -14,10 +14,15 @@ class Pattern : public QObject
 Q_OBJECT
 
 public:
+    enum PatternType{
+        Scrolling,
+        FrameBased
+    };
+
     /// Constructor for an empty pattern item
     /// @param size Size of the display, in pixels
     /// @param frameCount Length of the pattern, in frames
-    Pattern(QSize size, int frameCount, QListWidget* parent = 0);
+    Pattern(PatternType type, QSize size, int frameCount, QListWidget* parent = 0);
 
     /// Set the pattern image directly without resizing or setting an undo state. This
     /// is used by the undocommand and should probably be refactored.

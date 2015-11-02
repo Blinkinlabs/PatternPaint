@@ -202,6 +202,8 @@
      </property>
     </widget>
     <addaction name="actionNew"/>
+    <addaction name="actionNew_ScrollingPattern"/>
+    <addaction name="actionNew_FramePattern"/>
     <addaction name="actionLoad_File"/>
     <addaction name="menuExamples"/>
     <addaction name="separator"/>
@@ -718,6 +720,16 @@
   <action name="actionDd">
    <property name="text">
     <string>dd</string>
+   </property>
+  </action>
+  <action name="actionNew_ScrollingPattern">
+   <property name="text">
+    <string>New Scrolling Pattern</string>
+   </property>
+  </action>
+  <action name="actionNew_FramePattern">
+   <property name="text">
+    <string>New Frame-by-frame Pattern</string>
    </property>
   </action>
  </widget>

@@ -16,8 +16,8 @@ TARGET = PatternPaint
 TEMPLATE = app
 
 #Application version
-VERSION_MAJOR = 1
-VERSION_MINOR = 9
+VERSION_MAJOR = 2
+VERSION_MINOR = 0
 VERSION_BUILD = 0
 
 #Target version and application information
@@ -55,7 +55,6 @@ SOURCES += main.cpp\
     aboutpatternpaint.cpp \
     addressprogrammer.cpp \
     letterboxscrollarea.cpp \
-    undocommand.cpp \
     colorchooser.cpp \
     patternframemodel.cpp \
     pattern.cpp \
@@ -68,7 +67,9 @@ SOURCES += main.cpp\
     patternwriter.cpp \
     fixture.cpp \
     patternscrollmodel.cpp \
-    patterndelegate.cpp
+    patterndelegate.cpp \
+    patternframeundocommand.cpp \
+    patternscrollundocommand.cpp
 
 HEADERS  += mainwindow.h \
     systeminformation.h \
@@ -76,7 +77,6 @@ HEADERS  += mainwindow.h \
     aboutpatternpaint.h \
     addressprogrammer.h \
     letterboxscrollarea.h \
-    undocommand.h \
     colorchooser.h \
     patternframemodel.h \
     pattern.h \
@@ -91,7 +91,9 @@ HEADERS  += mainwindow.h \
     patternscrollmodel.h \
     patternmodel.h \
     patterndelegate.h \
-    colors.h
+    colors.h \
+    patternframeundocommand.h \
+    patternscrollundocommand.h
 
 mac {
 HEADERS  += \

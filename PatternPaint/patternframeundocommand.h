@@ -23,36 +23,37 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "undocommand.h"
-#include "frameeditor.h"
-#include <QDebug>
-#include "patternframemodel.h"
+#ifndef UNDOCOMMAND_H
+#define UNDOCOMMAND_H
+
+#include <QUndoCommand>
+#include <QImage>
 
 
-UndoCommand::UndoCommand(PatternFrameModel *item,
-                         const QList<QImage> &frames,
-                         const QSize size,
-                         QUndoCommand *parent) :
-    QUndoCommand(parent),
-    previousFrames(frames),
-    previousSize(size),
-    patternFrameModel(item)
+// TODO: Base this on actions, not blindly storing/restoring the state.
+
+class PatternFrameModel;
+
+/**
+ * @brief Class which provides undo/redo actions
+ *
+ */
+class PatternFrameUndoCommand : public QUndoCommand
 {
-    firstRun = true;
-}
+public:
+    PatternFrameUndoCommand(PatternFrameModel *item, QUndoCommand *parent = 0);
 
-void UndoCommand::undo() {
-    currentFrames = patternFrameModel->getFrames();
-    currentSize = patternFrameModel->data(patternFrameModel->index(0),PatternFrameModel::FrameSize).toSize();
-    patternFrameModel->applyUndoState(previousFrames, previousSize);
-}
+    virtual void undo();
+    virtual void redo();
 
-void UndoCommand::redo() {
-    // TODO: We're likely not handling undo/redo correctly if we need this?
-    if(firstRun) {
-        firstRun = false;
-        return;
-    }
+private:
+    QList<QImage> previousFrames;
+    QList<QImage> currentFrames;
+    QSize previousSize;
+    QSize currentSize;
 
-    patternFrameModel->applyUndoState(currentFrames, currentSize);
-}
+    PatternFrameModel* patternFrameModel;
+    bool firstRun;
+};
+
+#endif // UNDOCOMMAND_H

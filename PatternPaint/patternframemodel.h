@@ -7,6 +7,8 @@
 #include <QUndoStack>
 #include "patternmodel.h"
 
+class PatternFrameUndoCommand;
+
 /// Model for a pattern made from a list of QImage frames
 class PatternFrameModel : public PatternModel
 {
@@ -31,10 +33,8 @@ public:
     /// TODO: Move the specializations to a delegate?
 
     QUndoStack* getUndoStack() {return &undoStack;}
-    void applyUndoState(QList<QImage> &newFrames, QSize newSize);
 
-    // TODO: Delete me!
-    QList<QImage> getFrames() const {return frames;}
+    friend class PatternFrameUndoCommand;
 
 private:
     QList<QImage> frames;
@@ -44,6 +44,8 @@ private:
     bool modified;              ///< True if the pattern has been changed since last save
 
     void pushUndoState();
+
+    void applyUndoState(QList<QImage> &newFrames, QSize newSize);
 };
 
 #endif // PATTERNFRAMEMODEL_H

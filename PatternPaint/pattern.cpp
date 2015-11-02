@@ -1,19 +1,29 @@
 #include "pattern.h"
-#include "undocommand.h"
+#include "patternframeundocommand.h"
 #include "patternframemodel.h"
 #include "patternscrollmodel.h"
 
 #include <QDebug>
 #include <QPainter>
 
-Pattern::Pattern(QSize patternSize, int frameCount, QListWidget* parent) :
+Pattern::Pattern(PatternType type, QSize patternSize, int frameCount, QListWidget* parent) :
     QObject(parent)
 {
 
     uuid = QUuid::createUuid();
 
     // TODO: Choose a pattern type!
-    frames = new PatternScrollModel(patternSize, this);
+    switch(type) {
+    case FrameBased:
+        frames = new PatternFrameModel(patternSize, this);
+        break;
+    case Scrolling:
+        frames = new PatternScrollModel(patternSize, this);
+        break;
+    default:
+        // ??
+        break;
+    }
 
     frames->insertRows(0, frameCount);
     frames->setData(frames->index(0),false, PatternModel::Modified);

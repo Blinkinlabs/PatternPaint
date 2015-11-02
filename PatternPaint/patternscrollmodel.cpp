@@ -1,5 +1,5 @@
 #include "patternscrollmodel.h"
-#include "undocommand.h"
+#include "patternscrollundocommand.h"
 #include <QColor>
 #include <QDebug>
 #include <QPainter>
@@ -38,32 +38,30 @@ Qt::DropActions PatternScrollModel::supportedDropActions() const
 void PatternScrollModel::pushUndoState()
 {
     // TODO: Implement me!
-//    undoStack.push(new UndoCommand(this, frames, frameSize));
+    undoStack.push(new PatternScrollUndoCommand(this));
 
-//    if(modified != true) {
-//        modified = true;
+    if(modified != true) {
+        modified = true;
 
-//        QVector<int> roles;
-//        roles.append(Modified);
-//        emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
-//    }
+        QVector<int> roles;
+        roles.append(Modified);
+        emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
+    }
 }
 
-void PatternScrollModel::applyUndoState(QList<QImage> &newFrames, QSize newSize)
+void PatternScrollModel::applyUndoState(QImage newImage, QSize newSize)
 {
-    // TODO: Implement me!
+    // TODO: Handle the whole state, not just the frames...
+    image = newImage;
+    frameSize = newSize;
 
-//    // TODO: Handle the whole state, not just the frames...
-//    frames = newFrames;
-//    frameSize = newSize;
+    modified = true;
 
-//    modified = true;
-
-//    QVector<int> roles;
-//    roles.append(FrameSize);
-//    roles.append(FrameData);
-//    roles.append(Modified);
-//    emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
+    QVector<int> roles;
+    roles.append(FrameSize);
+    roles.append(FrameImage);
+    roles.append(Modified);
+    emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
 }
 
 QVariant PatternScrollModel::data(const QModelIndex &index, int role) const

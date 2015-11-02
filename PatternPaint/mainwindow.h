@@ -123,6 +123,10 @@ private slots:
 
     void on_timelineDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
 
+    void on_actionNew_ScrollingPattern_triggered();
+
+    void on_actionNew_FramePattern_triggered();
+
 signals:
 
     /// Signalled when an editable pattern is selected in the editor
@@ -168,7 +172,7 @@ private:
     void connectController();
     void connectUploader();
 
-    bool loadPattern(const QString fileName);
+    bool loadPattern(Pattern::PatternType type, const QString fileName);
 
     void setColorMode(PatternWriter::ColorMode newColorOrder);
 

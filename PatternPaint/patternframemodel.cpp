@@ -1,5 +1,5 @@
 #include "patternframemodel.h"
-#include "undocommand.h"
+#include "patternframeundocommand.h"
 #include <QColor>
 #include <QDebug>
 #include <QPainter>
@@ -33,7 +33,7 @@ Qt::DropActions PatternFrameModel::supportedDropActions() const
 
 void PatternFrameModel::pushUndoState()
 {
-    undoStack.push(new UndoCommand(this, frames, frameSize));
+    undoStack.push(new PatternFrameUndoCommand(this));
 
     if(modified != true) {
         modified = true;

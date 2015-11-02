@@ -6,7 +6,7 @@
 #include "pattern.h"
 
 class QUndoStack;
-class UndoCommand;
+class PatternFrameUndoCommand;
 class AbstractInstrument;
 
 
