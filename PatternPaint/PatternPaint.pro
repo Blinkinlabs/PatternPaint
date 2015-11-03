@@ -63,13 +63,13 @@ SOURCES += main.cpp\
     patterncollectiondelegate.cpp \
     patterncollection.cpp \
     frameeditor.cpp \
-    resizedialog.cpp \
     patternwriter.cpp \
     fixture.cpp \
     patternscrollmodel.cpp \
     patterndelegate.cpp \
     patternframeundocommand.cpp \
-    patternscrollundocommand.cpp
+    patternscrollundocommand.cpp \
+    fixturesettings.cpp
 
 HEADERS  += mainwindow.h \
     systeminformation.h \
@@ -85,7 +85,6 @@ HEADERS  += mainwindow.h \
     patterncollectiondelegate.h \
     patterncollection.h \
     frameeditor.h \
-    resizedialog.h \
     patternwriter.h \
     fixture.h \
     patternscrollmodel.h \
@@ -93,7 +92,8 @@ HEADERS  += mainwindow.h \
     patterndelegate.h \
     colors.h \
     patternframeundocommand.h \
-    patternscrollundocommand.h
+    patternscrollundocommand.h \
+    fixturesettings.h
 
 mac {
 HEADERS  += \
@@ -107,7 +107,7 @@ FORMS    += mainwindow.ui \
     systeminformation.ui \
     aboutpatternpaint.ui \
     addressprogrammer.ui \
-    resizedialog.ui
+    fixturesettings.ui
 
 include(instruments/instruments.pri)
 include(devices/devices.pri)

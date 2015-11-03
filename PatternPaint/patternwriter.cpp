@@ -4,6 +4,12 @@
 
 #include <QDebug>
 
+ColorModes colorModes[PatternWriter::COLOR_MODE_COUNT] =
+{
+    {PatternWriter::RGB, "RGB"},
+    {PatternWriter::GRB, "GRB"},
+};
+
 PatternWriter::PatternWriter(const Pattern *pattern,
                              int frameDelay,
                              Encoding encoding,

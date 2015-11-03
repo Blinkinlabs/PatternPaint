@@ -15,7 +15,7 @@ public:
     enum ColorMode {
         RGB,
         GRB,
-        RGBW,
+        COLOR_MODE_COUNT,
     };
 
     enum Encoding {
@@ -65,15 +65,13 @@ private:
 
 
 
-//struct ColorModes {
-//    PatternWriter::ColorMode colorMode;
-//    QString name;
-//};
+struct ColorModes {
+    PatternWriter::ColorMode colorMode;
+    QString name;
+};
 
-//ColorModes colorModes[] =
-//{
-//    {PatternWriter::RGB, "RGB"},
-//    {PatternWriter::GRB, "GRB"},
-//};
+Q_DECLARE_METATYPE(PatternWriter::ColorMode);
+
+extern ColorModes colorModes[PatternWriter::COLOR_MODE_COUNT];
 
 #endif // PATTERN_WRITER_H

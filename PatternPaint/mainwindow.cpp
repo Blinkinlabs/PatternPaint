@@ -3,7 +3,7 @@
 #include "colormodel.h"
 #include "systeminformation.h"
 #include "aboutpatternpaint.h"
-#include "resizedialog.h"
+#include "fixturesettings.h"
 #include "colorchooser.h"
 #include "blinkytape.h"
 #include "patternwriter.h"
@@ -178,7 +178,7 @@ MainWindow::MainWindow(QWidget *parent) :
     resize(settings.value("MainWindow/size", QSize(880, 450)).toSize());
     move(settings.value("MainWindow/pos", QPoint(100, 100)).toPoint());
 
-    setColorMode(static_cast<PatternWriter::ColorMode>(settings.value("Options/ColorOrder", PatternWriter::RGB).toUInt()));
+    colorMode = settings.value("Options/ColorOrder", PatternWriter::RGB).value<PatternWriter::ColorMode>();
 
     // Fill the examples menu using the examples resource
     populateExamplesMenu(":/examples", menuExamples);
@@ -194,7 +194,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     timeline->setItemDelegate(new PatternDelegate(this));
 
-    // Create a pattern.
+    // Create a pattern
     on_actionNew_triggered();
 }
 
@@ -705,20 +705,24 @@ void MainWindow::on_actionResize_Pattern_triggered()
         return;
     }
 
-    ResizeDialog resizeDialog(this);
-    resizeDialog.setWindowModality(Qt::WindowModal);
-    resizeDialog.setOutputSize(patternCollection.getPattern(getCurrentPatternIndex())->getEditImage(0).size());
+    FixtureSettings fixtureSettings(this);
+    fixtureSettings.setWindowModality(Qt::WindowModal);
+    fixtureSettings.setOutputSize(patternCollection.getPattern(getCurrentPatternIndex())->getEditImage(0).size());
+    fixtureSettings.setColorMode(colorMode);
 
-    resizeDialog.exec();
+    fixtureSettings.exec();
 
-    if(resizeDialog.result() != QDialog::Accepted) {
+    if(fixtureSettings.result() != QDialog::Accepted) {
         return;
     }
 
-    QSize newDisplaySize = resizeDialog.getOutputSize();
+    QSize newDisplaySize = fixtureSettings.getOutputSize();
+    colorMode = fixtureSettings.getColorMode();
 
+    // Push this to a function?
     QSettings settings;
     settings.setValue("Options/DisplaySize", newDisplaySize);
+    settings.setValue("Options/ColorOrder", colorMode);
 
     for(int i = 0; i < patternCollection.count(); i++) {
         // Resize the pattern
@@ -918,28 +922,6 @@ bool MainWindow::loadPattern(Pattern::PatternType type, const QString fileName)
     return true;
 }
 
-void MainWindow::setColorMode(PatternWriter::ColorMode newColorOrder)
-{
-    switch(newColorOrder) {
-    case PatternWriter::RGB:
-        actionRGB->setChecked(true);
-        actionGRB->setChecked(false);
-        break;
-    case PatternWriter::GRB:
-        actionRGB->setChecked(false);
-        actionGRB->setChecked(true);
-        break;
-    default:
-        return;
-        break;
-    }
-
-    colorMode = newColorOrder;
-
-    QSettings settings;
-    settings.setValue("Options/ColorOrder", static_cast<uint>(colorMode));
-}
-
 void MainWindow::setNewFrame(int newFrame)
 {
     if(!patternCollection.hasPattern()) {
@@ -982,8 +964,7 @@ void MainWindow::updateBlinky()
     for(int i = 0; i < pixels.size(); i++) {
         QColor color = ColorModel::correctBrightness(pixels[i]);
 
-        //switch(colorMode) {
-        switch(PatternWriter::RGBW) {
+        switch(colorMode) {
         case PatternWriter::RGB:
             ledData.append(color.red());
             ledData.append(color.green());
@@ -994,20 +975,13 @@ void MainWindow::updateBlinky()
             ledData.append(color.red());
             ledData.append(color.blue());
             break;
+        case PatternWriter::COLOR_MODE_COUNT:
+        default:
+            break;
         }
     }
 
     controller->sendUpdate(ledData);
-}
-
-void MainWindow::on_actionGRB_triggered()
-{
-    setColorMode(PatternWriter::GRB);
-}
-
-void MainWindow::on_actionRGB_triggered()
-{
-    setColorMode(PatternWriter::RGB);
 }
 
 void MainWindow::on_actionNew_triggered()

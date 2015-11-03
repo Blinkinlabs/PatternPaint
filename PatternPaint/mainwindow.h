@@ -95,10 +95,6 @@ private slots:
 
     void on_colorPicked(QColor);
 
-    void on_actionGRB_triggered();
-
-    void on_actionRGB_triggered();
-
     void on_actionNew_triggered();
 
     void on_actionClose_triggered();
@@ -173,8 +169,6 @@ private:
     void connectUploader();
 
     bool loadPattern(Pattern::PatternType type, const QString fileName);
-
-    void setColorMode(PatternWriter::ColorMode newColorOrder);
 
     void setPatternName(QString name);
 
