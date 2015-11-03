@@ -6,7 +6,7 @@
 #include "patternwriter.h"
 
 namespace Ui {
-class ResizeDialog;
+class FixtureSettings;
 }
 
 /// Dialog to allow the user to specify a new width/height for the animation
@@ -24,7 +24,7 @@ public:
     void setColorMode(PatternWriter::ColorMode mode);
     PatternWriter::ColorMode getColorMode() const;
 private:
-    Ui::ResizeDialog *ui;
+    Ui::FixtureSettings *ui;
 };
 
 #endif // FIXTURESETTINGS_H

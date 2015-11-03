@@ -79,13 +79,11 @@ private slots:
 
     void on_actionFlip_Vertical_triggered();
 
-    void on_actionLoad_rainbow_sketch_triggered();
+    void on_actionRestore_firmware_triggered();
 
     void on_actionSave_to_Blinky_triggered();
 
     void on_actionClear_Pattern_triggered();
-
-    void on_actionResize_Pattern_triggered();
 
     void on_actionAddress_programmer_triggered();
 
@@ -103,10 +101,6 @@ private slots:
 
     void on_actionStepBackward_triggered();
 
-    void on_actionTimeline_triggered();
-
-    void on_actionMatrix_triggered();
-
     void on_actionAddFrame_triggered();
 
     void on_actionDeleteFrame_triggered();
@@ -122,6 +116,8 @@ private slots:
     void on_actionNew_ScrollingPattern_triggered();
 
     void on_actionNew_FramePattern_triggered();
+
+    void on_actionConfigure_Fixture_triggered();
 
 signals:
 

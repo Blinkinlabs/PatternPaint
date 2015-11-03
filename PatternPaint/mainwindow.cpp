@@ -178,7 +178,8 @@ MainWindow::MainWindow(QWidget *parent) :
     resize(settings.value("MainWindow/size", QSize(880, 450)).toSize());
     move(settings.value("MainWindow/pos", QPoint(100, 100)).toPoint());
 
-    colorMode = settings.value("Options/ColorOrder", PatternWriter::RGB).value<PatternWriter::ColorMode>();
+    //colorMode = settings.value("Fixture/ColorOrder", PatternWriter::RGB).value<PatternWriter::ColorMode>();
+    colorMode = (PatternWriter::ColorMode)settings.value("Fixture/ColorOrder", PatternWriter::RGB).toInt();
 
     // Fill the examples menu using the examples resource
     populateExamplesMenu(":/examples", menuExamples);
@@ -604,7 +605,7 @@ void MainWindow::showError(QString errorMessage) {
     box.exec();
 }
 
-void MainWindow::on_actionLoad_rainbow_sketch_triggered()
+void MainWindow::on_actionRestore_firmware_triggered()
 {   
     // If the controller doesn't exist, create a new uploader based on the blinkytape
     if(controller.isNull()) {
@@ -696,38 +697,6 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
 
     progressDialog.setValue(progressDialog.minimum());
     progressDialog.show();
-}
-
-
-void MainWindow::on_actionResize_Pattern_triggered()
-{
-    if(!patternCollection.hasPattern()) {
-        return;
-    }
-
-    FixtureSettings fixtureSettings(this);
-    fixtureSettings.setWindowModality(Qt::WindowModal);
-    fixtureSettings.setOutputSize(patternCollection.getPattern(getCurrentPatternIndex())->getEditImage(0).size());
-    fixtureSettings.setColorMode(colorMode);
-
-    fixtureSettings.exec();
-
-    if(fixtureSettings.result() != QDialog::Accepted) {
-        return;
-    }
-
-    QSize newDisplaySize = fixtureSettings.getOutputSize();
-    colorMode = fixtureSettings.getColorMode();
-
-    // Push this to a function?
-    QSettings settings;
-    settings.setValue("Options/DisplaySize", newDisplaySize);
-    settings.setValue("Options/ColorOrder", colorMode);
-
-    for(int i = 0; i < patternCollection.count(); i++) {
-        // Resize the pattern
-        patternCollection.getPattern(i)->resize(newDisplaySize,false);
-    }
 }
 
 void MainWindow::on_actionAddress_programmer_triggered()
@@ -900,7 +869,7 @@ bool MainWindow::loadPattern(Pattern::PatternType type, const QString fileName)
 
     QSize displaySize;
     if(!patternCollection.hasPattern()) {
-        displaySize = settings.value("Options/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize();
+        displaySize = settings.value("Fixture/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize();
     }
     else {
         displaySize =  patternCollection.getPattern(getCurrentPatternIndex())->getFrameSize();
@@ -1118,14 +1087,6 @@ void MainWindow::on_actionStepBackward_triggered()
     setNewFrame(getCurrentFrameIndex()<=0?getFrameCount()-1:getCurrentFrameIndex()-1);
 }
 
-void MainWindow::on_actionTimeline_triggered()
-{
-}
-
-void MainWindow::on_actionMatrix_triggered()
-{
-}
-
 void MainWindow::on_actionAddFrame_triggered()
 {
     if(!patternCollection.hasPattern()) {
@@ -1171,4 +1132,37 @@ void MainWindow::on_actionNew_ScrollingPattern_triggered()
 void MainWindow::on_actionNew_FramePattern_triggered()
 {
     loadPattern(Pattern::FrameBased, QString());
+}
+
+void MainWindow::on_actionConfigure_Fixture_triggered()
+{
+    FixtureSettings fixtureSettings(this);
+    fixtureSettings.setWindowModality(Qt::WindowModal);
+
+    if(patternCollection.hasPattern()) {
+        fixtureSettings.setOutputSize(patternCollection.getPattern(getCurrentPatternIndex())->getEditImage(0).size());
+    }
+    // TODO: Load settings anyway
+
+    fixtureSettings.setColorMode(colorMode);
+
+    fixtureSettings.exec();
+
+    if(fixtureSettings.result() != QDialog::Accepted) {
+        return;
+    }
+
+    QSize newDisplaySize = fixtureSettings.getOutputSize();
+    colorMode = fixtureSettings.getColorMode();
+    qDebug() << "color mode:" << colorMode;
+
+    // Push this to a function?
+    QSettings settings;
+    settings.setValue("Fixture/DisplaySize", newDisplaySize);
+    settings.setValue("Fixture/ColorOrder", colorMode);
+
+    for(int i = 0; i < patternCollection.count(); i++) {
+        // Resize the pattern
+        patternCollection.getPattern(i)->resize(newDisplaySize,false);
+    }
 }

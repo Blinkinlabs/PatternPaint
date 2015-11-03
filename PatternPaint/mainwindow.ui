@@ -229,7 +229,6 @@
     <property name="title">
      <string>Edit</string>
     </property>
-    <addaction name="actionResize_Pattern"/>
     <addaction name="separator"/>
     <addaction name="actionFlip_Horizontal"/>
     <addaction name="actionFlip_Vertical"/>
@@ -243,30 +242,13 @@
     <property name="title">
      <string>Tools</string>
     </property>
-    <widget class="QMenu" name="menuColor_Order">
-     <property name="title">
-      <string>Color Order</string>
-     </property>
-     <addaction name="actionRGB"/>
-     <addaction name="actionGRB"/>
-    </widget>
-    <widget class="QMenu" name="menuMode">
-     <property name="title">
-      <string>Display Mode</string>
-     </property>
-     <addaction name="actionTimeline"/>
-     <addaction name="actionMatrix"/>
-    </widget>
+    <addaction name="actionConfigure_Fixture"/>
+    <addaction name="separator"/>
     <addaction name="actionSave_to_Blinky"/>
     <addaction name="separator"/>
-    <addaction name="actionAutomatically_connect"/>
-    <addaction name="separator"/>
-    <addaction name="menuColor_Order"/>
-    <addaction name="separator"/>
-    <addaction name="menuMode"/>
-    <addaction name="separator"/>
-    <addaction name="actionLoad_rainbow_sketch"/>
+    <addaction name="actionRestore_firmware"/>
     <addaction name="actionAddress_programmer"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuInstruments">
     <property name="title">
@@ -438,9 +420,9 @@
     <string>Flip the Pattern in the vertical direction</string>
    </property>
   </action>
-  <action name="actionLoad_rainbow_sketch">
+  <action name="actionRestore_firmware">
    <property name="text">
-    <string>Restore Rainbow Sketch</string>
+    <string>Restore Firmware</string>
    </property>
   </action>
   <action name="actionSave_to_Blinky">
@@ -463,31 +445,12 @@
     <string>Clear</string>
    </property>
   </action>
-  <action name="actionResize_Pattern">
-   <property name="text">
-    <string>Resize...</string>
-   </property>
-  </action>
   <action name="actionAddress_programmer">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
     <string>Address programmer...</string>
-   </property>
-  </action>
-  <action name="actionAutomatically_connect">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Automatically connect</string>
    </property>
   </action>
   <action name="actionPlay">
@@ -500,18 +463,6 @@
    </property>
    <property name="text">
     <string>Play</string>
-   </property>
-  </action>
-  <action name="actionConnect">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>:/resources/images/connect.png</normaloff>:/resources/images/connect.png</iconset>
-   </property>
-   <property name="text">
-    <string>Connect</string>
    </property>
   </action>
   <action name="actionPen">
@@ -613,25 +564,6 @@
     <bool>false</bool>
    </property>
   </action>
-  <action name="actionRGB">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>RGB (BlinkyTape, BlinkyTile)</string>
-   </property>
-  </action>
-  <action name="actionGRB">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>GRB (BlinkyPixel)</string>
-   </property>
-  </action>
   <action name="actionClose">
    <property name="icon">
     <iconset resource="images.qrc">
@@ -677,22 +609,6 @@
     <string>Step forward</string>
    </property>
   </action>
-  <action name="actionTimeline">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Timeline</string>
-   </property>
-  </action>
-  <action name="actionMatrix">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Single frame</string>
-   </property>
-  </action>
   <action name="actionAddFrame">
    <property name="icon">
     <iconset resource="images.qrc">
@@ -717,11 +633,6 @@
     <bool>false</bool>
    </property>
   </action>
-  <action name="actionDd">
-   <property name="text">
-    <string>dd</string>
-   </property>
-  </action>
   <action name="actionNew_ScrollingPattern">
    <property name="text">
     <string>New Scrolling Pattern</string>
@@ -730,6 +641,11 @@
   <action name="actionNew_FramePattern">
    <property name="text">
     <string>New Frame-by-frame Pattern</string>
+   </property>
+  </action>
+  <action name="actionConfigure_Fixture">
+   <property name="text">
+    <string>Fixture Setup</string>
    </property>
   </action>
  </widget>

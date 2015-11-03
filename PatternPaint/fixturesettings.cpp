@@ -1,11 +1,12 @@
 #include "fixturesettings.h"
-#include "ui_resizedialog.h"
+#include "ui_fixturesettings.h"
 
 #include <limits>
+#include <QDebug>
 
 FixtureSettings::FixtureSettings(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::ResizeDialog)
+    ui(new Ui::FixtureSettings)
 {
     ui->setupUi(this);
 
@@ -18,6 +19,7 @@ FixtureSettings::FixtureSettings(QWidget *parent) :
 
     // Load the available color modes
     for(int i = 0; i < PatternWriter::COLOR_MODE_COUNT; i++) {
+        qDebug() << "adding:" << colorModes[i].name << colorModes[i].colorMode;
         ui->ColorType->addItem(colorModes[i].name, colorModes[i].colorMode);
     }
 }
@@ -28,16 +30,19 @@ FixtureSettings::~FixtureSettings()
 }
 
 void FixtureSettings::setColorMode(PatternWriter::ColorMode mode) {
-    for(int i = 0; i < ui->FixtureType->count(); i++) {
-        if(ui->FixtureType->itemData(i).value<PatternWriter::ColorMode>() == mode) {
-            ui->FixtureType->setCurrentIndex(i);
+    for(int i = 0; i < ui->ColorType->count(); i++) {
+        // TODO: Why not .value<PatternWriter::ColorMode>() ?
+        //if(ui->ColorType->itemData(i).value<PatternWriter::ColorMode>() == mode) {
+        if(ui->ColorType->itemData(i).toInt() == mode) {
+            ui->ColorType->setCurrentIndex(i);
             break;
         }
     }
 }
 
 PatternWriter::ColorMode FixtureSettings::getColorMode() const {
-    return PatternWriter::GRB;
+    //return ui->ColorType->currentData().value<PatternWriter::ColorMode();
+    return (PatternWriter::ColorMode)ui->ColorType->currentData().toInt();
 }
 
 void FixtureSettings::setOutputSize(QSize size) {
