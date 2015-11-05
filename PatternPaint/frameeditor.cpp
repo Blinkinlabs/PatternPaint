@@ -298,16 +298,14 @@ void FrameEditor::paintEvent(QPaintEvent*)
                          fixtureHeight*yScale,
                          COLOR_PLAYBACK_TOP);
 
-        // TODO: only if playback is far enough out..
-
         painter.drawRect((playbackRow-frameData.width())*xScale +.5,
                          0,
                          int((playbackRow+fixtureWidth)*xScale +.5) - int(playbackRow*xScale +.5),
-                         frameData.height()*yScale);
+                         fixtureHeight*yScale);
         painter.fillRect((playbackRow-frameData.width())*xScale +.5,
                          0,
                          int((playbackRow+fixtureWidth)*xScale +.5) - int(playbackRow*xScale +.5),
-                         frameData.height()*yScale,
+                         fixtureHeight*yScale,
                          COLOR_PLAYBACK_TOP);
     }
 
