@@ -205,6 +205,11 @@ void FrameEditor::setInstrument(AbstractInstrument* pi) {
     instrument = pi;
 }
 
+void FrameEditor::setFixture(Fixture *newFixture)
+{
+    fixture = newFixture;
+}
+
 void FrameEditor::setFrameData(int index, const QImage data)
 {
     if(data.isNull()) {
@@ -271,12 +276,13 @@ void FrameEditor::paintEvent(QPaintEvent*)
 
     // TODO: How to do this more generically?
 //    if(deviceModel->showPlaybackIndicator()) {
-    if(true) {
+    if(!fixture.isNull()) {
 //        int playbackRow = deviceModel->getFrameIndex();
 //        const float outputScale = deviceModel->getDisplaySize().width()*xScale;
 
         int playbackRow = frameIndex;
-        int fixtureWidth = 1;
+        int fixtureWidth = fixture->getSize().width();
+        int fixtureHeight = fixture->getSize().height();
 
         // Draw the playback indicator
         // Note that we need to compute the correct width based on the rounding error of
@@ -285,11 +291,11 @@ void FrameEditor::paintEvent(QPaintEvent*)
         painter.drawRect(playbackRow*xScale +.5,
                          0,
                          int((playbackRow+fixtureWidth)*xScale +.5) - int(playbackRow*xScale +.5),
-                         frameData.height()*yScale);
+                         fixtureHeight*yScale);
         painter.fillRect(playbackRow*xScale +.5,
                          0,
                          int((playbackRow+fixtureWidth)*xScale +.5) - int(playbackRow*xScale +.5),
-                         frameData.height()*yScale,
+                         fixtureHeight*yScale,
                          COLOR_PLAYBACK_TOP);
 
         // TODO: only if playback is far enough out..

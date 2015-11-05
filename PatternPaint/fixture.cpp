@@ -1,12 +1,17 @@
 #include "fixture.h"
 
-
-MatrixFixture::MatrixFixture(QSize size) :
-    size(size)
+Fixture::Fixture(QObject *parent) :
+    QObject(parent)
 {
 }
 
-QList<QColor> MatrixFixture::getColorStreamForFrame(const QImage frame)
+MatrixFixture::MatrixFixture(QSize size, QObject *parent) :
+    size(size),
+    Fixture(parent)
+{
+}
+
+QList<QColor> MatrixFixture::getColorStreamForFrame(const QImage frame) const
 {
     QList<QColor> colorStream;
 
@@ -23,7 +28,20 @@ QList<QColor> MatrixFixture::getColorStreamForFrame(const QImage frame)
     return colorStream;
 }
 
-int MatrixFixture::getLedCount()
+int MatrixFixture::getLedCount() const
 {
     return size.height()*size.width();
 }
+
+QSize MatrixFixture::getSize() const
+{
+    return size;
+}
+
+void MatrixFixture::setSize(QSize newSize)
+{
+    size = newSize;
+}
+
+
+

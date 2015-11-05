@@ -178,6 +178,10 @@ MainWindow::MainWindow(QWidget *parent) :
     resize(settings.value("MainWindow/size", QSize(880, 450)).toSize());
     move(settings.value("MainWindow/pos", QPoint(100, 100)).toPoint());
 
+
+    fixture = new MatrixFixture(settings.value("Fixture/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize());
+    frameEditor->setFixture(fixture);
+
     //colorMode = settings.value("Fixture/ColorOrder", PatternWriter::RGB).value<PatternWriter::ColorMode>();
     colorMode = (PatternWriter::ColorMode)settings.value("Fixture/ColorOrder", PatternWriter::RGB).toInt();
 
@@ -748,21 +752,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
     event->accept();
 }
 
-
-void MainWindow::on_actionConnect_triggered()
-{
-    // If we were already connected, disconnect here
-    if(!controller.isNull()) {
-        qDebug() << "Disconnecting from tape";
-        controller->close();
-
-        return;
-    }
-
-    // Otherwise, search for a controller.
-    connectionScannerTimer_timeout();
-}
-
 void MainWindow::on_instrumentSelected(bool) {
     QAction* act = static_cast<QAction*>(sender());
     Q_ASSERT(act != NULL);
@@ -925,9 +914,8 @@ void MainWindow::updateBlinky()
     }
 
     QImage frame = patternCollection.getPattern(getCurrentPatternIndex())->getFrameImage(getCurrentFrameIndex());
-    MatrixFixture fixture(patternCollection.getPattern(getCurrentPatternIndex())->getFrameSize());
 
-    QList<QColor> pixels = fixture.getColorStreamForFrame(frame);
+    QList<QColor> pixels = fixture->getColorStreamForFrame(frame);
 
     QByteArray ledData;
     for(int i = 0; i < pixels.size(); i++) {
@@ -1139,13 +1127,15 @@ void MainWindow::on_actionConfigure_Fixture_triggered()
     FixtureSettings fixtureSettings(this);
     fixtureSettings.setWindowModality(Qt::WindowModal);
 
-    if(patternCollection.hasPattern()) {
-        fixtureSettings.setOutputSize(patternCollection.getPattern(getCurrentPatternIndex())->getEditImage(0).size());
-    }
-    // TODO: Load settings anyway
+    QSettings settings;
 
+    QSize displaySize;
+
+    // TODO: Have a fixture, set this from that.
+    displaySize = settings.value("Fixture/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize();
+
+    fixtureSettings.setOutputSize(displaySize);
     fixtureSettings.setColorMode(colorMode);
-
     fixtureSettings.exec();
 
     if(fixtureSettings.result() != QDialog::Accepted) {
@@ -1154,15 +1144,16 @@ void MainWindow::on_actionConfigure_Fixture_triggered()
 
     QSize newDisplaySize = fixtureSettings.getOutputSize();
     colorMode = fixtureSettings.getColorMode();
-    qDebug() << "color mode:" << colorMode;
 
-    // Push this to a function?
-    QSettings settings;
+    // TODO: redesign this to work with generic fixtures
+    fixture->setSize(newDisplaySize);
+
     settings.setValue("Fixture/DisplaySize", newDisplaySize);
     settings.setValue("Fixture/ColorOrder", colorMode);
 
-    for(int i = 0; i < patternCollection.count(); i++) {
-        // Resize the pattern
-        patternCollection.getPattern(i)->resize(newDisplaySize,false);
-    }
+//    // TODO: Prompt before resizing.
+//    for(int i = 0; i < patternCollection.count(); i++) {
+//        // Resize the pattern
+//        patternCollection.getPattern(i)->resize(newDisplaySize,false);
+//    }
 }

@@ -20,6 +20,7 @@
 
 #if defined Q_OS_MAC
 #include "appnap.h"
+#include "fixture.h"
 #endif
 
 class MainWindow : public QMainWindow, private Ui::MainWindow
@@ -87,8 +88,6 @@ private slots:
 
     void on_actionAddress_programmer_triggered();
 
-    void on_actionConnect_triggered();
-
     void on_instrumentSelected(bool);
 
     void on_colorPicked(QColor);
@@ -146,6 +145,7 @@ private:
 
     QUndoGroup undoGroup;
 
+    QPointer<Fixture> fixture;
     PatternWriter::ColorMode colorMode;
 
     void populateExamplesMenu(QString directory, QMenu* menu);

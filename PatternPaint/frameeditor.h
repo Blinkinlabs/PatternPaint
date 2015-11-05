@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QPointer>
+#include "fixture.h"
 #include "pattern.h"
 
 class QUndoStack;
@@ -69,6 +70,8 @@ private:
     /// True if the editor has an image to edit
     bool hasImage();
 
+    QPointer<Fixture> fixture;
+
 signals:
     void dataEdited(int index, const QImage data);
 
@@ -76,6 +79,7 @@ public slots:
     void setToolColor(QColor color);
     void setToolSize(int size);
     void setInstrument(AbstractInstrument*);
+    void setFixture(Fixture*);
 
     void setFrameData(int index, const QImage data);
 };
