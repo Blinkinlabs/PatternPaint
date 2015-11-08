@@ -98,8 +98,17 @@ public:
     /// Get the UUID for this pattern
     const QUuid getUuid() const { return uuid; }
 
+    /// True if the pattern editor should show a playback indicator for ths
+    /// pattern type
+    /// TODO: Delete this
+    bool hasPlaybackIndicator() const {return playbackIndicator;}
+
+    bool hasTimeline() const {return timeline;}
+
 private:
     QPointer<PatternModel> frames;   ///< Storage container for the images
+    bool playbackIndicator;
+    bool timeline;
 
     // TODO: Figure out a better way to store/copy patterns?
     // Difficult to do so now because they have to be tied into

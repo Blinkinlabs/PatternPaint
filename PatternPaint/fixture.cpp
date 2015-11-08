@@ -6,8 +6,8 @@ Fixture::Fixture(QObject *parent) :
 }
 
 MatrixFixture::MatrixFixture(QSize size, QObject *parent) :
-    size(size),
-    Fixture(parent)
+    Fixture(parent),
+    size(size)
 {
 }
 

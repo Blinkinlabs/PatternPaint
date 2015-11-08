@@ -21,7 +21,8 @@
 
 FrameEditor::FrameEditor(QWidget *parent) :
     QWidget(parent),
-    frameIndex(0)
+    frameIndex(0),
+    showPlaybackIndicator(false)
 {
     this->setAcceptDrops(true);
 
@@ -210,6 +211,11 @@ void FrameEditor::setFixture(Fixture *newFixture)
     fixture = newFixture;
 }
 
+void FrameEditor::setShowPlaybakIndicator(bool newShowPlaybackIndicator)
+{
+    showPlaybackIndicator = newShowPlaybackIndicator;
+}
+
 void FrameEditor::setFrameData(int index, const QImage data)
 {
     if(data.isNull()) {
@@ -276,7 +282,7 @@ void FrameEditor::paintEvent(QPaintEvent*)
 
     // TODO: How to do this more generically?
 //    if(deviceModel->showPlaybackIndicator()) {
-    if(!fixture.isNull()) {
+    if(!fixture.isNull() && showPlaybackIndicator) {
 //        int playbackRow = deviceModel->getFrameIndex();
 //        const float outputScale = deviceModel->getDisplaySize().width()*xScale;
 

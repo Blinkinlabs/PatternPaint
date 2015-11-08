@@ -20,6 +20,7 @@
 #include "patterndelegate.h"
 #include "patternCollection.h"
 #include "fixture.h"
+#include "deviceselector.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -65,6 +66,17 @@ MainWindow::MainWindow(QWidget *parent) :
     // so set one manually
     setWindowIcon(QIcon(":/resources/images/patternpaint.ico"));
 #endif
+
+    // Build the new pattern drop-down menu
+    QMenu* menu = new QMenu(this);
+    menu->addAction(this->actionNew_FramePattern);
+    menu->addAction(this->actionNew_ScrollingPattern);
+
+    QToolButton* toolButton = new QToolButton();
+    toolButton->setIcon(QIcon(":/icons/images/icons/Create New-100.png"));
+    toolButton->setMenu(menu);
+    toolButton->setPopupMode(QToolButton::InstantPopup);
+    fileToolbar->insertWidget(this->actionClose, toolButton);
 
     // prepare undo/redo
     menuEdit->addSeparator();
@@ -201,6 +213,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Create a pattern
     on_actionNew_triggered();
+
+//    DeviceSelector deviceSelector(this);
+//    deviceSelector.setWindowModality(Qt::WindowModal);
+//    deviceSelector.exec();
 }
 
 void MainWindow::populateExamplesMenu(QString directory, QMenu* menu) {
@@ -943,7 +959,7 @@ void MainWindow::updateBlinky()
 
 void MainWindow::on_actionNew_triggered()
 {
-    loadPattern(Pattern::Scrolling, QString());
+//    loadPattern(Pattern::Scrolling, QString());
 }
 
 void MainWindow::on_actionClose_triggered()
@@ -974,6 +990,8 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
         setPatternName("()");
         setPatternModified(false);
         setPatternData(0, QImage());
+        frameEditor->setShowPlaybakIndicator(false);
+        timeline->setVisible(false);
         return;
     }
 
@@ -986,7 +1004,8 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
     setPatternName(newpattern->getPatternName());
     setPatternModified(newpattern->getModified());
     setPatternData(getCurrentFrameIndex(), newpattern->getEditImage(getCurrentPatternIndex()));
-
+    frameEditor->setShowPlaybakIndicator(newpattern->hasPlaybackIndicator());
+    timeline->setVisible(newpattern->hasTimeline());
 
     // TODO: Should we unregister these eventually?
     connect(timeline->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
@@ -1142,18 +1161,51 @@ void MainWindow::on_actionConfigure_Fixture_triggered()
         return;
     }
 
+    // As long as the user didn't cancel, apply the new fixture size.
     QSize newDisplaySize = fixtureSettings.getOutputSize();
-    colorMode = fixtureSettings.getColorMode();
+    PatternWriter::ColorMode newColorMode = fixtureSettings.getColorMode();
 
-    // TODO: redesign this to work with generic fixtures
+    // Test if any patterns need to be resized
+    QVector<Pattern*> needToResize;
+
+    for(int i = 0; i < patternCollection.count(); i++) {
+        // Convert the current pattern into a Pattern
+        Pattern* pattern = patternCollection.getPattern(i);
+
+        if (pattern->getFrameSize() != newDisplaySize) {
+            needToResize.push_back(pattern);
+        }
+    }
+
+    if(needToResize.count() > 0) {
+        QString messageText = tr("Some patterns have a different size than the fixture. Rescale "
+                                 " them to to fit?");
+
+        QMessageBox msgBox(this);
+        msgBox.setWindowModality(Qt::WindowModal);
+        msgBox.setText(messageText);
+        msgBox.setInformativeText(tr("Resize patterns?"));
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Yes);
+        int ans = msgBox.exec();
+
+
+        if (ans == QMessageBox::Yes) {
+            // If yes, resize the patterns
+            for(int i = 0; i < needToResize.count(); i++) {
+                // Resize the pattern
+                needToResize.at(i)->resize(newDisplaySize,false);
+            }
+        }
+
+        else if (ans == QMessageBox::Cancel)
+            return;
+    }
+
+    // Finally, apply the new settings
+    colorMode = newColorMode;
     fixture->setSize(newDisplaySize);
 
     settings.setValue("Fixture/DisplaySize", newDisplaySize);
-    settings.setValue("Fixture/ColorOrder", colorMode);
-
-//    // TODO: Prompt before resizing.
-//    for(int i = 0; i < patternCollection.count(); i++) {
-//        // Resize the pattern
-//        patternCollection.getPattern(i)->resize(newDisplaySize,false);
-//    }
+    settings.setValue("Fixture/ColorOrder", newColorMode);
 }

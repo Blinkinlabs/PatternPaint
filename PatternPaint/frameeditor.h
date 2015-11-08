@@ -70,6 +70,8 @@ private:
     /// True if the editor has an image to edit
     bool hasImage();
 
+    bool showPlaybackIndicator;
+
     QPointer<Fixture> fixture;
 
 signals:
@@ -80,6 +82,7 @@ public slots:
     void setToolSize(int size);
     void setInstrument(AbstractInstrument*);
     void setFixture(Fixture*);
+    void setShowPlaybakIndicator(bool);
 
     void setFrameData(int index, const QImage data);
 };

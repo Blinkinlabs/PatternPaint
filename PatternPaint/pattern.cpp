@@ -16,9 +16,13 @@ Pattern::Pattern(PatternType type, QSize patternSize, int frameCount, QListWidge
     switch(type) {
     case FrameBased:
         frames = new PatternFrameModel(patternSize, this);
+        playbackIndicator = false;
+        timeline = true;
         break;
     case Scrolling:
         frames = new PatternScrollModel(patternSize, this);
+        playbackIndicator = true;
+        timeline = false;
         break;
     default:
         // ??
