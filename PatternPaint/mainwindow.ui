@@ -71,9 +71,9 @@
          <colorrole role="Base">
           <brush brushstyle="SolidPattern">
            <color alpha="255">
-            <red>233</red>
-            <green>233</green>
-            <blue>233</blue>
+            <red>228</red>
+            <green>228</green>
+            <blue>228</blue>
            </color>
           </brush>
          </colorrole>
@@ -82,9 +82,9 @@
          <colorrole role="Base">
           <brush brushstyle="SolidPattern">
            <color alpha="255">
-            <red>233</red>
-            <green>233</green>
-            <blue>233</blue>
+            <red>228</red>
+            <green>228</green>
+            <blue>228</blue>
            </color>
           </brush>
          </colorrole>
@@ -104,9 +104,6 @@
       </property>
       <property name="autoFillBackground">
        <bool>false</bool>
-      </property>
-      <property name="styleSheet">
-       <string notr="true"/>
       </property>
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
@@ -292,6 +289,164 @@
       </widget>
      </widget>
     </item>
+    <item>
+     <widget class="QWidget" name="widget" native="true">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>200</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="palette">
+       <palette>
+        <active>
+         <colorrole role="Base">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>255</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="Window">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>228</red>
+            <green>228</green>
+            <blue>228</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </active>
+        <inactive>
+         <colorrole role="Base">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>255</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="Window">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>228</red>
+            <green>228</green>
+            <blue>228</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </inactive>
+        <disabled>
+         <colorrole role="Base">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>228</red>
+            <green>228</green>
+            <blue>228</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="Window">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>228</red>
+            <green>228</green>
+            <blue>228</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </disabled>
+       </palette>
+      </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QLabel" name="patternName">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="text">
+          <string>()</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="patternType">
+         <property name="text">
+          <string>Scrolling Pattern</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame_2">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Speed:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QSpinBox" name="patternSpeed"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -312,10 +467,22 @@
       <string>Examples</string>
      </property>
     </widget>
-    <addaction name="actionNew"/>
-    <addaction name="actionNew_ScrollingPattern"/>
-    <addaction name="actionNew_FramePattern"/>
-    <addaction name="actionLoad_File"/>
+    <widget class="QMenu" name="menuNew">
+     <property name="title">
+      <string>New</string>
+     </property>
+     <addaction name="actionNew_ScrollingPattern"/>
+     <addaction name="actionNew_FramePattern"/>
+    </widget>
+    <widget class="QMenu" name="menuOpen">
+     <property name="title">
+      <string>Open</string>
+     </property>
+     <addaction name="actionOpen_Scrolling_Pattern"/>
+     <addaction name="actionOpen_Frame_based_Pattern"/>
+    </widget>
+    <addaction name="menuNew"/>
+    <addaction name="menuOpen"/>
     <addaction name="menuExamples"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
@@ -394,7 +561,6 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionClose"/>
-   <addaction name="actionLoad_File"/>
    <addaction name="actionSave_File"/>
    <addaction name="actionSave_to_Blinky"/>
   </widget>
@@ -442,27 +608,6 @@
    <addaction name="actionPipette"/>
    <addaction name="actionFill"/>
   </widget>
-  <action name="actionLoad_File">
-   <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/icons/images/icons/Add File-100.png</normaloff>:/icons/images/icons/Add File-100.png</iconset>
-   </property>
-   <property name="text">
-    <string>Open...</string>
-   </property>
-   <property name="iconText">
-    <string>Open</string>
-   </property>
-   <property name="toolTip">
-    <string>Load Pattern</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+O</string>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>false</bool>
-   </property>
-  </action>
   <action name="actionSave_File">
    <property name="enabled">
     <bool>true</bool>
@@ -686,18 +831,6 @@
     <bool>false</bool>
    </property>
   </action>
-  <action name="actionNew">
-   <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/icons/images/icons/Create New-100.png</normaloff>:/icons/images/icons/Create New-100.png</iconset>
-   </property>
-   <property name="text">
-    <string>New Pattern</string>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>false</bool>
-   </property>
-  </action>
   <action name="actionStepBackward">
    <property name="icon">
     <iconset resource="images.qrc">
@@ -745,17 +878,27 @@
   </action>
   <action name="actionNew_ScrollingPattern">
    <property name="text">
-    <string>New Scrolling Pattern</string>
+    <string>Scrolling Pattern</string>
    </property>
   </action>
   <action name="actionNew_FramePattern">
    <property name="text">
-    <string>New Frame-by-frame Pattern</string>
+    <string>Frame-based Pattern</string>
    </property>
   </action>
   <action name="actionConfigure_Fixture">
    <property name="text">
     <string>Fixture Setup</string>
+   </property>
+  </action>
+  <action name="actionOpen_Scrolling_Pattern">
+   <property name="text">
+    <string>Scrolling Pattern...</string>
+   </property>
+  </action>
+  <action name="actionOpen_Frame_based_Pattern">
+   <property name="text">
+    <string>Frame-based Pattern...</string>
    </property>
   </action>
  </widget>

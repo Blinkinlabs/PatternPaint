@@ -107,6 +107,7 @@ public:
 
 private:
     QPointer<PatternModel> frames;   ///< Storage container for the images
+    PatternType type;
     bool playbackIndicator;
     bool timeline;
 

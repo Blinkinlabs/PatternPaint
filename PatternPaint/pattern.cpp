@@ -7,7 +7,8 @@
 #include <QPainter>
 
 Pattern::Pattern(PatternType type, QSize patternSize, int frameCount, QListWidget* parent) :
-    QObject(parent)
+    QObject(parent),
+    type(type)
 {
 
     uuid = QUuid::createUuid();
@@ -64,29 +65,67 @@ bool Pattern::load(const QString &newFileName)
         return false;
     }
 
-    QSize frameSize = frames->data(frames->index(0),PatternModel::FrameSize).toSize();
 
-    // TODO: Warn if the source image wasn't of the expected aperture?
-    sourceImage = sourceImage.scaledToHeight(frameSize.height());
-    int newFrameCount = sourceImage.width()/frameSize.width();
+    switch(type) {
+    case FrameBased:
+    {
+        QSize frameSize = frames->data(frames->index(0),PatternModel::FrameSize).toSize();
 
-    frames->removeRows(0,frames->rowCount());
-    frames->insertRows(0,newFrameCount);
+        // TODO: Warn if the source image wasn't of the expected aperture?
+        sourceImage = sourceImage.scaledToHeight(frameSize.height());
+        int newFrameCount = sourceImage.width()/frameSize.width();
 
-    QPainter painter;
-    for(int i = 0; i < newFrameCount; i++) {
-        QImage newFrameData(frameSize, QImage::Format_ARGB32_Premultiplied);
-        painter.begin(&newFrameData);
-        painter.fillRect(newFrameData.rect(),QColor(0,0,0));
-        painter.drawImage(QPoint(0,0), sourceImage,
-                          QRect(frameSize.width()*i, 0, frameSize.width(),frameSize.height()));
-        painter.end();
-        frames->setData(frames->index(i),newFrameData,PatternModel::FrameImage);
+        frames->removeRows(0,frames->rowCount());
+        frames->insertRows(0,newFrameCount);
+
+        QPainter painter;
+        for(int i = 0; i < newFrameCount; i++) {
+            QImage newFrameData(frameSize, QImage::Format_ARGB32_Premultiplied);
+            painter.begin(&newFrameData);
+            painter.fillRect(newFrameData.rect(),QColor(0,0,0));
+            painter.drawImage(QPoint(0,0), sourceImage,
+                              QRect(frameSize.width()*i, 0, frameSize.width(),frameSize.height()));
+            painter.end();
+            frames->setData(frames->index(i),newFrameData,PatternModel::FrameImage);
+        }
+
+        // If successful, record the filename and clear the undo stack.
+        frames->setData(frames->index(0), newFileName, PatternModel::FileName);
+        frames->setData(frames->index(0),false, PatternModel::Modified);
+
     }
+        break;
+    case Scrolling:
+    {
+        QSize frameSize = frames->data(frames->index(0),PatternModel::FrameSize).toSize();
 
-    // If successful, record the filename and clear the undo stack.
-    frames->setData(frames->index(0), newFileName, PatternModel::FileName);
-    frames->setData(frames->index(0),false, PatternModel::Modified);
+        // TODO: Warn if the source image wasn't of the expected aperture?
+        sourceImage = sourceImage.scaledToHeight(frameSize.height());
+        int newFrameCount = sourceImage.width();
+
+        frames->removeRows(0,frames->rowCount());
+        frames->insertRows(0,newFrameCount);
+
+//        QPainter painter;
+//        for(int i = 0; i < newFrameCount; i++) {
+//            QImage newFrameData(frameSize, QImage::Format_ARGB32_Premultiplied);
+//            painter.begin(&newFrameData);
+//            painter.fillRect(newFrameData.rect(),QColor(0,0,0));
+//            painter.drawImage(QPoint(0,0), sourceImage,
+//                              QRect(frameSize.width()*i, 0, frameSize.width(),frameSize.height()));
+//            painter.end();
+//            frames->setData(frames->index(i),newFrameData,PatternModel::FrameImage);
+//        }
+
+        frames->setData(frames->index(0), sourceImage, PatternModel::EditImage);
+
+        // If successful, record the filename and clear the undo stack.
+        frames->setData(frames->index(0), newFileName, PatternModel::FileName);
+        frames->setData(frames->index(0),false, PatternModel::Modified);
+
+    }
+        break;
+    }
 
     // TODO: MVC way of handling this?
     getUndoStack()->clear();
@@ -98,20 +137,34 @@ bool Pattern::saveAs(const QString newFileName) {
     // Attempt to save to this location
 
     QSize frameSize = frames->data(frames->index(0),PatternModel::FrameSize).toSize();
+    QImage output;
 
-    // Create a big image consisting of all the frames side-by-side
-    QImage output(frameSize.width()*getFrameCount(), frameSize.height(),
-                  QImage::Format_ARGB32_Premultiplied);
+    switch(type) {
 
-    // And copy the frames into it
-    QPainter painter;
-    painter.begin(&output);
-    painter.fillRect(output.rect(),QColor(0,0,0));
-    for(int i = 0; i < getFrameCount(); i++) {
-        painter.drawImage(QPoint(frameSize.width()*i, 0),
-                          getFrameImage(i));
+    case FrameBased:
+    {
+        // Create a big image consisting of all the frames side-by-side
+        output = QImage(frameSize.width()*getFrameCount(), frameSize.height(),
+                      QImage::Format_ARGB32_Premultiplied);
+
+        // And copy the frames into it
+        QPainter painter;
+        painter.begin(&output);
+        painter.fillRect(output.rect(),QColor(0,0,0));
+        for(int i = 0; i < getFrameCount(); i++) {
+            painter.drawImage(QPoint(frameSize.width()*i, 0),
+                              getFrameImage(i));
+        }
+        painter.end();
     }
-    painter.end();
+        break;
+    case Scrolling:
+    {
+        // Just grab the edit image.
+        output = frames->data(frames->index(0),PatternModel::EditImage).value<QImage>();
+    }
+        break;
+    }
 
     if(!output.save(newFileName)) {
         return false;

@@ -118,13 +118,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     // tools
-    pSpeed.setRange(PATTERN_SPEED_MINIMUM_VALUE, PATTERN_SPEED_MAXIMUM_VALUE);
-    pSpeed.setValue(PATTERN_SPEED_DEFAULT_VALUE);
-    pSpeed.setToolTip(tr("Pattern speed"));
-    playbackToolbar->addWidget(&pSpeed);
-    connect(&pSpeed, SIGNAL(valueChanged(int)), this, SLOT(patternSpeed_valueChanged(int)));
-    patternSpeed_valueChanged(PATTERN_SPEED_DEFAULT_VALUE);
-
     pFrame.setMaximumWidth(30);
     pFrame.setMinimumWidth(30);
     pFrame.setValidator(new QIntValidator(1,std::numeric_limits<int>::max(),this));
@@ -133,6 +126,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&pFrame, SIGNAL(textEdited(QString)), this, SLOT(frameIndex_valueChanged(QString)));
     frameIndex_valueChanged("1");
 
+    // Pattern info
+    patternSpeed->setRange(PATTERN_SPEED_MINIMUM_VALUE, PATTERN_SPEED_MAXIMUM_VALUE);
+    patternSpeed->setValue(PATTERN_SPEED_DEFAULT_VALUE);
+    connect(patternSpeed, SIGNAL(valueChanged(int)), this, SLOT(patternSpeed_valueChanged(int)));
+    patternSpeed_valueChanged(PATTERN_SPEED_DEFAULT_VALUE);
 
     connect(this, SIGNAL(patternStatusChanged(bool)),
             actionClose, SLOT(setEnabled(bool)));
@@ -210,9 +208,6 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(on_patternCollectionCurrentChanged(const QModelIndex &, const QModelIndex &)));
 
     timeline->setItemDelegate(new PatternDelegate(this));
-
-    // Create a pattern
-    on_actionNew_triggered();
 
 //    DeviceSelector deviceSelector(this);
 //    deviceSelector.setWindowModality(Qt::WindowModal);
@@ -349,34 +344,6 @@ void MainWindow::stopPlayback() {
     drawTimer.stop();
     actionPlay->setText(tr("Play"));
     actionPlay->setIcon(QIcon(":/icons/images/icons/Play-100.png"));
-}
-
-void MainWindow::on_actionLoad_File_triggered()
-{
-    QSettings settings;
-    QString lastDirectory = settings.value("File/LoadDirectory").toString();
-
-    QDir dir(lastDirectory);
-    if(!dir.isReadable()) {
-        lastDirectory = QDir::homePath();
-    }
-
-    QString fileName = QFileDialog::getOpenFileName(this,
-        tr("Open Pattern"), lastDirectory, tr("Pattern Files (*.png *.jpg *.bmp *.gif)"));
-
-    if(fileName.length() == 0) {
-        return;
-    }
-
-    QFileInfo fileInfo(fileName);
-    settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
-
-    // TODO: choose scrolling/frame-based
-    if(!loadPattern(Pattern::Scrolling, fileName)) {
-        showError(tr("Could not open file %1. Perhaps it has a formatting problem?")
-                  .arg(fileName));
-        return;
-    }
 }
 
 
@@ -957,11 +924,6 @@ void MainWindow::updateBlinky()
     controller->sendUpdate(ledData);
 }
 
-void MainWindow::on_actionNew_triggered()
-{
-//    loadPattern(Pattern::Scrolling, QString());
-}
-
 void MainWindow::on_actionClose_triggered()
 {
     if(!patternCollection.hasPattern()) {
@@ -1208,4 +1170,42 @@ void MainWindow::on_actionConfigure_Fixture_triggered()
 
     settings.setValue("Fixture/DisplaySize", newDisplaySize);
     settings.setValue("Fixture/ColorOrder", newColorMode);
+}
+
+void MainWindow::openPattern(Pattern::PatternType type)
+{
+    QSettings settings;
+    QString lastDirectory = settings.value("File/LoadDirectory").toString();
+
+    QDir dir(lastDirectory);
+    if(!dir.isReadable()) {
+        lastDirectory = QDir::homePath();
+    }
+
+    QString fileName = QFileDialog::getOpenFileName(this,
+        tr("Open Pattern"), lastDirectory, tr("Pattern Files (*.png *.jpg *.bmp *.gif)"));
+
+    if(fileName.length() == 0) {
+        return;
+    }
+
+    QFileInfo fileInfo(fileName);
+    settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
+
+    // TODO: choose scrolling/frame-based
+    if(!loadPattern(type, fileName)) {
+        showError(tr("Could not open file %1. Perhaps it has a formatting problem?")
+                  .arg(fileName));
+        return;
+    }
+}
+
+void MainWindow::on_actionOpen_Scrolling_Pattern_triggered()
+{
+    openPattern(Pattern::Scrolling);
+}
+
+void MainWindow::on_actionOpen_Frame_based_Pattern_triggered()
+{
+    openPattern(Pattern::FrameBased);
 }

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>278</width>
-    <height>224</height>
+    <height>228</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,37 +23,13 @@
       <property name="bottomMargin">
        <number>12</number>
       </property>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="FixtureType"/>
+      </item>
       <item row="2" column="2">
        <widget class="QLabel" name="label_5">
         <property name="text">
          <string>LEDs</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>LEDs</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QComboBox" name="ColorType"/>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="fixtureWidth">
-        <property name="text">
-         <string>0</string>
-        </property>
-        <property name="maxLength">
-         <number>10</number>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Colors:</string>
         </property>
        </widget>
       </item>
@@ -74,10 +50,23 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_3">
+      <item row="3" column="1">
+       <widget class="QComboBox" name="ColorType"/>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>Height:</string>
+         <string>LEDs</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="fixtureWidth">
+        <property name="text">
+         <string>0</string>
+        </property>
+        <property name="maxLength">
+         <number>10</number>
         </property>
        </widget>
       </item>
@@ -88,8 +77,19 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="FixtureType"/>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Colors:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Height:</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

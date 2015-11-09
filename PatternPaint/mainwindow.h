@@ -45,8 +45,6 @@ private slots:
 
     void connectionScannerTimer_timeout();
 
-    void on_actionLoad_File_triggered();
-
     void on_actionSave_File_triggered();
     void on_actionSave_File_as_triggered();
 
@@ -92,8 +90,6 @@ private slots:
 
     void on_colorPicked(QColor);
 
-    void on_actionNew_triggered();
-
     void on_actionClose_triggered();
 
     void on_actionStepForward_triggered();
@@ -117,6 +113,10 @@ private slots:
     void on_actionNew_FramePattern_triggered();
 
     void on_actionConfigure_Fixture_triggered();
+
+    void on_actionOpen_Scrolling_Pattern_triggered();
+
+    void on_actionOpen_Frame_based_Pattern_triggered();
 
 signals:
 
@@ -186,6 +186,7 @@ private:
     int getFrameCount();
     int getCurrentPatternIndex();
     int getPatternCount();
+    void openPattern(Pattern::PatternType type);
 };
 
 #endif // MAINWINDOW_H

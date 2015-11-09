@@ -19,7 +19,6 @@ PatternScrollModel::PatternScrollModel(QSize size, QObject *parent) :
 
 int PatternScrollModel::rowCount(const QModelIndex &) const
 {
-//    return image.width()-frameSize.width();
     return image.width();
 }
 
