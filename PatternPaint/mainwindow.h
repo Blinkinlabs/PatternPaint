@@ -137,7 +137,6 @@ private:
 
     PatternCollection patternCollection;
 
-    QSpinBox pSpeed;
     QLineEdit pFrame;
 
     enum Modes { Disconnected, Connected, Uploading };

@@ -217,6 +217,16 @@ int Pattern::getFrameCount() const {
     return frames->rowCount();
 }
 
+float Pattern::getFrameSpeed() const
+{
+    return frames->index(0).data(PatternModel::FrameSpeed).toFloat();
+}
+
+void Pattern::setFrameSpeed(float speed)
+{
+    frames->setData(frames->index(0), speed, PatternModel::FrameSpeed);
+}
+
 void Pattern::deleteFrame(int index) {
     frames->removeRow(index);
 }

@@ -40,6 +40,7 @@ private:
     QList<QImage> frames;
     QUndoStack  undoStack;      ///< Undo stack for this pattern
     QSize frameSize;            ///< Resolution of this pattern, in pixels
+    float frameSpeed;           ///< Speed to play back the pattern
     QString fileInfo;           ///< Filename for the pattern
     bool modified;              ///< True if the pattern has been changed since last save
 

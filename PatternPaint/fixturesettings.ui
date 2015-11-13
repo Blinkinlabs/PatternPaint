@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>278</width>
-    <height>228</height>
+    <height>366</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,9 +15,85 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Device</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QComboBox" name="comboBox">
+        <item>
+         <property name="text">
+          <string>BlinkyTape</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Blinky Pixels</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Blinky Matrix</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>BlinkyTile</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>BlinkyPendant</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Custom</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>Controller</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="0">
+       <widget class="QComboBox" name="comboBox_2">
+        <item>
+         <property name="text">
+          <string>BlinkyTape</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Light Buddy (BlinkyTile)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>BlinkyPendant</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Arduino Leonardo</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Fixture configuration</string>
+      <string>Fixture</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <property name="bottomMargin">

@@ -33,7 +33,6 @@
 
 #define PATTERN_SPEED_MINIMUM_VALUE 1
 #define PATTERN_SPEED_MAXIMUM_VALUE 100
-#define PATTERN_SPEED_DEFAULT_VALUE 20
 
 #define DRAWING_SIZE_MINIMUM_VALUE 1
 #define DRAWING_SIZE_MAXIMUM_VALUE 20
@@ -128,9 +127,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Pattern info
     patternSpeed->setRange(PATTERN_SPEED_MINIMUM_VALUE, PATTERN_SPEED_MAXIMUM_VALUE);
-    patternSpeed->setValue(PATTERN_SPEED_DEFAULT_VALUE);
+//    patternSpeed->setValue(PATTERN_SPEED_MINIMUM_VALUE);
     connect(patternSpeed, SIGNAL(valueChanged(int)), this, SLOT(patternSpeed_valueChanged(int)));
-    patternSpeed_valueChanged(PATTERN_SPEED_DEFAULT_VALUE);
 
     connect(this, SIGNAL(patternStatusChanged(bool)),
             actionClose, SLOT(setEnabled(bool)));
@@ -151,7 +149,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(patternStatusChanged(bool)),
             actionStepBackward, SLOT(setEnabled(bool)));
     connect(this, SIGNAL(patternStatusChanged(bool)),
-            &pSpeed, SLOT(setEnabled(bool)));
+            patternSpeed, SLOT(setEnabled(bool)));
 
     mode = Disconnected;
 
@@ -208,10 +206,6 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(on_patternCollectionCurrentChanged(const QModelIndex &, const QModelIndex &)));
 
     timeline->setItemDelegate(new PatternDelegate(this));
-
-//    DeviceSelector deviceSelector(this);
-//    deviceSelector.setWindowModality(Qt::WindowModal);
-//    deviceSelector.exec();
 }
 
 void MainWindow::populateExamplesMenu(QString directory, QMenu* menu) {
@@ -317,6 +311,11 @@ void MainWindow::connectionScannerTimer_timeout() {
 
 void MainWindow::patternSpeed_valueChanged(int value)
 {
+    if(!patternCollection.hasPattern()) {
+        return;
+    }
+    patternCollection.getPattern(getCurrentPatternIndex())->setFrameSpeed(value);
+
     drawTimer.setInterval(1000/value);
 }
 
@@ -429,7 +428,6 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
 
     // Note: Converting frameRate to frame delay here.
     PatternWriter patternWriter(patternCollection.getPattern(getCurrentPatternIndex()),
-                                drawTimer.interval(),
                                 PatternWriter::RGB24,
                                 colorMode);
 
@@ -653,9 +651,10 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
 
     std::vector<PatternWriter> patterns;
 
+    // TODO: Leave
+
     for(int i = 0; i < patternCollection.count(); i++) {
         PatternWriter patternWriter(patternCollection.getPattern(i),
-                        drawTimer.interval(),
                         //PatternWriter::RGB24,
                         PatternWriter::RGB565_RLE,
                         colorMode);
@@ -954,6 +953,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
         setPatternData(0, QImage());
         frameEditor->setShowPlaybakIndicator(false);
         timeline->setVisible(false);
+        patternSpeed->setValue(1);
         return;
     }
 
@@ -968,6 +968,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
     setPatternData(getCurrentFrameIndex(), newpattern->getEditImage(getCurrentPatternIndex()));
     frameEditor->setShowPlaybakIndicator(newpattern->hasPlaybackIndicator());
     timeline->setVisible(newpattern->hasTimeline());
+    patternSpeed->setValue(newpattern->getFrameSpeed());
 
     // TODO: Should we unregister these eventually?
     connect(timeline->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
@@ -1035,7 +1036,8 @@ void MainWindow::on_frameDataEdited(int index, QImage update)
 
 void MainWindow::setPatternName(QString name)
 {
-    this->setWindowTitle(name + " - Pattern Paint");
+    setWindowTitle(name + " - Pattern Paint");
+    patternName->setText(name);
 }
 
 void MainWindow::on_actionStepForward_triggered()

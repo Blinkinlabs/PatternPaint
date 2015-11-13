@@ -66,6 +66,11 @@ public:
     /// @return Frame count
     int getFrameCount() const;
 
+
+    float getFrameSpeed() const;
+
+    void setFrameSpeed(float speed);
+
     /// Get an image representing the current frame
     /// @return an NxN QImage reperesenting the current frame data
     const QImage getFrameImage(int index) const;
@@ -107,6 +112,8 @@ public:
 
 private:
     QPointer<PatternModel> frames;   ///< Storage container for the images
+
+    // TODO: Push these into the model?
     PatternType type;
     bool playbackIndicator;
     bool timeline;

@@ -5,10 +5,12 @@
 #include <QPainter>
 
 #define FRAME_COLOR_DEFAULT    QColor(0,0,0,255)
+#define PATTERN_FRAME_SPEED_DEFAULT_VALUE 10
 
 PatternFrameModel::PatternFrameModel(QSize size, QObject *parent) :
     PatternModel(parent),
-    frameSize(size)
+    frameSize(size),
+    frameSpeed(PATTERN_FRAME_SPEED_DEFAULT_VALUE)
 {
     undoStack.setUndoLimit(50);
 }
@@ -73,6 +75,9 @@ QVariant PatternFrameModel::data(const QModelIndex &index, int role) const
     else if (role == FrameSize)
         return frameSize;
 
+    else if (role == FrameSpeed)
+        return frameSpeed;
+
     else if (role == FileName)
         return fileInfo;
 
@@ -127,6 +132,16 @@ bool PatternFrameModel::setData(const QModelIndex &index,
         emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
         return true;
     }
+
+    else if(role == FrameSpeed) {
+        frameSpeed = value.toFloat();
+
+        QVector<int> roles;
+        roles.append(FrameSpeed);
+        emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
+        return true;
+    }
+
     else if(role == FileName) {
         fileInfo = value.toString();
 

@@ -26,7 +26,7 @@ public:
     };
 
     // Create an pattern from a QImage
-    PatternWriter(const Pattern *pattern, int frameDelay, Encoding encoding, ColorMode colorMode);
+    PatternWriter(const Pattern *pattern, Encoding encoding, ColorMode colorMode);
 
     Encoding getEncoding() const { return encoding; }
     QByteArray getData() const { return data; }

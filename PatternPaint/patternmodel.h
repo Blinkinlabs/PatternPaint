@@ -14,6 +14,7 @@ public:
     enum Roles {
         FrameImage = Qt::UserRole,      // Image data for the given frame
         FrameSize,                      // Size of a frame image
+        FrameSpeed,                     // Speed to play back the frame
         FileName,                       // File location for this pattern
         Modified,                       // Whether the pattern has unsaved data
         EditImage,                      // Image data for editing

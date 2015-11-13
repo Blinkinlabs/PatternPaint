@@ -69,8 +69,7 @@ SOURCES += main.cpp\
     patterndelegate.cpp \
     patternframeundocommand.cpp \
     patternscrollundocommand.cpp \
-    fixturesettings.cpp \
-    deviceselector.cpp
+    fixturesettings.cpp
 
 HEADERS  += mainwindow.h \
     systeminformation.h \
@@ -94,8 +93,7 @@ HEADERS  += mainwindow.h \
     colors.h \
     patternframeundocommand.h \
     patternscrollundocommand.h \
-    fixturesettings.h \
-    deviceselector.h
+    fixturesettings.h
 
 mac {
 HEADERS  += \
@@ -109,11 +107,11 @@ FORMS    += mainwindow.ui \
     systeminformation.ui \
     aboutpatternpaint.ui \
     addressprogrammer.ui \
-    fixturesettings.ui \
-    deviceselector.ui
+    fixturesettings.ui
 
 include(instruments/instruments.pri)
-include(devices/devices.pri)
+include(controllers/controllers.pri)
+include(fixtures/fixtures.pri)
 include(updater/updater.pri)
 
 mac {

@@ -11,14 +11,13 @@ ColorModes colorModes[PatternWriter::COLOR_MODE_COUNT] =
 };
 
 PatternWriter::PatternWriter(const Pattern *pattern,
-                             int frameDelay,
                              Encoding encoding,
                              ColorMode colorMode) :
     encoding(encoding),
-    frameDelay(frameDelay),
     colorMode(colorMode)
 {
     frameCount = pattern->getFrameCount();
+    frameDelay = 1000/pattern->getFrameSpeed();
     ledCount = pattern->getFrameSize().width()*pattern->getFrameSize().height(); // TODO: Integrate a fixture here.
 
     // Create a new encoder
