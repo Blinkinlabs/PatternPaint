@@ -21,8 +21,8 @@ public:
     void setOutputSize(QSize size);
     QSize getOutputSize() const;
 
-    void setColorMode(PatternWriter::ColorMode mode);
-    PatternWriter::ColorMode getColorMode() const;
+    void setColorMode(ColorMode mode);
+    ColorMode getColorMode() const;
 private:
     Ui::FixtureSettings *ui;
 };

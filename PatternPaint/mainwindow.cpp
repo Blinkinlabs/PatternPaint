@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "colormodel.h"
+#include "colormode.h"
+#include "brightnessmodel.h"
 #include "systeminformation.h"
 #include "aboutpatternpaint.h"
 #include "fixturesettings.h"
@@ -20,7 +21,7 @@
 #include "patterndelegate.h"
 #include "patternCollection.h"
 #include "fixture.h"
-#include "deviceselector.h"
+#include "matrixfixture.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -187,11 +188,10 @@ MainWindow::MainWindow(QWidget *parent) :
     move(settings.value("MainWindow/pos", QPoint(100, 100)).toPoint());
 
 
-    fixture = new MatrixFixture(settings.value("Fixture/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize());
+    fixture = new MatrixFixture(settings.value("Fixture/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize(),
+                                (ColorMode)settings.value("Fixture/ColorOrder", RGB).toInt(),
+                                new ExponentialBrightness(1.8,1.8,2.1));
     frameEditor->setFixture(fixture);
-
-    //colorMode = settings.value("Fixture/ColorOrder", PatternWriter::RGB).value<PatternWriter::ColorMode>();
-    colorMode = (PatternWriter::ColorMode)settings.value("Fixture/ColorOrder", PatternWriter::RGB).toInt();
 
     // Fill the examples menu using the examples resource
     populateExamplesMenu(":/examples", menuExamples);
@@ -429,7 +429,7 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered() {
     // Note: Converting frameRate to frame delay here.
     PatternWriter patternWriter(patternCollection.getPattern(getCurrentPatternIndex()),
                                 PatternWriter::RGB24,
-                                colorMode);
+                                fixture);
 
 
     // Attempt to open the specified file
@@ -657,7 +657,7 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
         PatternWriter patternWriter(patternCollection.getPattern(i),
                         //PatternWriter::RGB24,
                         PatternWriter::RGB565_RLE,
-                        colorMode);
+                        fixture);
 
         patterns.push_back(patternWriter);
     }
@@ -899,22 +899,21 @@ void MainWindow::updateBlinky()
 
     QList<QColor> pixels = fixture->getColorStreamForFrame(frame);
 
+    // TODO:
     QByteArray ledData;
     for(int i = 0; i < pixels.size(); i++) {
-        QColor color = ColorModel::correctBrightness(pixels[i]);
-
-        switch(colorMode) {
-        case PatternWriter::RGB:
-            ledData.append(color.red());
-            ledData.append(color.green());
-            ledData.append(color.blue());
+        switch(fixture->getColorMode()) {
+        case RGB:
+            ledData.append(pixels[i].red());
+            ledData.append(pixels[i].green());
+            ledData.append(pixels[i].blue());
             break;
-        case PatternWriter::GRB:
-            ledData.append(color.green());
-            ledData.append(color.red());
-            ledData.append(color.blue());
+        case GRB:
+            ledData.append(pixels[i].green());
+            ledData.append(pixels[i].red());
+            ledData.append(pixels[i].blue());
             break;
-        case PatternWriter::COLOR_MODE_COUNT:
+        case COLOR_MODE_COUNT:
         default:
             break;
         }
@@ -1113,9 +1112,12 @@ void MainWindow::on_actionConfigure_Fixture_triggered()
     QSettings settings;
 
     QSize displaySize;
+    ColorMode colorMode;
 
     // TODO: Have a fixture, set this from that.
     displaySize = settings.value("Fixture/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize();
+    colorMode = (ColorMode)settings.value("Fixture/ColorOrder", RGB).toInt();
+
 
     fixtureSettings.setOutputSize(displaySize);
     fixtureSettings.setColorMode(colorMode);
@@ -1127,7 +1129,7 @@ void MainWindow::on_actionConfigure_Fixture_triggered()
 
     // As long as the user didn't cancel, apply the new fixture size.
     QSize newDisplaySize = fixtureSettings.getOutputSize();
-    PatternWriter::ColorMode newColorMode = fixtureSettings.getColorMode();
+    ColorMode newColorMode = fixtureSettings.getColorMode();
 
     // Test if any patterns need to be resized
     QVector<Pattern*> needToResize;
@@ -1167,8 +1169,8 @@ void MainWindow::on_actionConfigure_Fixture_triggered()
     }
 
     // Finally, apply the new settings
-    colorMode = newColorMode;
     fixture->setSize(newDisplaySize);
+    fixture->setColorMode(newColorMode);
 
     settings.setValue("Fixture/DisplaySize", newDisplaySize);
     settings.setValue("Fixture/ColorOrder", newColorMode);

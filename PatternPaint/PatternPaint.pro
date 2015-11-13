@@ -51,7 +51,6 @@ equals(QT_MAJOR_VERSION, 5){
 SOURCES += main.cpp\
     mainwindow.cpp \
     systeminformation.cpp \
-    colormodel.cpp \
     aboutpatternpaint.cpp \
     addressprogrammer.cpp \
     letterboxscrollarea.cpp \
@@ -64,7 +63,6 @@ SOURCES += main.cpp\
     patterncollection.cpp \
     frameeditor.cpp \
     patternwriter.cpp \
-    fixture.cpp \
     patternscrollmodel.cpp \
     patterndelegate.cpp \
     patternframeundocommand.cpp \
@@ -73,7 +71,6 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     systeminformation.h \
-    colormodel.h \
     aboutpatternpaint.h \
     addressprogrammer.h \
     letterboxscrollarea.h \
@@ -86,7 +83,6 @@ HEADERS  += mainwindow.h \
     patterncollection.h \
     frameeditor.h \
     patternwriter.h \
-    fixture.h \
     patternscrollmodel.h \
     patternmodel.h \
     patterndelegate.h \

@@ -1023,7 +1023,7 @@
   </action>
   <action name="actionConfigure_Fixture">
    <property name="text">
-    <string>Fixture Setup</string>
+    <string>Scene configuration...</string>
    </property>
   </action>
   <action name="actionOpen_Scrolling_Pattern">

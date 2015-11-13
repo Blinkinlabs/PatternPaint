@@ -1,20 +1,13 @@
 #include "patternwriter.h"
-#include "colormodel.h"
-#include "fixture.h"
+#include "colormode.h"
 
 #include <QDebug>
 
-ColorModes colorModes[PatternWriter::COLOR_MODE_COUNT] =
-{
-    {PatternWriter::RGB, "RGB"},
-    {PatternWriter::GRB, "GRB"},
-};
-
 PatternWriter::PatternWriter(const Pattern *pattern,
                              Encoding encoding,
-                             ColorMode colorMode) :
+                             Fixture* fixture) :
     encoding(encoding),
-    colorMode(colorMode)
+    fixture(fixture)
 {
     frameCount = pattern->getFrameCount();
     frameDelay = 1000/pattern->getFrameSpeed();
@@ -58,7 +51,7 @@ int PatternWriter::colorCount() const
 }
 
 int PatternWriter::QRgbTo565(QColor color) {
-    switch(colorMode) {
+    switch(fixture->getColorMode()) {
         case GRB:
             return (((color.green()   >> 3) & 0x1F)   << 11)
                    | (((color.red()   >> 2) & 0x3F)   <<  5)
@@ -74,8 +67,6 @@ int PatternWriter::QRgbTo565(QColor color) {
 }
 
 void PatternWriter::encodeImageRGB16_RLE(const Pattern *pattern) {
-    MatrixFixture fixture(pattern->getFrameSize());
-
     data.clear();
     header.clear(); // TODO: Move the header builder somewhere else?
 
@@ -84,13 +75,13 @@ void PatternWriter::encodeImageRGB16_RLE(const Pattern *pattern) {
     for(int frame = 0; frame < pattern->getFrameCount(); frame++) {
         header.append(QString("// Frame: %1\n").arg(frame));
 
-        QList<QColor> colorStream = fixture.getColorStreamForFrame(pattern->getFrameImage(frame));
+        QList<QColor> colorStream = fixture->getColorStreamForFrame(pattern->getFrameImage(frame));
 
         int currentColor;
         int runCount = 0;
 
         for(int pixel = 0; pixel < colorStream.count(); pixel++) {
-            QColor color = ColorModel::correctBrightness(colorStream.at(pixel));
+            QColor color = colorStream.at(pixel);
 
             int decimatedColor = QRgbTo565(color);
 
@@ -135,23 +126,21 @@ void PatternWriter::encodeImageRGB16_RLE(const Pattern *pattern) {
     header.append("};\n\n");
     header.append(QString("Animation animation(%1, animationData, ENCODING_RGB565_RLE, %2);\n")
                   .arg(pattern->getFrameCount())
-                  .arg(fixture.getLedCount()));
+                  .arg(fixture->getLedCount()));
 }
 
 
 void PatternWriter::encodeImageRGB24(const Pattern *pattern) {
-    MatrixFixture fixture(pattern->getFrameSize());
-
     header.clear();
     data.clear();
 
     for(int frame = 0; frame < pattern->getFrameCount(); frame++) {
-        QList<QColor> colorStream = fixture.getColorStreamForFrame(pattern->getFrameImage(frame));
+        QList<QColor> colorStream = fixture->getColorStreamForFrame(pattern->getFrameImage(frame));
 
         for(int pixel = 0; pixel < colorStream.count(); pixel++) {
-            QColor color = ColorModel::correctBrightness(colorStream.at(pixel));
+            QColor color = colorStream.at(pixel);
 
-            switch(colorMode) {
+            switch(fixture->getColorMode()) {
                 case GRB:
                     data.append(color.green());
                     data.append(color.red());
@@ -172,12 +161,12 @@ void PatternWriter::encodeImageRGB24(const Pattern *pattern) {
     for(int frame = 0; frame < pattern->getFrameCount(); frame++) {
         header.append(QString("// Frame: %1\n").arg(frame));
 
-        QList<QColor> colorStream = fixture.getColorStreamForFrame(pattern->getFrameImage(frame));
+        QList<QColor> colorStream = fixture->getColorStreamForFrame(pattern->getFrameImage(frame));
 
         for(int pixel = 0; pixel < colorStream.count(); pixel++) {
-            QColor color = ColorModel::correctBrightness(colorStream.at(pixel));
+            QColor color = colorStream.at(pixel);
 
-            switch(colorMode) {
+            switch(fixture->getColorMode()) {
                 case GRB:
                     header.append(QString("    %1, %2, %3, // %4\n")
                                   .arg(color.green(), 3)
@@ -203,7 +192,7 @@ void PatternWriter::encodeImageRGB24(const Pattern *pattern) {
     header.append("\n");
     header.append(QString("Animation animation(%1, animationData, ENCODING_RGB24, %2);")
                           .arg(pattern->getFrameCount())
-                          .arg(fixture.getLedCount()));
+                          .arg(fixture->getLedCount()));
 }
 
 //void PatternWriter::encodeImageIndexed(const Pattern *pattern) {
@@ -236,7 +225,7 @@ void PatternWriter::encodeImageRGB24(const Pattern *pattern) {
 //                  .arg(indexed.colorCount()*3));
 
 //    for (int index = 0; index < indexed.colorCount(); index++) {
-//        QColor color = ColorModel::correctBrightness(indexed.color(index));
+//        QColor color = indexed.color(index);
 
 //        header.append(QString(" %1, %2, %3,\n")
 //                          .arg(color.red(),   3)
@@ -306,8 +295,7 @@ void PatternWriter::encodeImageRGB24(const Pattern *pattern) {
 //                  .arg(indexed.colorCount()*3));
 
 //    for (int index = 0; index < indexed.colorCount(); index++) {
-//        // TODO: Brightness correction before pallete reduction?
-//        QColor color = ColorModel::correctBrightness(indexed.color(index));
+//        QColor color = indexed.color(index);
 
 //        header.append(QString(" %1, %2, %3,\n")
 //                          .arg(color.red(),   3)

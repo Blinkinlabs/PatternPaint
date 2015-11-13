@@ -18,7 +18,7 @@ FixtureSettings::FixtureSettings(QWidget *parent) :
     ui->fixtureWidth->setValidator(new QIntValidator(1,std::numeric_limits<int>::max(),this));
 
     // Load the available color modes
-    for(int i = 0; i < PatternWriter::COLOR_MODE_COUNT; i++) {
+    for(int i = 0; i < COLOR_MODE_COUNT; i++) {
         qDebug() << "adding:" << colorModes[i].name << colorModes[i].colorMode;
         ui->ColorType->addItem(colorModes[i].name, colorModes[i].colorMode);
     }
@@ -29,10 +29,10 @@ FixtureSettings::~FixtureSettings()
     delete ui;
 }
 
-void FixtureSettings::setColorMode(PatternWriter::ColorMode mode) {
+void FixtureSettings::setColorMode(ColorMode mode) {
     for(int i = 0; i < ui->ColorType->count(); i++) {
-        // TODO: Why not .value<PatternWriter::ColorMode>() ?
-        //if(ui->ColorType->itemData(i).value<PatternWriter::ColorMode>() == mode) {
+        // TODO: Why not .value<ColorMode>() ?
+        //if(ui->ColorType->itemData(i).value<ColorMode>() == mode) {
         if(ui->ColorType->itemData(i).toInt() == mode) {
             ui->ColorType->setCurrentIndex(i);
             break;
@@ -40,9 +40,9 @@ void FixtureSettings::setColorMode(PatternWriter::ColorMode mode) {
     }
 }
 
-PatternWriter::ColorMode FixtureSettings::getColorMode() const {
-    //return ui->ColorType->currentData().value<PatternWriter::ColorMode();
-    return (PatternWriter::ColorMode)ui->ColorType->currentData().toInt();
+ColorMode FixtureSettings::getColorMode() const {
+    //return ui->ColorType->currentData().value<ColorMode();
+    return (ColorMode)ui->ColorType->currentData().toInt();
 }
 
 void FixtureSettings::setOutputSize(QSize size) {

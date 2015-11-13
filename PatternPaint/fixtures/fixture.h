@@ -2,9 +2,13 @@
 #define FIXTURE_H
 
 #include <QObject>
+#include <QImage>
 #include <QList>
 #include <QColor>
-#include "pattern.h"
+#include <QSize>
+
+#include "colormode.h"
+#include "brightnessmodel.h"
 
 class Fixture : public QObject
 {
@@ -14,27 +18,18 @@ public:
     Fixture(QObject *parent = 0);
 
     virtual QList<QColor> getColorStreamForFrame(const QImage frame) const = 0;
+
     virtual int getLedCount() const = 0;
 
-    // TODO: Make these non-generic.
+    // TODO: Push these to individual classes?
     virtual QSize getSize() const = 0;
     virtual void setSize(QSize newSize) = 0;
-};
 
-class MatrixFixture : public Fixture
-{
-    Q_OBJECT
+    virtual ColorMode getColorMode() const = 0;
+    virtual void setColorMode(ColorMode newColorMode) = 0;
 
-public:
-    MatrixFixture(QSize size, QObject *parent = 0);
-
-    QList<QColor> getColorStreamForFrame(const QImage frame) const;
-    int getLedCount() const;
-    QSize getSize() const;
-    void setSize(QSize newSize);
-
-private:
-    QSize size;
+    virtual BrightnessModel *getBrightnessModel() const = 0;
+    virtual void setBrightnessModel(BrightnessModel *BrightnessModel) = 0;
 };
 
 #endif // FIXTURE_H

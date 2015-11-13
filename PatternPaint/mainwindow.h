@@ -145,7 +145,6 @@ private:
     QUndoGroup undoGroup;
 
     QPointer<Fixture> fixture;
-    PatternWriter::ColorMode colorMode;
 
     void populateExamplesMenu(QString directory, QMenu* menu);
 
