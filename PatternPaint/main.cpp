@@ -1,6 +1,8 @@
 #include "mainwindow.h"
-#include <QApplication>
+
 #include "autoupdater.h"
+
+#include <QApplication>
 
 #if defined Q_OS_MAC
 #include "CocoaInitializer.h"
@@ -8,6 +10,8 @@
 #elif defined Q_OS_WIN
 #include "winsparkleautoupdater.h"
 #endif
+
+
 
 #define OSX_RELEASE_APPCAST_DEFAULT "http://software.blinkinlabs.com/patternpaint/patternpaint-osx.xml"
 #define WINDOWS_RELEASE_APPCAST_DEFAULT "http://software.blinkinlabs.com/patternpaint/patternpaint-windows.xml"
@@ -23,9 +27,9 @@ int main(int argc, char *argv[])
 
     AutoUpdater* updater = 0;
 
-#if defined(Q_OS_MAC)
+#if defined(Q_OS_MACX)
     CocoaInitializer cocoaInitiarizer;
-#endif
+#endif //Q_OS_MACX
 
 
 #if defined(DISABLE_UPDATE_CHECKS)
@@ -34,11 +38,11 @@ int main(int argc, char *argv[])
 
 #else
 
-#if defined(Q_OS_MAC)
+#if defined(Q_OS_MACX)
     QSettings settings;
     QString updateUrl = settings.value("Updates/releaseAppcastUrl", OSX_RELEASE_APPCAST_DEFAULT).toString();
     updater = new SparkleAutoUpdater(updateUrl);
-#endif /// Q_OS__MAC
+#endif // Q_OS__MACX
 
 #if defined(Q_OS_WIN)
     QSettings settings;

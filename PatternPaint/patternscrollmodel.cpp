@@ -1,5 +1,7 @@
 #include "patternscrollmodel.h"
+
 #include "patternscrollundocommand.h"
+
 #include <QColor>
 #include <QDebug>
 #include <QPainter>

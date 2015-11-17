@@ -1,4 +1,5 @@
 #include "patterncollectionmodel.h"
+
 #include <QDebug>
 
 PatternCollectionModel::PatternCollectionModel(QObject *parent) :

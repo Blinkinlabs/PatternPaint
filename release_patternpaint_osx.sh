@@ -3,10 +3,11 @@
 # Stop at any error
 set -e
 
-VERSION="1.9.0"
+VERSION="2.0.0"
 
 # Pull in the QT tools
-export QTDIR=~/Qt5.4.1/5.4/clang_64/
+#export QTDIR=~/Qt5.4.1/5.4/clang_64/
+export QTDIR=~/Qt/5.5/clang_64/
 
 OUTPUTDIR=`pwd`
 echo "Output to: " ${OUTPUTDIR}

@@ -1,10 +1,13 @@
 #include "blinkytapeuploader.h"
+
 #include "blinkypendantuploader.h"
 #include "lightbuddyuploader.h"
 #include "blinkytape.h"
 
 #include <QDebug>
 #include <QTime>
+#include <QtSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
 
 
 /// Interval between scans to see if the device is still connected

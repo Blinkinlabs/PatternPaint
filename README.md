@@ -1,15 +1,27 @@
 # PatternPaint
 
-![image](http://blinkinlabs.com/wp-content/uploads/2014/07/Screen-Shot-2015-03-31-at-10.33.14-AM.png)
+![image](http://blinkinlabs.com/wp-content/uploads/2015/11/Screen-Shot-2015-11-17-at-5.14.06-PM.png)
 
-Making beautiful light shows is as easy as drawing a picture with Pattern Paint! Simply plug in your BlinkyTape, run Pattern Paint, and draw away!
+Making beautiful light shows is as easy as drawing a picture with PatternPaint! Simply plug in your BlinkyTape, run PatternPaint, and draw away!
 
 # User Guide
 
-Please visit the PatternPaint website for instructions on how to use it!: 
+This is the devlopment guide- For instructions on how to use Pattern Paint, please visit the PatternPaint website:
 [http://blinkinlabs.com/patternpaint](http://blinkinlabs.com/patternpaint)
 
+For instructions on how to contribute to Pattern Paint development, read on!
+
 # Development
+
+
+## Strategy
+
+PatternPaint is a cross-platform application, targetting Mac OS X, Windows, and Linux.
+
+We use [Github Issues](https://github.com/Blinkinlabs/PatternPaint/issues) for bug tracking and feature implementation.
+
+
+## Getting started
 
 PatternPaint is written in C++ with QT (5.4.1) libraries. The easiest way to get started is to download QT Creator, and run the project through there.
 
@@ -42,7 +54,7 @@ These are the steps required to build a release version (installer) for PatternP
 
 Xcode (for clang compiler and git)
 
-	Find and install through the App Store
+	https://itunes.apple.com/us/app/xcode/id497799835?ls=1&mt=12
 
 QT dev environment (Qt 5.4.1 for Mac):
 
@@ -78,15 +90,15 @@ Windows deployment requires the following tools:
 
 msysgit:
 
-	http://msysgit.github.io/
+	https://git-for-windows.github.io/
 
 Note: be sure to check 'Run Git from the Windows Command Prompt' and 'Checkout Windows-style'.
 
-The QT dev environment (Qt 5.4.1 for Windows 32-bit (MinGW 4.9.1, OpenGL):
+The QT dev environment (Qt 5.5.1 for Windows 32-bit (MinGW 4.9.2, OpenGL):
 
-	http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-mingw491_opengl-5.4.1.exe
+	http://download.qt.io/official_releases/qt/5.5/5.5.1/qt-opensource-windows-x86-mingw492-5.5.1.exe
 
-NSIS (3.0b1), for generating the installer:
+NSIS (3.0b2), for generating the installer:
 
 	http://nsis.sourceforge.net/Download
 

@@ -1,4 +1,5 @@
 #include "patterncollection.h"
+
 #include <QDebug>
 
 PatternCollection::PatternCollection()

@@ -1,13 +1,15 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
 #include "colormode.h"
 #include "brightnessmodel.h"
 #include "systeminformation.h"
 #include "aboutpatternpaint.h"
 #include "fixturesettings.h"
 #include "colorchooser.h"
-#include "blinkytape.h"
 #include "patternwriter.h"
+#include "blinkytape.h"
+#include "blinkytapeuploader.h"
 
 #include "pencilinstrument.h"
 #include "lineinstrument.h"
@@ -23,13 +25,12 @@
 #include "fixture.h"
 #include "matrixfixture.h"
 
+
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDebug>
 #include <QDesktopServices>
 #include <QtWidgets>
-
-#include <blinkytapeuploader.h>
 
 
 #define PATTERN_SPEED_MINIMUM_VALUE 1
@@ -57,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     setupUi(this);
 
-#if defined(Q_OS_MAC)
+#if defined(Q_OS_MACX)
     appNap = NULL;
 #endif
 
@@ -233,7 +234,7 @@ void MainWindow::populateExamplesMenu(QString directory, QMenu* menu) {
 }
 
 MainWindow::~MainWindow(){
-#if defined(Q_OS_MAC)
+#if defined(Q_OS_MACX)
     // start the app nap inhibitor
     if(appNap != NULL) {
         delete appNap;
@@ -455,7 +456,7 @@ void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
         mode = Connected;
         startPlayback();
 
-#if defined(Q_OS_MAC)
+#if defined(Q_OS_MACX)
         // start the app nap inhibitor
         if(appNap == NULL) {
             appNap = new CAppNapInhibitor("Interaction with hardware");
@@ -472,7 +473,7 @@ void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
 
         connectionScannerTimer.start();
 
-#if defined(Q_OS_MAC)
+#if defined(Q_OS_MACX)
         // start the app nap inhibitor
         if(appNap != NULL) {
             delete appNap;
@@ -605,39 +606,39 @@ void MainWindow::on_actionRestore_firmware_triggered()
 
         progressDialog.setWindowTitle("Firmware reset");
         progressDialog.setLabelText(
-                    "Searching for a BlinkyTape bootloader...\n"
-                    "\n"
-                    "Please connect your blinkytape to the computer via USB,\n"
-                    "then perform the reset trick. As soon as the device\n"
-                    "restarts, the progress bar should start moving and the\n"
-                    "firmware will be restored.");
+                        "Searching for a BlinkyTape bootloader...\n"
+                        "\n"
+                        "Please connect your blinkytape to the computer via USB,\n"
+                        "then perform the reset trick. As soon as the device\n"
+                        "restarts, the progress bar should start moving and the\n"
+                        "firmware will be restored.");
+        }
+        // Otherwise just grab it
+        else {
+            if (!controller->getUploader(uploader)) {
+                return;
+            }
+
+            if(uploader.isNull()) {
+                return;
+            }
+
+            connectUploader();
+
+            if(!uploader->upgradeFirmware(*controller)) {
+                showError(uploader->getErrorString());
+                return;
+            }
+
+            progressDialog.setWindowTitle("Firmware reset");
+            progressDialog.setLabelText("Loading new firmware onto Blinky");
+        }
+
+        mode = Uploading;
+
+        progressDialog.setValue(progressDialog.minimum());
+        progressDialog.show();
     }
-    // Otherwise just grab it
-    else {
-        if (!controller->getUploader(uploader)) {
-            return;
-        }
-
-        if(uploader.isNull()) {
-            return;
-        }
-
-        connectUploader();
-
-        if(!uploader->upgradeFirmware(*controller)) {
-            showError(uploader->getErrorString());
-            return;
-        }
-
-        progressDialog.setWindowTitle("Firmware reset");
-        progressDialog.setLabelText("Loading new firmware onto Blinky");
-    }
-
-    mode = Uploading;
-
-    progressDialog.setValue(progressDialog.minimum());
-    progressDialog.show();
-}
 
 void MainWindow::on_actionSave_to_Blinky_triggered()
 {

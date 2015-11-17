@@ -1,36 +1,49 @@
 INCLUDEPATH += $$PWD
 
-HEADERS += $$PWD/avrprogrammer.h \
+HEADERS += \
     $$PWD/blinkycontroller.h \
-    $$PWD/blinkypendantuploader.h \
-    $$PWD/blinkytapeuploader.h \
-    $$PWD/serialcommandqueue.h \
-    $$PWD/avruploaddata.h \
-    $$PWD/blinkypendantprogrammer.h \
-    $$PWD/blinkytape.h \
-    $$PWD/lightbuddyprogrammer.h \
-    $$PWD/lightbuddyuploader.h \
-    $$PWD/patternuploader.h \
-    $$PWD/PatternPlayer_Sketch.h \
-    $$PWD/ProductionSketch.h \
-    $$PWD/usbutils.h
+    $$PWD/controllerinfo.h \
+    $$PWD/patternuploader.h
 
-
-SOURCES +=  $$PWD/avrprogrammer.cpp \
+SOURCES += \
     $$PWD/blinkycontroller.cpp \
-    $$PWD/blinkypendantuploader.cpp \
-    $$PWD/blinkytapeuploader.cpp \
-    $$PWD/serialcommandqueue.cpp \
-    $$PWD/avruploaddata.cpp \
-    $$PWD/blinkypendantprogrammer.cpp \
-    $$PWD/blinkytape.cpp \
-    $$PWD/lightbuddyprogrammer.cpp \
-    $$PWD/lightbuddyuploader.cpp \
-    $$PWD/usbutils.cpp
+    $$PWD/controllerinfo.cpp
+
+# For platforms that have serial ports
+# TODO: Pull hard-coded references to BlinkyTape from the gui, make these disableable
+#has_serial {
+    QT += serialport
+
+    HEADERS += \
+        $$PWD/avrprogrammer.h \
+        $$PWD/blinkypendantuploader.h \
+        $$PWD/blinkytapeuploader.h \
+        $$PWD/serialcommandqueue.h \
+        $$PWD/avruploaddata.h \
+        $$PWD/blinkypendantprogrammer.h \
+        $$PWD/blinkytape.h \
+        $$PWD/lightbuddyprogrammer.h \
+        $$PWD/lightbuddyuploader.h \
+        $$PWD/PatternPlayer_Sketch.h \
+        $$PWD/ProductionSketch.h \
+        $$PWD/usbutils.h
+
+    SOURCES += \
+        $$PWD/avrprogrammer.cpp \
+        $$PWD/blinkypendantuploader.cpp \
+        $$PWD/blinkytapeuploader.cpp \
+        $$PWD/serialcommandqueue.cpp \
+        $$PWD/avruploaddata.cpp \
+        $$PWD/blinkypendantprogrammer.cpp \
+        $$PWD/blinkytape.cpp \
+        $$PWD/lightbuddyprogrammer.cpp \
+        $$PWD/lightbuddyuploader.cpp \
+        $$PWD/usbutils.cpp \
+#}
 
 
 # For libusb on OS X
-mac {
+macx {
     LIBUSB_PATH = $$PWD/../../thirdparty/libusb-1.0.20/osx-install
 
     INCLUDEPATH += $$LIBUSB_PATH/include

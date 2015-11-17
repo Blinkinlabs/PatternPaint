@@ -2,6 +2,7 @@
 #define BLINKYPENDANTPATTERNUPLOADER_H
 
 #include <QObject>
+
 #include "patternuploader.h"
 #include "blinkypendantprogrammer.h"
 

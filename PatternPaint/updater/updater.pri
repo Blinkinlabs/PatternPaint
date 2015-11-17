@@ -7,7 +7,7 @@ SOURCES += \
     $$PWD/autoupdater.cpp
 
 # For sparkle on OS X
-mac {
+macx {
     HEADERS +=  \
         $$PWD/sparkleautoupdater.h \
         $$PWD/cocoainitializer.h

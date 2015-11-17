@@ -1,6 +1,7 @@
+#include "usbutils.h"
+
 #include <QDebug>
 #include <libusb-1.0/libusb.h>
-#include "usbutils.h"
 
 
 // TODO: This assumes that only one device of this type is connected to the PC...

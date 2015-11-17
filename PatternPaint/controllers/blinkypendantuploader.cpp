@@ -1,5 +1,7 @@
 #include "blinkypendantuploader.h"
+
 #include "usbutils.h"
+#include "blinkycontroller.h"
 
 #define BLINKY_PENDANT_VERSION_1 256
 #define BLINKY_PENDANT_VERSION_2 512

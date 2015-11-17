@@ -1,5 +1,7 @@
 #include "patternframemodel.h"
+
 #include "patternframeundocommand.h"
+
 #include <QColor>
 #include <QDebug>
 #include <QPainter>

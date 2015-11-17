@@ -1,6 +1,6 @@
 #include "blinkytapeuploader.h"
-#include "avruploaddata.h"
 
+#include "avruploaddata.h"
 #include "ProductionSketch.h"
 
 #include <QDebug>

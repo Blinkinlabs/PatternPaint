@@ -3,8 +3,6 @@
 
 #include <QObject>
 #include <QList>
-#include <QtSerialPort>
-#include <QtSerialPort/QSerialPortInfo>
 
 #define LIGHT_BUDDY_APPLICATION_VID     0x1D50
 #define LIGHT_BUDDY_APPLICATION_PID     0x60AA
@@ -12,6 +10,7 @@
 #define LIGHT_BUDDY_BOOTLOADER_PID      0x60A9
 
 class PatternUploader;
+class QSerialPortInfo;
 
 /// Connect to a BlinkyTape over a serial port, and manage sending data to it.
 class BlinkyController : public QObject

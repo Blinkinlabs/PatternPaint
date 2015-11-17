@@ -3,7 +3,6 @@
 
 #include "blinkytape.h"
 
-#include <QSerialPortInfo>
 #include <QSysInfo>
 #include <QLibraryInfo>
 #include <QtWidgetsDepends>
@@ -24,6 +23,7 @@ SystemInformation::~SystemInformation()
 
 void SystemInformation::on_refresh_clicked()
 {
+
     QString report;
 
     report.append("Pattern Paint ");
@@ -37,6 +37,7 @@ void SystemInformation::on_refresh_clicked()
 
     report.append("Operating system: " + QSysInfo::prettyProductName() + "\r");
 
+    // TODO: Get this from the controllers rather than building them here.
     report.append("Detected Blinkies: \r");
     foreach (const QSerialPortInfo &info, BlinkyTape::probe()) {
         report.append("  BlinkyTape:" + info.portName() + "\r");

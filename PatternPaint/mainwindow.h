@@ -8,6 +8,7 @@
 #include <QToolButton>
 #include <QSpinBox>
 #include <QLineEdit>
+#include <QTimer>
 
 #include "blinkycontroller.h"
 #include "patternuploader.h"

@@ -1,6 +1,9 @@
 #include "avruploaddata.h"
+
 #include "PatternPlayer_Sketch.h"
 #include "blinkytape.h"
+
+#include <QDebug>
 
 #define BUFF_LENGTH 100
 

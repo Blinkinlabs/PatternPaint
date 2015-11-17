@@ -1,4 +1,5 @@
 #include "patternwriter.h"
+
 #include "colormode.h"
 
 #include <QDebug>

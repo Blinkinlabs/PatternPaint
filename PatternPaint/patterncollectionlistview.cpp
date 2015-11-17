@@ -1,4 +1,5 @@
 #include "patterncollectionlistview.h"
+
 #include <QDebug>
 #include <QSettings>
 

@@ -2,8 +2,10 @@
 #define PATTERNUPLOADER_H
 
 #include <QObject>
+
 #include "patternwriter.h"
-#include "blinkytape.h"
+
+class BlinkyController;
 
 /// This is an re-entreant version of an pattern uploader.
 /// Each task in the upload process is broken into a single state, and the state
@@ -12,7 +14,7 @@
 ///
 /// This seems convoluted, but the goal is to avoid ever waiting on a serial read
 /// event. For some reason, doing so seems to block the main thread even if we are
-/// in a different thread; it's possible serial sits on the main lock?
+/// in a different thread; it's possible serial sits on a main lock?
 ///
 /// While the upload process is underway, it will send periodic progress updates
 /// via the progressUpdate() signal.

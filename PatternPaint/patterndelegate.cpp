@@ -1,9 +1,10 @@
 #include "patterndelegate.h"
+
 #include "patternframemodel.h"
+#include "colors.h"
+
 
 #include <QDebug>
-
-#include "colors.h"
 
 #define ITEM_LETTERBOX 2
 #define FRAME_SIZE 1

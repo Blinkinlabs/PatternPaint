@@ -1,6 +1,6 @@
 #include "patterncollectiondelegate.h"
-#include "patterncollectionmodel.h"
 
+#include "patterncollectionmodel.h"
 #include "colors.h"
 
 #include <QDebug>

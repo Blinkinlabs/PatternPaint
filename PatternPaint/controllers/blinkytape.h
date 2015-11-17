@@ -3,10 +3,13 @@
 
 #include <QObject>
 #include <QList>
-#include <QtSerialPort>
-#include <QtSerialPort/QSerialPortInfo>
+#include <QTimer>
+#include <QPointer>
+#include <QSerialPort>
+#include <QSerialPortInfo>
 
 #include "blinkycontroller.h"
+
 
 #define BLINKYTAPE_SKETCH_VID           0x1D50
 #define BLINKYTAPE_SKETCH_PID           0x605E

@@ -1,11 +1,13 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2013-09-30T22:28:07
+# Pattern Paint
+# http://blinkinlabs.com/patternpaint
+#
+# Copyright 2013, 2014, 2015 Blinkinlabs, LLC
 #
 #-------------------------------------------------
 
-QT       += core gui
-QT       += widgets serialport
+QT += widgets gui core
 
 OBJECTS_DIR = tmp
 MOC_DIR = $$OBJECTS_DIR/moc
@@ -48,7 +50,8 @@ equals(QT_MAJOR_VERSION, 5){
     }
 }
 
-SOURCES += main.cpp\
+SOURCES += \
+    main.cpp\
     mainwindow.cpp \
     systeminformation.cpp \
     aboutpatternpaint.cpp \
@@ -69,7 +72,8 @@ SOURCES += main.cpp\
     patternscrollundocommand.cpp \
     fixturesettings.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS  += \
+    mainwindow.h \
     systeminformation.h \
     aboutpatternpaint.h \
     addressprogrammer.h \
@@ -91,15 +95,9 @@ HEADERS  += mainwindow.h \
     patternscrollundocommand.h \
     fixturesettings.h
 
-mac {
-HEADERS  += \
-    appnap.h
-OBJECTIVE_SOURCES += \
-    appnap.mm
-}
 
-
-FORMS    += mainwindow.ui \
+FORMS    += \
+    mainwindow.ui \
     systeminformation.ui \
     aboutpatternpaint.ui \
     addressprogrammer.ui \
@@ -110,12 +108,15 @@ include(controllers/controllers.pri)
 include(fixtures/fixtures.pri)
 include(updater/updater.pri)
 
-mac {
+macx {
     # OS X: Specify icon resource to use
     ICON = images/patternpaint.icns
 
     # OS X: Specify our developer information using a custom plist
     QMAKE_INFO_PLIST = Info.plist
+
+    HEADERS  += \
+        appnap.h
 
     OBJECTIVE_SOURCES += \
         appnap.mm
@@ -129,7 +130,3 @@ win32 {
 RESOURCES += \
     images.qrc \
     examples.qrc
-
-OTHER_FILES += \
-    README.md
-

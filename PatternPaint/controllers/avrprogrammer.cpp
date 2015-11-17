@@ -1,4 +1,5 @@
 #include "avrprogrammer.h"
+
 #include <QDebug>
 
 #define PAGE_SIZE_BYTES 128

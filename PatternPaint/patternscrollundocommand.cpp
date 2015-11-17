@@ -1,4 +1,5 @@
 #include "patternscrollundocommand.h"
+
 #include "patternscrollmodel.h"
 
 
