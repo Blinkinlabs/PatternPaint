@@ -89,9 +89,9 @@ ${INSTALL_TYPE}
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR"
 
-File "PatternPaintWindows\icudt53.dll"
-File "PatternPaintWindows\icuin53.dll"
-File "PatternPaintWindows\icuuc53.dll"
+File "PatternPaintWindows\icudt54.dll"
+File "PatternPaintWindows\icuin54.dll"
+File "PatternPaintWindows\icuuc54.dll"
 File "PatternPaintWindows\libgcc_s_dw2-1.dll"
 File "PatternPaintWindows\libstdc++-6.dll"
 File "PatternPaintWindows\libwinpthread-1.dll"
@@ -188,9 +188,9 @@ SectionEnd
 
 Section Uninstall
 ${INSTALL_TYPE}
-Delete "$INSTDIR\icudt53.dll"
-Delete "$INSTDIR\icuin53.dll"
-Delete "$INSTDIR\icuuc53.dll"
+Delete "$INSTDIR\icudt54.dll"
+Delete "$INSTDIR\icuin54.dll"
+Delete "$INSTDIR\icuuc54.dll"
 Delete "$INSTDIR\libgcc_s_dw2-1.dll"
 Delete "$INSTDIR\libstdc++-6.dll"
 Delete "$INSTDIR\libwinpthread-1.dll"

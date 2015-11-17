@@ -3,9 +3,9 @@ set -e
 
 ################# Library Locations #############################
 # Location of the MINGW libraries (Installed as part of Qt)
-QT_DIR='/c/Qt/'
-QT_MINGW=${QT_DIR}'/5.4/mingw491_32/'
-QT_TOOLS=${QT_DIR}'/Tools/mingw491_32/bin/'
+QT_DIR='/c/Qt/Qt5.5.1'
+QT_MINGW=${QT_DIR}'/5.5/mingw492_32/'
+QT_TOOLS=${QT_DIR}'/Tools/mingw492_32/bin/'
 
 # Location of the Windows SDK and WDK
 WIN_KIT='/c/Program Files (x86)/Windows Kits/8.0/'
@@ -125,9 +125,9 @@ cp ${QT_MINGW}bin/Qt5Widgets.dll ${OUTDIR}
 cp ${QT_MINGW}bin/Qt5Gui.dll ${OUTDIR}
 cp ${QT_MINGW}bin/libgcc_s_dw2-1.dll ${OUTDIR}
 cp ${QT_MINGW}bin/libstdc++-6.dll ${OUTDIR}
-cp ${QT_MINGW}bin/icuin53.dll ${OUTDIR}
-cp ${QT_MINGW}bin/icuuc53.dll ${OUTDIR}
-cp ${QT_MINGW}bin/icudt53.dll ${OUTDIR}
+cp ${QT_MINGW}bin/icuin54.dll ${OUTDIR}
+cp ${QT_MINGW}bin/icuuc54.dll ${OUTDIR}
+cp ${QT_MINGW}bin/icudt54.dll ${OUTDIR}
 cp ${QT_MINGW}bin/libgcc_s_dw2-1.dll ${OUTDIR}
 cp ${QT_MINGW}bin/libwinpthread-1.dll ${OUTDIR}
 
