@@ -13,9 +13,6 @@ For instructions on how to contribute to Pattern Paint development, read on!
 
 # Development
 
-
-## Strategy
-
 PatternPaint is a cross-platform application, targetting Mac OS X, Windows, and Linux.
 
 We use [Github Issues](https://github.com/Blinkinlabs/PatternPaint/issues) for bug tracking and feature implementation.
@@ -41,7 +38,10 @@ Next, clone the PatternPaint repository:
 Finally, open QT creator, then open the project file PatternPaint.pro, which should be located in the PatternPaint subdirectory of the repository.
 
 That's all you should need to do to build and make changes to PatternPaint. If you come up with a cool new feature or add support for a new device, please send a pull request!
-    
+
+## License
+
+PatternPaint is licensed under the GPL version 2
 
 
 # Deployment instructions
@@ -72,8 +72,8 @@ Developer certificate (for signing the application)
 
 Once the prerequsites have been installed, the deployment script can be run:
 
-	curl -O https://raw.githubusercontent.com/Blinkinlabs/PatternPaint/master/DeployPatternPaintOSX.sh
-	sh ./DeployPatternPaintOSX.sh
+	curl -O https://raw.githubusercontent.com/Blinkinlabs/PatternPaint/master/release_patternpaint_osx.sh
+	sh ./release_patternpaint_osx.sh
 	
 If everything works, it will generate a redistributable disk image 'PatternPaint_X.Y.Z.dmg', where X.Y.Y is the current version of PatternPaint.
 
@@ -102,7 +102,11 @@ NSIS (3.0b2), for generating the installer:
 
 	http://nsis.sourceforge.net/Download
 
-Windows SDK (version 8.1):
+Windows SDK (version 10):
+
+	https://go.microsoft.com/fwlink/p/?LinkId=619296
+
+NOTE: Not sure if 10 will work. If you run into problems, try: Windows SDK (version 8.1):
 
 	http://www.microsoft.com/click/services/Redirect2.ashx?CR_EAC=300135395
 
@@ -122,8 +126,8 @@ NOTE: Obtain the GlobalSign file and install the Blinkinlabs Cert before continu
 
 Start Git bash (start->run->git bash)
 
-	curl -O https://raw.githubusercontent.com/Blinkinlabs/PatternPaint/master/BuildPatternPaint_Windows.sh
-	sh ./BuildPatternPaint_Windows.sh
+	curl -O https://raw.githubusercontent.com/Blinkinlabs/PatternPaint/master/release_patternpaint_windows.sh
+	sh ./release_patternpaint_windows.sh
 
 
 If everything works, it will generate an installer executable 'PatternPaint_Installer_X.Y.Z.exe', where X.Y.Y is the current version of PatternPaint.

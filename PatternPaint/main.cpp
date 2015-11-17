@@ -3,6 +3,8 @@
 #include "autoupdater.h"
 
 #include <QApplication>
+#include <QSettings>
+#include <QString>
 
 #if defined Q_OS_MAC
 #include "CocoaInitializer.h"

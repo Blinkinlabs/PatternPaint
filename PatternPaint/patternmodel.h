@@ -37,7 +37,6 @@ public:
     virtual bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex()) = 0;
     virtual bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex()) = 0;
 
-    /// TODO: Move the specializations to a delegate?
     virtual QUndoStack* getUndoStack() = 0;
 };
 

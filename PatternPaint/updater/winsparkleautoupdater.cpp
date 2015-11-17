@@ -15,8 +15,10 @@ WinSparkleAutoUpdater::WinSparkleAutoUpdater(const QString& url)
     // could be also, often more conveniently, done using a VERSIONINFO Windows
     // resource. See the "psdk" example and its .rc file for an example of that
     // (these calls wouldn't be needed then).
-    // TODO: Better string conversion here?
-    win_sparkle_set_appcast_url(d->url.toStdString().c_str());
+    // TODO: Test me on Windows!
+    //win_sparkle_set_appcast_url(d->url.toStdString().c_str());
+    win_sparkle_set_appcast_url(d->url.toUtf8().constData());
+
 
 #define W(x)          W_(x)
 #define W_(x)         L ## x

@@ -30,8 +30,6 @@ public:
     bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex());
     bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex());
 
-    /// TODO: Move the specializations to a delegate?
-
     QUndoStack* getUndoStack() {return &undoStack;}
 
     friend class PatternFrameUndoCommand;

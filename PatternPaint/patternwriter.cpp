@@ -12,7 +12,7 @@ PatternWriter::PatternWriter(const Pattern *pattern,
 {
     frameCount = pattern->getFrameCount();
     frameDelay = 1000/pattern->getFrameSpeed();
-    ledCount = pattern->getFrameSize().width()*pattern->getFrameSize().height(); // TODO: Integrate a fixture here.
+    ledCount = fixture->getLedCount();
 
     // Create a new encoder
     switch(encoding) {
@@ -30,6 +30,37 @@ PatternWriter::PatternWriter(const Pattern *pattern,
 //        break;
     }
 }
+
+PatternWriter::Encoding PatternWriter::getEncoding() const
+{
+    return encoding;
+}
+
+QByteArray PatternWriter::getData() const
+{
+    return data;
+}
+
+QString PatternWriter::getHeader() const
+{
+    return header;
+}
+
+int PatternWriter::getFrameCount() const
+{
+    return frameCount;
+}
+
+int PatternWriter::getLedCount() const
+{
+    return ledCount;
+}
+
+int PatternWriter::getFrameDelay() const
+{
+    return frameDelay;
+}
+
 
 int PatternWriter::colorCount() const
 {

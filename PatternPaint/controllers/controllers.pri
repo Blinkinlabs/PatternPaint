@@ -10,7 +10,7 @@ SOURCES += \
     $$PWD/controllerinfo.cpp
 
 # For platforms that have serial ports
-# TODO: Pull hard-coded references to BlinkyTape from the gui, make these disableable
+# TODO: Pull hard-coded references to BlinkyTape from the gui, allowing this section to be switchable
 #has_serial {
     QT += serialport
 

@@ -22,16 +22,16 @@ public:
     // Create an pattern from a QImage
     PatternWriter(const Pattern *pattern, Encoding encoding, Fixture *fixture);
 
-    Encoding getEncoding() const { return encoding; }
-    QByteArray getData() const { return data; }
-    QString getHeader() const { return header; }
+    Encoding getEncoding() const;
+    QByteArray getData() const;
+    QString getHeader() const;
 
 
     int colorCount() const;  /// Number of unique colors in the original image
 
-    int getFrameCount() const { return frameCount; }
-    int getLedCount() const { return ledCount; }
-    int getFrameDelay() const { return frameDelay; }
+    int getFrameCount() const;
+    int getLedCount() const;
+    int getFrameDelay() const;
 
 private:
 
