@@ -11,7 +11,7 @@ ExponentialBrightness::ExponentialBrightness(float r, float g, float b) :
 
 QColor ExponentialBrightness::correct(QColor uncorrected)
 {
-    float scale = .5;
+    float scale = 1;
 
     return QColor(
         int(255*pow(uncorrected.red()/255.0*scale, r)),
