@@ -2,6 +2,7 @@
 #include "ui_systeminformation.h"
 
 #include "blinkytape.h"
+#include "usbutils.h"
 
 #include <QSysInfo>
 #include <QLibraryInfo>
@@ -48,11 +49,15 @@ void SystemInformation::on_refresh_clicked()
 
     report.append("Detected Serial Ports: \r");
     foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
+        int version = getVersionForDevice(info.vendorIdentifier(),info.productIdentifier());
+
         report.append("  " + info.portName() + "\r");
         report.append("    Manufacturer: " + info.manufacturer() + "\r");
         report.append("    Description: " + info.description() + "\r");
         report.append("    VID: 0x" + QString::number(info.vendorIdentifier(),16) + "\r");
         report.append("    PID: 0x" + QString::number(info.productIdentifier(),16) + "\r");
+        if(version > -1)
+            report.append("    Version: 0x" + QString::number(version,16) + "\r");
         report.append("    Serial: " + info.serialNumber() + "\r");
     }
 
