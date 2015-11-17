@@ -51,7 +51,7 @@ private:
     int QRgbTo565(QColor color);
 
     void encodeImageRGB24(const Pattern *pattern);
-    void encodeImageRGB16_RLE(const Pattern *pattern);
+    void encodeImageRGB565_RLE(const Pattern *pattern);
 //    void encodeImageIndexed(const Pattern *pattern);
 //    void encodeImageIndexed_RLE(const Pattern *pattern);
 };

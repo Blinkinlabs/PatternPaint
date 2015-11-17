@@ -17,7 +17,7 @@ PatternWriter::PatternWriter(const Pattern *pattern,
     // Create a new encoder
     switch(encoding) {
     case RGB565_RLE:
-        encodeImageRGB16_RLE(pattern);
+        encodeImageRGB565_RLE(pattern);
         break;
     case RGB24:
         encodeImageRGB24(pattern);
@@ -98,7 +98,9 @@ int PatternWriter::QRgbTo565(QColor color) {
     }
 }
 
-void PatternWriter::encodeImageRGB16_RLE(const Pattern *pattern) {
+void PatternWriter::encodeImageRGB565_RLE(const Pattern *pattern) {
+    qDebug() << "Encoding pattern as RGB565";
+
     data.clear();
     header.clear(); // TODO: Move the header builder somewhere else?
 
@@ -163,6 +165,8 @@ void PatternWriter::encodeImageRGB16_RLE(const Pattern *pattern) {
 
 
 void PatternWriter::encodeImageRGB24(const Pattern *pattern) {
+    qDebug() << "Encoding pattern as RGB24";
+
     header.clear();
     data.clear();
 

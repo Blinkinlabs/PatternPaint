@@ -122,7 +122,7 @@ void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
 
 
     if (error == QSerialPort::ResourceError) {
-        qCritical() << "Serial resource error, BlinkyTape unplugged?" << errorString;
+        qCritical() << "Serial resource error, device unplugged?" << errorString;
     }
     else {
         qCritical() << "Unrecognized serial error:" << errorString;
@@ -205,11 +205,11 @@ void BlinkyTape::connectionScannerTimer_timeout() {
 
 bool BlinkyTape::open(QSerialPortInfo info) {
     if(isConnected()) {
-        qCritical() << "Already connected to a BlinkyTape";
+        qCritical() << "Already connected to a device";
         return false;
     }
 
-    qDebug() << "Connecting to BlinkyTape on " << info.portName();
+    qDebug() << "Connecting to device on " << info.portName();
 
 #if defined(Q_OS_OSX)
     // Note: This should be info.portName(). Changed here as a workaround for:
@@ -221,7 +221,7 @@ bool BlinkyTape::open(QSerialPortInfo info) {
     serial->setBaudRate(QSerialPort::Baud115200);
 
     if( !serial->open(QIODevice::ReadWrite) ) {
-        qDebug() << "Could not connect to BlinkyTape. Error: " << serial->error() << serial->errorString();
+        qDebug() << "Could not connect to device. Error: " << serial->error() << serial->errorString();
         return false;
     }
 
@@ -346,7 +346,7 @@ void BlinkyTape::reset()
         return;
     }
 
-    qDebug() << "Attempting to reset BlinkyTape";
+    qDebug() << "Attempting to reset device";
 
     resetTriesRemaining = RESET_MAX_TRIES;
     resetTimer_timeout();

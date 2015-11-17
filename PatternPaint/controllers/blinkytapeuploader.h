@@ -48,6 +48,8 @@ public:
     bool upgradeFirmware(int timeout);
     QString getErrorString() const;
 
+    QList<PatternWriter::Encoding> getSupportedEncodings() const;
+
 private slots:
     void doWork();  /// Handle the next section of work, whatever it is
 

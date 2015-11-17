@@ -138,6 +138,13 @@ QString BlinkyPendantUploader::getErrorString() const
     return errorString;
 }
 
+QList<PatternWriter::Encoding> BlinkyPendantUploader::getSupportedEncodings() const
+{
+    QList<PatternWriter::Encoding> encodings;
+    encodings.append(PatternWriter::RGB24);
+    return encodings;
+}
+
 void BlinkyPendantUploader::handleProgrammerError(QString error) {
     qCritical() << error;
 

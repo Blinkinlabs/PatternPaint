@@ -12,6 +12,13 @@ LightBuddyUploader::LightBuddyUploader(QObject *parent) :
 }
 
 
+QList<PatternWriter::Encoding> LightBuddyUploader::getSupportedEncodings() const
+{
+    QList<PatternWriter::Encoding> encodings;
+    encodings.append(PatternWriter::RGB24);
+    return encodings;
+}
+
 bool LightBuddyUploader::startUpload(BlinkyController& controller, std::vector<PatternWriter> patterns)
 {
     Q_UNUSED(controller);

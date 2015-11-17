@@ -642,25 +642,12 @@ void MainWindow::on_actionRestore_firmware_triggered()
 
 void MainWindow::on_actionSave_to_Blinky_triggered()
 {
-    if(controller.isNull()) {
-        return;
-    }
-
     if(!patternCollection.hasPattern()) {
         return;
     }
 
-    std::vector<PatternWriter> patterns;
-
-    // TODO: Leave
-
-    for(int i = 0; i < patternCollection.count(); i++) {
-        PatternWriter patternWriter(patternCollection.getPattern(i),
-                        //PatternWriter::RGB24,
-                        PatternWriter::RGB565_RLE,
-                        fixture);
-
-        patterns.push_back(patternWriter);
+    if(controller.isNull()) {
+        return;
     }
 
     if(!controller->getUploader(uploader)) {
@@ -669,6 +656,22 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
 
     if(uploader.isNull()) {
         return;
+    }
+
+    if(uploader->getSupportedEncodings().count() == 0) {
+        return;
+    }
+
+    std::vector<PatternWriter> patterns;
+
+    for(int i = 0; i < patternCollection.count(); i++) {
+        PatternWriter patternWriter(patternCollection.getPattern(i),
+                        //PatternWriter::RGB24,
+                        //PatternWriter::RGB565_RLE,
+                        uploader->getSupportedEncodings().front(),
+                        fixture);
+
+        patterns.push_back(patternWriter);
     }
 
     connectUploader();

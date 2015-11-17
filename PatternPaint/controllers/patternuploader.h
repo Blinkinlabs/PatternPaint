@@ -1,9 +1,10 @@
 #ifndef PATTERNUPLOADER_H
 #define PATTERNUPLOADER_H
 
-#include <QObject>
-
 #include "patternwriter.h"
+
+#include <QObject>
+#include <QList>
 
 class BlinkyController;
 
@@ -44,6 +45,8 @@ public:
 
     /// Get a string describing the last error, if any.
     virtual QString getErrorString() const = 0;
+
+    virtual QList<PatternWriter::Encoding> getSupportedEncodings() const = 0;
 
 signals:
     /// Sends an update about the maximum update progress, from 0 to 1

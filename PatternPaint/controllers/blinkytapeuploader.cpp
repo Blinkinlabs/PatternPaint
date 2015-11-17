@@ -35,6 +35,14 @@ BlinkyTapeUploader::BlinkyTapeUploader(QObject *parent) :
             this,SLOT(handleProgrammerCommandFinished(QString,QByteArray)));
 }
 
+QList<PatternWriter::Encoding> BlinkyTapeUploader::getSupportedEncodings() const
+{
+    QList<PatternWriter::Encoding> encodings;
+    encodings.append(PatternWriter::RGB565_RLE);
+    encodings.append(PatternWriter::RGB24);
+    return encodings;
+}
+
 void BlinkyTapeUploader::handleProgrammerError(QString error) {
     qCritical() << error;
 
