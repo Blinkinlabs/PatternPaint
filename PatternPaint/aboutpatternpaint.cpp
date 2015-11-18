@@ -7,13 +7,13 @@
 
 void fitTextToLabel(QLabel *label) {
 
-    qDebug() << "Fiting text to label " << label->text();
+//    qDebug() << "Fiting text to label " << label->text();
 
     // check the font size - need a better algorithm... this could take awhile
     while (label->fontMetrics().width(label->text()) > label->rect().width()) {
-        qDebug() << "Font size: " << label->fontMetrics().width(label->text())
-                 << " rect size: " << label->rect().width()
-                 << " point size: " << label->font().pointSize();
+//        qDebug() << "Font size: " << label->fontMetrics().width(label->text())
+//                 << " rect size: " << label->rect().width()
+//                 << " point size: " << label->font().pointSize();
 
         int newsize = label->font().pointSize() - 1;
         label->setFont(QFont(label->font().family(), newsize));
