@@ -21,23 +21,23 @@ git clone https://github.com/Blinkinlabs/PatternPaint.git
 
 # Build PatternPaint
 cd PatternPaint/PatternPaint
-${QTDIR}/bin/qmake MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build   DESTDIR=bin -config release
+${QTDIR}/bin/qmake -config release OBJECTS_DIR=build MOC_DIR=build/moc RCC_DIR=build/rcc UI_DIR=build/uic
 make -j
 cd ..
 
 # Sign the Sparkle framework
-codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/bin/PatternPaint.app/Contents/Frameworks/Sparkle.framework/Versions/A
+codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/Sparkle.framework/Versions/A
 
 # Deploy and sign the release
-${QTDIR}/bin/macdeployqt PatternPaint/bin/PatternPaint.app/ -codesign="Developer ID Application: Blinkinlabs, LLC" -dmg
-codesign --verify --verbose=4 PatternPaint/bin/PatternPaint.app
+${QTDIR}/bin/macdeployqt PatternPaint/PatternPaint.app/ -codesign="Developer ID Application: Blinkinlabs, LLC" -dmg
+codesign --verify --verbose=4 PatternPaint/PatternPaint.app
 
 # Test the signature
-hdiutil mount PatternPaint/bin/PatternPaint.dmg
-codesign --verify --verbose=4 /Volumes/PatternPaint:bin:PatternPaint/PatternPaint.app
-umount /Volumes/PatternPaint\:bin\:PatternPaint/
+hdiutil mount PatternPaint/PatternPaint.dmg
+codesign --verify --verbose=4 /Volumes/PatternPaint:PatternPaint/PatternPaint.app
+umount /Volumes/PatternPaint\:PatternPaint/
 
 # And copy out the resulting disk image
-mv PatternPaint/bin/PatternPaint.dmg ${OUTPUTDIR}/PatternPaint_${VERSION}.dmg
+mv PatternPaint/PatternPaint.dmg ${OUTPUTDIR}/PatternPaint_${VERSION}.dmg
 
 # TODO: Clean up temp dir
