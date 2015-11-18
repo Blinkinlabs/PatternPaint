@@ -2,6 +2,7 @@
 
 #include "avruploaddata.h"
 #include "ProductionSketch.h"
+#include "blinkycontroller.h"
 
 #include <QDebug>
 
@@ -21,6 +22,7 @@
 
 /// Length of character buffer for debug messages
 #define BUFF_LENGTH 100
+
 
 BlinkyTapeUploader::BlinkyTapeUploader(QObject *parent) :
     PatternUploader(parent)
@@ -221,7 +223,7 @@ void BlinkyTapeUploader::doWork() {
         {
             // Scan to see if there is a bootloader present
             QList<QSerialPortInfo> postResetTapes
-                    = BlinkyTape::probeBootloaders();
+                    = BlinkyController::probeBootloaders();
 
             // If we didn't detect a bootloader and still have time, then queue the timer and
             // wait. Otherwise, we timed out, so fail.
@@ -248,7 +250,7 @@ void BlinkyTapeUploader::doWork() {
     case State_WaitAfterBootloaderPort:
         {
             QList<QSerialPortInfo> postResetTapes
-                    = BlinkyTape::probeBootloaders();
+                    = BlinkyController::probeBootloaders();
 
             // If we didn't detect a bootloader and still have time, then queue the timer and
             // wait. Otherwise, we timed out, so fail.

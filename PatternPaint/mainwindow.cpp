@@ -8,6 +8,7 @@
 #include "fixturesettings.h"
 #include "colorchooser.h"
 #include "patternwriter.h"
+
 #include "blinkytape.h"
 #include "blinkytapeuploader.h"
 
@@ -295,7 +296,7 @@ void MainWindow::connectionScannerTimer_timeout() {
     }
 
     // First look for Blinky devices
-    QList<QSerialPortInfo> blinky = BlinkyTape::probe();
+    QList<QSerialPortInfo> blinky = BlinkyController::probe();
 
     if(blinky.length() > 0) {
         qDebug() << "BlinkyTapes found:" << blinky.length();

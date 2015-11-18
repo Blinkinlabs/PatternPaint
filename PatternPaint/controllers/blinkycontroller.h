@@ -4,10 +4,25 @@
 #include <QObject>
 #include <QList>
 
-#define LIGHT_BUDDY_APPLICATION_VID     0x1D50
-#define LIGHT_BUDDY_APPLICATION_PID     0x60AA
-#define LIGHT_BUDDY_BOOTLOADER_VID      0x1D50
-#define LIGHT_BUDDY_BOOTLOADER_PID      0x60A9
+#define BLINKYTAPE_SKETCH_VID           0x1D50
+#define BLINKYTAPE_SKETCH_PID           0x605E
+#define BLINKYTAPE_BOOTLOADER_VID       0x1D50
+#define BLINKYTAPE_BOOTLOADER_PID       0x606C
+
+#define LEONARDO_SKETCH_VID             0x2341
+#define LEONARDO_SKETCH_PID             0x8036
+#define LEONARDO_BOOTLOADER_VID         0x2341
+#define LEONARDO_BOOTLOADER_PID         0x0036
+
+#define BLINKYPENDANT_SKETCH_VID        0x1209
+#define BLINKYPENDANT_SKETCH_PID        0x8888
+#define BLINKYPENDANT_BOOTLOADER_VID    0x1209
+#define BLINKYPENDANT_BOOTLOADER_PID    0x8889
+
+#define LIGHTBUDDY_SKETCH_VID        0x1d50
+#define LIGHTBUDDY_SKETCH_PID        0x60aa
+#define LIGHTBUDDY_BOOTLOADER_VID    0x1d50
+#define LIGHTBUDDY_BOOTLOADER_PID    0x60a9
 
 class PatternUploader;
 class QSerialPortInfo;
@@ -17,6 +32,9 @@ class BlinkyController : public QObject
 {
     Q_OBJECT
 public:
+    static QList<QSerialPortInfo> probe();
+    static QList<QSerialPortInfo> probeBootloaders();
+
     BlinkyController(QObject *parent);
 
     virtual bool isConnected() = 0;

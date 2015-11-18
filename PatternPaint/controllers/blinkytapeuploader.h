@@ -6,7 +6,7 @@
 #include <iostream>
 #include "patternwriter.h"
 #include "avrprogrammer.h"
-#include "blinkytape.h"
+
 #include "patternuploader.h"
 
 struct FlashSection {
