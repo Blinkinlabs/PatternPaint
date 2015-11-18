@@ -40,7 +40,7 @@ OUTDIR='PatternPaintWindows/'
 TEMPDIR='TempWindowsBuild'
 
 
-VERSION='1.9.0'
+VERSION='2.0.0'
 
 
 ################## New directory #################################
@@ -89,15 +89,15 @@ else
 fi
 
 ################## Build PatternPaint ###################
-#cd ${PATTERNPAINT}/PatternPaint
-#
-#PATH=${QT_TOOLS}:${PATH}
-#
-#${QT_MINGW}bin/qmake.exe -config release MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build DESTDIR=bin
-#mingw32-make.exe clean
-#mingw32-make.exe -j 4
-#
-#cd ../../
+cd ${PATTERNPAINT}/PatternPaint
+
+PATH=${QT_TOOLS}:${PATH}
+
+${QT_MINGW}bin/qmake.exe -config release MOC_DIR=build OBJECTS_DIR=build RCC_DIR=build UI_DIR=build DESTDIR=bin
+mingw32-make.exe clean
+mingw32-make.exe -j
+
+cd ../../
 
 
 ################## Package Everything ############################
@@ -189,7 +189,7 @@ grep -q ${VERSION} "Pattern Paint.nsi"
 rm "Pattern Paint.nsi"
 
 # Sign the installer
-# NOTE: You need to install the Blinkinlabs key and the GlobalSign Root CA for this to work
-"${WIN_KIT2}bin/x86/signtool.exe" sign //v //ac "../GlobalSign Root CA.crt" //n "Blinkinlabs, LLC" //tr http://tsa.starfieldtech.com "PatternPaint Windows Installer.exe"
+# NOTE: You need to install the Blinkinlabs key for this to work
+"${WIN_KIT2}bin/x86/signtool.exe" sign //v //n "Blinkinlabs, LLC" //tr http://tsa.starfieldtech.com "PatternPaint Windows Installer.exe"
 
 mv "PatternPaint Windows Installer.exe" "../PatternPaint_Installer_"${VERSION}".exe"
