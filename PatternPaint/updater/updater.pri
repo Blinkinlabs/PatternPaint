@@ -24,17 +24,13 @@ macx {
     LIBS += -framework Sparkle
 
     # Copy Sparkle into the app bundle
-    sparkle.files = $$SPARKLE_PATH/Sparkle.framework
     sparkle.path = Contents/Frameworks
+    sparkle.files = $$SPARKLE_PATH/Sparkle.framework
     QMAKE_BUNDLE_DATA += sparkle
 
     # And add frameworks to the rpath so that the app can find the framework.
     QMAKE_RPATHDIR += @executable_path/../Frameworks
 }
-
-win32:COPY_CMD = copy
-unix:COPY_CMD = cp -P
-macx:COPY_CMD = cp -R
 
 # For Winsparkle on Windows
 win32 {

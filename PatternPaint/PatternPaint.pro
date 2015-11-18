@@ -103,10 +103,29 @@ FORMS    += \
     addressprogrammer.ui \
     fixturesettings.ui
 
+RESOURCES += \
+    images.qrc \
+    examples.qrc
+
 include(instruments/instruments.pri)
 include(controllers/controllers.pri)
 include(fixtures/fixtures.pri)
 include(updater/updater.pri)
+
+
+# Copies the given files to the destination directory
+defineTest(copyToFrameworks) {
+    files = $$1
+    DDIR = PatternPaint.app/Contents/Frameworks
+
+    QMAKE_POST_LINK += mkdir -p $$quote($$DDIR) $$escape_expand(\\n\\t)
+
+    for(FILE, files) {
+        QMAKE_POST_LINK += cp -R $$quote($$FILE) $$quote($$DDIR) $$escape_expand(\\n\\t)
+    }
+
+    export(QMAKE_POST_LINK)
+}
 
 macx {
     # OS X: Specify icon resource to use
@@ -120,13 +139,30 @@ macx {
 
     OBJECTIVE_SOURCES += \
         appnap.mm
+
+    # Workaround for broken macdeployqt on Qt 5.5.1: Copy in the system
+    # libraries manually
+    equals(QT_VERSION, 5.5.1){
+
+        QTLIBS_PATH = ~/qt/5.5/clang_64/lib
+#        TARGET_PATH = Contents/Frameworks
+
+        SYSTEM_LIBS += \
+            $$QTLIBS_PATH/QtCore.framework \
+            $$QTLIBS_PATH/QtDBus.framework \
+            $$QTLIBS_PATH/QtGui.framework \
+            $$QTLIBS_PATH/QtPrintSupport.framework \
+            $$QTLIBS_PATH/QtSerialPort.framework \
+            $$QTLIBS_PATH/QtWidgets.framework
+
+        copyToFrameworks($$SYSTEM_LIBS)
+
+        # And add frameworks to the rpath so that the app can find the framework.
+        QMAKE_RPATHDIR += @executable_path/../Frameworks
+    }
 }
 
 win32 {
     # Windows: Specify the icon to use
     RC_ICONS += images/patternpaint.ico
 }
-
-RESOURCES += \
-    images.qrc \
-    examples.qrc

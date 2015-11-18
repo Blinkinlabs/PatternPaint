@@ -51,8 +51,8 @@ macx {
     LIBS += -lusb-1.0
 
     # Copy libusb into the app bundle
-    libusb.files = $$LIBUSB_PATH/lib/libusb-1.0.0.dylib
     libusb.path = Contents/Frameworks
+    libusb.files = $$LIBUSB_PATH/lib/libusb-1.0.0.dylib
     QMAKE_BUNDLE_DATA += libusb
 
     # And add to the rpath so that the app can find the library
