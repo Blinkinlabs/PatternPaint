@@ -88,6 +88,10 @@ Note: There might be some temporary file carnage left over after running this. S
 ### Prerequisites
 Windows deployment requires the following tools:
 
+Windows:
+	
+	Windows 7 is used internally, newer versions will likely work as well.
+
 msysgit:
 
 	https://git-for-windows.github.io/
@@ -102,19 +106,26 @@ NSIS (3.0b2), for generating the installer:
 
 	http://nsis.sourceforge.net/Download
 
-Windows SDK (version 10):
+Windows SDK (version 10) (for signtool):
 
 	https://go.microsoft.com/fwlink/p/?LinkId=619296
 
-NOTE: Not sure if 10 will work. If you run into problems, try: Windows SDK (version 8.1):
+Windows Driver Kit (version 10) (for dpinst):
+
+	http://go.microsoft.com/fwlink/p/?LinkId=526733
+	
+	
+	
+NOTE: Not sure if 10 will work. If you run into problems, try: 
+
+Windows SDK (version 8.1):
 
 	http://www.microsoft.com/click/services/Redirect2.ashx?CR_EAC=300135395
-
-Windows Driver Kit (version 8.0):
-
+	
+Windows Driver Kit (version 8.0) (for dpinst):
+	
 	http://go.microsoft.com/fwlink/p/?LinkID=324284
 
-NOTE: The Driver Kit might not be necessicary, since the drivers should already be signed.
 
 (Optional) Dependency Walker, for tracking down which DLLs need to be included with the release:
 
@@ -127,7 +138,7 @@ NOTE: Obtain the GlobalSign file and install the Blinkinlabs Cert before continu
 Start Git bash (start->run->git bash)
 
 	curl -O https://raw.githubusercontent.com/Blinkinlabs/PatternPaint/master/release_patternpaint_windows.sh
-	sh ./release_patternpaint_windows.sh
+	sh release_patternpaint_windows.sh
 
 
 If everything works, it will generate an installer executable 'PatternPaint_Installer_X.Y.Z.exe', where X.Y.Y is the current version of PatternPaint.
