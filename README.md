@@ -114,22 +114,17 @@ Windows Driver Kit (version 10) (for dpinst):
 
 	http://go.microsoft.com/fwlink/p/?LinkId=526733
 	
-	
-	
-NOTE: Not sure if 10 will work. If you run into problems, try: 
-
-Windows SDK (version 8.1):
-
-	http://www.microsoft.com/click/services/Redirect2.ashx?CR_EAC=300135395
-	
-Windows Driver Kit (version 8.0) (for dpinst):
-	
-	http://go.microsoft.com/fwlink/p/?LinkID=324284
-
-
 (Optional) Dependency Walker, for tracking down which DLLs need to be included with the release:
 
 	http://www.dependencywalker.com/
+	
+### Certificate setup
+
+The release version of PatternPaint needs to be crypograpically signed. We use a certificate from GlobalSign. 
+
+1. Install the .pfx file for code signing (right click and choose 'Install PFX'). You'll need to purchase your own if you intend to distribute PatternPaint for Windows with a signature.
+2. Install the [GlobalSign cross certificate](https://jp.globalsign.com/support/docs/r1cross.cer) if you are using a GlobalSign certificate ([as suggested in David Grayson's guide](http://www.davidegrayson.com/signing/))
+
 
 ### Building a Pattern Paint Release
 
@@ -145,7 +140,7 @@ If everything works, it will generate an installer executable 'PatternPaint_Inst
 
 Test this file manually on clean Windows 7 and 8 hosts.
 
-## Create a Github release
+## Create a release page on Github
 
 1. Go to the releases page:
 
