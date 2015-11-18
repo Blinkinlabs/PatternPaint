@@ -4,7 +4,8 @@
 #include <libusb-1.0/libusb.h>
 
 
-// TODO: This assumes that only one device of this type is connected to the PC...
+// TODO: This returns the first matching device. Should allow side channel info to look
+// up an exact match.
 int getVersionForDevice(quint16 idVendor, quint16 idProduct) {
     libusb_device **devs;
     int r;

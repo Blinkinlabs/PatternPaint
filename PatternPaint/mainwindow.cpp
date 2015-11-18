@@ -596,7 +596,7 @@ void MainWindow::on_actionRestore_firmware_triggered()
 {   
     // If the controller doesn't exist, create a new uploader based on the blinkytape
     if(controller.isNull()) {
-        uploader = QPointer<PatternUploader>(new BlinkyTapeUploader(this));
+        uploader = QPointer<BlinkyUploader>(new BlinkyTapeUploader(this));
 
         connectUploader();
 

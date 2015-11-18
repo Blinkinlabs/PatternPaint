@@ -3,7 +3,7 @@
 #define FLASH_PAGE_SIZE 256
 
 LightBuddyUploader::LightBuddyUploader(QObject *parent) :
-    PatternUploader(parent)
+    BlinkyUploader(parent)
 {
     connect(&programmer,SIGNAL(error(QString)),
             this,SLOT(handleProgrammerError(QString)));

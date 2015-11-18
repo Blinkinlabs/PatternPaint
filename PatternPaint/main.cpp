@@ -6,7 +6,7 @@
 #include <QSettings>
 #include <QString>
 
-#if defined Q_OS_MAC
+#if defined Q_OS_MACX
 #include "CocoaInitializer.h"
 #include "SparkleAutoUpdater.h"
 #elif defined Q_OS_WIN

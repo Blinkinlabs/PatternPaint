@@ -2,11 +2,11 @@
 #define LIGHTBUDDYUPLOADER_H
 
 #include <QObject>
-#include "patternuploader.h"
+#include "blinkyuploader.h"
 #include "lightbuddyprogrammer.h"
 
 
-class LightBuddyUploader : public PatternUploader
+class LightBuddyUploader : public BlinkyUploader
 {
     Q_OBJECT
 

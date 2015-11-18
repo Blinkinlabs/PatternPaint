@@ -3,10 +3,10 @@
 
 #include <QObject>
 
-#include "patternuploader.h"
+#include "blinkyuploader.h"
 #include "blinkypendantprogrammer.h"
 
-class BlinkyPendantUploader : public PatternUploader
+class BlinkyPendantUploader : public BlinkyUploader
 {
     Q_OBJECT
 

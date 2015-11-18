@@ -1,5 +1,5 @@
-#ifndef PATTERNUPLOADER_H
-#define PATTERNUPLOADER_H
+#ifndef BLINKYUPLOADER_H
+#define BLINKYUPLOADER_H
 
 #include "patternwriter.h"
 
@@ -19,12 +19,12 @@ class BlinkyController;
 ///
 /// While the upload process is underway, it will send periodic progress updates
 /// via the progressUpdate() signal.
-class PatternUploader : public QObject
+class BlinkyUploader : public QObject
 {
     Q_OBJECT
 
 public:
-    PatternUploader(QObject *parent=0) :
+    BlinkyUploader(QObject *parent=0) :
         QObject(parent) {}
 
     /// Start an upload, using the passed blinkytape as a launching point
@@ -59,5 +59,5 @@ signals:
     void finished(bool result);
 };
 
-#endif // PATTERNUPLOADER_H
+#endif // BLINKYUPLOADER_H
 

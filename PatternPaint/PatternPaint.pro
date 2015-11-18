@@ -9,6 +9,7 @@
 
 QT += widgets gui core
 
+# Specificy where to place the object files so they don't clutter the source tree
 OBJECTS_DIR = tmp
 MOC_DIR = $$OBJECTS_DIR/moc
 RCC_DIR = $$OBJECTS_DIR/rcc

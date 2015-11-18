@@ -297,7 +297,7 @@ void BlinkyTape::reset()
 }
 
 
-bool BlinkyTape::getUploader(QPointer<PatternUploader>& uploader)
+bool BlinkyTape::getUploader(QPointer<BlinkyUploader>& uploader)
 {
     if(!isConnected()) {
         return false;

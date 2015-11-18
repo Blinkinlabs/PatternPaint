@@ -3,7 +3,7 @@ INCLUDEPATH += $$PWD
 HEADERS += \
     $$PWD/blinkycontroller.h \
     $$PWD/controllerinfo.h \
-    $$PWD/patternuploader.h
+    $$PWD/blinkyuploader.h
 
 SOURCES += \
     $$PWD/blinkycontroller.cpp \

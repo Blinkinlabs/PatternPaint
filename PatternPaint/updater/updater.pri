@@ -15,17 +15,18 @@ macx {
         $$PWD/cocoainitializer.mm \
         $$PWD/sparkleautoupdater.mm
 
-    LIBS += -framework Sparkle -framework AppKit
+    LIBS += -framework AppKit
 
     SPARKLE_PATH = $$PWD/../../thirdparty/Sparkle-1.11.0rc2/
 
     QMAKE_LFLAGS += -F $$SPARKLE_PATH
     QMAKE_OBJECTIVE_CFLAGS += -F $$SPARKLE_PATH
+    LIBS += -framework Sparkle
 
     # Copy Sparkle into the app bundle
-    SparkleFiles.files = $$SPARKLE_PATH/Sparkle.framework
-    SparkleFiles.path = Contents/Frameworks
-    QMAKE_BUNDLE_DATA += SparkleFiles
+    sparkle.files = $$SPARKLE_PATH/Sparkle.framework
+    sparkle.path = Contents/Frameworks
+    QMAKE_BUNDLE_DATA += sparkle
 
     # And add frameworks to the rpath so that the app can find the framework.
     QMAKE_RPATHDIR += @executable_path/../Frameworks

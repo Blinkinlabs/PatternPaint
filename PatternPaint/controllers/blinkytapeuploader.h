@@ -7,7 +7,7 @@
 #include "patternwriter.h"
 #include "avrprogrammer.h"
 
-#include "patternuploader.h"
+#include "blinkyuploader.h"
 
 struct FlashSection {
     /// Create a new flash section
@@ -36,7 +36,7 @@ struct FlashSection {
 ///
 /// While the upload process is underway, it will send periodic progress updates
 /// via the progressUpdate() signal.
-class BlinkyTapeUploader : public PatternUploader
+class BlinkyTapeUploader : public BlinkyUploader
 {
     Q_OBJECT
 

@@ -23,7 +23,7 @@ public:
     void sendUpdate(QByteArray colors);
     bool getPortInfo(QSerialPortInfo &info);
 
-    bool getUploader(QPointer<PatternUploader>& uploader);
+    bool getUploader(QPointer<BlinkyUploader>& uploader);
 
     // Atempt to reset the strip by setting it's baud rate to 1200 and closing it.
     void reset();

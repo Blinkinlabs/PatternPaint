@@ -25,7 +25,7 @@
 
 
 BlinkyTapeUploader::BlinkyTapeUploader(QObject *parent) :
-    PatternUploader(parent)
+    BlinkyUploader(parent)
 {
     bootloaderResetTimer = new QTimer(this);
 
@@ -221,7 +221,7 @@ void BlinkyTapeUploader::doWork() {
     switch(state) {
     case State_WaitForBootloaderPort:
         {
-            // Scan to see if there is a bootloader present
+            // TODO: Only search BlinkyTapes bootloaders!
             QList<QSerialPortInfo> postResetTapes
                     = BlinkyController::probeBootloaders();
 
@@ -249,6 +249,7 @@ void BlinkyTapeUploader::doWork() {
 
     case State_WaitAfterBootloaderPort:
         {
+            // TODO: Only search BlinkyTapes bootloaders!
             QList<QSerialPortInfo> postResetTapes
                     = BlinkyController::probeBootloaders();
 

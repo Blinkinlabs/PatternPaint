@@ -24,7 +24,7 @@
 #define LIGHTBUDDY_BOOTLOADER_VID    0x1d50
 #define LIGHTBUDDY_BOOTLOADER_PID    0x60a9
 
-class PatternUploader;
+class BlinkyUploader;
 class QSerialPortInfo;
 
 /// Connect to a BlinkyTape over a serial port, and manage sending data to it.
@@ -45,7 +45,7 @@ public:
 
     virtual bool getPortInfo(QSerialPortInfo &info) = 0;
 
-    virtual bool getUploader(QPointer<PatternUploader>& uploader) = 0;
+    virtual bool getUploader(QPointer<BlinkyUploader>& uploader) = 0;
 
     // Atempt to reset the strip by setting it's baud rate to 1200 and closing it.
     virtual void reset() = 0;

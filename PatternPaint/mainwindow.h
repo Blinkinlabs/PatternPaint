@@ -11,7 +11,7 @@
 #include <QTimer>
 
 #include "blinkycontroller.h"
-#include "patternuploader.h"
+#include "blinkyuploader.h"
 #include "frameeditor.h"
 #include "addressprogrammer.h"
 #include "colorchooser.h"
@@ -132,7 +132,7 @@ private:
     QTimer connectionScannerTimer;
 
     QPointer<BlinkyController> controller;
-    QPointer<PatternUploader> uploader;
+    QPointer<BlinkyUploader> uploader;
 
     QProgressDialog progressDialog;
 

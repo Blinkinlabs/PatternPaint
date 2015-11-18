@@ -7,7 +7,7 @@
 #define BLINKY_PENDANT_VERSION_2 512
 
 BlinkyPendantUploader::BlinkyPendantUploader(QObject *parent) :
-    PatternUploader(parent)
+    BlinkyUploader(parent)
 {
     connect(&programmer,SIGNAL(error(QString)),
             this,SLOT(handleProgrammerError(QString)));
