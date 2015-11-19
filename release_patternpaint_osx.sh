@@ -40,13 +40,9 @@ codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" P
 
 # Deploy and sign the release
 # Note: macdeployqt seems to freeze in Qt 5.5.1. Using workaround.
+# TODO: This is a workaround for toolchain changes in 5.5.1
 export QTDIR=~/Qt5.4.1/5.4/clang_64/
 ${QTDIR}/bin/macdeployqt PatternPaint/PatternPaint.app/ -codesign="Developer ID Application: Blinkinlabs, LLC" -dmg
-
-#${QTDIR}/bin/macdeployqt PatternPaint/PatternPaint.app/ -dmg
-#codesign --verbose --deep --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app
-#${QTDIR}/bin/macdeployqt PatternPaint/PatternPaint.app/ -dmg
-
 
 # Perform a quick verification of the application signature
 codesign --verify --verbose=4 PatternPaint/PatternPaint.app
