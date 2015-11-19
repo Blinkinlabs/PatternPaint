@@ -25,11 +25,30 @@ ${QTDIR}/bin/qmake -config release OBJECTS_DIR=build MOC_DIR=build/moc RCC_DIR=b
 make -j
 cd ..
 
-# Sign the Sparkle framework
+# Sign the frameworks
 codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/Sparkle.framework/Versions/A
+codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/libusb-1.0.0.dylib
+
+# And the system frameworks 
+# TODO: This is a workaround for toolchain changes in 5.5.1
+codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/QtCore.framework/Versions/5
+codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/QtDBus.framework/Versions/5
+codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/QtGui.framework/Versions/5
+codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/QtPrintSupport.framework/Versions/5
+codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/QtWidgets.framework/Versions/5
+codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/QtSerialPort.framework/Versions/5
 
 # Deploy and sign the release
+# Note: macdeployqt seems to freeze in Qt 5.5.1. Using workaround.
+export QTDIR=~/Qt5.4.1/5.4/clang_64/
 ${QTDIR}/bin/macdeployqt PatternPaint/PatternPaint.app/ -codesign="Developer ID Application: Blinkinlabs, LLC" -dmg
+
+#${QTDIR}/bin/macdeployqt PatternPaint/PatternPaint.app/ -dmg
+#codesign --verbose --deep --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app
+#${QTDIR}/bin/macdeployqt PatternPaint/PatternPaint.app/ -dmg
+
+
+# Perform a quick verification of the application signature
 codesign --verify --verbose=4 PatternPaint/PatternPaint.app
 
 # Test the signature

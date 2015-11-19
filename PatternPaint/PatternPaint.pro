@@ -129,6 +129,10 @@ defineTest(copySystemFrameworks) {
 
         # and remove the .prl files since they will cause the signing process to fail
         QMAKE_POST_LINK += rm $$quote($$DDIR/$$FILE/*.prl) $$escape_expand(\\n\\t)
+        QMAKE_POST_LINK += rm $$quote($$DDIR/$$FILE/*_debug) $$escape_expand(\\n\\t)
+        QMAKE_POST_LINK += rm $$quote($$DDIR/$$FILE/Versions/5/*_debug) $$escape_expand(\\n\\t)
+        QMAKE_POST_LINK += rm $$quote($$DDIR/$$FILE/Headers) $$escape_expand(\\n\\t)
+        QMAKE_POST_LINK += rm -R $$quote($$DDIR/$$FILE/Versions/5/Headers/) $$escape_expand(\\n\\t)
     }
 
     export(QMAKE_POST_LINK)
