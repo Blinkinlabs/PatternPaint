@@ -203,8 +203,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Fill the examples menu using the examples resource
     populateExamplesMenu(":/examples", menuExamples);
-//    connect(menuExamples, SIGNAL(triggered(QAction *)),
-//            this, SLOT(on_ExampleSelected(QAction *)), Qt::UniqueConnection);
 
 
     patternCollectionListView->setItemDelegate(new PatternCollectionDelegate(this));
@@ -214,6 +212,9 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(on_patternCollectionCurrentChanged(const QModelIndex &, const QModelIndex &)));
 
     timeline->setItemDelegate(new PatternDelegate(this));
+
+    // Refresh the display for no pattern selected
+    on_patternCollectionCurrentChanged(QModelIndex(), QModelIndex());
 }
 
 void MainWindow::populateExamplesMenu(QString directory, QMenu* menu) {
