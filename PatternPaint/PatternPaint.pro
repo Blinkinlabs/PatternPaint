@@ -50,6 +50,13 @@ equals(QT_MAJOR_VERSION, 5){
     }
 }
 
+# Workaround for issue 106, caused by a bug in QT 5.5.1: progress bar appears after creation
+# see: https://github.com/Blinkinlabs/PatternPaint/issues/106
+# Qt issue: https://bugreports.qt.io/browse/QTBUG-47042
+equals(QT_VERSION, 5.5.1) {
+    DEFINES += PROGRESS_DIALOG_WORKAROUND
+}
+
 SOURCES += \
     main.cpp\
     mainwindow.cpp \

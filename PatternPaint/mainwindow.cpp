@@ -173,13 +173,10 @@ MainWindow::MainWindow(QWidget *parent) :
     progressDialog.setWindowModality(Qt::WindowModal);
     progressDialog.setAutoClose(false);
 
-    // Workaround for issue 106, caused by a bug in QT 5.5.1: progress bar appears after creation
-    // see: https://github.com/Blinkinlabs/PatternPaint/issues/106
-    // Qt issue: https://bugreports.qt.io/browse/QTBUG-47042
-#if QT_VERSION >= QT_VERSION_CHECK(5, 5, 1)
+    // Workaround for bug in QT 5.5.1
+#if defined(PROGRESS_DIALOG_WORKAROUND)
     progressDialog.reset();
     progressDialog.hide();
-
 #endif
 
     // The draw timer tells the pattern to advance
@@ -206,8 +203,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Fill the examples menu using the examples resource
     populateExamplesMenu(":/examples", menuExamples);
-    connect(menuExamples, SIGNAL(triggered(QAction *)),
-            this, SLOT(on_ExampleSelected(QAction *)), Qt::UniqueConnection);
+//    connect(menuExamples, SIGNAL(triggered(QAction *)),
+//            this, SLOT(on_ExampleSelected(QAction *)), Qt::UniqueConnection);
 
 
     patternCollectionListView->setItemDelegate(new PatternCollectionDelegate(this));
