@@ -50,8 +50,9 @@ bool avrUploadData::init(std::vector<PatternWriter> patterns) {
              patterns[0].getLedCount());
     qDebug() << buff;
 
-    patternTable.append(static_cast<char>(patterns.size()));       // First byte of the metadata is how many patterns there are
-    patternTable.append(static_cast<char>(patterns[0].getLedCount()));  // Second byte is the length of the LED strip
+    patternTable.append(static_cast<char>(patterns.size()));       // Offset 0: Pattern count (1 byte)
+    patternTable.append(static_cast<char>((patterns[0].getLedCount()     ) & 0xFF));  // Offset 1: Number of LEDs connected to the controller (2 bytes)
+    patternTable.append(static_cast<char>((patterns[0].getLedCount() >> 8) & 0xFF));
     // TODO: make the LED count to a separate, explicit parameter?
 
     int dataOffset = sketch.length();

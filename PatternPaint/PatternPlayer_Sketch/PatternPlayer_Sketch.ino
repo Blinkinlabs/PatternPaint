@@ -8,12 +8,14 @@
 
 // Pattern table definitions
 #define PATTERN_TABLE_ADDRESS  (0x7000 - 0x80)   // Location of the pattern table in the flash memory
-#define PATTERN_TABLE_HEADER_LENGTH     2        // Length of the header, in bytes
+#define PATTERN_TABLE_HEADER_LENGTH     3        // Length of the header, in bytes
 #define PATTERN_TABLE_ENTRY_LENGTH      7        // Length of each entry, in bytes
-  
-#define PATTERN_COUNT_OFFSET    0    // Number of patterns in the pattern table
-#define LED_COUNT_OFFSET        1    // Number of LEDs in the pattern
- 
+
+// Header data sections
+#define PATTERN_COUNT_OFFSET    0    // Number of patterns in the pattern table (1 byte)
+#define LED_COUNT_OFFSET        1    // Number of LEDs in the pattern (2 bytes)
+
+// Entry data sections
 #define ENCODING_TYPE_OFFSET    0    // Encoding (1 byte)
 #define FRAME_DATA_OFFSET       1    // Memory location (2 bytes)
 #define FRAME_COUNT_OFFSET      3    // Frame count (2 bytes)
@@ -22,7 +24,7 @@
 
 // LED data array
 struct CRGB leds[LED_COUNT];   // Space to hold the pattern
-uint8_t ledCount;             // Actual number of LEDs present
+uint16_t ledCount;             // Actual number of LEDs present
 
 // Pattern information
 volatile uint8_t patternCount;         // Number of available patterns
@@ -32,10 +34,10 @@ int frameDelay = 30;          // Number of ms each frame should be displayed.
 
 #define BRIGHT_STEP_COUNT 8
 #define STARTING_BRIGHTNESS 4
-volatile uint8_t brightnesSteps[BRIGHT_STEP_COUNT] = {5,15,40,70,93,70,40,15};
+volatile uint8_t brightnesSteps[BRIGHT_STEP_COUNT] = {5,15,40,70,93, 70, 40, 15};
 
-uint8_t brightness = 4;
-uint8_t lastBrightness = 4;
+uint8_t brightness = STARTING_BRIGHTNESS;
+uint8_t lastBrightness = STARTING_BRIGHTNESS;
 
 // Button interrupt variables and Interrupt Service Routine
 uint8_t buttonState = 0;
@@ -48,10 +50,6 @@ long buttonPressTime = 0;
 
 // Read the pattern data from the end of the program memory, and construct a new Pattern from it.
 void loadPattern(uint8_t newPattern) {
-//  if(newPattern >= patternCount) {
-//    return;
-//  }
-  
   currentPattern = newPattern;
   
   uint16_t patternEntryAddress =
@@ -62,18 +60,9 @@ void loadPattern(uint8_t newPattern) {
 
   Animation::Encoding encodingType = (Animation::Encoding)pgm_read_byte(patternEntryAddress + ENCODING_TYPE_OFFSET);
   
-//  PGM_P frameData  =
-//  (PGM_P)((pgm_read_byte(patternEntryAddress + FRAME_DATA_OFFSET    ) << 8)
-//        + (pgm_read_byte(patternEntryAddress + FRAME_DATA_OFFSET + 1)));
-  PGM_P frameData  =  (PGM_P)pgm_read_word(patternEntryAddress + FRAME_DATA_OFFSET);
-
-//  uint16_t frameCount = (pgm_read_byte(patternEntryAddress + FRAME_COUNT_OFFSET    ) << 8)
-//                      + (pgm_read_byte(patternEntryAddress + FRAME_COUNT_OFFSET + 1));
+  PGM_P frameData =  (PGM_P)pgm_read_word(patternEntryAddress + FRAME_DATA_OFFSET);
   uint16_t frameCount = pgm_read_word(patternEntryAddress + FRAME_COUNT_OFFSET);
-
-//  frameDelay  = (pgm_read_byte(patternEntryAddress + FRAME_DELAY_OFFSET    ) << 8)
-//              + (pgm_read_byte(patternEntryAddress + FRAME_DELAY_OFFSET + 1));
-  frameDelay  = pgm_read_word(patternEntryAddress + FRAME_DELAY_OFFSET);
+  frameDelay = pgm_read_word(patternEntryAddress + FRAME_DELAY_OFFSET);
 
   pattern.init(frameCount, frameData, encodingType, ledCount);
 }
@@ -139,15 +128,13 @@ void setup()
 
   // First, load the pattern count and LED geometry from the pattern table
   patternCount = pgm_read_byte(PATTERN_TABLE_ADDRESS + PATTERN_COUNT_OFFSET);
-  ledCount     = pgm_read_byte(PATTERN_TABLE_ADDRESS + LED_COUNT_OFFSET);
+  ledCount     = pgm_read_word(PATTERN_TABLE_ADDRESS + LED_COUNT_OFFSET);
   
   // Now, read the first pattern from the table
   // TODO: Read a different pattern?
   loadPattern(0);
 
-  LEDS.addLeds<WS2811, LED_OUT, GRB>(leds, ledCount);
-  LEDS.showColor(CRGB(0, 0, 0));
-  brightness = STARTING_BRIGHTNESS;
+  LEDS.addLeds<WS2811, LED_OUT, GRB>(leds, LED_COUNT);
   LEDS.setBrightness(brightnesSteps[brightness]);
   LEDS.show();
 }

@@ -123,7 +123,7 @@ void PatternWriter::encodeImageRGB565_RLE(const Pattern *pattern) {
                 currentColor = decimatedColor;
             }
 
-            if(currentColor != decimatedColor) {
+            if((currentColor != decimatedColor) || (runCount == 255)) {
                 int highByte = (currentColor >> 8) & 0xFF;
                 int lowByte  = (currentColor)      & 0xFF;
 
