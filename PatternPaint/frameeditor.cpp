@@ -234,7 +234,9 @@ void FrameEditor::setFrameData(int index, const QImage data)
 
     if(updateSize) {
         updateGridSize();
-//        resizeEvent(new QResizeEvent(QSize(),QSize()));
+        //Compute a new viewport size, based on the current viewport height
+        float scale = float(size().height())/data.size().height();
+        this->setMinimumWidth(data.size().width()*scale);
     }
 
     // and force a screen update
