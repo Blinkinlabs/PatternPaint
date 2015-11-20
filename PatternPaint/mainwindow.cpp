@@ -173,6 +173,15 @@ MainWindow::MainWindow(QWidget *parent) :
     progressDialog.setWindowModality(Qt::WindowModal);
     progressDialog.setAutoClose(false);
 
+    // Workaround for issue 106, caused by a bug in QT 5.5.1: progress bar appears after creation
+    // see: https://github.com/Blinkinlabs/PatternPaint/issues/106
+    // Qt issue: https://bugreports.qt.io/browse/QTBUG-47042
+#if QT_VERSION >= QT_VERSION_CHECK(5, 5, 1)
+    progressDialog.reset();
+    progressDialog.hide();
+
+#endif
+
     // The draw timer tells the pattern to advance
     connect(&drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
 
