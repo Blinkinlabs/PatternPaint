@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import argparse
+import time
 
 def ParseLine(line):
   """ Parse a line of an Intel HEX file into its component parts """
@@ -44,7 +45,7 @@ def HexToHeader(fileName, animationName):
   print "#ifndef %s_SKETCH_H"%(animationName)
   print "#define %s_SKETCH_H"%(animationName)
   print ""
-  print "//Automatically generated file..."
+  print "// Generated automatically on: %s"%(time.strftime("%c"))
   print ""
   print "#include <stdint.h>"
   print ""

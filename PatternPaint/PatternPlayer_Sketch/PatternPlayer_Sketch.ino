@@ -1,4 +1,4 @@
-#include <Animation.h>
+#include <animation.h>
 
 #include <FastLED.h>
 #include <avr/pgmspace.h>
@@ -60,17 +60,20 @@ void loadPattern(uint8_t newPattern) {
         + currentPattern * PATTERN_TABLE_ENTRY_LENGTH;
 
 
-  uint8_t encodingType = pgm_read_byte(patternEntryAddress + ENCODING_TYPE_OFFSET);
+  Animation::Encoding encodingType = (Animation::Encoding)pgm_read_byte(patternEntryAddress + ENCODING_TYPE_OFFSET);
   
-  uint8_t PROGMEM *frameData  =
-  (uint8_t PROGMEM *)((pgm_read_byte(patternEntryAddress + FRAME_DATA_OFFSET    ) << 8)
-                + (pgm_read_byte(patternEntryAddress + FRAME_DATA_OFFSET + 1)));
+//  PGM_P frameData  =
+//  (PGM_P)((pgm_read_byte(patternEntryAddress + FRAME_DATA_OFFSET    ) << 8)
+//        + (pgm_read_byte(patternEntryAddress + FRAME_DATA_OFFSET + 1)));
+  PGM_P frameData  =  (PGM_P)pgm_read_word(patternEntryAddress + FRAME_DATA_OFFSET);
 
-  uint16_t frameCount = (pgm_read_byte(patternEntryAddress + FRAME_COUNT_OFFSET    ) << 8)
-                      + (pgm_read_byte(patternEntryAddress + FRAME_COUNT_OFFSET + 1));
-             
-  frameDelay  = (pgm_read_byte(patternEntryAddress + FRAME_DELAY_OFFSET    ) << 8)
-              + (pgm_read_byte(patternEntryAddress + FRAME_DELAY_OFFSET + 1));
+//  uint16_t frameCount = (pgm_read_byte(patternEntryAddress + FRAME_COUNT_OFFSET    ) << 8)
+//                      + (pgm_read_byte(patternEntryAddress + FRAME_COUNT_OFFSET + 1));
+  uint16_t frameCount = pgm_read_word(patternEntryAddress + FRAME_COUNT_OFFSET);
+
+//  frameDelay  = (pgm_read_byte(patternEntryAddress + FRAME_DELAY_OFFSET    ) << 8)
+//              + (pgm_read_byte(patternEntryAddress + FRAME_DELAY_OFFSET + 1));
+  frameDelay  = pgm_read_word(patternEntryAddress + FRAME_DELAY_OFFSET);
 
   pattern.init(frameCount, frameData, encodingType, ledCount);
 }

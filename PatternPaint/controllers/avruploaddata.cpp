@@ -71,12 +71,13 @@ bool avrUploadData::init(std::vector<PatternWriter> patterns) {
 
         // Build the table entry for this pattern
         patternTable.append(static_cast<char>((pattern->getEncoding()) & 0xFF));             // Offset 0: encoding (1 byte)
-        patternTable.append(static_cast<char>((dataOffset >> 8) & 0xFF));               // Offset 1: memory location (2 bytes)
-        patternTable.append(static_cast<char>((dataOffset     ) & 0xFF));
-        patternTable.append(static_cast<char>((pattern->getFrameCount() >> 8  ) & 0xFF));    // Offset 3: frame count (2 bytes)
-        patternTable.append(static_cast<char>((pattern->getFrameCount()       ) & 0xFF));
-        patternTable.append(static_cast<char>((pattern->getFrameDelay() >> 8  ) & 0xFF));    // Offset 5: frame delay (2 bytes)
-        patternTable.append(static_cast<char>((pattern->getFrameDelay()       ) & 0xFF));
+        patternTable.append(static_cast<char>((dataOffset     ) & 0xFF));                    // Offset 1: memory location (2 bytes)
+        patternTable.append(static_cast<char>((dataOffset >> 8) & 0xFF));
+        patternTable.append(static_cast<char>((pattern->getFrameCount()       ) & 0xFF));    // Offset 3: frame count (2 bytes)
+        patternTable.append(static_cast<char>((pattern->getFrameCount() >> 8  ) & 0xFF));
+        patternTable.append(static_cast<char>((pattern->getFrameDelay()       ) & 0xFF));    // Offset 5: frame delay (2 bytes)
+        patternTable.append(static_cast<char>((pattern->getFrameDelay() >> 8  ) & 0xFF));
+
 
         // and append the image data
         patternData += pattern->getData();
