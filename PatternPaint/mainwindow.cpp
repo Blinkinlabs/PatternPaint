@@ -1047,7 +1047,6 @@ void MainWindow::on_frameDataEdited(int index, QImage update)
 
 void MainWindow::setPatternName(QString name)
 {
-    setWindowTitle(name + " - Pattern Paint");
     patternName->setText(name);
 }
 
