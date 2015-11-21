@@ -42,6 +42,8 @@ private:
 
     int resetTriesRemaining;
 
+    bool hasError;  // If true, reset will not be attempted on close.
+
 #if defined(Q_OS_WIN)
     // Windows only: Timer that periodically checks if the serial device is
     // still present (it seems to disappear without sending an error?)

@@ -19,6 +19,11 @@ QList<PatternWriter::Encoding> LightBuddyUploader::getSupportedEncodings() const
     return encodings;
 }
 
+void LightBuddyUploader::cancel()
+{
+    qDebug() << "Cancel signalled, but not supported";
+}
+
 bool LightBuddyUploader::startUpload(BlinkyController& controller, std::vector<PatternWriter> patterns)
 {
     Q_UNUSED(controller);

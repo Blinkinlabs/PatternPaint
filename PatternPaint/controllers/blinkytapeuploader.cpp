@@ -45,6 +45,17 @@ QList<PatternWriter::Encoding> BlinkyTapeUploader::getSupportedEncodings() const
     return encodings;
 }
 
+void BlinkyTapeUploader::cancel()
+{
+    if(state != State_WaitForBootloaderPort) {
+        qDebug() << "Can't cancel during upload";
+        return;
+    }
+
+    state = State_Ready;
+    bootloaderResetTimer.clear();
+}
+
 void BlinkyTapeUploader::handleProgrammerError(QString error) {
     qCritical() << error;
 

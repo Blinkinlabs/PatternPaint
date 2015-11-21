@@ -145,6 +145,11 @@ QList<PatternWriter::Encoding> BlinkyPendantUploader::getSupportedEncodings() co
     return encodings;
 }
 
+void BlinkyPendantUploader::cancel()
+{
+    qDebug() << "Cancel signalled, but not supported";
+}
+
 void BlinkyPendantUploader::handleProgrammerError(QString error) {
     qCritical() << error;
 

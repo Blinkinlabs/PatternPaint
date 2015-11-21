@@ -20,6 +20,9 @@ public:
 
     QList<PatternWriter::Encoding> getSupportedEncodings() const;
 
+public slots:
+    void cancel();
+
 private slots:
     void handleProgrammerError(QString error);
 

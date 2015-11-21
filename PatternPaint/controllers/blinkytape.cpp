@@ -72,6 +72,7 @@ void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
         qCritical() << "Unrecognized serial error:" << errorString;
     }
 
+
     close();
 }
 
@@ -183,7 +184,7 @@ bool BlinkyTape::open(QSerialPortInfo info) {
 }
 
 void BlinkyTape::close() {
-    if(serial->isOpen()) {
+    if(isConnected()) {
         serial->close();
     }
 
@@ -286,9 +287,10 @@ bool BlinkyTape::getPortInfo(QSerialPortInfo& info)
 
 void BlinkyTape::reset()
 {
-    if(!isConnected()) {
+    if(!isConnected() || serial->error() != QSerialPort::NoError) {
         return;
     }
+    qDebug() << serial->error();
 
     qDebug() << "Attempting to reset device";
 

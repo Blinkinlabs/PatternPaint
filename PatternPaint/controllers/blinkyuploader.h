@@ -57,6 +57,10 @@ signals:
 
     /// Sends a signal at end of upload to report the result.
     void finished(bool result);
+
+public slots:
+    /// Request that the upload process be stopped
+    virtual void cancel() = 0;
 };
 
 #endif // BLINKYUPLOADER_H

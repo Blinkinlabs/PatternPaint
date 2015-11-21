@@ -19,6 +19,10 @@ public:
     QString getErrorString() const;
 
     QList<PatternWriter::Encoding> getSupportedEncodings() const;
+
+public slots:
+    void cancel();
+
 private slots:
     void doWork();  /// Handle the next section of work, whatever it is
 

@@ -842,6 +842,8 @@ void MainWindow::connectUploader()
             this, SLOT(on_uploaderProgressChanged(int)));
     connect(uploader, SIGNAL(finished(bool)),
             this, SLOT(on_uploaderFinished(bool)));
+    connect(&progressDialog, SIGNAL(canceled()),
+            uploader, SLOT(cancel()));
 
 }
 
