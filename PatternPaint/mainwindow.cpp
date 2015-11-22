@@ -1159,15 +1159,12 @@ void MainWindow::on_actionConfigure_Fixture_triggered()
     FixtureSettings fixtureSettings(this);
     fixtureSettings.setWindowModality(Qt::WindowModal);
 
-    QSettings settings;
-
     QSize displaySize;
     ColorMode colorMode;
 
     // TODO: Have a fixture, set this from that.
-    displaySize = settings.value("Fixture/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize();
-    colorMode = (ColorMode)settings.value("Fixture/ColorOrder", RGB).toInt();
-
+    displaySize = fixture->getSize();
+    colorMode = fixture->getColorMode();
 
     fixtureSettings.setOutputSize(displaySize);
     fixtureSettings.setColorMode(colorMode);
@@ -1222,6 +1219,7 @@ void MainWindow::on_actionConfigure_Fixture_triggered()
     fixture->setSize(newDisplaySize);
     fixture->setColorMode(newColorMode);
 
+    QSettings settings;
     settings.setValue("Fixture/DisplaySize", newDisplaySize);
     settings.setValue("Fixture/ColorOrder", newColorMode);
 }
