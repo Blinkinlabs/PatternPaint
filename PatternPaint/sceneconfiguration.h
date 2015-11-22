@@ -1,22 +1,22 @@
-#ifndef FIXTURESETTINGS_H
-#define FIXTURESETTINGS_H
+#ifndef SCENECONFIGURATION_H
+#define SCENECONFIGURATION_H
 
 #include <QDialog>
 
 #include "patternwriter.h"
 
 namespace Ui {
-class FixtureSettings;
+class SceneConfiguration;
 }
 
 /// Dialog to allow the user to specify a new width/height for the animation
-class FixtureSettings : public QDialog
+class SceneConfiguration : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit FixtureSettings(QWidget *parent = 0);
-    ~FixtureSettings();
+    explicit SceneConfiguration(QWidget *parent = 0);
+    ~SceneConfiguration();
 
     void setOutputSize(QSize size);
     QSize getOutputSize() const;
@@ -24,7 +24,7 @@ public:
     void setColorMode(ColorMode mode);
     ColorMode getColorMode() const;
 private:
-    Ui::FixtureSettings *ui;
+    Ui::SceneConfiguration *ui;
 };
 
-#endif // FIXTURESETTINGS_H
+#endif // SCENECONFIGURATION_H

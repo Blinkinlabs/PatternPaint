@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>FixtureSettings</class>
- <widget class="QDialog" name="FixtureSettings">
+ <class>SceneConfiguration</class>
+ <widget class="QDialog" name="SceneConfiguration">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Fixture Settings</string>
+   <string>Scene Configuration</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -200,7 +203,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>FixtureSettings</receiver>
+   <receiver>SceneConfiguration</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -216,7 +219,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>FixtureSettings</receiver>
+   <receiver>SceneConfiguration</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

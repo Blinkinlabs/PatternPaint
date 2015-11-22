@@ -5,7 +5,7 @@
 #include "brightnessmodel.h"
 #include "systeminformation.h"
 #include "aboutpatternpaint.h"
-#include "fixturesettings.h"
+#include "sceneconfiguration.h"
 #include "colorchooser.h"
 #include "patternwriter.h"
 
@@ -221,7 +221,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // Try running the welcome screen menu
     if(settings.value("MainWindow/showWelcomeScreenAtStartup",true).toBool()) {
         WelcomeScreen welcomeScreen(this);
-        welcomeScreen.setWindowModality(Qt::WindowModal);
         welcomeScreen.exec();
 
         if(welcomeScreen.result() == QDialog::Accepted) {
@@ -229,7 +228,6 @@ MainWindow::MainWindow(QWidget *parent) :
             fixture->setColorMode(welcomeScreen.getSelectedTemplate().colorMode);
             fixture->setSize(QSize(welcomeScreen.getSelectedTemplate().width,
                                    welcomeScreen.getSelectedTemplate().height));
-
 
             QDir examplesDir(welcomeScreen.getSelectedTemplate().examples);
             QFileInfoList examplesList = examplesDir.entryInfoList();
@@ -1156,27 +1154,25 @@ void MainWindow::on_actionNew_FramePattern_triggered()
 
 void MainWindow::on_actionConfigure_Fixture_triggered()
 {
-    FixtureSettings fixtureSettings(this);
-    fixtureSettings.setWindowModality(Qt::WindowModal);
+    SceneConfiguration sceneConfiguration(this);
 
     QSize displaySize;
     ColorMode colorMode;
 
-    // TODO: Have a fixture, set this from that.
     displaySize = fixture->getSize();
     colorMode = fixture->getColorMode();
 
-    fixtureSettings.setOutputSize(displaySize);
-    fixtureSettings.setColorMode(colorMode);
-    fixtureSettings.exec();
+    sceneConfiguration.setOutputSize(displaySize);
+    sceneConfiguration.setColorMode(colorMode);
+    sceneConfiguration.exec();
 
-    if(fixtureSettings.result() != QDialog::Accepted) {
+    if(sceneConfiguration.result() != QDialog::Accepted) {
         return;
     }
 
     // As long as the user didn't cancel, apply the new fixture size.
-    QSize newDisplaySize = fixtureSettings.getOutputSize();
-    ColorMode newColorMode = fixtureSettings.getColorMode();
+    QSize newDisplaySize = sceneConfiguration.getOutputSize();
+    ColorMode newColorMode = sceneConfiguration.getColorMode();
 
     // Test if any patterns need to be resized
     QVector<Pattern*> needToResize;
@@ -1265,6 +1261,5 @@ void MainWindow::on_actionOpen_Frame_based_Pattern_triggered()
 void MainWindow::on_actionPreferences_triggered()
 {
     Preferences * preferences = new Preferences(this);
-    preferences->setWindowModality(Qt::WindowModal);
     preferences->show();
 }

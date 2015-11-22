@@ -1,12 +1,12 @@
-#include "fixturesettings.h"
-#include "ui_fixturesettings.h"
+#include "sceneconfiguration.h"
+#include "ui_sceneconfiguration.h"
 
 #include <limits>
 #include <QDebug>
 
-FixtureSettings::FixtureSettings(QWidget *parent) :
+SceneConfiguration::SceneConfiguration(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::FixtureSettings)
+    ui(new Ui::SceneConfiguration)
 {
     ui->setupUi(this);
 
@@ -24,12 +24,12 @@ FixtureSettings::FixtureSettings(QWidget *parent) :
     }
 }
 
-FixtureSettings::~FixtureSettings()
+SceneConfiguration::~SceneConfiguration()
 {
     delete ui;
 }
 
-void FixtureSettings::setColorMode(ColorMode mode) {
+void SceneConfiguration::setColorMode(ColorMode mode) {
     for(int i = 0; i < ui->ColorType->count(); i++) {
         // TODO: Why not .value<ColorMode>() ?
         //if(ui->ColorType->itemData(i).value<ColorMode>() == mode) {
@@ -40,17 +40,17 @@ void FixtureSettings::setColorMode(ColorMode mode) {
     }
 }
 
-ColorMode FixtureSettings::getColorMode() const {
+ColorMode SceneConfiguration::getColorMode() const {
     //return ui->ColorType->currentData().value<ColorMode();
     return (ColorMode)ui->ColorType->currentData().toInt();
 }
 
-void FixtureSettings::setOutputSize(QSize size) {
+void SceneConfiguration::setOutputSize(QSize size) {
     ui->fixtureHeight->setText(QString::number(size.height()));
     ui->fixtureWidth->setText(QString::number(size.width()));
 }
 
-QSize FixtureSettings::getOutputSize() const
+QSize SceneConfiguration::getOutputSize() const
 {
     return QSize(ui->fixtureWidth->text().toInt(), ui->fixtureHeight->text().toInt());
 }

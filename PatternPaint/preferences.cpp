@@ -17,6 +17,8 @@ Preferences::Preferences(QWidget *parent) :
 
     QSettings settings;
 
+    ui->gridLayout->setColumnMinimumWidth(0, 150);
+
     ui->showWelcomeScreen->setChecked(settings.value("MainWindow/showWelcomeScreenAtStartup",true).toBool());
 
 #if defined(Q_OS_MACX)
