@@ -235,20 +235,14 @@ MainWindow::MainWindow(QWidget *parent) :
             QFileInfoList examplesList = examplesDir.entryInfoList();
 
             for(int i = 0; i < examplesList.size(); ++i) {
-                // If we found a directory, skip it.
-                if(examplesList.at(i).isDir()) {
-//                    QMenu* submenu = new QMenu(this);
-//                    submenu->setTitle(examplesList.at(i).fileName());
-//                    menu->addMenu(submenu);
-//                    connect(submenu, SIGNAL(triggered(QAction *)),
-//                            this, SLOT(on_ExampleSelected(QAction *)), Qt::UniqueConnection);
+                if(!examplesList.at(i).isDir()) {
+                    Pattern::PatternType type = Pattern::Scrolling;
+                    if(examplesList.at(i).fileName().endsWith(".frames.png"))
+                        type = Pattern::FrameBased;
 
-//                    populateExamplesMenu(directory + "/" + examplesList.at(i).fileName(), submenu);
-                }
-                // Otherwise this is a file, so add it to the examples menu.
-                else
-                    loadPattern(Pattern::Scrolling,
+                    loadPattern(type,
                                 welcomeScreen.getSelectedTemplate().examples + "/" + examplesList.at(i).fileName());
+                }
             }
         }
     }
@@ -1138,8 +1132,11 @@ void MainWindow::setPatternModified(bool modified)
 void MainWindow::on_ExampleSelected(QAction* action) {
     qDebug() << "Example selected:" << action->objectName();
 
-    // TODO: Choose scrolling/frame based
-    if(!loadPattern(Pattern::Scrolling, action->objectName())) {
+    Pattern::PatternType type = Pattern::Scrolling;
+    if(action->objectName().endsWith(".frames.png"))
+        type = Pattern::FrameBased;
+
+    if(!loadPattern(type, action->objectName())) {
         showError("Could not open file "
                    + action->objectName()
                    + ". Perhaps it has a formatting problem?");
