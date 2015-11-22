@@ -37,3 +37,38 @@ A scrolling pattern consists of a static image file, which is made into an anima
 
 ## Frame-based pattern
 Frame-based patterns consist of a set of frames, such as a GIF animation or video. The animation is made by drawing each frame onto the fixture in succession, like projecting a movie onto the frame surface. This kind of pattern is suited for animations on 2 or 3D displays.
+
+# BlinkyTape Protocol
+
+The BlinkyTape protocol describes how to send data to the BlinkyTape (and compatible) controllers over a serial link. Data is sent as RGB triplets, with 8 bits per color channel. Color can be in the range of 0-254. A 255 character signals a frame ending.
+
+## Example: 3 color LED device
+
+Say we want to send data to a string of 3 LEDs attached to a controller. We want the first LED to show red, the second green, and the third white. The data stream would look like this:
+
+[254][0][0][0][254][0][254][254][254][255]
+
+The first three bytes are RGB for the first pixel (254,0,0) = red. The next three bytes are RGB for the second pixel (0,254,0) = green. The following three bytes are RGB for the third pixel (254,254,254) = white. Finally, a (255) = break character is added at the end to signal that the frame should be drawn.
+
+## Notes
+
+For devices where the color order is changed, such as Blinky Pixel, the data stream should be swapped before sending it to the controller. At this time, only 8 bit, 3 color outputs are supported by this protocol. It will need to be modified to support RGBW in the future.
+
+# Uploading to a BlinkyTape
+
+Patterns are uploaded to a BlinkyTape by putting it into bootloader mode, instructing the bootloader to erase the flash, then uploading a new application firmware with the patterns appended to it. PatternPaint emulates a simple AVR109-compatible bootloader protocol in order to support this.
+
+The BlinkyTape controller memory map looks like this:
+
+	[0x0000] Start of application firmware (PatternPlayer_Sketch)
+	[0x????] Start of pattern memory (first page after the application firmware)
+	[0x6F80] Pattern Table
+	[0x7000] Start of bootloader (Caterina)
+
+The pattern Table looks like this:
+
+	[0x0000] Number of patterns stored (1 byte, 0-255)
+	[0x0001] Number of LEDs attached to the controller (2 bytes, 0-65535)
+	[0x0003] First Pattern Entry
+	[0x000A] Second Pattern Entry
+	[0x0011] Third Pattern Entry
