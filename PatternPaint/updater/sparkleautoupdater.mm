@@ -7,6 +7,8 @@
 #include <Cocoa/Cocoa.h>
 #include <Sparkle/Sparkle.h>
 
+#include <QtCore/qdebug.h>
+
 class SparkleAutoUpdater::Private
 {
     public:
@@ -34,4 +36,16 @@ SparkleAutoUpdater::~SparkleAutoUpdater()
 void SparkleAutoUpdater::checkForUpdates()
 {
     [d->updater checkForUpdatesInBackground];
+}
+
+bool SparkleAutoUpdater::getAutomatic()
+{
+ return [d->updater automaticallyChecksForUpdates];
+}
+
+void SparkleAutoUpdater::setAutomatic(bool setting)
+{
+    qDebug() << "     *** [Lib] {MegaUp}: set automatic update checking";
+    [d->updater setAutomaticallyChecksForUpdates: setting];
+    qDebug() << "     ***                 done";
 }

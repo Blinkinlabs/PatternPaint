@@ -11,15 +11,18 @@
 
 class SparkleAutoUpdater : public AutoUpdater
 {
-    public:
-        SparkleAutoUpdater(const QString& url);
-        ~SparkleAutoUpdater();
+public:
+    SparkleAutoUpdater(const QString& url);
+    ~SparkleAutoUpdater();
 
-        void checkForUpdates();
+    void checkForUpdates();
 
-    private:
-        class Private;
-        Private* d;
+    bool getAutomatic();
+    void setAutomatic(bool);
+
+private:
+    class Private;
+    Private* d;
 };
 
 #endif

@@ -119,6 +119,8 @@ private slots:
 
     void on_actionOpen_Frame_based_Pattern_triggered();
 
+    void on_actionPreferences_triggered();
+
 signals:
 
     /// Signalled when an editable pattern is selected in the editor

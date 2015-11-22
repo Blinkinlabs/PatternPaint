@@ -13,6 +13,8 @@ class WinSparkleAutoUpdater : public AutoUpdater
 
         void checkForUpdates();
 
+        bool getAutomatic();
+        void setAutomatic(bool setting);
     private:
         class Private;
         Private* d;

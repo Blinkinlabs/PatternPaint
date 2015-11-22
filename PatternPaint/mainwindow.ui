@@ -397,16 +397,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="patternType">
-         <property name="text">
-          <string>Scrolling Pattern</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="Line" name="line_4">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -447,15 +437,15 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item row="0" column="1">
-           <widget class="QSpinBox" name="patternSpeed"/>
-          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label">
             <property name="text">
              <string>Speed:</string>
             </property>
            </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QSpinBox" name="patternSpeed"/>
           </item>
          </layout>
         </widget>
@@ -623,6 +613,7 @@
     <addaction name="separator"/>
     <addaction name="actionExport_pattern_for_Arduino"/>
     <addaction name="separator"/>
+    <addaction name="actionPreferences"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -1031,6 +1022,11 @@
   <action name="actionOpen_Frame_based_Pattern">
    <property name="text">
     <string>Frame-based Pattern...</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences...</string>
    </property>
   </action>
  </widget>

@@ -29,4 +29,11 @@
         <file>images/icons/Remove Image-100.png</file>
         <file>images/icons/Minus-100.png</file>
     </qresource>
+    <qresource prefix="/scenetemplates">
+        <file>images/scenetemplates/matrix.jpg</file>
+        <file>images/scenetemplates/pendant.jpg</file>
+        <file>images/scenetemplates/blinkytape.jpg</file>
+        <file>images/scenetemplates/blinkytile.jpg</file>
+        <file>images/scenetemplates/pixels.jpg</file>
+    </qresource>
 </RCC>

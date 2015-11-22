@@ -35,6 +35,18 @@ void WinSparkleAutoUpdater::checkForUpdates()
     win_sparkle_init();
 }
 
+// TODO: Test in Windows
+bool WinSparkleAutoUpdater::getAutomatic()
+{
+    return win_sparkle_get_automatic_check_for_updates() == 1;
+}
+
+// TODO: Test in Windows
+void WinSparkleAutoUpdater::setAutomatic(bool setting)
+{
+    win_sparkle_set_automatic_check_for_updates(setting?1:0);
+}
+
 WinSparkleAutoUpdater::~WinSparkleAutoUpdater()
 {
     win_sparkle_cleanup();

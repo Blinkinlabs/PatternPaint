@@ -11,6 +11,7 @@
 
 #include "blinkytape.h"
 #include "blinkytapeuploader.h"
+#include "welcomescreen.h"
 
 #include "pencilinstrument.h"
 #include "lineinstrument.h"
@@ -25,6 +26,7 @@
 #include "patternCollection.h"
 #include "fixture.h"
 #include "matrixfixture.h"
+#include "preferences.h"
 
 
 #include <QFileDialog>
@@ -215,6 +217,41 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Refresh the display for no pattern selected
     on_patternCollectionCurrentChanged(QModelIndex(), QModelIndex());
+
+    // Try running the welcome screen menu
+    if(settings.value("MainWindow/showWelcomeScreenAtStartup",true).toBool()) {
+        WelcomeScreen welcomeScreen(this);
+        welcomeScreen.setWindowModality(Qt::WindowModal);
+        welcomeScreen.exec();
+
+        if(welcomeScreen.result() == QDialog::Accepted) {
+            qDebug() << welcomeScreen.getSelectedTemplate().name;
+            fixture->setColorMode(welcomeScreen.getSelectedTemplate().colorMode);
+            fixture->setSize(QSize(welcomeScreen.getSelectedTemplate().width,
+                                   welcomeScreen.getSelectedTemplate().height));
+
+
+            QDir examplesDir(welcomeScreen.getSelectedTemplate().examples);
+            QFileInfoList examplesList = examplesDir.entryInfoList();
+
+            for(int i = 0; i < examplesList.size(); ++i) {
+                // If we found a directory, skip it.
+                if(examplesList.at(i).isDir()) {
+//                    QMenu* submenu = new QMenu(this);
+//                    submenu->setTitle(examplesList.at(i).fileName());
+//                    menu->addMenu(submenu);
+//                    connect(submenu, SIGNAL(triggered(QAction *)),
+//                            this, SLOT(on_ExampleSelected(QAction *)), Qt::UniqueConnection);
+
+//                    populateExamplesMenu(directory + "/" + examplesList.at(i).fileName(), submenu);
+                }
+                // Otherwise this is a file, so add it to the examples menu.
+                else
+                    loadPattern(Pattern::Scrolling,
+                                welcomeScreen.getSelectedTemplate().examples + "/" + examplesList.at(i).fileName());
+            }
+        }
+    }
 }
 
 void MainWindow::populateExamplesMenu(QString directory, QMenu* menu) {
@@ -853,12 +890,15 @@ bool MainWindow::loadPattern(Pattern::PatternType type, const QString fileName)
     int frameCount = settings.value("Options/FrameCount", DEFAULT_FRAME_COUNT).toUInt();
 
     QSize displaySize;
-    if(!patternCollection.hasPattern()) {
-        displaySize = settings.value("Fixture/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize();
-    }
-    else {
-        displaySize =  patternCollection.getPattern(getCurrentPatternIndex())->getFrameSize();
-    }
+
+    displaySize = fixture->getSize();
+
+//    if(!patternCollection.hasPattern()) {
+//        displaySize = settings.value("Fixture/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize();
+//    }
+//    else {
+//        displaySize =  patternCollection.getPattern(getCurrentPatternIndex())->getFrameSize();
+//    }
 
     Pattern *pattern = new Pattern(type, displaySize, frameCount);
 
@@ -1225,4 +1265,11 @@ void MainWindow::on_actionOpen_Scrolling_Pattern_triggered()
 void MainWindow::on_actionOpen_Frame_based_Pattern_triggered()
 {
     openPattern(Pattern::FrameBased);
+}
+
+void MainWindow::on_actionPreferences_triggered()
+{
+    Preferences * preferences = new Preferences(this);
+    preferences->setWindowModality(Qt::WindowModal);
+    preferences->show();
 }
