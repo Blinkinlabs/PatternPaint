@@ -77,7 +77,8 @@ SOURCES += \
     patterndelegate.cpp \
     patternframeundocommand.cpp \
     patternscrollundocommand.cpp \
-    fixturesettings.cpp
+    fixturesettings.cpp \
+    welcomescreen.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -100,7 +101,8 @@ HEADERS  += \
     colors.h \
     patternframeundocommand.h \
     patternscrollundocommand.h \
-    fixturesettings.h
+    fixturesettings.h \
+    welcomescreen.h
 
 
 FORMS    += \
@@ -108,7 +110,8 @@ FORMS    += \
     systeminformation.ui \
     aboutpatternpaint.ui \
     addressprogrammer.ui \
-    fixturesettings.ui
+    fixturesettings.ui \
+    welcomescreen.ui
 
 RESOURCES += \
     images.qrc \

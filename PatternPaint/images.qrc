@@ -1,10 +1,7 @@
 <RCC>
     <qresource prefix="/resources">
-        <file>images/redo.png</file>
-        <file>images/undo.png</file>
         <file>images/patternpaint.icns</file>
         <file>images/patternpaint.ico</file>
-        <file>images/patternpaint.png</file>
         <file>images/PatternPaint-Splash-Screen.png</file>
     </qresource>
     <qresource prefix="/instruments">
@@ -12,11 +9,6 @@
         <file>images/instruments-icons/cursor_fill.png</file>
         <file>images/instruments-icons/cursor_pipette.png</file>
         <file>images/instruments-icons/cursor_spray.png</file>
-        <file>images/instruments-icons/fill.png</file>
-        <file>images/instruments-icons/line.png</file>
-        <file>images/instruments-icons/pencil.png</file>
-        <file>images/instruments-icons/pipette.png</file>
-        <file>images/instruments-icons/spray.png</file>
     </qresource>
     <qresource prefix="/icons">
         <file>images/icons/Add File-100.png</file>
