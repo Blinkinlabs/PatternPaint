@@ -274,6 +274,9 @@
        <property name="verticalScrollBarPolicy">
         <enum>Qt::ScrollBarAlwaysOff</enum>
        </property>
+       <property name="autoScroll">
+        <bool>false</bool>
+       </property>
        <property name="dragDropMode">
         <enum>QAbstractItemView::InternalMove</enum>
        </property>
