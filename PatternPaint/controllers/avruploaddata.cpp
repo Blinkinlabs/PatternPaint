@@ -7,7 +7,7 @@
 
 #define BUFF_LENGTH 100
 
-#define PATTERN_TABLE_HEADER_LENGTH     2
+#define PATTERN_TABLE_HEADER_LENGTH     3
 #define PATTERN_TABLE_ENTRY_LENGTH      7
 
 
@@ -78,7 +78,6 @@ bool avrUploadData::init(std::vector<PatternWriter> patterns) {
         patternTable.append(static_cast<char>((pattern->getFrameCount() >> 8  ) & 0xFF));
         patternTable.append(static_cast<char>((pattern->getFrameDelay()       ) & 0xFF));    // Offset 5: frame delay (2 bytes)
         patternTable.append(static_cast<char>((pattern->getFrameDelay() >> 8  ) & 0xFF));
-
 
         // and append the image data
         patternData += pattern->getData();
