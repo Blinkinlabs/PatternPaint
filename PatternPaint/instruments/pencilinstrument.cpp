@@ -7,7 +7,7 @@
 #include <QDebug>
 
 PencilInstrument::PencilInstrument(QObject *parent) :
-    AbstractInstrument(parent)
+    CustomCursorInstrument(":/instruments/images/instruments-icons/cursor.png", parent)
 {
     drawing = false;
 }
@@ -31,7 +31,8 @@ void PencilInstrument::mouseMoveEvent(QMouseEvent *event, FrameEditor& editor, c
 {
     if(drawing) {
         mEndPoint = pt;
-        if(event->buttons() & Qt::LeftButton)  paint(editor);
+        if(event->buttons() & Qt::LeftButton)
+            paint(editor);
         mStartPoint = pt;
     }
 }

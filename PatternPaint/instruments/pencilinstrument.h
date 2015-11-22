@@ -35,7 +35,7 @@
  * @brief Pencil instrument class.
  *
  */
-class PencilInstrument : public AbstractInstrument
+class PencilInstrument : public CustomCursorInstrument
 {
     Q_OBJECT
 

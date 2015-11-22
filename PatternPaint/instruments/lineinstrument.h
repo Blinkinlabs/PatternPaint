@@ -34,7 +34,7 @@
  * @brief Line instrument class.
  *
  */
-class LineInstrument : public AbstractInstrument
+class LineInstrument : public CustomCursorInstrument
 {
     Q_OBJECT
 
