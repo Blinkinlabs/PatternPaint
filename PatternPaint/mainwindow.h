@@ -123,7 +123,7 @@ private slots:
 
     void on_actionPreferences_triggered();
 
-    void showWelcomeDialog();
+    void showWelcomeScreen();
 
 
 signals:

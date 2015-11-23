@@ -216,7 +216,7 @@ MainWindow::MainWindow(QWidget *parent) :
     timeline->setItemDelegate(new PatternDelegate(this));
 
     if(settings.value("MainWindow/showWelcomeScreenAtStartup",true).toBool())
-        connect(this, SIGNAL(windowLoaded()), this, SLOT(showWelcomeDialog()));
+        connect(this, SIGNAL(windowLoaded()), this, SLOT(showWelcomeScreen()));
 
     // Refresh the display for no pattern selected
     on_patternCollectionCurrentChanged(QModelIndex(), QModelIndex());
@@ -837,7 +837,7 @@ bool MainWindow::promptForSave(std::vector<Pattern*> patterns) {
     }
 }
 
-void MainWindow::showWelcomeDialog()
+void MainWindow::showWelcomeScreen()
 {
     WelcomeScreen welcomeScreen(this);
     welcomeScreen.exec();
@@ -862,6 +862,7 @@ void MainWindow::showWelcomeDialog()
                         welcomeScreen.getSelectedTemplate().examples + "/" + examplesList.at(i).fileName());
         }
     }
+    patternCollectionListView->setCurrentIndex(patternCollectionListView->model()->index(0,0));
 }
 
 
@@ -894,13 +895,6 @@ bool MainWindow::loadPattern(Pattern::PatternType type, const QString fileName)
     QSize displaySize;
 
     displaySize = fixture->getSize();
-
-//    if(!patternCollection.hasPattern()) {
-//        displaySize = settings.value("Fixture/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize();
-//    }
-//    else {
-//        displaySize =  patternCollection.getPattern(getCurrentPatternIndex())->getFrameSize();
-//    }
 
     Pattern *pattern = new Pattern(type, displaySize, frameCount);
 
