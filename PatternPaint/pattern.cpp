@@ -104,18 +104,8 @@ bool Pattern::load(const QString &newFileName)
         int newFrameCount = sourceImage.width();
 
         frames->removeRows(0,frames->rowCount());
-        frames->insertRows(0,newFrameCount);
 
-//        QPainter painter;
-//        for(int i = 0; i < newFrameCount; i++) {
-//            QImage newFrameData(frameSize, QImage::Format_ARGB32_Premultiplied);
-//            painter.begin(&newFrameData);
-//            painter.fillRect(newFrameData.rect(),QColor(0,0,0));
-//            painter.drawImage(QPoint(0,0), sourceImage,
-//                              QRect(frameSize.width()*i, 0, frameSize.width(),frameSize.height()));
-//            painter.end();
-//            frames->setData(frames->index(i),newFrameData,PatternModel::FrameImage);
-//        }
+        frames->insertRows(0,newFrameCount);
 
         frames->setData(frames->index(0), sourceImage, PatternModel::EditImage);
 

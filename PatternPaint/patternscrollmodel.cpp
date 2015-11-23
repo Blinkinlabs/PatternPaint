@@ -236,7 +236,7 @@ bool PatternScrollModel::insertRows(int position, int rows, const QModelIndex &)
     pushUndoState();
     beginInsertRows(QModelIndex(), position, position+rows-1);
 
-    QImage newImage(image.width()+rows,image.height(), QImage::Format_ARGB32_Premultiplied);
+    QImage newImage(image.width()+rows,frameSize.height(), QImage::Format_ARGB32_Premultiplied);
 
     newImage.fill(FRAME_COLOR_DEFAULT);
 
@@ -273,7 +273,7 @@ bool PatternScrollModel::removeRows(int position, int rows, const QModelIndex &)
     pushUndoState();
     beginRemoveRows(QModelIndex(), position, position+rows-1);
 
-    QImage newImage(image.width()-1,image.height(), QImage::Format_ARGB32_Premultiplied);
+    QImage newImage(image.width()-rows,image.height(), QImage::Format_ARGB32_Premultiplied);
     newImage.fill(FRAME_COLOR_DEFAULT);
 
     QPainter painter;
