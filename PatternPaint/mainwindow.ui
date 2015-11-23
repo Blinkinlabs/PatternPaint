@@ -102,6 +102,9 @@
         </disabled>
        </palette>
       </property>
+      <property name="focusPolicy">
+       <enum>Qt::StrongFocus</enum>
+      </property>
       <property name="autoFillBackground">
        <bool>false</bool>
       </property>
@@ -264,6 +267,9 @@
           </colorrole>
          </disabled>
         </palette>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
        </property>
        <property name="styleSheet">
         <string notr="true"/>
