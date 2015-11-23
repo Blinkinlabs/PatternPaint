@@ -2,6 +2,7 @@
 #include "ui_welcomescreen.h"
 #include "colormode.h"
 
+#include <QDebug>
 
 #define SCENE_TEMPLATE_COUNT 5
 SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT] =
@@ -93,3 +94,8 @@ SceneTemplate WelcomeScreen::getSelectedTemplate()
     return sceneTemplates[selected];
 }
 
+
+void WelcomeScreen::on_SceneList_doubleClicked(const QModelIndex &index)
+{
+    this->accept();
+}

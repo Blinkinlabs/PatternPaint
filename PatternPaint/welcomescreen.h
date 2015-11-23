@@ -31,6 +31,9 @@ public:
 
     SceneTemplate getSelectedTemplate();
 
+private slots:
+    void on_SceneList_doubleClicked(const QModelIndex &index);
+
 private:
     Ui::WelcomeScreen *ui;
 };
