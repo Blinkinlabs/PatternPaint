@@ -1,10 +1,9 @@
 #include "patterncollectionlistview.h"
+#include "defaults.h"
 
 #include <QDebug>
 #include <QSettings>
 
-#define DEFAULT_DISPLAY_WIDTH 1
-#define DEFAULT_DISPLAY_HEIGHT 60
 
 PatternCollectionListView::PatternCollectionListView(QWidget *parent) :
     QListView(parent)
@@ -87,8 +86,8 @@ PatternCollectionListView::~PatternCollectionListView()
 //                // TODO: pass this to mainwindow for proper handling!
 //                QSettings settings;
 //                QSize displaySize;
-//                displaySize.setWidth(settings.value("Options/displayWidth", DEFAULT_DISPLAY_WIDTH).toUInt());
-//                displaySize.setHeight(settings.value("Options/displayHeight", DEFAULT_DISPLAY_HEIGHT).toUInt());
+//                displaySize.setWidth(settings.value("Options/displayWidth", DEFAULT_FIXTURE_WIDTH).toUInt());
+//                displaySize.setHeight(settings.value("Options/displayHeight", DEFAULT_FIXTURE_HEIGHT).toUInt());
 
 //                Pattern* patternItem = new Pattern(displaySize, 1);
 

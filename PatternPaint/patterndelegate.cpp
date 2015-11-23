@@ -1,8 +1,7 @@
 #include "patterndelegate.h"
 
 #include "patternframemodel.h"
-#include "colors.h"
-
+#include "defaults.h"
 
 #include <QDebug>
 

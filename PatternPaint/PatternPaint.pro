@@ -99,12 +99,12 @@ HEADERS  += \
     patternscrollmodel.h \
     patternmodel.h \
     patterndelegate.h \
-    colors.h \
     patternframeundocommand.h \
     patternscrollundocommand.h \
     welcomescreen.h \
     preferences.h \
-    sceneconfiguration.h
+    sceneconfiguration.h \
+    defaults.h
 
 
 FORMS    += \

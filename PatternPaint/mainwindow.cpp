@@ -27,7 +27,7 @@
 #include "fixture.h"
 #include "matrixfixture.h"
 #include "preferences.h"
-
+#include "defaults.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -35,24 +35,6 @@
 #include <QDesktopServices>
 #include <QtWidgets>
 
-
-#define PATTERN_SPEED_MINIMUM_VALUE 1
-#define PATTERN_SPEED_MAXIMUM_VALUE 100
-
-#define DRAWING_SIZE_MINIMUM_VALUE 1
-#define DRAWING_SIZE_MAXIMUM_VALUE 20
-#define DRAWING_SIZE_DEFAULT_VALUE 1
-
-#define COLOR_CANVAS_DEFAULT    QColor(0,0,0,255)
-#define COLOR_TOOL_DEFAULT    QColor(255,255,255,255)
-
-#define DEFAULT_DISPLAY_WIDTH 1
-#define DEFAULT_DISPLAY_HEIGHT 60
-#define DEFAULT_FRAME_COUNT 8
-
-#define MIN_TIMER_INTERVAL 5  // minimum interval to wait between blinkytape updates
-
-#define CONNECTION_SCANNER_INTERVAL 1000
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -198,7 +180,7 @@ MainWindow::MainWindow(QWidget *parent) :
     move(settings.value("MainWindow/pos", QPoint(100, 100)).toPoint());
 
 
-    fixture = new MatrixFixture(settings.value("Fixture/DisplaySize", QSize(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT)).toSize(),
+    fixture = new MatrixFixture(settings.value("Fixture/DisplaySize", QSize(DEFAULT_FIXTURE_WIDTH, DEFAULT_FIXTURE_HEIGHT)).toSize(),
                                 (ColorMode)settings.value("Fixture/ColorOrder", RGB).toInt(),
                                 new ExponentialBrightness(1.8,1.8,2.1));
     frameEditor->setFixture(fixture);
