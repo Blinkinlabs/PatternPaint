@@ -23,6 +23,7 @@ We use [Github Issues](https://github.com/Blinkinlabs/PatternPaint/issues) for b
 PatternPaint is written in C++ with QT (5.4.1) libraries. The easiest way to get started is to download QT Creator, and run the project through there.
 
 First download QT Creator 5.4.1.
+
 For OS X:
 
     http://download.qt.io/archive/qt/5.4/5.4.1/qt-opensource-mac-x64-clang-5.4.1.dmg
@@ -30,6 +31,10 @@ For OS X:
 For Windows:
 
 	http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-mingw491_opengl-5.4.1.exe
+	
+For Ubuntu (tested with 14.4):
+
+	sudo apt-get install qtcreator libusb-1.0-0-dev
 
 Next, clone the PatternPaint repository:
 
@@ -139,6 +144,10 @@ Start Git bash (start->run->git bash)
 If everything works, it will generate an installer executable 'PatternPaint_Installer_X.Y.Z.exe', where X.Y.Y is the current version of PatternPaint.
 
 Test this file manually on clean Windows 7 and 8 hosts.
+
+## Linux
+
+Please contact us if you have experience releasing packages for Linux. We're particularly interested in making a release for Debian-based systems. The main requirement is that a fairly recent version of Qt (5.1+) is available. There appear to be random bugs with each Qt release on each platform, so some attention needs to be paid to the specific version targeted.
 
 ## Create a release page on Github
 
