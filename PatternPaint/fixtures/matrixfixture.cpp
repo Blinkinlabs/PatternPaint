@@ -6,9 +6,9 @@ MatrixFixture::MatrixFixture(
         BrightnessModel *brightnessModel,
         QObject *parent) :
     Fixture(parent),
-    brightnessModel(brightnessModel),
+    size(size),
     colormode(colorMode),
-    size(size)
+    brightnessModel(brightnessModel)
 {
 }
 

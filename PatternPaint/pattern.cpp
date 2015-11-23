@@ -187,6 +187,8 @@ bool Pattern::getModified() const
 }
 
 void Pattern::resize(QSize newSize, bool scale) {
+    Q_UNUSED(scale);
+
     frames->setData(frames->index(0),newSize, PatternModel::FrameSize);
 }
 

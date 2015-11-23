@@ -49,6 +49,8 @@ void FrameEditor::dragEnterEvent(QDragEnterEvent *event)
 
 void FrameEditor::dropEvent(QDropEvent *event)
 {
+    Q_UNUSED(event);
+
 // TODO: Attempt to load the file as a single frame image, to replace this frame?
 
 //    if(patternData == NULL) {

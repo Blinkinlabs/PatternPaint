@@ -97,5 +97,7 @@ SceneTemplate WelcomeScreen::getSelectedTemplate()
 
 void WelcomeScreen::on_SceneList_doubleClicked(const QModelIndex &index)
 {
+    Q_UNUSED(index);
+
     this->accept();
 }

@@ -13,7 +13,7 @@ CAppNapInhibitor::CAppNapInhibitor(const char* strReason) :
     d(new Private)
 {
 #if defined(MAC_OS_X_VERSION_MAX_ALLOWED) &&  MAC_OS_X_VERSION_MAX_ALLOWED >= 1090
-    auto processInfo = [NSProcessInfo processInfo];
+    id processInfo = [NSProcessInfo processInfo];
     if ([processInfo respondsToSelector:@selector(beginActivityWithOptions:reason:)])
         d->activityId = [[processInfo beginActivityWithOptions:NSActivityUserInitiatedAllowingIdleSystemSleep
                                                  reason:[NSString stringWithUTF8String:strReason]]
@@ -25,7 +25,7 @@ CAppNapInhibitor::CAppNapInhibitor(const char* strReason) :
 CAppNapInhibitor::~CAppNapInhibitor()
 {
 #if defined(MAC_OS_X_VERSION_MAX_ALLOWED) &&  MAC_OS_X_VERSION_MAX_ALLOWED >= 1090
-    auto processInfo = [NSProcessInfo processInfo];
+    id processInfo = [NSProcessInfo processInfo];
     if (d->activityId && [processInfo respondsToSelector:@selector(endActivity:)])
         [processInfo endActivity:(id)d->activityId];
     [(id)d->activityId release];
