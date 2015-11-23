@@ -30,7 +30,7 @@ Preferences::Preferences(QWidget *parent) :
 
     ui->updateURL->setText(settings.value("Updates/releaseAppcastUrl", WINDOWS_RELEASE_APPCAST_DEFAULT).toString());
 #else
-    ui->updateGroup->hide();
+    ui->updateURL->setEnabled(false);
 #endif
 }
 

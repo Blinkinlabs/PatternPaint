@@ -36,7 +36,11 @@ void SystemInformation::on_refresh_clicked()
     report.append(__TIME__);
     report.append("\r");
 
+#if QT_VERSION > QT_VERSION_CHECK(5, 4, 0)
     report.append("Operating system: " + QSysInfo::prettyProductName() + "\r");
+#else
+    report.append("Operating system: ???\r");
+#endif
 
     // TODO: Get this from the controllers rather than building them here.
     report.append("Detected Blinkies: \r");
@@ -58,7 +62,12 @@ void SystemInformation::on_refresh_clicked()
         report.append("    PID: 0x" + QString::number(info.productIdentifier(),16) + "\r");
         if(version > -1)
             report.append("    Version: 0x" + QString::number(version,16) + "\r");
+
+#if QT_VERSION > QT_VERSION_CHECK(5, 3, 0)
         report.append("    Serial: " + info.serialNumber() + "\r");
+#else
+        report.append("    Serial: ???\r");
+#endif
     }
 
     ui->infoBrowser->setText(report);

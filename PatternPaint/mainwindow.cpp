@@ -23,7 +23,7 @@
 
 #include "patternframemodel.h"
 #include "patterndelegate.h"
-#include "patternCollection.h"
+#include "patterncollection.h"
 #include "fixture.h"
 #include "matrixfixture.h"
 #include "preferences.h"

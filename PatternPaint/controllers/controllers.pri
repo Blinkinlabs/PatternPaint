@@ -70,3 +70,8 @@ win32 {
     QMAKE_PRE_LINK += copy $$shell_path($$LIBUSB_DLL)  $$shell_path($$OUT_PWD) &
 }
 
+# For libusb on Linux
+linux {
+    LIBS += -lusb-1.0
+}
+
