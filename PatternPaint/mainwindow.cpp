@@ -215,35 +215,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     timeline->setItemDelegate(new PatternDelegate(this));
 
+    if(settings.value("MainWindow/showWelcomeScreenAtStartup",true).toBool())
+        connect(this, SIGNAL(windowLoaded()), this, SLOT(showWelcomeDialog()));
+
     // Refresh the display for no pattern selected
     on_patternCollectionCurrentChanged(QModelIndex(), QModelIndex());
-
-    // Try running the welcome screen menu
-    if(settings.value("MainWindow/showWelcomeScreenAtStartup",true).toBool()) {
-        WelcomeScreen welcomeScreen(this);
-        welcomeScreen.exec();
-
-        if(welcomeScreen.result() == QDialog::Accepted) {
-            qDebug() << welcomeScreen.getSelectedTemplate().name;
-            fixture->setColorMode(welcomeScreen.getSelectedTemplate().colorMode);
-            fixture->setSize(QSize(welcomeScreen.getSelectedTemplate().width,
-                                   welcomeScreen.getSelectedTemplate().height));
-
-            QDir examplesDir(welcomeScreen.getSelectedTemplate().examples);
-            QFileInfoList examplesList = examplesDir.entryInfoList();
-
-            for(int i = 0; i < examplesList.size(); ++i) {
-                if(!examplesList.at(i).isDir()) {
-                    Pattern::PatternType type = Pattern::Scrolling;
-                    if(examplesList.at(i).fileName().endsWith(".frames.png"))
-                        type = Pattern::FrameBased;
-
-                    loadPattern(type,
-                                welcomeScreen.getSelectedTemplate().examples + "/" + examplesList.at(i).fileName());
-                }
-            }
-        }
-    }
 }
 
 void MainWindow::populateExamplesMenu(QString directory, QMenu* menu) {
@@ -775,6 +751,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
     event->accept();
 }
 
+void MainWindow::showEvent(QShowEvent *event)
+{
+    QMainWindow::showEvent(event);
+    emit windowLoaded();
+}
+
 void MainWindow::on_instrumentSelected(bool) {
     QAction* act = static_cast<QAction*>(sender());
     Q_ASSERT(act != NULL);
@@ -854,6 +836,34 @@ bool MainWindow::promptForSave(std::vector<Pattern*> patterns) {
         return false;
     }
 }
+
+void MainWindow::showWelcomeDialog()
+{
+    WelcomeScreen welcomeScreen(this);
+    welcomeScreen.exec();
+
+    if(welcomeScreen.result() != QDialog::Accepted)
+        return;
+
+    fixture->setColorMode(welcomeScreen.getSelectedTemplate().colorMode);
+    fixture->setSize(QSize(welcomeScreen.getSelectedTemplate().width,
+                           welcomeScreen.getSelectedTemplate().height));
+
+    QDir examplesDir(welcomeScreen.getSelectedTemplate().examples);
+    QFileInfoList examplesList = examplesDir.entryInfoList();
+
+    for(int i = 0; i < examplesList.size(); ++i) {
+        if(!examplesList.at(i).isDir()) {
+            Pattern::PatternType type = Pattern::Scrolling;
+            if(examplesList.at(i).fileName().endsWith(".frames.png"))
+                type = Pattern::FrameBased;
+
+            loadPattern(type,
+                        welcomeScreen.getSelectedTemplate().examples + "/" + examplesList.at(i).fileName());
+        }
+    }
+}
+
 
 void MainWindow::connectController()
 {

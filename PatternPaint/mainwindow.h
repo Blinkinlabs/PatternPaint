@@ -41,6 +41,8 @@ public slots:
 protected:
     void closeEvent(QCloseEvent *event);
 
+    void showEvent(QShowEvent *event);
+
 private slots:
     void drawTimer_timeout();
 
@@ -121,11 +123,16 @@ private slots:
 
     void on_actionPreferences_triggered();
 
+    void showWelcomeDialog();
+
+
 signals:
 
     /// Signalled when an editable pattern is selected in the editor
     /// @param status true if pattern available, false otherwise.
     void patternStatusChanged(bool status);
+
+    void windowLoaded();
 
 private:
     ColorChooser colorChooser;

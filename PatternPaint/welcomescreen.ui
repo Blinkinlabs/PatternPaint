@@ -49,47 +49,6 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_2">
-      <widget class="QPushButton" name="pushButton">
-       <property name="geometry">
-        <rect>
-         <x>170</x>
-         <y>110</y>
-         <width>241</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Start with sample patterns</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_2">
-       <property name="geometry">
-        <rect>
-         <x>170</x>
-         <y>150</y>
-         <width>241</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Load a pattern...</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_3">
-       <property name="geometry">
-        <rect>
-         <x>170</x>
-         <y>190</y>
-         <width>241</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Start with an empty pattern</string>
-       </property>
-      </widget>
-     </widget>
     </widget>
    </item>
    <item>
