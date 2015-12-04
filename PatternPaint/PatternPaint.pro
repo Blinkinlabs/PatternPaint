@@ -21,7 +21,7 @@ TEMPLATE = app
 #Application version
 VERSION_MAJOR = 2
 VERSION_MINOR = 0
-VERSION_BUILD = 0
+VERSION_BUILD = 2
 
 #Target version and application information
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
@@ -170,7 +170,7 @@ macx {
         appnap.mm
 
     # Workaround for broken macdeployqt on Qt 5.5.1: Copy in the system
-    # libraries manually
+    # libraries manually. Unfortunately this is pretty broken.
     equals(QT_VERSION, 5.5.1){
         SYSTEM_LIBS += \
             QtCore.framework \

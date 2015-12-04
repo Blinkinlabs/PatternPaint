@@ -40,7 +40,7 @@ OUTDIR='PatternPaintWindows/'
 TEMPDIR='TempWindowsBuild'
 
 
-VERSION='2.0.0'
+VERSION='2.0.2'
 
 
 ################## New directory #################################
