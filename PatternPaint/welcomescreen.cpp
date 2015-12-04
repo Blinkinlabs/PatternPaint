@@ -46,8 +46,8 @@ void WelcomeScreen::on_SceneList_doubleClicked(const QModelIndex &index)
 }
 
 void WelcomeScreen::accept() {
+    QDialog::accept();
+
     // Send scene apply signal here
     emit(sceneSelected(getSelectedTemplate()));
-
-    QDialog::accept();
 }
