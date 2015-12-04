@@ -1,9 +1,10 @@
 #ifndef SCENECONFIGURATION_H
 #define SCENECONFIGURATION_H
 
-#include <QDialog>
-
+#include "scenetemplate.h"
 #include "patternwriter.h"
+
+#include <QDialog>
 
 namespace Ui {
 class SceneConfiguration;
@@ -18,13 +19,32 @@ public:
     explicit SceneConfiguration(QWidget *parent = 0);
     ~SceneConfiguration();
 
-    void setOutputSize(QSize size);
-    QSize getOutputSize() const;
+    void setSceneTemplate(SceneTemplate sceneTemplate);
 
-    void setColorMode(ColorMode mode);
-    ColorMode getColorMode() const;
+    SceneTemplate getSceneTemplate();
+
+private slots:
+    void on_sceneTemplate_activated(const QString &arg1);
+
+    void on_fixtureHeight_textEdited(const QString &arg1);
+
+    void on_fixtureWidth_textEdited(const QString &arg1);
+
+    void on_FixtureType_currentIndexChanged(int index);
+
+    void on_ColorType_currentIndexChanged(int index);
+
+    void on_controllerType_currentIndexChanged(int index);
+
 private:
     Ui::SceneConfiguration *ui;
+
+    void setControllerType(QString type);
+    void setFixtureType(QString type);
+    void setFixtureSize(QSize size);
+    void setColorMode(ColorMode mode);
+
+    void sceneCustomized();
 };
 
 #endif // SCENECONFIGURATION_H

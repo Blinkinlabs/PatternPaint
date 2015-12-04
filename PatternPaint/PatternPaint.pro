@@ -79,7 +79,8 @@ SOURCES += \
     patternscrollundocommand.cpp \
     welcomescreen.cpp \
     preferences.cpp \
-    sceneconfiguration.cpp
+    sceneconfiguration.cpp \
+    scenetemplate.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -104,7 +105,8 @@ HEADERS  += \
     welcomescreen.h \
     preferences.h \
     sceneconfiguration.h \
-    defaults.h
+    defaults.h \
+    scenetemplate.h
 
 
 FORMS    += \

@@ -821,24 +821,73 @@ bool MainWindow::promptForSave(std::vector<Pattern*> patterns) {
 
 void MainWindow::applyScene(SceneTemplate sceneTemplate)
 {
-    fixture->setColorMode(sceneTemplate.colorMode);
-    fixture->setSize(QSize(sceneTemplate.width,
-                           sceneTemplate.height));
+    QSize newDisplaySize(sceneTemplate.width, sceneTemplate.height);
+    ColorMode newColorMode = sceneTemplate.colorMode;
 
-    QDir examplesDir(sceneTemplate.examples);
-    QFileInfoList examplesList = examplesDir.entryInfoList();
+    // Test if any patterns need to be resized
+    QVector<Pattern*> needToResize;
 
-    for(int i = 0; i < examplesList.size(); ++i) {
-        if(!examplesList.at(i).isDir()) {
-            Pattern::PatternType type = Pattern::Scrolling;
-            if(examplesList.at(i).fileName().endsWith(".frames.png"))
-                type = Pattern::FrameBased;
+    for(int i = 0; i < patternCollection.count(); i++) {
+        // Convert the current pattern into a Pattern
+        Pattern* pattern = patternCollection.getPattern(i);
 
-            loadPattern(type,
-                        sceneTemplate.examples + "/" + examplesList.at(i).fileName());
+        if (pattern->getFrameSize() != newDisplaySize) {
+            needToResize.push_back(pattern);
         }
     }
-    patternCollectionListView->setCurrentIndex(patternCollectionListView->model()->index(0,0));
+
+    if(needToResize.count() > 0) {
+        QString messageText = tr("Some patterns have a different size than the fixture. Rescale "
+                                 " them to to fit?");
+
+        QMessageBox msgBox(this);
+        msgBox.setWindowModality(Qt::WindowModal);
+        msgBox.setText(messageText);
+        msgBox.setInformativeText(tr("Resize patterns?"));
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Yes);
+        int ans = msgBox.exec();
+
+
+        if (ans == QMessageBox::Yes) {
+            // If yes, resize the patterns
+            for(int i = 0; i < needToResize.count(); i++) {
+                // Resize the pattern
+                needToResize.at(i)->resize(newDisplaySize,false);
+            }
+        }
+
+        else if (ans == QMessageBox::Cancel)
+            return;
+    }
+
+    // Finally, apply the new settings
+    QSettings settings;
+    settings.setValue("Fixture/DisplaySize", newDisplaySize);
+    settings.setValue("Fixture/ColorOrder", newColorMode);
+
+    fixture->setSize(newDisplaySize);
+    fixture->setColorMode(newColorMode);
+
+
+    // If the new scene includes examples, load them as well
+    // TODO: Separate this out into a different process?
+    if(!sceneTemplate.examples.isEmpty()) {
+        QDir examplesDir(sceneTemplate.examples);
+        QFileInfoList examplesList = examplesDir.entryInfoList();
+
+        for(int i = 0; i < examplesList.size(); ++i) {
+            if(!examplesList.at(i).isDir()) {
+                Pattern::PatternType type = Pattern::Scrolling;
+                if(examplesList.at(i).fileName().endsWith(".frames.png"))
+                    type = Pattern::FrameBased;
+
+                loadPattern(type,
+                            sceneTemplate.examples + "/" + examplesList.at(i).fileName());
+            }
+        }
+        patternCollectionListView->setCurrentIndex(patternCollectionListView->model()->index(0,0));
+    }
 }
 
 
@@ -1136,68 +1185,28 @@ void MainWindow::on_actionConfigure_Fixture_triggered()
 {
     SceneConfiguration sceneConfiguration(this);
 
-    QSize displaySize;
-    ColorMode colorMode;
+    // To do: save the controller and fixture types so that we can recall them here.
+    SceneTemplate sceneTemplate;
+    sceneTemplate.name = "???";
+    sceneTemplate.photo = "";
+    sceneTemplate.examples = "";
+    if(!controller.isNull())
+        sceneTemplate.controllerType = controller->getName();
+    if(!fixture.isNull()) {
+        sceneTemplate.fixtureType = fixture->getName();
+        sceneTemplate.colorMode = fixture->getColorMode();
+        sceneTemplate.height = fixture->getSize().height();
+        sceneTemplate.width = fixture->getSize().width();
+    }
 
-    displaySize = fixture->getSize();
-    colorMode = fixture->getColorMode();
-
-    sceneConfiguration.setOutputSize(displaySize);
-    sceneConfiguration.setColorMode(colorMode);
+    sceneConfiguration.setSceneTemplate(sceneTemplate);
     sceneConfiguration.exec();
 
     if(sceneConfiguration.result() != QDialog::Accepted) {
         return;
     }
 
-    // As long as the user didn't cancel, apply the new fixture size.
-    QSize newDisplaySize = sceneConfiguration.getOutputSize();
-    ColorMode newColorMode = sceneConfiguration.getColorMode();
-
-    // Test if any patterns need to be resized
-    QVector<Pattern*> needToResize;
-
-    for(int i = 0; i < patternCollection.count(); i++) {
-        // Convert the current pattern into a Pattern
-        Pattern* pattern = patternCollection.getPattern(i);
-
-        if (pattern->getFrameSize() != newDisplaySize) {
-            needToResize.push_back(pattern);
-        }
-    }
-
-    if(needToResize.count() > 0) {
-        QString messageText = tr("Some patterns have a different size than the fixture. Rescale "
-                                 " them to to fit?");
-
-        QMessageBox msgBox(this);
-        msgBox.setWindowModality(Qt::WindowModal);
-        msgBox.setText(messageText);
-        msgBox.setInformativeText(tr("Resize patterns?"));
-        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
-        msgBox.setDefaultButton(QMessageBox::Yes);
-        int ans = msgBox.exec();
-
-
-        if (ans == QMessageBox::Yes) {
-            // If yes, resize the patterns
-            for(int i = 0; i < needToResize.count(); i++) {
-                // Resize the pattern
-                needToResize.at(i)->resize(newDisplaySize,false);
-            }
-        }
-
-        else if (ans == QMessageBox::Cancel)
-            return;
-    }
-
-    // Finally, apply the new settings
-    fixture->setSize(newDisplaySize);
-    fixture->setColorMode(newColorMode);
-
-    QSettings settings;
-    settings.setValue("Fixture/DisplaySize", newDisplaySize);
-    settings.setValue("Fixture/ColorOrder", newColorMode);
+    applyScene(sceneConfiguration.getSceneTemplate());
 }
 
 void MainWindow::openPattern(Pattern::PatternType type)

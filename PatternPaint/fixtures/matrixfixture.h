@@ -15,6 +15,8 @@ public:
                   BrightnessModel *brightnessModel,
                   QObject *parent = 0);
 
+    QString getName() const;
+
     QList<QColor> getColorStreamForFrame(const QImage frame) const;
     int getLedCount() const;
 

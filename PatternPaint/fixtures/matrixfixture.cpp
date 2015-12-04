@@ -12,6 +12,11 @@ MatrixFixture::MatrixFixture(
 {
 }
 
+QString MatrixFixture::getName() const
+{
+    return QString("Matrix");
+}
+
 QList<QColor> MatrixFixture::getColorStreamForFrame(const QImage frame) const
 {
     QList<QColor> colorStream;

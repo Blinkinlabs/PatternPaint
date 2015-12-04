@@ -18,6 +18,8 @@ class BlinkyTape : public BlinkyController
 public:
     BlinkyTape(QObject *parent);
 
+    QString getName() const;
+
     bool isConnected();
     bool open(QSerialPortInfo info);
     void sendUpdate(QByteArray colors);

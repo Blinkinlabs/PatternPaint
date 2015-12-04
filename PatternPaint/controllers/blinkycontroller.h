@@ -37,6 +37,8 @@ public:
 
     BlinkyController(QObject *parent);
 
+    virtual QString getName() const = 0;
+
     virtual bool isConnected() = 0;
 
     virtual bool open(QSerialPortInfo info) = 0;

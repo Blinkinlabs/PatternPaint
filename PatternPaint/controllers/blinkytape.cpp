@@ -54,6 +54,11 @@ BlinkyTape::BlinkyTape(QObject *parent) :
 #endif
 }
 
+QString BlinkyTape::getName() const
+{
+    return QString("BlinkyTape");
+}
+
 void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
 {
     // The serial library appears to emit an extraneous SerialPortError
