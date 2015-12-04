@@ -4,6 +4,3 @@ Fixture::Fixture(QObject *parent) :
     QObject(parent)
 {
 }
-
-
-

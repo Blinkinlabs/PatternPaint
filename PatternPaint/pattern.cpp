@@ -43,7 +43,16 @@ QUndoStack *Pattern::getUndoStack()
 
 bool Pattern::hasValidFilename() const
 {
-    return !frames->data(frames->index(0),PatternModel::FileName).toString().isEmpty();
+    QString filename = frames->data(frames->index(0),PatternModel::FileName).toString();
+
+    if(filename.isEmpty())
+        return false;
+
+    // If this is a Qt Resource, we can't save here
+    if(filename.startsWith(":/"))
+        return false;
+
+    return true;
 }
 
 QString Pattern::getPatternName() const
