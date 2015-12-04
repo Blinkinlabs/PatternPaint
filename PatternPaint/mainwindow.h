@@ -16,6 +16,7 @@
 #include "addressprogrammer.h"
 #include "colorchooser.h"
 #include "patterncollection.h"
+#include "welcomescreen.h"  // for SceneTemplate
 
 #include "ui_mainwindow.h"
 
@@ -33,10 +34,11 @@ public:
     ~MainWindow();
 
 public slots:
-
     void on_patternSizeUpdated();
 
     void on_frameDataEdited(int index, QImage update);
+
+    void applyScene(SceneTemplate sceneTemplate);
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -123,8 +125,7 @@ private slots:
 
     void on_actionPreferences_triggered();
 
-    void showWelcomeScreen();
-
+    void on_actionWelcome_triggered();
 
 signals:
 

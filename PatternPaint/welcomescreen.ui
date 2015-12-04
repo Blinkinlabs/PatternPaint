@@ -3,7 +3,7 @@
  <class>WelcomeScreen</class>
  <widget class="QDialog" name="WelcomeScreen">
   <property name="windowModality">
-   <enum>Qt::WindowModal</enum>
+   <enum>Qt::ApplicationModal</enum>
   </property>
   <property name="geometry">
    <rect>

@@ -34,6 +34,12 @@ public:
 private slots:
     void on_SceneList_doubleClicked(const QModelIndex &index);
 
+    void accept();
+
+signals:
+
+    void sceneSelected(SceneTemplate sceneTemplate);
+
 private:
     Ui::WelcomeScreen *ui;
 };

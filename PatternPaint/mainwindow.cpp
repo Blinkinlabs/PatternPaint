@@ -198,7 +198,7 @@ MainWindow::MainWindow(QWidget *parent) :
     timeline->setItemDelegate(new PatternDelegate(this));
 
     if(settings.value("MainWindow/showWelcomeScreenAtStartup",true).toBool())
-        connect(this, SIGNAL(windowLoaded()), this, SLOT(showWelcomeScreen()));
+        connect(this, SIGNAL(windowLoaded()), this, SLOT(on_actionWelcome_triggered()));
 
     // Refresh the display for no pattern selected
     on_patternCollectionCurrentChanged(QModelIndex(), QModelIndex());
@@ -819,19 +819,13 @@ bool MainWindow::promptForSave(std::vector<Pattern*> patterns) {
     }
 }
 
-void MainWindow::showWelcomeScreen()
+void MainWindow::applyScene(SceneTemplate sceneTemplate)
 {
-    WelcomeScreen welcomeScreen(this);
-    welcomeScreen.exec();
+    fixture->setColorMode(sceneTemplate.colorMode);
+    fixture->setSize(QSize(sceneTemplate.width,
+                           sceneTemplate.height));
 
-    if(welcomeScreen.result() != QDialog::Accepted)
-        return;
-
-    fixture->setColorMode(welcomeScreen.getSelectedTemplate().colorMode);
-    fixture->setSize(QSize(welcomeScreen.getSelectedTemplate().width,
-                           welcomeScreen.getSelectedTemplate().height));
-
-    QDir examplesDir(welcomeScreen.getSelectedTemplate().examples);
+    QDir examplesDir(sceneTemplate.examples);
     QFileInfoList examplesList = examplesDir.entryInfoList();
 
     for(int i = 0; i < examplesList.size(); ++i) {
@@ -841,7 +835,7 @@ void MainWindow::showWelcomeScreen()
                 type = Pattern::FrameBased;
 
             loadPattern(type,
-                        welcomeScreen.getSelectedTemplate().examples + "/" + examplesList.at(i).fileName());
+                        sceneTemplate.examples + "/" + examplesList.at(i).fileName());
         }
     }
     patternCollectionListView->setCurrentIndex(patternCollectionListView->model()->index(0,0));
@@ -1248,4 +1242,15 @@ void MainWindow::on_actionPreferences_triggered()
 {
     Preferences * preferences = new Preferences(this);
     preferences->show();
+}
+
+void MainWindow::on_actionWelcome_triggered()
+{
+    WelcomeScreen* welcomeScreen = new WelcomeScreen(this);
+
+    connect(welcomeScreen, SIGNAL(sceneSelected(SceneTemplate)),
+            this, SLOT(applyScene(SceneTemplate)));
+
+    welcomeScreen->setAttribute(Qt::WA_DeleteOnClose, true);
+    welcomeScreen->show();
 }
