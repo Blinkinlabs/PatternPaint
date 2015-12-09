@@ -147,7 +147,7 @@ Test this file manually on clean Windows 7 and 8 hosts.
 
 ## Linux
 
-Please contact us if you have experience releasing packages for Linux. We're particularly interested in making a release for Debian-based systems. The main requirement is that a fairly recent version of Qt (5.1+) is available. There appear to be random bugs with each Qt release on each platform, so some attention needs to be paid to the specific version targeted.
+Please contact us if you have experience releasing packages for Linux. We're particularly interested in making a release for Debian-based systems. The main requirement is that a fairly recent version of Qt (5.2.1+) is available. There appear to be random bugs with each Qt release on each platform, so some attention needs to be paid to the specific version targeted.
 
 ## Create a release page on Github
 
