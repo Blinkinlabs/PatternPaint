@@ -32,8 +32,10 @@ Pattern::Pattern(PatternType type, QSize patternSize, int frameCount, QListWidge
 
     frames->insertRows(0, frameCount);
     frames->setData(frames->index(0),false, PatternModel::Modified);
+
     // TODO: MVC way of handling this?
     getUndoStack()->clear();
+    frames->setData(frames->index(0),false, PatternModel::Modified);
 }
 
 QUndoStack *Pattern::getUndoStack()

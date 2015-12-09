@@ -26,8 +26,9 @@
 #define WRITE_CHUNK_DELAY 4
 #define CHUNK_SIZE 300
 
-BlinkyTape::BlinkyTape(QObject *parent) :
-    BlinkyController(parent)
+BlinkyTape::BlinkyTape(QSerialPortInfo info, QObject *parent) :
+    BlinkyController(parent),
+    serialInfo(info)
 {
     serial = new QSerialPort(this);
     serial->setSettingsRestoredOnClose(false);
@@ -153,20 +154,20 @@ void BlinkyTape::connectionScannerTimer_timeout() {
 }
 #endif
 
-bool BlinkyTape::open(QSerialPortInfo info) {
+bool BlinkyTape::open() {
     if(isConnected()) {
         qCritical() << "Already connected to a device";
         return false;
     }
 
-    qDebug() << "Connecting to device on " << info.portName();
+    qDebug() << "Connecting to device on " << serialInfo.portName();
 
 #if defined(Q_OS_OSX)
     // Note: This should be info.portName(). Changed here as a workaround for:
     // https://bugreports.qt.io/browse/QTBUG-45127
-    serial->setPortName(info.systemLocation());
+    serial->setPortName(serialInfo.systemLocation());
 #else
-    serial->setPortName(info.portName());
+    serial->setPortName(serialInfo.portName());
 #endif
     serial->setBaudRate(QSerialPort::Baud115200);
 
@@ -174,8 +175,6 @@ bool BlinkyTape::open(QSerialPortInfo info) {
         qDebug() << "Could not connect to device. Error: " << serial->error() << serial->errorString();
         return false;
     }
-
-    serialInfo = info;
 
     resetTriesRemaining = 0;
 

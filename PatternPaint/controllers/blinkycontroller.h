@@ -1,6 +1,8 @@
 #ifndef BLINKYCONTROLLER_H
 #define BLINKYCONTROLLER_H
 
+#include "controllerinfo.h"
+
 #include <QObject>
 #include <QList>
 
@@ -27,12 +29,12 @@
 class BlinkyUploader;
 class QSerialPortInfo;
 
-/// Connect to a BlinkyTape over a serial port, and manage sending data to it.
+/// Connect to an LED controller, and manage sending data to it.
 class BlinkyController : public QObject
 {
     Q_OBJECT
 public:
-    static QList<QSerialPortInfo> probe();
+    static QList<QPointer<ControllerInfo> > probe();
     static QList<QSerialPortInfo> probeBootloaders();
 
     BlinkyController(QObject *parent);
@@ -41,7 +43,7 @@ public:
 
     virtual bool isConnected() = 0;
 
-    virtual bool open(QSerialPortInfo info) = 0;
+    virtual bool open() = 0;
 
     virtual void sendUpdate(QByteArray colors) = 0;
 
@@ -49,7 +51,7 @@ public:
 
     virtual bool getUploader(QPointer<BlinkyUploader>& uploader) = 0;
 
-    // Atempt to reset the strip by setting it's baud rate to 1200 and closing it.
+    // Reset the controller
     virtual void reset() = 0;
 
 public slots:

@@ -1,8 +1,10 @@
 #include "blinkycontroller.h"
+#include "controllerinfo.h"
+#include "blinkytapecontrollerinfo.h"
 
 #include <QList>
 #include <QSerialPortInfo>
-
+#include <QPOinter>
 
 BlinkyController::BlinkyController(QObject *parent) : QObject(parent)
 {
@@ -15,35 +17,31 @@ void BlinkyController::close()
 
 
 // TODO: Support a method for loading these from preferences file
-QList<QSerialPortInfo> BlinkyController::probe()
+QList<QPointer<ControllerInfo> > BlinkyController::probe()
 {
     QList<QSerialPortInfo> serialPorts = QSerialPortInfo::availablePorts();
-    QList<QSerialPortInfo> tapes;
+    QList<QPointer<ControllerInfo> > controllerInfos;
 
     foreach (const QSerialPortInfo &info, serialPorts) {
         // Only connect to known BlinkyTapes
         if(info.vendorIdentifier() == BLINKYTAPE_SKETCH_VID
-           && info.productIdentifier() == BLINKYTAPE_SKETCH_PID) {
-            tapes.push_back(info);
-        }
+           && info.productIdentifier() == BLINKYTAPE_SKETCH_PID)
+            controllerInfos.push_back(new BlinkyTapeControllerInfo(info));
         // If it's a leonardo, it /may/ be a BlinkyTape running a user sketch
         else if(info.vendorIdentifier() == LEONARDO_SKETCH_VID
-                && info.productIdentifier() == LEONARDO_SKETCH_PID) {
-                 tapes.push_back(info);
-        }
+                && info.productIdentifier() == LEONARDO_SKETCH_PID)
+            controllerInfos.push_back(new BlinkyTapeControllerInfo(info));
         // Also BlinkyPendants!
         else if(info.vendorIdentifier() == BLINKYPENDANT_SKETCH_VID
-                && info.productIdentifier() == BLINKYPENDANT_SKETCH_PID) {
-                 tapes.push_back(info);
-        }
+                && info.productIdentifier() == BLINKYPENDANT_SKETCH_PID)
+            controllerInfos.push_back(new BlinkyTapeControllerInfo(info));
         // And Lightbuddies!
         else if(info.vendorIdentifier() == LIGHTBUDDY_SKETCH_VID
-                && info.productIdentifier() == LIGHTBUDDY_SKETCH_PID) {
-                 tapes.push_back(info);
-        }
+                && info.productIdentifier() == LIGHTBUDDY_SKETCH_PID)
+            controllerInfos.push_back(new BlinkyTapeControllerInfo(info));
     }
 
-    return tapes;
+    return controllerInfos;
 }
 
 // TODO: Support a method for loading these from preferences file

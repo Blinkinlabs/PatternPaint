@@ -3,11 +3,13 @@ INCLUDEPATH += $$PWD
 HEADERS += \
     $$PWD/blinkycontroller.h \
     $$PWD/controllerinfo.h \
-    $$PWD/blinkyuploader.h
+    $$PWD/blinkyuploader.h \
+    $$PWD/blinkytapecontrollerinfo.h
 
 SOURCES += \
     $$PWD/blinkycontroller.cpp \
-    $$PWD/controllerinfo.cpp
+    $$PWD/controllerinfo.cpp \
+    $$PWD/blinkytapecontrollerinfo.cpp
 
 # For platforms that have serial ports
 # TODO: Pull hard-coded references to BlinkyTape from the gui, allowing this section to be switchable

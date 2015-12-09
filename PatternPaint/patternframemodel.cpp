@@ -153,6 +153,7 @@ bool PatternFrameModel::setData(const QModelIndex &index,
         return true;
     }
     else if(role == Modified) {
+        // TODO: This should only be accessable through the undo stack?
         modified = value.toBool();
 
         QVector<int> roles;

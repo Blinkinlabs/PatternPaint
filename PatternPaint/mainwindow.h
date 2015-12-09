@@ -111,7 +111,7 @@ private slots:
 
     void on_timelineSelectedChanged(const QModelIndex &current, const QModelIndex &);
 
-    void on_timelineDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
+    void on_PatternDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
 
     void on_actionNew_ScrollingPattern_triggered();
 
@@ -170,7 +170,6 @@ private:
     bool savePattern(Pattern *item);
     bool savePatternAs(Pattern *item);
 
-    void connectController();
     void connectUploader();
 
     bool loadPattern(Pattern::PatternType type, const QString fileName);

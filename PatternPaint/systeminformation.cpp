@@ -3,10 +3,12 @@
 
 #include "blinkytape.h"
 #include "usbutils.h"
+#include "blinkycontroller.h"
 
 #include <QSysInfo>
 #include <QLibraryInfo>
 #include <QtWidgetsDepends>
+#include <QPointer>
 
 SystemInformation::SystemInformation(QWidget *parent) :
     QDialog(parent),
@@ -44,8 +46,8 @@ void SystemInformation::on_refresh_clicked()
 
     // TODO: Get this from the controllers rather than building them here.
     report.append("Detected Blinkies: \r");
-    foreach (const QSerialPortInfo &info, BlinkyTape::probe()) {
-        report.append("  BlinkyTape:" + info.portName() + "\r");
+    foreach (const QPointer<ControllerInfo> &info, BlinkyTape::probe()) {
+        report.append("  BlinkyTape:" + info->resourceName() + "\r");
     }
     foreach (const QSerialPortInfo &info, BlinkyTape::probeBootloaders()) {
         report.append("  BlinkyTape:" + info.portName() + " (bootloader)\r");

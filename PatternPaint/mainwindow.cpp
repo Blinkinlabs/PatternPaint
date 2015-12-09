@@ -18,6 +18,7 @@
 #include "colorpickerinstrument.h"
 #include "sprayinstrument.h"
 #include "fillinstrument.h"
+
 #include "pattern.h"
 #include "patterncollectiondelegate.h"
 
@@ -34,6 +35,7 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QtWidgets>
+#include <QDebug>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -290,17 +292,22 @@ void MainWindow::connectionScannerTimer_timeout() {
     }
 
     // First look for Blinky devices
-    QList<QSerialPortInfo> blinky = BlinkyController::probe();
+    QList<QPointer<ControllerInfo> > controllerInfos = BlinkyController::probe();
 
-    if(blinky.length() > 0) {
-        qDebug() << "BlinkyTapes found:" << blinky.length();
+    if(controllerInfos.count() > 0) {
+        qDebug() << "Controllers found:" << controllerInfos.count();
 
         // TODO: Try another one if this one fails?
-        qDebug() << "Attempting to connect to tape on:" << blinky[0].portName();
+        qDebug() << "Attempting to connect to controller at:" << controllerInfos[0]->resourceName();
 
-        controller = new BlinkyTape(this);
-        connectController();
-        controller->open(blinky[0]);
+        controller = controllerInfos[0]->createController();
+
+        // Modify our UI when the tape connection status changes
+        connect(controller, SIGNAL(connectionStatusChanged(bool)),
+                this,SLOT(on_blinkyConnectionStatusChanged(bool)));
+
+        controller->open();
+
         return;
     }
 }
@@ -891,13 +898,6 @@ void MainWindow::applyScene(SceneTemplate sceneTemplate)
 }
 
 
-void MainWindow::connectController()
-{
-    // Modify our UI when the tape connection status changes
-    connect(controller, SIGNAL(connectionStatusChanged(bool)),
-            this,SLOT(on_blinkyConnectionStatusChanged(bool)));
-}
-
 void MainWindow::connectUploader()
 {
     // TODO: Should this be a separate view?
@@ -1036,7 +1036,6 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
     undoGroup.setActiveStack(newpattern->getUndoStack());
     timeline->setModel(newpattern->getModel());
 
-
     setPatternName(newpattern->getPatternName());
     setPatternModified(newpattern->getModified());
     setPatternData(getCurrentFrameIndex(), newpattern->getEditImage(getCurrentPatternIndex()));
@@ -1048,7 +1047,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
     connect(timeline->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
             this, SLOT(on_timelineSelectedChanged(const QModelIndex &, const QModelIndex &)));
     connect(timeline->model(), SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &, const QVector<int> &)),
-            this, SLOT(on_timelineDataChanged(const QModelIndex &, const QModelIndex &, const QVector<int> &)));
+            this, SLOT(on_PatternDataChanged(const QModelIndex &, const QModelIndex &, const QVector<int> &)));
 }
 
 
@@ -1056,17 +1055,22 @@ void MainWindow::on_timelineSelectedChanged(const QModelIndex &current, const QM
     setNewFrame(current.row());
 }
 
-void MainWindow::on_timelineDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles) {
+void MainWindow::on_PatternDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles) {
     int currentIndex = getCurrentFrameIndex();
 
+    qDebug() << "Count: " << roles.count();
+    qDebug() << "FrameImage:" << PatternModel::FrameImage;
+
     for(int i = 0; i < roles.count(); i++) {
-        if(roles[i] == PatternFrameModel::FileName)
+        qDebug() << " [" << i << "]: " << roles[i];
+
+        if(roles[i] == PatternModel::FileName)
             setPatternName(patternCollection.getPattern(getCurrentPatternIndex())->getPatternName());
 
-        else if(roles[i] == PatternFrameModel::Modified)
+        else if(roles[i] == PatternModel::Modified)
             setPatternModified(patternCollection.getPattern(getCurrentPatternIndex())->getModified());
 
-        else if(roles[i] == PatternFrameModel::FrameImage) {
+        else if(roles[i] == PatternModel::FrameImage) {
             // If the current selection changed, refresh so that the FrameEditor contents will be redrawn
             if(currentIndex >= topLeft.row() && currentIndex <= bottomRight.row()) {
                 setPatternData(getCurrentFrameIndex(),
