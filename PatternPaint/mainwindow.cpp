@@ -190,7 +190,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // Fill the examples menu using the examples resource
     populateExamplesMenu(":/examples", menuExamples);
 
-
     patternCollectionListView->setItemDelegate(new PatternCollectionDelegate(this));
     patternCollectionListView->setModel(patternCollection.getModel());
 
@@ -1058,12 +1057,7 @@ void MainWindow::on_timelineSelectedChanged(const QModelIndex &current, const QM
 void MainWindow::on_PatternDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles) {
     int currentIndex = getCurrentFrameIndex();
 
-    qDebug() << "Count: " << roles.count();
-    qDebug() << "FrameImage:" << PatternModel::FrameImage;
-
     for(int i = 0; i < roles.count(); i++) {
-        qDebug() << " [" << i << "]: " << roles[i];
-
         if(roles[i] == PatternModel::FileName)
             setPatternName(patternCollection.getPattern(getCurrentPatternIndex())->getPatternName());
 

@@ -80,7 +80,8 @@ SOURCES += \
     welcomescreen.cpp \
     preferences.cpp \
     sceneconfiguration.cpp \
-    scenetemplate.cpp
+    scenetemplate.cpp \
+    patternframelistview.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -106,7 +107,8 @@ HEADERS  += \
     preferences.h \
     sceneconfiguration.h \
     defaults.h \
-    scenetemplate.h
+    scenetemplate.h \
+    patternframelistview.h
 
 
 FORMS    += \

@@ -218,7 +218,7 @@
         </property>
        </widget>
       </widget>
-      <widget class="QListView" name="timeline">
+      <widget class="PatternFrameListView" name="timeline">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -1056,6 +1056,11 @@
    <extends>QWidget</extends>
    <header>frameeditor.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PatternFrameListView</class>
+   <extends>QListView</extends>
+   <header>patternframelistview.h</header>
   </customwidget>
  </customwidgets>
  <resources>
