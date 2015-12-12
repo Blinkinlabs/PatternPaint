@@ -231,6 +231,9 @@ void Pattern::setFrameSpeed(float speed)
 }
 
 void Pattern::deleteFrame(int index) {
+    if(getFrameCount() == 1)
+        return;
+
     frames->removeRow(index);
 }
 
