@@ -27,7 +27,6 @@
 
 #include <QColor>
 #include <QPixmap>
-#include <QPainter>
 #include <QMouseEvent>
 #include <QColorDialog>
 #include <QDebug>

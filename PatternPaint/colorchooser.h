@@ -32,7 +32,6 @@
 QT_BEGIN_NAMESPACE
 class QColor;
 class QPixmap;
-class QPainter;
 class QMouseEvent;
 QT_END_NAMESPACE
 

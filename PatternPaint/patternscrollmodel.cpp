@@ -276,23 +276,26 @@ bool PatternScrollModel::removeRows(int position, int rows, const QModelIndex &)
     QImage newImage(image.width()-rows,image.height(), QImage::Format_ARGB32_Premultiplied);
     newImage.fill(FRAME_COLOR_DEFAULT);
 
-    QPainter painter;
-    painter.begin(&newImage);
+    // If we have any rows remaining, copy them into the new image
+    if(newImage.width() > 0) {
+        QPainter painter;
+        painter.begin(&newImage);
 
-    if(position == 0)
-        painter.drawImage(0,0,image,rows,0,image.width()-rows,frameSize.height());
+        if(position == 0)
+            painter.drawImage(0,0,image,rows,0,image.width()-rows,frameSize.height());
 
-    else if(position == image.width())
-        painter.drawImage(0,0,image,0,0,image.width()-rows,frameSize.height());
+        else if(position == image.width())
+            painter.drawImage(0,0,image,0,0,image.width()-rows,frameSize.height());
 
-    else {
-        painter.drawImage(0,0,image,0,0,position,frameSize.height());
-        painter.drawImage(position, 0, image,
-                          position + rows, 0,
-                          image.width() - position - rows,frameSize.height());
+        else {
+            painter.drawImage(0,0,image,0,0,position,frameSize.height());
+            painter.drawImage(position, 0, image,
+                              position + rows, 0,
+                              image.width() - position - rows,frameSize.height());
+        }
+
+        painter.end();
     }
-
-    painter.end();
 
     image = newImage;
     endRemoveRows();
