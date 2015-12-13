@@ -103,8 +103,6 @@ bool BlinkyPendantUploader::startUpload(BlinkyController& controller, std::vecto
     commandQueue.open(portInfo);
 
     setProgress(0);
-    // TODO: Calculate this based on feedback from the commandQueue.
-    setMaxProgress(10);
 
     // Queue the following commands:
     // 1. start write
@@ -176,9 +174,5 @@ void BlinkyPendantUploader::handleProgrammerCommandFinished(QString command, QBy
 
 void BlinkyPendantUploader::setProgress(int newProgress) {
     progress = newProgress;
-    emit(progressChanged(progress));
-}
-
-void BlinkyPendantUploader::setMaxProgress(int newMaxProgress) {
-    emit(maxProgressChanged(newMaxProgress));
+    emit(progressChanged(static_cast<float>(progress)/10));
 }

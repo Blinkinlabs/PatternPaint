@@ -67,9 +67,7 @@ private slots:
 
     void on_blinkyConnectionStatusChanged(bool connected);
 
-    void on_uploaderMaxProgressChanged(int progressDialog);
-
-    void on_uploaderProgressChanged(int progressDialog);
+    void on_uploaderProgressChanged(float progressDialog);
 
     void on_uploaderFinished(bool result);
 

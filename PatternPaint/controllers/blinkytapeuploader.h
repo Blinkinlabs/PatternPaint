@@ -92,9 +92,6 @@ private:
     /// Current command state
     State state;
 
-    /// Update any listeners with the maximum progress
-    void setMaxProgress(int newProgress);
-
     /// Update any listeners with the latest progress
     void setProgress(int newProgress);
 

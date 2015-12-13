@@ -3,13 +3,14 @@
 #include "blinkycontroller.h"
 
 #define FLASH_PAGE_SIZE 256
+#define MAX_PATTERN_SIZE 507648
 
 LightBuddyUploader::LightBuddyUploader(QObject *parent) :
     BlinkyUploader(parent)
 {
-    connect(&serialQueue,SIGNAL(error(QString)),
+    connect(&commandQueue,SIGNAL(error(QString)),
             this,SLOT(handleProgrammerError(QString)));
-    connect(&serialQueue,SIGNAL(commandFinished(QString,QByteArray)),
+    connect(&commandQueue,SIGNAL(commandFinished(QString,QByteArray)),
             this,SLOT(handleProgrammerCommandFinished(QString,QByteArray)));
 }
 
@@ -28,22 +29,11 @@ void LightBuddyUploader::cancel()
 
 bool LightBuddyUploader::startUpload(BlinkyController& controller, std::vector<PatternWriter> patternWriters)
 {
-#define LIGHTBUDDY_UPLOADER
-
-#if !defined(LIGHTBUDDY_UPLOADER)
-
-    Q_UNUSED(controller);
-    Q_UNUSED(patterns);
-
-    // TODO: Support firmware upload for the lightbuddy
-    errorString = "Animation upload not currently supported for Lightbuddy!";
-    return false;
-
-#else
-
     // 1. Make the patterns into data and store them in a vector
-    // 2. Check that they will fit in the BlinkyTile memory (TODO!!!)
+    // 2. Check that they will fit in the BlinkyTile memory
     // 3. Kick off the uploader state machine
+
+    maxProgress = 1;    // For the initial erase command
 
     // For each pattern, append the image data to the sketch
     for (std::vector<PatternWriter>::iterator patternWriter = patternWriters.begin();
@@ -52,6 +42,11 @@ bool LightBuddyUploader::startUpload(BlinkyController& controller, std::vector<P
 
         if(patternWriter->getEncoding() != PatternWriter::RGB24) {
             errorString = "Lightbuddy only supports RGB24 encoding";
+            return false;
+        }
+
+        if(patternWriter->getData().count() > MAX_PATTERN_SIZE) {
+            errorString = QString("Pattern too big to fit in memory! Size=%1, Max size=%2").arg(patternWriter->getData().count()).arg(MAX_PATTERN_SIZE);
             return false;
         }
 
@@ -76,16 +71,16 @@ bool LightBuddyUploader::startUpload(BlinkyController& controller, std::vector<P
 
         data += patternWriter->getData();
 
-        while(data.count()%256 != 0)
+        while(data.count()%FLASH_PAGE_SIZE != 0)
             data.append((char)0x255);
 
         flashData.append(data);
+
+        // Calculate the number of serial transactions that will occur in this upload
+        maxProgress += data.count()/FLASH_PAGE_SIZE+2;
     }
 
-
     setProgress(0);
-    // TODO: Calculate this based on feedback from the programmer.
-    setMaxProgress(300);
 
     QSerialPortInfo info;
     controller.getPortInfo(info);
@@ -94,13 +89,12 @@ bool LightBuddyUploader::startUpload(BlinkyController& controller, std::vector<P
         controller.close();
     }
 
-    serialQueue.open(info);
+    commandQueue.open(info);
     state = State_EraseFlash;
- //   state = State_FileNew;
+//    state = State_FileNew;
     doWork();
 
     return true;
-#endif // LIGHTBUDDY_UPLOADER
 }
 
 void LightBuddyUploader::doWork() {
@@ -120,14 +114,14 @@ void LightBuddyUploader::doWork() {
 
     case State_EraseFlash:
         {
-        serialQueue.eraseFlash();
+        commandQueue.eraseFlash();
         //serialCommands.largestFile();
             state = State_FileNew;
         }
         break;
     case State_FileNew:
         {
-            serialQueue.fileNew(flashData.front().size());
+            commandQueue.fileNew(flashData.front().size());
             //serialCommands.fileNew(256);
             state = State_WriteFileData;
         }
@@ -135,11 +129,11 @@ void LightBuddyUploader::doWork() {
     case State_WriteFileData:
         {
             for(int offset = 0; offset < flashData.front().size(); offset += FLASH_PAGE_SIZE) {
-                serialQueue.writePage(sector, offset, flashData.front().mid(offset, FLASH_PAGE_SIZE));
+                commandQueue.writePage(sector, offset, flashData.front().mid(offset, FLASH_PAGE_SIZE));
             }
             flashData.pop_front();
 
-            serialQueue.reloadAnimations();
+            commandQueue.reloadAnimations();
 
             if(flashData.size() > 0) {
                 state = State_FileNew;
@@ -179,8 +173,8 @@ QString LightBuddyUploader::getErrorString() const
 void LightBuddyUploader::handleProgrammerError(QString error) {
     qCritical() << error;
 
-    if(serialQueue.isConnected()) {
-        serialQueue.close();
+    if(commandQueue.isConnected()) {
+        commandQueue.close();
     }
 
     emit(finished(false));
@@ -189,16 +183,12 @@ void LightBuddyUploader::handleProgrammerError(QString error) {
 void LightBuddyUploader::handleProgrammerCommandFinished(QString command, QByteArray returnData) {
     Q_UNUSED(returnData);
 
-    qDebug() << "Command finished:" << command;
-//    setProgress(progress + 1);
+//    qDebug() << "Command finished:" << command;
+    setProgress(progress + 1);
 
     // TODO: This is poor logic.
 
     if(command == "eraseFlash")
-        doWork();
-
-    // TODO: Just for testing
-    if(command == "largestFile")
         doWork();
 
     if(command == "fileNew") {
@@ -219,7 +209,7 @@ void LightBuddyUploader::handleProgrammerCommandFinished(QString command, QByteA
     // If it was a reload animation command, we might have more work, or might be done.
     if(command == "reloadAnimations") {
         if(state == State_Done) {
-            serialQueue.close();
+            commandQueue.close();
             emit(finished(true));
         }
         else {
@@ -229,10 +219,9 @@ void LightBuddyUploader::handleProgrammerCommandFinished(QString command, QByteA
 }
 
 void LightBuddyUploader::setProgress(int newProgress) {
-//    progress = newProgress;
-    emit(progressChanged(newProgress));
+    qDebug() << "new progress: " << newProgress;
+
+    progress = newProgress;
+    emit(progressChanged(static_cast<float>(newProgress)/maxProgress));
 }
 
-void LightBuddyUploader::setMaxProgress(int newMaxProgress) {
-    emit(maxProgressChanged(newMaxProgress));
-}

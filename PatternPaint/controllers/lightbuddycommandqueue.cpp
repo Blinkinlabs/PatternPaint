@@ -1,4 +1,4 @@
-#include "lightbuddyserialqueue.h"
+#include "lightbuddycommandqueue.h"
 
 
 void addHeader(QByteArray& command) {

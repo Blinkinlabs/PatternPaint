@@ -98,7 +98,7 @@ void SerialCommandQueue::processCommandQueue() {
         return;
     }
 
-    qDebug() << "Starting Command:" << commandQueue.front().name;
+//    qDebug() << "Starting Command:" << commandQueue.front().name;
     responseData.clear();
 
 
@@ -159,6 +159,7 @@ void SerialCommandQueue::handleReadData() {
         if(commandQueue.front().expectedResponseMask.length() !=
             commandQueue.front().expectedResponse.length()) {
             qCritical() << "Expected response mask length incorrect!";
+            emit(error("Expected response mask length incorrect!"));
             return;
         }
         for(int i = 0; i < responseData.length(); i++) {
@@ -166,9 +167,10 @@ void SerialCommandQueue::handleReadData() {
                 && responseData[i] != commandQueue.front().expectedResponse.at(i)) {
                 qCritical() << "Got unexpected data back"
                             << " position=" << i
-                            << " expected=" << (int)responseData[i]
-                            << " received=" << (int)commandQueue.front().expectedResponse.at(i)
+                            << " expected=" << (int)commandQueue.front().expectedResponse.at(i)
+                            << " received=" << (int)responseData[i]
                             << " mask=" << (int)commandQueue.front().expectedResponseMask.at(i);
+                emit(error("Got unexpected data back"));
                 return;
             }
         }
@@ -176,6 +178,7 @@ void SerialCommandQueue::handleReadData() {
     // Otherwise just check if the strings match
     else if(responseData != commandQueue.front().expectedResponse) {
         qCritical() << "Got unexpected data back";
+        emit(error("Got unexpected data back"));
         return;
     }
 

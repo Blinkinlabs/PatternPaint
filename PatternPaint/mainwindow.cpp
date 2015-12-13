@@ -155,7 +155,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Pre-set the upload progress dialog
     progressDialog.setMinimum(0);
-    progressDialog.setMaximum(150);
+    progressDialog.setMaximum(1000);
     progressDialog.setWindowModality(Qt::WindowModal);
     progressDialog.setAutoClose(false);
 
@@ -498,17 +498,7 @@ void MainWindow::on_actionSystem_Information_triggered()
     info->show();
 }
 
-void MainWindow::on_uploaderMaxProgressChanged(int progressValue)
-{
-    if(progressDialog.isHidden()) {
-        qDebug() << "Got a progress event while the progress dialog is hidden, event order problem?";
-        return;
-    }
-
-    progressDialog.setMaximum(progressValue);
-}
-
-void MainWindow::on_uploaderProgressChanged(int progressValue)
+void MainWindow::on_uploaderProgressChanged(float progressValue)
 {
     if(progressDialog.isHidden()) {
         qDebug() << "Got a progress event while the progress dialog is hidden, event order problem?";
@@ -516,11 +506,15 @@ void MainWindow::on_uploaderProgressChanged(int progressValue)
     }
 
     // Clip the progress to maximum, until we work out a better way to estimate it.
-    if(progressValue >= progressDialog.maximum()) {
-        progressValue = progressDialog.maximum() - 1;
+    if(progressValue > 1) {
+        progressValue = 1;
     }
 
-    progressDialog.setValue(progressValue);
+    // Assume minimum() is 0.
+    int newValue = progressDialog.maximum()*progressValue;
+    qDebug() << newValue;
+
+    progressDialog.setValue(newValue);
 }
 
 void MainWindow::on_uploaderFinished(bool result)
@@ -667,8 +661,6 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
 
     for(int i = 0; i < patternCollection.count(); i++) {
         PatternWriter patternWriter(patternCollection.getPattern(i),
-                        //PatternWriter::RGB24,
-                        //PatternWriter::RGB565_RLE,
                         uploader->getSupportedEncodings().front(),
                         fixture);
 
@@ -683,8 +675,8 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
     }
     mode = Uploading;
 
-    progressDialog.setWindowTitle("Blinky exporter");
-    progressDialog.setLabelText("Saving pattern to Blinky...");
+    progressDialog.setWindowTitle(tr("Blinky exporter"));
+    progressDialog.setLabelText(tr("Saving to Blinky..."));
 
     progressDialog.setValue(progressDialog.minimum());
     progressDialog.show();
@@ -899,16 +891,12 @@ void MainWindow::applyScene(SceneTemplate sceneTemplate)
 
 void MainWindow::connectUploader()
 {
-    // TODO: Should this be a separate view?
-    connect(uploader, SIGNAL(maxProgressChanged(int)),
-            this, SLOT(on_uploaderMaxProgressChanged(int)));
-    connect(uploader, SIGNAL(progressChanged(int)),
-            this, SLOT(on_uploaderProgressChanged(int)));
+    connect(uploader, SIGNAL(progressChanged(float)),
+            this, SLOT(on_uploaderProgressChanged(float)));
     connect(uploader, SIGNAL(finished(bool)),
             this, SLOT(on_uploaderFinished(bool)));
     connect(&progressDialog, SIGNAL(canceled()),
             uploader, SLOT(cancel()));
-
 }
 
 bool MainWindow::loadPattern(Pattern::PatternType type, const QString fileName)

@@ -87,12 +87,10 @@ void BlinkyTapeUploader::handleResetTimer()
 
 void BlinkyTapeUploader::setProgress(int newProgress) {
     progress = newProgress;
-    emit(progressChanged(progress));
+    // TODO: Precalculate the max progress
+    emit(progressChanged(static_cast<float>(progress)/300));
 }
 
-void BlinkyTapeUploader::setMaxProgress(int newMaxProgress) {
-    emit(maxProgressChanged(newMaxProgress));
-}
 
 bool BlinkyTapeUploader::startUpload(BlinkyController& tape, std::vector<PatternWriter> patterns) {
     /// Create the compressed image and check if it will fit into the device memory
@@ -185,8 +183,6 @@ bool BlinkyTapeUploader::upgradeFirmware(int timeout) {
     flashData.push_back(FlashSection(PRODUCTION_ADDRESS, sketch));
 
     setProgress(0);
-    // TODO: Calculate this based on feedback from the programmer.
-    setMaxProgress(300);
 
     stateStartTime = QDateTime::currentDateTime();
     state = State_WaitForBootloaderPort;
@@ -197,8 +193,6 @@ bool BlinkyTapeUploader::upgradeFirmware(int timeout) {
 
 bool BlinkyTapeUploader::startUpload(BlinkyController& tape) {
     setProgress(0);
-    // TODO: Calculate this based on feedback from the programmer.
-    setMaxProgress(300);
 
     bootloaderPollTimeout = BOOTLOADER_POLL_TIMEOUT;
 

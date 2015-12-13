@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include "blinkyuploader.h"
-#include "lightbuddyserialqueue.h"
+#include "lightbuddycommandqueue.h"
 
 
 class LightBuddyUploader : public BlinkyUploader
@@ -33,10 +33,7 @@ private slots:
 private:
     QString errorString;
 
-    LightBuddySerialQueue serialQueue;
-
-    /// Update any listeners with the maximum progress
-    void setMaxProgress(int newProgress);
+    LightBuddySerialQueue commandQueue;
 
     /// Update any listeners with the latest progress
     void setProgress(int newProgress);
@@ -49,6 +46,9 @@ private:
     };
 
     State state;
+
+    int progress;
+    int maxProgress;
 
     int sector; /// Current file sector that is being written to/read from
 
