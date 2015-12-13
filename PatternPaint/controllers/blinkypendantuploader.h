@@ -4,7 +4,7 @@
 #include <QObject>
 
 #include "blinkyuploader.h"
-#include "blinkypendantprogrammer.h"
+#include "blinkypendantcommandqueue.h"
 
 class BlinkyPendantUploader : public BlinkyUploader
 {
@@ -40,7 +40,7 @@ private:
 
     QString errorString;
 
-    BlinkyPendantProgrammer programmer;
+    BlinkyPendantCommandQueue commandQueue;
 };
 
 #endif // BLINKYPENDANTPATTERNUPLOADER_H

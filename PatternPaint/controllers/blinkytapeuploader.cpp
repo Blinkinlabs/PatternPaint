@@ -238,7 +238,7 @@ void BlinkyTapeUploader::doWork() {
 
             // If we didn't detect a bootloader and still have time, then queue the timer and
             // wait. Otherwise, we timed out, so fail.
-            if(postResetTapes.length() == 0) {
+            if(postResetTapes.count() == 0) {
                 if((bootloaderPollTimeout > 0)
                         && (stateStartTime.msecsTo(QDateTime::currentDateTime())
                         > bootloaderPollTimeout)) {
@@ -266,7 +266,7 @@ void BlinkyTapeUploader::doWork() {
 
             // If we didn't detect a bootloader and still have time, then queue the timer and
             // wait. Otherwise, we timed out, so fail.
-            if(postResetTapes.length() == 0) {
+            if(postResetTapes.count() == 0) {
                 handleProgrammerError("Bootloader dissappeared!");
                 return;
             }

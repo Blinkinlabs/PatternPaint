@@ -4,12 +4,16 @@ HEADERS += \
     $$PWD/blinkycontroller.h \
     $$PWD/controllerinfo.h \
     $$PWD/blinkyuploader.h \
-    $$PWD/blinkytapecontrollerinfo.h
+    $$PWD/blinkytapecontrollerinfo.h \
+    $$PWD/lightbuddyserialqueue.h \
+    $$PWD/blinkypendantcommandqueue.h
 
 SOURCES += \
     $$PWD/blinkycontroller.cpp \
     $$PWD/controllerinfo.cpp \
-    $$PWD/blinkytapecontrollerinfo.cpp
+    $$PWD/blinkytapecontrollerinfo.cpp \
+    $$PWD/lightbuddyserialqueue.cpp \
+    $$PWD/blinkypendantcommandqueue.cpp
 
 # For platforms that have serial ports
 # TODO: Pull hard-coded references to BlinkyTape from the gui, allowing this section to be switchable
@@ -22,9 +26,7 @@ SOURCES += \
         $$PWD/blinkytapeuploader.h \
         $$PWD/serialcommandqueue.h \
         $$PWD/avruploaddata.h \
-        $$PWD/blinkypendantprogrammer.h \
         $$PWD/blinkytape.h \
-        $$PWD/lightbuddyprogrammer.h \
         $$PWD/lightbuddyuploader.h \
         $$PWD/PatternPlayer_Sketch.h \
         $$PWD/ProductionSketch.h \
@@ -36,9 +38,7 @@ SOURCES += \
         $$PWD/blinkytapeuploader.cpp \
         $$PWD/serialcommandqueue.cpp \
         $$PWD/avruploaddata.cpp \
-        $$PWD/blinkypendantprogrammer.cpp \
         $$PWD/blinkytape.cpp \
-        $$PWD/lightbuddyprogrammer.cpp \
         $$PWD/lightbuddyuploader.cpp \
         $$PWD/usbutils.cpp \
 #}

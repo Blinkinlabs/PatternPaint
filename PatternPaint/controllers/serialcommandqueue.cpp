@@ -58,6 +58,8 @@ void SerialCommandQueue::queueCommand(QString name,
                                  QByteArray data,
                                  QByteArray expectedRespone) {
 
+//    qDebug() << "Queueing command:" << name;
+
     commandQueue.push_back(Command(name, data, expectedRespone));
 
     // Try to start processing commands.
@@ -69,6 +71,8 @@ void SerialCommandQueue::queueCommand(QString name,
                                  QByteArray expectedRespone,
                                  QByteArray expectedResponseMask) {
 
+//    qDebug() << "Queueing command:" << name;
+
     commandQueue.push_back(Command(name, data, expectedRespone, expectedResponseMask));
 
     // Try to start processing commands.
@@ -76,8 +80,11 @@ void SerialCommandQueue::queueCommand(QString name,
 }
 
 void SerialCommandQueue::processCommandQueue() {
+//    for(int i = 0; i < commandQueue.count(); i++)
+//        qDebug() << i << ": " << commandQueue.at(i).name;
+
     // Nothing to do if we don't have any commands...
-    if(commandQueue.length() == 0) {
+    if(commandQueue.count() == 0) {
         return;
     }
 
@@ -91,13 +98,19 @@ void SerialCommandQueue::processCommandQueue() {
         return;
     }
 
-//    qDebug() << "Starting Command:" << commandQueue.front().name;
+    qDebug() << "Starting Command:" << commandQueue.front().name;
     responseData.clear();
+
 
     if(serial->write(commandQueue.front().commandData) != commandQueue.front().commandData.length()) {
         qCritical() << "Error writing to device";
         return;
     }
+
+//    for(int i = 0; i < commandQueue.front().commandData.count(); i++)
+//        qDebug() << "Data at " << i << ": "
+//                 << (int)commandQueue.front().commandData.at(i)
+//                 << "(" << commandQueue.front().commandData.at(i) << ")";
 
     // Start the timer; the command must complete before it fires, or it
     // is considered an error. This is to prevent a misbehaving device from hanging
@@ -115,6 +128,11 @@ void SerialCommandQueue::handleReadData() {
     if(isConnected()) {
         responseData.append(serial->readAll());
     }
+
+//    for(int i = 0; i < responseData.count(); i++)
+//        qDebug() << "Data at " << i << ": "
+//                 << (int)responseData.at(i)
+//                 << "(" << responseData.at(i) << ")";
 
     if(responseData.length() > commandQueue.front().expectedResponse.length()) {
         // TODO: error, we got unexpected data.
@@ -161,9 +179,6 @@ void SerialCommandQueue::handleReadData() {
         return;
     }
 
-    // At this point, we've gotten all of the data that we expected.
-    commandTimeoutTimer->stop();
-
 //    qDebug() << "Command completed successfully: " << commandQueue.front().name;
     emit(commandFinished(commandQueue.front().name,responseData));
 
@@ -177,6 +192,12 @@ void SerialCommandQueue::handleReadData() {
         return;
     }
 
+    // At this point, we've gotten all of the data that we expected.
+    commandTimeoutTimer->stop();
+
+    // TODO: There's some danger of an out-of-order operation here.
+    // if processCommandQueue() is run by anything else before the command
+    // is popped, the current command could be run twice.
     commandQueue.pop_front();
 
     // Start another command, if there is one.

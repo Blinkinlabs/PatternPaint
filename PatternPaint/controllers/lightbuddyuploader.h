@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include "blinkyuploader.h"
-#include "lightbuddyprogrammer.h"
+#include "lightbuddyserialqueue.h"
 
 
 class LightBuddyUploader : public BlinkyUploader
@@ -13,7 +13,7 @@ class LightBuddyUploader : public BlinkyUploader
 public:
     LightBuddyUploader(QObject *parent=0);
 
-    bool startUpload(BlinkyController& controller, std::vector<PatternWriter> patterns);
+    bool startUpload(BlinkyController& controller, std::vector<PatternWriter> patternWriters);
     bool upgradeFirmware(BlinkyController& controller);
     bool upgradeFirmware(int timeout);
     QString getErrorString() const;
@@ -33,7 +33,7 @@ private slots:
 private:
     QString errorString;
 
-    LightBuddyProgrammer programmer;
+    LightBuddySerialQueue serialQueue;
 
     /// Update any listeners with the maximum progress
     void setMaxProgress(int newProgress);
@@ -49,6 +49,8 @@ private:
     };
 
     State state;
+
+    int sector; /// Current file sector that is being written to/read from
 
     QQueue<QByteArray> flashData; ///< Queue of memory sections to write
 };

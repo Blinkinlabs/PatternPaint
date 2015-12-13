@@ -9,10 +9,10 @@
 BlinkyPendantUploader::BlinkyPendantUploader(QObject *parent) :
     BlinkyUploader(parent)
 {
-    connect(&programmer,SIGNAL(error(QString)),
-            this,SLOT(handleProgrammerError(QString)));
-    connect(&programmer,SIGNAL(commandFinished(QString,QByteArray)),
-            this,SLOT(handleProgrammerCommandFinished(QString,QByteArray)));
+    connect(&commandQueue,SIGNAL(error(QString)),
+            this,SLOT(handlecommandQueueError(QString)));
+    connect(&commandQueue,SIGNAL(commandFinished(QString,QByteArray)),
+            this,SLOT(handlecommandQueueCommandFinished(QString,QByteArray)));
 }
 
 bool BlinkyPendantUploader::startUpload(BlinkyController& controller, std::vector<PatternWriter> patterns)
@@ -98,23 +98,23 @@ bool BlinkyPendantUploader::startUpload(BlinkyController& controller, std::vecto
 
     // TODO: Check if the data can fit in the device memory
 
-    // Set up the programmer using the serial descriptor, and close the tape connection
+    // Set up the commandQueue using the serial descriptor, and close the tape connection
     controller.close();
-    programmer.open(portInfo);
+    commandQueue.open(portInfo);
 
     setProgress(0);
-    // TODO: Calculate this based on feedback from the programmer.
+    // TODO: Calculate this based on feedback from the commandQueue.
     setMaxProgress(10);
 
     // Queue the following commands:
     // 1. start write
-    programmer.startWrite();
+    commandQueue.startWrite();
 
     // 2-n. write data (aligned to 1024-byte sectors, 64 bytes at a time)
-    programmer.writeData(data);
+    commandQueue.writeData(data);
 
     // n+1 stop write
-    programmer.stopWrite();
+    commandQueue.stopWrite();
 
     return true;
 }
@@ -153,8 +153,8 @@ void BlinkyPendantUploader::cancel()
 void BlinkyPendantUploader::handleProgrammerError(QString error) {
     qCritical() << error;
 
-    if(programmer.isConnected()) {
-        programmer.close();
+    if(commandQueue.isConnected()) {
+        commandQueue.close();
     }
 
     emit(finished(false));
@@ -169,7 +169,7 @@ void BlinkyPendantUploader::handleProgrammerCommandFinished(QString command, QBy
 
     // TODO: Let the receiver handle this instead.
     if(command == "stopWrite") {
-        programmer.close();
+        commandQueue.close();
         emit(finished(true));
     }
 }

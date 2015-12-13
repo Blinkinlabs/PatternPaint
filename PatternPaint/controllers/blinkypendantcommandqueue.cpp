@@ -1,4 +1,4 @@
-#include "blinkypendantprogrammer.h"
+#include "blinkypendantcommandqueue.h"
 
 #define COMMAND_START_WRITE 0x01
 #define COMMAND_WRITE       0x02
@@ -7,13 +7,13 @@
 #define PAGE_SIZE_BYTES     1024    // Size unit for writes to flash
 #define WRITE_SIZE_BYTES    64      // Number of bytes the write command requires per call
 
-BlinkyPendantProgrammer::BlinkyPendantProgrammer(QObject *parent) :
+BlinkyPendantCommandQueue::BlinkyPendantCommandQueue(QObject *parent) :
     SerialCommandQueue(parent)
 {
 
 }
 
-void BlinkyPendantProgrammer::startWrite() {
+void BlinkyPendantCommandQueue::startWrite() {
     QByteArray command;
     for(int i = 0; i < 10; i++) {
         command.append(0xFF);
@@ -33,7 +33,7 @@ void BlinkyPendantProgrammer::startWrite() {
     queueCommand("startWrite",command, response, responseMask);
 }
 
-void BlinkyPendantProgrammer::writeData(QByteArray& data) {
+void BlinkyPendantCommandQueue::writeData(QByteArray& data) {
     if(data.length() == 0) {
         qCritical() << "No data to write";
         return;
@@ -70,7 +70,7 @@ void BlinkyPendantProgrammer::writeData(QByteArray& data) {
     }
 }
 
-void BlinkyPendantProgrammer::stopWrite() {
+void BlinkyPendantCommandQueue::stopWrite() {
     QByteArray command;
     for(int i = 0; i < 10; i++) {
         command.append(0xFF);

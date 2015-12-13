@@ -1,13 +1,15 @@
 #include "lightbuddyuploader.h"
 
+#include "blinkycontroller.h"
+
 #define FLASH_PAGE_SIZE 256
 
 LightBuddyUploader::LightBuddyUploader(QObject *parent) :
     BlinkyUploader(parent)
 {
-    connect(&programmer,SIGNAL(error(QString)),
+    connect(&serialQueue,SIGNAL(error(QString)),
             this,SLOT(handleProgrammerError(QString)));
-    connect(&programmer,SIGNAL(commandFinished(QString,QByteArray)),
+    connect(&serialQueue,SIGNAL(commandFinished(QString,QByteArray)),
             this,SLOT(handleProgrammerCommandFinished(QString,QByteArray)));
 }
 
@@ -24,8 +26,12 @@ void LightBuddyUploader::cancel()
     qDebug() << "Cancel signalled, but not supported";
 }
 
-bool LightBuddyUploader::startUpload(BlinkyController& controller, std::vector<PatternWriter> patterns)
+bool LightBuddyUploader::startUpload(BlinkyController& controller, std::vector<PatternWriter> patternWriters)
 {
+#define LIGHTBUDDY_UPLOADER
+
+#if !defined(LIGHTBUDDY_UPLOADER)
+
     Q_UNUSED(controller);
     Q_UNUSED(patterns);
 
@@ -33,41 +39,45 @@ bool LightBuddyUploader::startUpload(BlinkyController& controller, std::vector<P
     errorString = "Animation upload not currently supported for Lightbuddy!";
     return false;
 
+#else
 
-#if defined(LIGHTBUDDY_UPLOADER)
     // 1. Make the patterns into data and store them in a vector
     // 2. Check that they will fit in the BlinkyTile memory (TODO!!!)
     // 3. Kick off the uploader state machine
 
     // For each pattern, append the image data to the sketch
-    for (std::vector<Pattern>::iterator pattern = patterns.begin();
-        pattern != patterns.end();
-        ++pattern) {
+    for (std::vector<PatternWriter>::iterator patternWriter = patternWriters.begin();
+        patternWriter != patternWriters.end();
+        ++patternWriter) {
 
-        const int animationType = 0;
+        if(patternWriter->getEncoding() != PatternWriter::RGB24) {
+            errorString = "Lightbuddy only supports RGB24 encoding";
+            return false;
+        }
 
         QByteArray data;
         // Build the header
-        data.append((char)((pattern->ledCount >> 24) & 0xFF));
-        data.append((char)((pattern->ledCount >> 16) & 0xFF));
-        data.append((char)((pattern->ledCount >>  8) & 0xFF));
-        data.append((char)((pattern->ledCount      ) & 0xFF));
-        data.append((char)((pattern->frameCount >> 24) & 0xFF));
-        data.append((char)((pattern->frameCount >> 16) & 0xFF));
-        data.append((char)((pattern->frameCount >>  8) & 0xFF));
-        data.append((char)((pattern->frameCount      ) & 0xFF));
-        data.append((char)((pattern->frameDelay >> 24) & 0xFF));
-        data.append((char)((pattern->frameDelay >> 16) & 0xFF));
-        data.append((char)((pattern->frameDelay >>  8) & 0xFF));
-        data.append((char)((pattern->frameDelay      ) & 0xFF));
-        data.append((char)((animationType >> 24) & 0xFF));
-        data.append((char)((animationType >> 16) & 0xFF));
-        data.append((char)((animationType >>  8) & 0xFF));
-        data.append((char)((animationType      ) & 0xFF));
+        data.append((char)((patternWriter->getLedCount() >> 24) & 0xFF));
+        data.append((char)((patternWriter->getLedCount() >> 16) & 0xFF));
+        data.append((char)((patternWriter->getLedCount() >>  8) & 0xFF));
+        data.append((char)((patternWriter->getLedCount()      ) & 0xFF));
+        data.append((char)((patternWriter->getFrameCount() >> 24) & 0xFF));
+        data.append((char)((patternWriter->getFrameCount() >> 16) & 0xFF));
+        data.append((char)((patternWriter->getFrameCount() >>  8) & 0xFF));
+        data.append((char)((patternWriter->getFrameCount()      ) & 0xFF));
+        data.append((char)((patternWriter->getFrameDelay() >> 24) & 0xFF));
+        data.append((char)((patternWriter->getFrameDelay() >> 16) & 0xFF));
+        data.append((char)((patternWriter->getFrameDelay() >>  8) & 0xFF));
+        data.append((char)((patternWriter->getFrameDelay()      ) & 0xFF));
+        data.append((char)((patternWriter->getEncoding() >> 24) & 0xFF));
+        data.append((char)((patternWriter->getEncoding() >> 16) & 0xFF));
+        data.append((char)((patternWriter->getEncoding() >>  8) & 0xFF));
+        data.append((char)((patternWriter->getEncoding()      ) & 0xFF));
 
-        // Recompress the pattern in RGB24
-        Pattern recompressedPattern(pattern->image, 0, Pattern::RGB24, Pattern::RGB);
-        data += recompressedPattern.data;
+        data += patternWriter->getData();
+
+        while(data.count()%256 != 0)
+            data.append((char)0x255);
 
         flashData.append(data);
     }
@@ -84,8 +94,9 @@ bool LightBuddyUploader::startUpload(BlinkyController& controller, std::vector<P
         controller.close();
     }
 
-    programmer.open(info);
+    serialQueue.open(info);
     state = State_EraseFlash;
+ //   state = State_FileNew;
     doWork();
 
     return true;
@@ -94,7 +105,7 @@ bool LightBuddyUploader::startUpload(BlinkyController& controller, std::vector<P
 
 void LightBuddyUploader::doWork() {
 
-    // 1. Erase the flash (slow! TODO: new firmware that's faster)
+    // 1. Erase the flash (slow! TODO: new firmware that's faster, or walk through the files to delete them)
     // 2. For each pattern:
     //    a. create a new file
     //    b. if creation successful, upload image data
@@ -109,27 +120,26 @@ void LightBuddyUploader::doWork() {
 
     case State_EraseFlash:
         {
-            programmer.eraseFlash();
+        serialQueue.eraseFlash();
+        //serialCommands.largestFile();
             state = State_FileNew;
         }
         break;
     case State_FileNew:
         {
-            programmer.fileNew(flashData.front().size());
+            serialQueue.fileNew(flashData.front().size());
+            //serialCommands.fileNew(256);
             state = State_WriteFileData;
         }
         break;
     case State_WriteFileData:
         {
-            // TODO: Extract this from the fileNew() call response
-            int sector = 0;
-
             for(int offset = 0; offset < flashData.front().size(); offset += FLASH_PAGE_SIZE) {
-                programmer.writePage(sector, offset, flashData.front().mid(offset, FLASH_PAGE_SIZE));
+                serialQueue.writePage(sector, offset, flashData.front().mid(offset, FLASH_PAGE_SIZE));
             }
             flashData.pop_front();
 
-            programmer.reloadAnimations();
+            serialQueue.reloadAnimations();
 
             if(flashData.size() > 0) {
                 state = State_FileNew;
@@ -169,8 +179,8 @@ QString LightBuddyUploader::getErrorString() const
 void LightBuddyUploader::handleProgrammerError(QString error) {
     qCritical() << error;
 
-    if(programmer.isConnected()) {
-        programmer.close();
+    if(serialQueue.isConnected()) {
+        serialQueue.close();
     }
 
     emit(finished(false));
@@ -184,15 +194,32 @@ void LightBuddyUploader::handleProgrammerCommandFinished(QString command, QByteA
 
     // TODO: This is poor logic.
 
-    // If it was a file new command, we have more work to do
+    if(command == "eraseFlash")
+        doWork();
+
+    // TODO: Just for testing
+    if(command == "largestFile")
+        doWork();
+
     if(command == "fileNew") {
+        // record sector for new file here.
+        for(int i = 0; i < returnData.count();i++)
+            qDebug() << i << ": " << (int)returnData.at(i)
+                     << "(" << returnData.at(i) << ")";
+
+        sector = ((int)returnData.at(2) << 24)
+                + ((int)returnData.at(3) << 16)
+                + ((int)returnData.at(4) << 8)
+                + ((int)returnData.at(5) << 0);
+        qDebug() << "sector: " << sector;
+
         doWork();
     }
 
     // If it was a reload animation command, we might have more work, or might be done.
     if(command == "reloadAnimations") {
         if(state == State_Done) {
-            programmer.close();
+            serialQueue.close();
             emit(finished(true));
         }
         else {

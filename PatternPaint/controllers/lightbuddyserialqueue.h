@@ -1,21 +1,22 @@
-#ifndef LIGHTBUDDYPROGRAMMER_H
-#define LIGHTBUDDYPROGRAMMER_H
+#ifndef LIGHTBUDDYSERIALQUEUE_H
+#define LIGHTBUDDYSERIALQUEUE_H
 
 #include <QObject>
 #include "serialcommandqueue.h"
 
-class LightBuddyProgrammer : public SerialCommandQueue
+class LightBuddySerialQueue : public SerialCommandQueue
 {
     Q_OBJECT
 
 public:
-    LightBuddyProgrammer(QObject *parent = 0);
+    LightBuddySerialQueue(QObject *parent = 0);
 
     void eraseFlash();
+    void largestFile();
     void fileNew(int sizeBytes);
     void writePage(int sector, int offset, QByteArray data);
     void reloadAnimations();
 
 };
 
-#endif // LIGHTBUDDYPROGRAMMER_H
+#endif // LIGHTBUDDYSERIALQUEUE_H
