@@ -14,5 +14,9 @@
         <file>examples/matrix/tunnel.frames.png</file>
         <file>examples/matrix/go forward.png</file>
         <file>examples/blinkytape/cylon.png</file>
+        <file>examples/blinkytile/colors.png</file>
+        <file>examples/blinkytile/flashlight.png</file>
+        <file>examples/blinkytile/shadow.png</file>
+        <file>examples/blinkytile/shimmer.png</file>
     </qresource>
 </RCC>

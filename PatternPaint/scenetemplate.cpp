@@ -17,7 +17,7 @@ SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT] =
     {
         "BlinkyTile",
         ":/scenetemplates/images/scenetemplates/blinkytile.jpg",
-        ":/examples/blinkytape",
+        ":/examples/blinkytile",
         "Light Buddy (BlinkyTile)",
         "Linear",
         RGB,
