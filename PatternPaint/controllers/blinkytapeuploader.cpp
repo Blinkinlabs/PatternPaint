@@ -9,6 +9,8 @@
 // TODO: Combine this with the definitions in avruploaddata.cpp
 #define FLASH_MEMORY_AVAILABLE          0x7000  // Amount of application space in the flash
 
+#define PAGE_SIZE_BYTES 128
+
 /// Interval between polling the serial port list for new devices
 #define BOOTLOADER_POLL_INTERVAL 200
 
@@ -88,7 +90,7 @@ void BlinkyTapeUploader::handleResetTimer()
 void BlinkyTapeUploader::setProgress(int newProgress) {
     progress = newProgress;
     // TODO: Precalculate the max progress
-    emit(progressChanged(static_cast<float>(progress)/300));
+    emit(progressChanged(static_cast<float>(progress)/maxProgress));
 }
 
 
@@ -139,8 +141,6 @@ bool BlinkyTapeUploader::upgradeFirmware(BlinkyController& tape) {
 
     // The entire sketch must fit into the available memory, minus a single page
     // at the end of flash for the configuration header
-    // TODO: Could save ~100 bytes if we let the sketch spill into the unused portion
-    // of the header.
     if(sketch.length() > FLASH_MEMORY_AVAILABLE) {
         qDebug() << "sketch can't fit into memory!";
 
@@ -182,6 +182,11 @@ bool BlinkyTapeUploader::upgradeFirmware(int timeout) {
     // Put the sketch, pattern, and metadata into the programming queue.
     flashData.push_back(FlashSection(PRODUCTION_ADDRESS, sketch));
 
+    // TODO: This is duplicated in startUpload...
+    maxProgress = 1;    // checkDeviceSignature
+    for(int i = 0; i < flashData.count(); i++) {
+        maxProgress += flashData.at(i).data.count()/PAGE_SIZE_BYTES;
+    }
     setProgress(0);
 
     stateStartTime = QDateTime::currentDateTime();
@@ -192,6 +197,11 @@ bool BlinkyTapeUploader::upgradeFirmware(int timeout) {
 
 
 bool BlinkyTapeUploader::startUpload(BlinkyController& tape) {
+
+    maxProgress = 1;    // checkDeviceSignature
+    for(int i = 0; i < flashData.count(); i++) {
+        maxProgress += flashData.at(i).data.count()/PAGE_SIZE_BYTES;
+    }
     setProgress(0);
 
     bootloaderPollTimeout = BOOTLOADER_POLL_TIMEOUT;

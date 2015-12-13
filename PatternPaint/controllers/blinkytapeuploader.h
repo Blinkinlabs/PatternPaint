@@ -82,7 +82,8 @@ private:
     qint64 bootloaderPollTimeout;
 
     /// Current upload progress, in command counts
-    float progress;
+    int progress;
+    int maxProgress;
 
     QString errorString;
 
