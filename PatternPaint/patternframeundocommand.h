@@ -29,7 +29,6 @@
 #include <QUndoCommand>
 #include <QImage>
 
-
 // TODO: Base this on actions, not blindly storing/restoring the state.
 
 class PatternFrameModel;
@@ -52,7 +51,7 @@ private:
     QSize previousSize;
     QSize currentSize;
 
-    PatternFrameModel* patternFrameModel;
+    PatternFrameModel *patternFrameModel;
     bool firstRun;
 };
 

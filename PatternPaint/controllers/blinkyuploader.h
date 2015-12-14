@@ -24,19 +24,21 @@ class BlinkyUploader : public QObject
     Q_OBJECT
 
 public:
-    BlinkyUploader(QObject *parent=0) :
-        QObject(parent) {}
+    BlinkyUploader(QObject *parent = 0) :
+        QObject(parent)
+    {
+    }
 
     /// Start an upload, using the passed blinkytape as a launching point
     /// Note that the blinkytape will be disconnected during the upload process,
     /// and will need to be reconnected manually afterwards.
     /// @param tape BlinkyTape to upload to (must already be connected)
     /// @param pattern Pattern to upload to the BlinkyTape
-    virtual bool startUpload(BlinkyController& controller, std::vector<PatternWriter> patterns) = 0;
+    virtual bool startUpload(BlinkyController &controller, std::vector<PatternWriter> patterns) = 0;
 
     /// Update/restore the firmware on the specificed device
     /// @param tape BlinkyTape to upload to (must already be connected)
-    virtual bool upgradeFirmware(BlinkyController& controller) = 0;
+    virtual bool upgradeFirmware(BlinkyController &controller) = 0;
 
     /// Scan for a device bootloader, then attempt to restore the firmware to it.
     /// @param timeout Number of seconds to wait for a bootloader, or -1 to wait
@@ -61,4 +63,3 @@ public slots:
 };
 
 #endif // BLINKYUPLOADER_H
-

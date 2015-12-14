@@ -10,14 +10,13 @@
 BlinkyPendantCommandQueue::BlinkyPendantCommandQueue(QObject *parent) :
     SerialCommandQueue(parent)
 {
-
 }
 
-void BlinkyPendantCommandQueue::startWrite() {
+void BlinkyPendantCommandQueue::startWrite()
+{
     QByteArray command;
-    for(int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++)
         command.append(0xFF);
-    }
     command.append(COMMAND_START_WRITE);
 
     QByteArray response;
@@ -30,28 +29,26 @@ void BlinkyPendantCommandQueue::startWrite() {
     responseMask.append((char)0);
     responseMask.append((char)0);
 
-    queueCommand("startWrite",command, response, responseMask);
+    queueCommand("startWrite", command, response, responseMask);
 }
 
-void BlinkyPendantCommandQueue::writeData(QByteArray& data) {
-    if(data.length() == 0) {
+void BlinkyPendantCommandQueue::writeData(QByteArray &data)
+{
+    if (data.length() == 0) {
         qCritical() << "No data to write";
         return;
     }
 
     // Pad the data to the page size
-    while(data.length()%PAGE_SIZE_BYTES != 0) {
+    while (data.length()%PAGE_SIZE_BYTES != 0)
         data.append((char)0xFF);
-    }
 
-    for(int currentChunkPosition = 0;
-        currentChunkPosition < data.length();
-        currentChunkPosition += WRITE_SIZE_BYTES) {
-
+    for (int currentChunkPosition = 0;
+         currentChunkPosition < data.length();
+         currentChunkPosition += WRITE_SIZE_BYTES) {
         QByteArray command;
-        for(int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++)
             command.append(0xFF);
-        }
         command.append(COMMAND_WRITE);
 
         command += data.mid(currentChunkPosition, WRITE_SIZE_BYTES);
@@ -66,15 +63,15 @@ void BlinkyPendantCommandQueue::writeData(QByteArray& data) {
         responseMask.append((char)0);
         responseMask.append((char)0);
 
-        queueCommand("write",command, response, responseMask);
+        queueCommand("write", command, response, responseMask);
     }
 }
 
-void BlinkyPendantCommandQueue::stopWrite() {
+void BlinkyPendantCommandQueue::stopWrite()
+{
     QByteArray command;
-    for(int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++)
         command.append(0xFF);
-    }
     command.append(COMMAND_STOP_WRITE);
 
     QByteArray response;
@@ -87,5 +84,5 @@ void BlinkyPendantCommandQueue::stopWrite() {
     responseMask.append((char)0);
     responseMask.append((char)0);
 
-    queueCommand("stopWrite",command, response, responseMask);
+    queueCommand("stopWrite", command, response, responseMask);
 }

@@ -103,13 +103,14 @@ private slots:
 
     void on_actionDeleteFrame_triggered();
 
-    void on_ExampleSelected(QAction*);
+    void on_ExampleSelected(QAction *);
 
     void on_patternCollectionCurrentChanged(const QModelIndex &current, const QModelIndex &);
 
     void on_timelineSelectedChanged(const QModelIndex &current, const QModelIndex &);
 
-    void on_PatternDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
+    void on_PatternDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
+                               const QVector<int> &roles);
 
     void on_actionNew_ScrollingPattern_triggered();
 
@@ -148,14 +149,16 @@ private:
 
     QLineEdit pFrame;
 
-    enum Modes { Disconnected, Connected, Uploading };
+    enum Modes {
+        Disconnected, Connected, Uploading
+    };
     Modes mode;
 
     QUndoGroup undoGroup;
 
     QPointer<Fixture> fixture;
 
-    void populateExamplesMenu(QString directory, QMenu* menu);
+    void populateExamplesMenu(QString directory, QMenu *menu);
 
     void showError(QString errorMessage);
 
@@ -163,7 +166,7 @@ private:
     void stopPlayback();
 
     bool promptForSave(Pattern *item);
-    bool promptForSave(std::vector<Pattern*> item);
+    bool promptForSave(std::vector<Pattern *> item);
 
     bool savePattern(Pattern *item);
     bool savePatternAs(Pattern *item);
@@ -184,7 +187,7 @@ private:
 
 #if defined(Q_OS_MAC)
     /// Object to inhibit app nap when connected to a blinky
-    CAppNapInhibitor* appNap;
+    CAppNapInhibitor *appNap;
 #endif
 
     // TODO: These don't belong here.

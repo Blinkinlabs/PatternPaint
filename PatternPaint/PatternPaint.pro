@@ -193,3 +193,6 @@ win32 {
     # Windows: Specify the icon to use
     RC_ICONS += images/patternpaint.ico
 }
+
+DISTFILES += \
+    ../uncrustify.cfg

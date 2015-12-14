@@ -10,9 +10,7 @@ class MatrixFixture : public Fixture
     Q_OBJECT
 
 public:
-    MatrixFixture(QSize size,
-                  ColorMode colorMode,
-                  BrightnessModel *brightnessModel,
+    MatrixFixture(QSize size, ColorMode colorMode, BrightnessModel *brightnessModel,
                   QObject *parent = 0);
 
     QString getName() const;

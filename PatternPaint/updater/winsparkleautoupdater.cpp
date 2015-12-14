@@ -1,12 +1,13 @@
 #include "winsparkleautoupdater.h"
 #include <winsparkle.h>
 
-class WinSparkleAutoUpdater::Private {
+class WinSparkleAutoUpdater::Private
+{
 public:
     QString url;
 };
 
-WinSparkleAutoUpdater::WinSparkleAutoUpdater(const QString& url)
+WinSparkleAutoUpdater::WinSparkleAutoUpdater(const QString &url)
 {
     d = new Private();
     d->url = url;
@@ -16,17 +17,16 @@ WinSparkleAutoUpdater::WinSparkleAutoUpdater(const QString& url)
     // resource. See the "psdk" example and its .rc file for an example of that
     // (these calls wouldn't be needed then).
     // TODO: Test me on Windows!
-    //win_sparkle_set_appcast_url(d->url.toStdString().c_str());
+    // win_sparkle_set_appcast_url(d->url.toStdString().c_str());
     win_sparkle_set_appcast_url(d->url.toUtf8().constData());
-
 
 #define W(x)          W_(x)
 #define W_(x)         L ## x
 
     win_sparkle_set_app_details(
-                W(ORGANIZATION_NAME),
-                W(APPLICATION_NAME),
-                W(VERSION_STRING));
+        W(ORGANIZATION_NAME),
+        W(APPLICATION_NAME),
+        W(VERSION_STRING));
 }
 
 void WinSparkleAutoUpdater::checkForUpdates()
@@ -44,7 +44,7 @@ bool WinSparkleAutoUpdater::getAutomatic()
 // TODO: Test in Windows
 void WinSparkleAutoUpdater::setAutomatic(bool setting)
 {
-    win_sparkle_set_automatic_check_for_updates(setting?1:0);
+    win_sparkle_set_automatic_check_for_updates(setting ? 1 : 0);
 }
 
 WinSparkleAutoUpdater::~WinSparkleAutoUpdater()
@@ -52,4 +52,3 @@ WinSparkleAutoUpdater::~WinSparkleAutoUpdater()
     win_sparkle_cleanup();
     delete d;
 }
-

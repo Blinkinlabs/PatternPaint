@@ -22,7 +22,8 @@ public:
 
     PatternModel(QObject *parent = 0) :
         QAbstractListModel(parent)
-    {}
+    {
+    }
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const = 0;
     virtual QVariant data(const QModelIndex &index, int role) const = 0;
@@ -32,14 +33,12 @@ public:
     virtual Qt::DropActions supportedDropActions() const = 0;
 
     virtual bool setData(const QModelIndex &index, const QVariant &value,
-                 int role = Qt::EditRole) = 0;
+                         int role = Qt::EditRole) = 0;
 
     virtual bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex()) = 0;
     virtual bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex()) = 0;
 
-    virtual QUndoStack* getUndoStack() = 0;
+    virtual QUndoStack *getUndoStack() = 0;
 };
 
-
 #endif // PATTERNMODEL
-

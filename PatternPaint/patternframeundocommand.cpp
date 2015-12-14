@@ -2,9 +2,7 @@
 
 #include "patternframemodel.h"
 
-
-PatternFrameUndoCommand::PatternFrameUndoCommand(PatternFrameModel *item,
-                         QUndoCommand *parent) :
+PatternFrameUndoCommand::PatternFrameUndoCommand(PatternFrameModel *item, QUndoCommand *parent) :
     QUndoCommand(parent),
     patternFrameModel(item)
 {
@@ -14,15 +12,17 @@ PatternFrameUndoCommand::PatternFrameUndoCommand(PatternFrameModel *item,
     firstRun = true;
 }
 
-void PatternFrameUndoCommand::undo() {
+void PatternFrameUndoCommand::undo()
+{
     currentFrames = patternFrameModel->frames;
     currentSize = patternFrameModel->frameSize;
     patternFrameModel->applyUndoState(previousFrames, previousSize);
 }
 
-void PatternFrameUndoCommand::redo() {
+void PatternFrameUndoCommand::redo()
+{
     // TODO: We're likely not handling undo/redo correctly if we need this?
-    if(firstRun) {
+    if (firstRun) {
         firstRun = false;
         return;
     }

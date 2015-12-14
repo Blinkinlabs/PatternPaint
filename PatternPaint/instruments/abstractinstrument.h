@@ -42,25 +42,27 @@ class AbstractInstrument : public QObject
 
 public:
     explicit AbstractInstrument(QObject *parent = 0);
-    virtual ~AbstractInstrument(){}
+    virtual ~AbstractInstrument()
+    {
+    }
 
     /// mousePressEvent
     /// @param event - mouse event
     /// @param FrameEditor - editor
     /// @param QPoint - logical position on image
-    virtual void mousePressEvent(QMouseEvent *event, FrameEditor&, const QPoint&) = 0;
+    virtual void mousePressEvent(QMouseEvent *event, FrameEditor &, const QPoint &) = 0;
 
     /// mousePressEvent
     /// @param event - mouse event
     /// @param FrameEditor - editor
     /// @param QPoint - logical position on image
-    virtual void mouseMoveEvent(QMouseEvent *event, FrameEditor&, const QPoint& pt) = 0;
+    virtual void mouseMoveEvent(QMouseEvent *event, FrameEditor &, const QPoint &pt) = 0;
 
     /// mousePressEvent
     /// @param event - mouse event
     /// @param FrameEditor - editor
     /// @param QPoint - logical position on image
-    virtual void mouseReleaseEvent(QMouseEvent *event, FrameEditor&, const QPoint& pt) = 0;
+    virtual void mouseReleaseEvent(QMouseEvent *event, FrameEditor &, const QPoint &pt) = 0;
 
     /// Get the mouse cursor for this instrument
     /// @return cursor for this tool
@@ -68,26 +70,32 @@ public:
 
     /// Check if the tool has preview data to display
     /// @return true if the instrument has preview data to display
-    virtual bool showPreview() const { return drawing; }
+    virtual bool showPreview() const
+    {
+        return drawing;
+    }
 
-    virtual const QImage& getPreview() const {return toolPreview; }
+    virtual const QImage &getPreview() const
+    {
+        return toolPreview;
+    }
+
 signals:
-    
+
 protected:
     QPoint mStartPoint, mEndPoint; ///< Point for events.
     QImage toolPreview; ///< Scratch space to draw tool output onto
     bool drawing;       ///< True if we have an unsaved
 
-    virtual void paint(FrameEditor&) = 0;
+    virtual void paint(FrameEditor &) = 0;
 };
-
 
 /// Class for managing the mouse cursor
 class CustomCursorInstrument : public AbstractInstrument
 {
     Q_OBJECT
 public:
-    CustomCursorInstrument(const QString& resource, QObject* parent = 0);
+    CustomCursorInstrument(const QString &resource, QObject *parent = 0);
     virtual QCursor cursor() const;
 private:
     QPixmap mpm;

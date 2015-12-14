@@ -8,11 +8,14 @@ AbstractInstrument::AbstractInstrument(QObject *parent) :
 {
 }
 
-CustomCursorInstrument::CustomCursorInstrument(const QString& resource, QObject* parent):
-    AbstractInstrument(parent), mpm(resource) {
+CustomCursorInstrument::CustomCursorInstrument(const QString &resource, QObject *parent) :
+    AbstractInstrument(parent),
+    mpm(resource)
+{
     mcur = QCursor(mpm);
 }
 
-QCursor CustomCursorInstrument::cursor() const {
-    return  mcur;
+QCursor CustomCursorInstrument::cursor() const
+{
+    return mcur;
 }

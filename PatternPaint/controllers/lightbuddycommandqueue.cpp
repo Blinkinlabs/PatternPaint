@@ -1,19 +1,18 @@
 #include "lightbuddycommandqueue.h"
 
-
-void addHeader(QByteArray& command) {
-    for(int i = 0; i < 12; i++) {
+void addHeader(QByteArray &command)
+{
+    for (int i = 0; i < 12; i++)
         command.append((char)0xFF);
-    }
 }
 
 LightBuddySerialQueue::LightBuddySerialQueue(QObject *parent) :
     SerialCommandQueue(parent)
 {
-
 }
 
-void LightBuddySerialQueue::eraseFlash() {
+void LightBuddySerialQueue::eraseFlash()
+{
     QByteArray command;
     addHeader(command);
 
@@ -33,7 +32,7 @@ void LightBuddySerialQueue::eraseFlash() {
 
     // Note: only the length matters for the response, the response data
     // will be ignored.
-    queueCommand("eraseFlash",command,ret,mask);
+    queueCommand("eraseFlash", command, ret, mask);
 }
 
 void LightBuddySerialQueue::largestFile()
@@ -61,11 +60,11 @@ void LightBuddySerialQueue::largestFile()
 
     // Note: only the length matters for the response, the response data
     // will be ignored.
-    queueCommand("largestFile",command,ret,mask);
+    queueCommand("largestFile", command, ret, mask);
 }
 
-void LightBuddySerialQueue::fileNew(int sizeBytes) {
-
+void LightBuddySerialQueue::fileNew(int sizeBytes)
+{
     QByteArray command;
     addHeader(command);
 
@@ -74,7 +73,7 @@ void LightBuddySerialQueue::fileNew(int sizeBytes) {
     command.append((char)((sizeBytes >> 24) & 0xFF));
     command.append((char)((sizeBytes >> 16) & 0xFF));
     command.append((char)((sizeBytes >>  8) & 0xFF));
-    command.append((char)((sizeBytes      ) & 0xFF));
+    command.append((char)((sizeBytes) & 0xFF));
 
     QByteArray ret;
     ret.append('P');
@@ -92,19 +91,20 @@ void LightBuddySerialQueue::fileNew(int sizeBytes) {
     mask.append((char)0x00);
     mask.append((char)0x00);
 
-//    // We're expecting 4 bytes of sector data back
-//        sector = 0
-//        if status:
-//            sector += ord(returnData[0]) << 24
-//            sector += ord(returnData[1]) << 16
-//            sector += ord(returnData[2]) << 8
-//            sector += ord(returnData[3]) << 0
+//// We're expecting 4 bytes of sector data back
+// sector = 0
+// if status:
+// sector += ord(returnData[0]) << 24
+// sector += ord(returnData[1]) << 16
+// sector += ord(returnData[2]) << 8
+// sector += ord(returnData[3]) << 0
 
-    queueCommand("fileNew",command,ret,mask);
+    queueCommand("fileNew", command, ret, mask);
 }
 
-void LightBuddySerialQueue::writePage(int sector, int offset, QByteArray data) {
-    if(data.size() != 256) {
+void LightBuddySerialQueue::writePage(int sector, int offset, QByteArray data)
+{
+    if (data.size() != 256) {
         // TODO: How to error out here?
         return;
     }
@@ -116,11 +116,11 @@ void LightBuddySerialQueue::writePage(int sector, int offset, QByteArray data) {
     command.append((char)((sector >> 24) & 0xFF));
     command.append((char)((sector >> 16) & 0xFF));
     command.append((char)((sector >>  8) & 0xFF));
-    command.append((char)((sector      ) & 0xFF));
+    command.append((char)((sector) & 0xFF));
     command.append((char)((offset >> 24) & 0xFF));
     command.append((char)((offset >> 16) & 0xFF));
     command.append((char)((offset >>  8) & 0xFF));
-    command.append((char)((offset      ) & 0xFF));
+    command.append((char)((offset) & 0xFF));
     command += data;
 
     QByteArray ret;
@@ -135,11 +135,11 @@ void LightBuddySerialQueue::writePage(int sector, int offset, QByteArray data) {
 
     // Note: only the length matters for the response, the response data
     // will be ignored.
-    queueCommand("writePage",command,ret, mask);
+    queueCommand("writePage", command, ret, mask);
 }
 
-void LightBuddySerialQueue::reloadAnimations() {
-
+void LightBuddySerialQueue::reloadAnimations()
+{
     QByteArray command;
     addHeader(command);
     command.append((char)0x02);
@@ -156,5 +156,5 @@ void LightBuddySerialQueue::reloadAnimations() {
 
     // Note: only the length matters for the response, the response data
     // will be ignored.
-    queueCommand("reloadAnimations",command,ret,mask);
+    queueCommand("reloadAnimations", command, ret, mask);
 }

@@ -6,7 +6,8 @@
 #include "patternwriter.h"
 
 /// Memory class to
-class avrUploadData {
+class avrUploadData
+{
 public:
     bool init(std::vector<PatternWriter> patterns);
 
@@ -20,6 +21,5 @@ public:
 
     QString errorString;
 };
-
 
 #endif // AVRUPLOADDATA_H

@@ -5,19 +5,18 @@
 #include <QtWidgets>
 #include <QDebug>
 
-#define COLOR_CLEAR             QColor(0,0,0,0)
-#define COLOR_GRID_LINES        QColor(30,30,30,200)
+#define COLOR_CLEAR             QColor(0, 0, 0, 0)
+#define COLOR_GRID_LINES        QColor(30, 30, 30, 200)
 
-#define COLOR_TOOL_DEFAULT      QColor(255,255,255)
+#define COLOR_TOOL_DEFAULT      QColor(255, 255, 255)
 
-#define COLOR_PLAYBACK_EDGE     QColor(255,255,255,255)
-#define COLOR_PLAYBACK_TOP      QColor(255,255,255,100)
+#define COLOR_PLAYBACK_EDGE     QColor(255, 255, 255, 255)
+#define COLOR_PLAYBACK_TOP      QColor(255, 255, 255, 100)
 
 #define MIN_UPDATE_INTERVAL     15  // minimum interval between screen updates, in ms
 #define MIN_MOUSE_INTERVAL      5   // minimum interval between mouse inputs, in ms
 
 #define GRID_MIN_Y_SCALE        6   // Minimum scale that the image needs to scale to before the grid is displayed
-
 
 FrameEditor::FrameEditor(QWidget *parent) :
     QWidget(parent),
@@ -26,25 +25,23 @@ FrameEditor::FrameEditor(QWidget *parent) :
 {
     this->setAcceptDrops(true);
 
-
     // Turn on mouse tracking so we can draw a preview
     // TODO: DO we need to do this here, or just in the constructor?
     setMouseTracking(true);
 }
 
-bool FrameEditor::hasImage() {
+bool FrameEditor::hasImage()
+{
     return !frameData.isNull();
 }
 
 void FrameEditor::dragEnterEvent(QDragEnterEvent *event)
 {
-    if(!hasImage()) {
+    if (!hasImage())
         return;
-    }
 
-    if(event->mimeData()->hasUrls()) {
+    if (event->mimeData()->hasUrls())
         event->acceptProposedAction();
-    }
 }
 
 void FrameEditor::dropEvent(QDropEvent *event)
@@ -53,44 +50,45 @@ void FrameEditor::dropEvent(QDropEvent *event)
 
 // TODO: Attempt to load the file as a single frame image, to replace this frame?
 
-//    if(patternData == NULL) {
+// if(patternData == NULL) {
 ////    if(patternItem == NULL) {
-//        return;
-//    }
+// return;
+// }
 
-//    // TODO: Pass this down for someone else to handle?
+//// TODO: Pass this down for someone else to handle?
 
-//    QList<QUrl> droppedUrls = event->mimeData()->urls();
-//    int droppedUrlCnt = droppedUrls.size();
-//    for(int i = 0; i < droppedUrlCnt; i++) {
-//        QString localPath = droppedUrls[i].toLocalFile();
-//        QFileInfo fileInfo(localPath);
+// QList<QUrl> droppedUrls = event->mimeData()->urls();
+// int droppedUrlCnt = droppedUrls.size();
+// for(int i = 0; i < droppedUrlCnt; i++) {
+// QString localPath = droppedUrls[i].toLocalFile();
+// QFileInfo fileInfo(localPath);
 
-//        // TODO: OS X Yosemite hack for /.file/id= references
+//// TODO: OS X Yosemite hack for /.file/id= references
 
-//        if(fileInfo.isFile()) {
-//            patternItem->replace(fileInfo.absoluteFilePath());
-//            // And stop on the first one we've found.
-//            return;
-//        }
-//    }
+// if(fileInfo.isFile()) {
+// patternItem->replace(fileInfo.absoluteFilePath());
+//// And stop on the first one we've found.
+// return;
+// }
+// }
 }
 
-const QImage &FrameEditor::getPatternAsImage() const {
+const QImage &FrameEditor::getPatternAsImage() const
+{
     return frameData;
 }
 
-void FrameEditor::resizeEvent(QResizeEvent * resizeEvent)
+void FrameEditor::resizeEvent(QResizeEvent *resizeEvent)
 {
     updateGridSize();
 
     QWidget::resizeEvent(resizeEvent);
 }
 
-void FrameEditor::updateGridSize() {
-    if(!hasImage()) {
+void FrameEditor::updateGridSize()
+{
+    if (!hasImage())
         return;
-    }
 
     // Update the widget geometry so that it can be resized correctly
     this->setBaseSize(frameData.size());
@@ -107,12 +105,11 @@ void FrameEditor::updateGridSize() {
     yScale = scale;
 
     // If the drawing space is large enough, make a grid pattern to superimpose over the image
-    if(yScale >= GRID_MIN_Y_SCALE) {
+    if (yScale >= GRID_MIN_Y_SCALE) {
         gridPattern = QImage(frameSize.width()*xScale  +.5 + 1,
                              frameSize.height()*yScale +.5 + 1,
                              QImage::Format_ARGB32_Premultiplied);
         gridPattern.fill(COLOR_CLEAR);
-
 
         QPainter painter(&gridPattern);
         painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
@@ -120,7 +117,7 @@ void FrameEditor::updateGridSize() {
 
         // Draw vertical lines
         painter.setPen(COLOR_GRID_LINES);
-        for(int x = 0; x <= frameSize.width(); x++) {
+        for (int x = 0; x <= frameSize.width(); x++) {
             painter.drawLine(x*xScale+.5,
                              0,
                              x*xScale+.5,
@@ -128,7 +125,7 @@ void FrameEditor::updateGridSize() {
         }
 
         // Draw horizontal lines
-        for(int y = 0; y <= frameSize.height(); y++) {
+        for (int y = 0; y <= frameSize.height(); y++) {
             painter.drawLine(0,
                              y*yScale+.5,
                              gridPattern.width(),
@@ -137,28 +134,26 @@ void FrameEditor::updateGridSize() {
     }
 }
 
-
-void FrameEditor::mousePressEvent(QMouseEvent *event) {
-    if(!hasImage() || instrument.isNull()) {
+void FrameEditor::mousePressEvent(QMouseEvent *event)
+{
+    if (!hasImage() || instrument.isNull())
         return;
-    }
 
     setCursor(instrument->cursor());
     instrument->mousePressEvent(event, *this, QPoint(event->x()/xScale, event->y()/yScale));
     lazyUpdate();
 }
 
-void FrameEditor::mouseMoveEvent(QMouseEvent *event){
-    if(!hasImage() || instrument.isNull()) {
+void FrameEditor::mouseMoveEvent(QMouseEvent *event)
+{
+    if (!hasImage() || instrument.isNull())
         return;
-    }
 
     // Ignore the update request if it came too quickly
     static qint64 lastTime = 0;
     qint64 newTime = QDateTime::currentMSecsSinceEpoch();
-    if (newTime - lastTime < MIN_MOUSE_INTERVAL) {
+    if (newTime - lastTime < MIN_MOUSE_INTERVAL)
         return;
-    }
 
     lastTime = newTime;
 
@@ -173,9 +168,8 @@ void FrameEditor::mouseMoveEvent(QMouseEvent *event){
 
     // If the position hasn't changed, don't do anything.
     // This is to avoid expensive reprocessing of the tool preview window.
-    if(x == oldX && y == oldY) {
+    if (x == oldX && y == oldY)
         return;
-    }
 
     oldX = x;
     oldY = y;
@@ -185,26 +179,29 @@ void FrameEditor::mouseMoveEvent(QMouseEvent *event){
     lazyUpdate();
 }
 
-void FrameEditor::mouseReleaseEvent(QMouseEvent* event) {
+void FrameEditor::mouseReleaseEvent(QMouseEvent *event)
+{
     setCursor(Qt::ArrowCursor);
 
-    if(!hasImage() || instrument.isNull()) {
+    if (!hasImage() || instrument.isNull())
         return;
-    }
 
     instrument->mouseReleaseEvent(event, *this, QPoint(event->x()/xScale, event->y()/yScale));
     lazyUpdate();
 }
 
-void FrameEditor::setToolColor(QColor color) {
+void FrameEditor::setToolColor(QColor color)
+{
     toolColor = color;
 }
 
-void FrameEditor::setToolSize(int size) {
+void FrameEditor::setToolSize(int size)
+{
     toolSize = size;
 }
 
-void FrameEditor::setInstrument(AbstractInstrument* pi) {
+void FrameEditor::setInstrument(AbstractInstrument *pi)
+{
     instrument = pi;
 }
 
@@ -220,10 +217,10 @@ void FrameEditor::setShowPlaybakIndicator(bool newShowPlaybackIndicator)
 
 void FrameEditor::setFrameData(int index, const QImage data)
 {
-    if(data.isNull()) {
+    if (data.isNull()) {
         frameData = data;
         frameIndex = index;
-        this->setBaseSize(1,1);
+        this->setBaseSize(1, 1);
         update();
         return;
     }
@@ -234,9 +231,9 @@ void FrameEditor::setFrameData(int index, const QImage data)
     frameData = data;
     frameIndex = index;
 
-    if(updateSize) {
+    if (updateSize) {
         updateGridSize();
-        //Compute a new viewport size, based on the current viewport height
+        // Compute a new viewport size, based on the current viewport height
         float scale = float(size().height())/data.size().height();
         this->setMinimumWidth(data.size().width()*scale);
     }
@@ -245,50 +242,49 @@ void FrameEditor::setFrameData(int index, const QImage data)
     update();
 }
 
-void FrameEditor::lazyUpdate() {
+void FrameEditor::lazyUpdate()
+{
     // Ignore the update request if it came too quickly
     static qint64 lastTime = 0;
     qint64 newTime = QDateTime::currentMSecsSinceEpoch();
-    if (newTime - lastTime < MIN_UPDATE_INTERVAL) {
+    if (newTime - lastTime < MIN_UPDATE_INTERVAL)
         return;
-    }
 
     lastTime = newTime;
 
     update();
 }
 
-void FrameEditor::paintEvent(QPaintEvent*)
+void FrameEditor::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter.setRenderHint(QPainter::Antialiasing, false);
 
     // If we don't have an image, show an empty view
-    if(!hasImage()) {
-        painter.fillRect(0,0,this->width(),this->height(), COLOR_CLEAR);
+    if (!hasImage()) {
+        painter.fillRect(0, 0, this->width(), this->height(), COLOR_CLEAR);
         return;
     }
 
     // Draw the image and tool preview
-    painter.drawImage(QRect(0,0,
+    painter.drawImage(QRect(0, 0,
                             frameData.width()*xScale+.5,
                             frameData.height()*yScale),
                       frameData);
 
-    if (!instrument.isNull() && instrument->showPreview()) {
-        painter.drawImage(QRect(0,0,frameData.width()*xScale+.5,frameData.height()*yScale), (instrument->getPreview()));
-    }
+    if (!instrument.isNull() && instrument->showPreview())
+        painter.drawImage(QRect(0, 0, frameData.width()*xScale+.5, frameData.height()*yScale),
+                          (instrument->getPreview()));
 
-    if(yScale >= GRID_MIN_Y_SCALE) {
-        painter.drawImage(0,0,gridPattern);
-    }
+    if (yScale >= GRID_MIN_Y_SCALE)
+        painter.drawImage(0, 0, gridPattern);
 
     // TODO: How to do this more generically?
-//    if(deviceModel->showPlaybackIndicator()) {
-    if(!fixture.isNull() && showPlaybackIndicator) {
-//        int playbackRow = deviceModel->getFrameIndex();
-//        const float outputScale = deviceModel->getDisplaySize().width()*xScale;
+// if(deviceModel->showPlaybackIndicator()) {
+    if (!fixture.isNull() && showPlaybackIndicator) {
+// int playbackRow = deviceModel->getFrameIndex();
+// const float outputScale = deviceModel->getDisplaySize().width()*xScale;
 
         int playbackRow = frameIndex;
         int fixtureWidth = fixture->getSize().width();
@@ -318,14 +314,13 @@ void FrameEditor::paintEvent(QPaintEvent*)
                          fixtureHeight*yScale,
                          COLOR_PLAYBACK_TOP);
     }
-
 }
 
-void FrameEditor::applyInstrument(QImage& update)
+void FrameEditor::applyInstrument(QImage &update)
 {
     QPainter painter;
     painter.begin(&frameData);
-    painter.drawImage(0,0,update);
+    painter.drawImage(0, 0, update);
     painter.end();
 
     emit(dataEdited(frameIndex, frameData));

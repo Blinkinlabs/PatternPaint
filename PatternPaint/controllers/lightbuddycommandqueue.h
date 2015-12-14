@@ -16,7 +16,6 @@ public:
     void fileNew(int sizeBytes);
     void writePage(int sector, int offset, QByteArray data);
     void reloadAnimations();
-
 };
 
 #endif // LIGHTBUDDYSERIALQUEUE_H

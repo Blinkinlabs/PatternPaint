@@ -49,7 +49,7 @@ public:
 
     virtual bool getPortInfo(QSerialPortInfo &info) = 0;
 
-    virtual bool getUploader(QPointer<BlinkyUploader>& uploader) = 0;
+    virtual bool getUploader(QPointer<BlinkyUploader> &uploader) = 0;
 
     // Reset the controller
     virtual void reset() = 0;

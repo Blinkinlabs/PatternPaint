@@ -39,13 +39,12 @@ class SprayInstrument : public CustomCursorInstrument
     Q_OBJECT
 public:
     explicit SprayInstrument(QObject *parent = 0);
-    
-    void mousePressEvent(QMouseEvent *event, FrameEditor&, const QPoint&);
-    void mouseMoveEvent(QMouseEvent *event, FrameEditor&, const QPoint&);
-    void mouseReleaseEvent(QMouseEvent *event, FrameEditor& editor, const QPoint&);
+
+    void mousePressEvent(QMouseEvent *event, FrameEditor &, const QPoint &);
+    void mouseMoveEvent(QMouseEvent *event, FrameEditor &, const QPoint &);
+    void mouseReleaseEvent(QMouseEvent *event, FrameEditor &editor, const QPoint &);
 protected:
-    void paint(FrameEditor&);
-    
+    void paint(FrameEditor &);
 };
 
 #endif // SPRAYINSTRUMENT_H

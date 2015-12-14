@@ -15,13 +15,16 @@ private:
     QSize getScaledImageSize(int height, QSize imageSize) const;
 
 public:
-    PatternDelegate(QObject* parent = 0);
+    PatternDelegate(QObject *parent = 0);
 
-    QWidget * createEditor(QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const { return NULL; }
+    QWidget *createEditor(QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const
+    {
+        return NULL;
+    }
 
-    virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex & index ) const;
-    QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & modelIndex ) const;
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option,
+                       const QModelIndex &index) const;
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &modelIndex) const;
 };
-
 
 #endif // PATTERNFRAMEDELEGATE_H

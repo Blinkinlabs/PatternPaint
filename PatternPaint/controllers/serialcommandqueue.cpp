@@ -9,7 +9,7 @@ SerialCommandQueue::SerialCommandQueue(QObject *parent) : QObject(parent)
 
     connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
             this, SLOT(handleSerialError(QSerialPort::SerialPortError)));
-    connect(serial,SIGNAL(readyRead()),this,SLOT(handleReadData()));
+    connect(serial, SIGNAL(readyRead()), this, SLOT(handleReadData()));
 
     commandTimeoutTimer = new QTimer(this);
     commandTimeoutTimer->setSingleShot(true);
@@ -18,9 +18,9 @@ SerialCommandQueue::SerialCommandQueue(QObject *parent) : QObject(parent)
             this, SLOT(handleCommandTimeout()));
 }
 
-
-bool SerialCommandQueue::open(QSerialPortInfo info) {
-    if(isConnected()) {
+bool SerialCommandQueue::open(QSerialPortInfo info)
+{
+    if (isConnected()) {
         qCritical("Already connected to serial device");
         return false;
     }
@@ -36,29 +36,29 @@ bool SerialCommandQueue::open(QSerialPortInfo info) {
 #endif
     serial->setBaudRate(QSerialPort::Baud115200);
 
-    if( !serial->open(QIODevice::ReadWrite) ) {
-        qDebug() << "Could not connect to serial device. Error: " << serial->error() << serial->errorString();
+    if (!serial->open(QIODevice::ReadWrite)) {
+        qDebug() << "Could not connect to serial device. Error: " << serial->error()
+                 << serial->errorString();
         return false;
     }
 
     return true;
 }
 
-void SerialCommandQueue::close() {
-    if(serial->isOpen()) {
+void SerialCommandQueue::close()
+{
+    if (serial->isOpen())
         serial->close();
-    }
 }
 
-bool SerialCommandQueue::isConnected() {
+bool SerialCommandQueue::isConnected()
+{
     return serial->isOpen();
 }
 
-void SerialCommandQueue::queueCommand(QString name,
-                                 QByteArray data,
-                                 QByteArray expectedRespone) {
-
-//    qDebug() << "Queueing command:" << name;
+void SerialCommandQueue::queueCommand(QString name, QByteArray data, QByteArray expectedRespone)
+{
+// qDebug() << "Queueing command:" << name;
 
     commandQueue.push_back(Command(name, data, expectedRespone));
 
@@ -66,12 +66,10 @@ void SerialCommandQueue::queueCommand(QString name,
     processCommandQueue();
 }
 
-void SerialCommandQueue::queueCommand(QString name,
-                                 QByteArray data,
-                                 QByteArray expectedRespone,
-                                 QByteArray expectedResponseMask) {
-
-//    qDebug() << "Queueing command:" << name;
+void SerialCommandQueue::queueCommand(QString name, QByteArray data, QByteArray expectedRespone,
+                                      QByteArray expectedResponseMask)
+{
+// qDebug() << "Queueing command:" << name;
 
     commandQueue.push_back(Command(name, data, expectedRespone, expectedResponseMask));
 
@@ -79,38 +77,37 @@ void SerialCommandQueue::queueCommand(QString name,
     processCommandQueue();
 }
 
-void SerialCommandQueue::processCommandQueue() {
-//    for(int i = 0; i < commandQueue.count(); i++)
-//        qDebug() << i << ": " << commandQueue.at(i).name;
+void SerialCommandQueue::processCommandQueue()
+{
+// for(int i = 0; i < commandQueue.count(); i++)
+// qDebug() << i << ": " << commandQueue.at(i).name;
 
     // Nothing to do if we don't have any commands...
-    if(commandQueue.count() == 0) {
+    if (commandQueue.count() == 0)
         return;
-    }
 
     // Don't start a new command if one is already in progress
-    if(commandTimeoutTimer->isActive()) {
+    if (commandTimeoutTimer->isActive())
         return;
-    }
 
-    if(!isConnected()) {
+    if (!isConnected()) {
         qCritical() << "Device disappeared, cannot run command";
         return;
     }
 
-//    qDebug() << "Starting Command:" << commandQueue.front().name;
+// qDebug() << "Starting Command:" << commandQueue.front().name;
     responseData.clear();
 
-
-    if(serial->write(commandQueue.front().commandData) != commandQueue.front().commandData.length()) {
+    if (serial->write(commandQueue.front().commandData)
+        != commandQueue.front().commandData.length()) {
         qCritical() << "Error writing to device";
         return;
     }
 
-//    for(int i = 0; i < commandQueue.front().commandData.count(); i++)
-//        qDebug() << "Data at " << i << ": "
-//                 << (int)commandQueue.front().commandData.at(i)
-//                 << "(" << commandQueue.front().commandData.at(i) << ")";
+// for(int i = 0; i < commandQueue.front().commandData.count(); i++)
+// qDebug() << "Data at " << i << ": "
+// << (int)commandQueue.front().commandData.at(i)
+// << "(" << commandQueue.front().commandData.at(i) << ")";
 
     // Start the timer; the command must complete before it fires, or it
     // is considered an error. This is to prevent a misbehaving device from hanging
@@ -118,29 +115,29 @@ void SerialCommandQueue::processCommandQueue() {
     commandTimeoutTimer->start(COMMAND_TIMEOUT_TIME);
 }
 
-void SerialCommandQueue::handleReadData() {
-    if(commandQueue.length() == 0) {
+void SerialCommandQueue::handleReadData()
+{
+    if (commandQueue.length() == 0) {
         // TODO: error, we got unexpected data.
         qCritical() << "Got data when we didn't expect it!";
         return;
     }
 
-    if(isConnected()) {
+    if (isConnected())
         responseData.append(serial->readAll());
-    }
 
-//    for(int i = 0; i < responseData.count(); i++)
-//        qDebug() << "Data at " << i << ": "
-//                 << (int)responseData.at(i)
-//                 << "(" << responseData.at(i) << ")";
+// for(int i = 0; i < responseData.count(); i++)
+// qDebug() << "Data at " << i << ": "
+// << (int)responseData.at(i)
+// << "(" << responseData.at(i) << ")";
 
-    if(responseData.length() > commandQueue.front().expectedResponse.length()) {
+    if (responseData.length() > commandQueue.front().expectedResponse.length()) {
         // TODO: error, we got unexpected data.
         qCritical() << "Got more data than we expected";
         return;
     }
 
-    if(responseData.length() < commandQueue.front().expectedResponse.length()) {
+    if (responseData.length() < commandQueue.front().expectedResponse.length()) {
         qDebug() << "Didn't get enough data yet. Expecting:"
                  << commandQueue.front().expectedResponse.length()
                  << " received: " << responseData.length();
@@ -148,22 +145,22 @@ void SerialCommandQueue::handleReadData() {
     }
 
     // If the command was to read from flash, short-circuit the response data check.
-    if(commandQueue.front().name == "readFlash") {
-        if(responseData.at(responseData.length()-1) != '\r') {
+    if (commandQueue.front().name == "readFlash") {
+        if (responseData.at(responseData.length()-1) != '\r') {
             qCritical() << "readFlash response didn't end with a \\r";
             return;
         }
     }
     // If the expected data should be masked, do a chracter by character match
-    else if(commandQueue.front().expectedResponseMask.length() > 0) {
-        if(commandQueue.front().expectedResponseMask.length() !=
-            commandQueue.front().expectedResponse.length()) {
+    else if (commandQueue.front().expectedResponseMask.length() > 0) {
+        if (commandQueue.front().expectedResponseMask.length()
+            != commandQueue.front().expectedResponse.length()) {
             qCritical() << "Expected response mask length incorrect!";
             emit(error("Expected response mask length incorrect!"));
             return;
         }
-        for(int i = 0; i < responseData.length(); i++) {
-            if(commandQueue.front().expectedResponseMask.at(i) != 0
+        for (int i = 0; i < responseData.length(); i++) {
+            if (commandQueue.front().expectedResponseMask.at(i) != 0
                 && responseData[i] != commandQueue.front().expectedResponse.at(i)) {
                 qCritical() << "Got unexpected data back"
                             << " position=" << i
@@ -176,19 +173,18 @@ void SerialCommandQueue::handleReadData() {
         }
     }
     // Otherwise just check if the strings match
-    else if(responseData != commandQueue.front().expectedResponse) {
+    else if (responseData != commandQueue.front().expectedResponse) {
         qCritical() << "Got unexpected data back";
         emit(error("Got unexpected data back"));
         return;
     }
 
-//    qDebug() << "Command completed successfully: " << commandQueue.front().name;
-    emit(commandFinished(commandQueue.front().name,responseData));
-
+// qDebug() << "Command completed successfully: " << commandQueue.front().name;
+    emit(commandFinished(commandQueue.front().name, responseData));
 
     // If the command was reset, disconnect from the programmer and cancel
     // any further commands
-    if(commandQueue.front().name == "reset") {
+    if (commandQueue.front().name == "reset") {
         qDebug() << "Disconnecting from programmer";
 
         resetState();
@@ -210,11 +206,10 @@ void SerialCommandQueue::handleReadData() {
 void SerialCommandQueue::handleSerialError(QSerialPort::SerialPortError serialError)
 {
     // If we aren't supposed to be connected, discard resource errors
-    if(!serial->isOpen() && serialError == QSerialPort::ResourceError) {
+    if (!serial->isOpen() && serialError == QSerialPort::ResourceError)
         return;
-    }
 
-    if(serialError == QSerialPort::NoError) {
+    if (serialError == QSerialPort::NoError) {
         // The serial library appears to emit an extraneous SerialPortError
         // when open() is called. Just ignore it.
         return;
@@ -233,7 +228,8 @@ void SerialCommandQueue::handleCommandTimeout()
     resetState();
 }
 
-void SerialCommandQueue::resetState() {
+void SerialCommandQueue::resetState()
+{
     close();
     commandQueue.clear();
     responseData.clear();

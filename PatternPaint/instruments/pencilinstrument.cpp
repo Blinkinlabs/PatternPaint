@@ -12,14 +12,13 @@ PencilInstrument::PencilInstrument(QObject *parent) :
     drawing = false;
 }
 
-void PencilInstrument::mousePressEvent(QMouseEvent *event, FrameEditor& editor, const QPoint& pt)
+void PencilInstrument::mousePressEvent(QMouseEvent *event, FrameEditor &editor, const QPoint &pt)
 {
-    if(event->button() == Qt::LeftButton )
-    {
+    if (event->button() == Qt::LeftButton) {
         toolPreview = QImage(editor.getPatternAsImage().width(),
                              editor.getPatternAsImage().height(),
                              QImage::Format_ARGB32_Premultiplied);
-        toolPreview.fill(QColor(0,0,0,0));
+        toolPreview.fill(QColor(0, 0, 0, 0));
 
         mStartPoint = mEndPoint = pt;
         paint(editor);
@@ -27,23 +26,23 @@ void PencilInstrument::mousePressEvent(QMouseEvent *event, FrameEditor& editor, 
     }
 }
 
-void PencilInstrument::mouseMoveEvent(QMouseEvent *event, FrameEditor& editor, const QPoint& pt)
+void PencilInstrument::mouseMoveEvent(QMouseEvent *event, FrameEditor &editor, const QPoint &pt)
 {
-    if(drawing) {
+    if (drawing) {
         mEndPoint = pt;
-        if(event->buttons() & Qt::LeftButton)
+        if (event->buttons() & Qt::LeftButton)
             paint(editor);
         mStartPoint = pt;
     }
 }
 
-void PencilInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor& editor, const QPoint&)
+void PencilInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QPoint &)
 {
     editor.applyInstrument(toolPreview);
     drawing = false;
 }
 
-void PencilInstrument::paint(FrameEditor& editor)
+void PencilInstrument::paint(FrameEditor &editor)
 {
     QPainter painter(&toolPreview);
 
@@ -51,11 +50,9 @@ void PencilInstrument::paint(FrameEditor& editor)
                         editor.getPenSize(),
                         Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
-    if(mStartPoint != mEndPoint) {
+    if (mStartPoint != mEndPoint)
         painter.drawLine(mStartPoint, mEndPoint);
-    }
 
-    if(mStartPoint == mEndPoint)  {
+    if (mStartPoint == mEndPoint)
         painter.drawPoint(mStartPoint);
-    }
 }

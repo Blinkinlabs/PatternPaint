@@ -44,9 +44,9 @@ public:
     /// Constructor
     /// @param color Default color
     /// @param parent Pointer for parent.
-    explicit ColorChooser(const QColor& color, QWidget *parent = 0);
+    explicit ColorChooser(const QColor &color, QWidget *parent = 0);
     ~ColorChooser();
-    
+
 private:
     QColor currentColor;
     QPixmap pixmap;
@@ -69,7 +69,6 @@ signals:
 
 protected:
     void mousePressEvent(QMouseEvent *event);
-    
 };
 
 #endif // COLORCHOOSER_H

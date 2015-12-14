@@ -3,12 +3,10 @@
 #include "blinkycontroller.h"
 #include "blinkytape.h"
 
-
 BlinkyTapeControllerInfo::BlinkyTapeControllerInfo(QSerialPortInfo info, QObject *parent) :
     ControllerInfo(parent),
     info(info)
 {
-
 }
 
 QString BlinkyTapeControllerInfo::resourceName() const

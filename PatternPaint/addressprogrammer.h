@@ -7,7 +7,6 @@ namespace Ui {
 class AddressProgrammer;
 }
 
-
 /// Dialog to enable the address programmer feature for LightBuddy controllers (program WS2821/WS2822s LEDs)
 class AddressProgrammer : public QDialog
 {

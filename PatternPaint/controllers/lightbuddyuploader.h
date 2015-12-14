@@ -5,16 +5,15 @@
 #include "blinkyuploader.h"
 #include "lightbuddycommandqueue.h"
 
-
 class LightBuddyUploader : public BlinkyUploader
 {
     Q_OBJECT
 
 public:
-    LightBuddyUploader(QObject *parent=0);
+    LightBuddyUploader(QObject *parent = 0);
 
-    bool startUpload(BlinkyController& controller, std::vector<PatternWriter> patternWriters);
-    bool upgradeFirmware(BlinkyController& controller);
+    bool startUpload(BlinkyController &controller, std::vector<PatternWriter> patternWriters);
+    bool upgradeFirmware(BlinkyController &controller);
     bool upgradeFirmware(int timeout);
     QString getErrorString() const;
 

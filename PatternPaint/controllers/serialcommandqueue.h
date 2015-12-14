@@ -23,13 +23,9 @@ public:
     bool isConnected();
 
     // Queue a new command
-    void queueCommand(QString name,
-                      QByteArray data,
-                      QByteArray expectedRespone);
+    void queueCommand(QString name, QByteArray data, QByteArray expectedRespone);
 
-    void queueCommand(QString name,
-                      QByteArray data,
-                      QByteArray expectedRespone,
+    void queueCommand(QString name, QByteArray data, QByteArray expectedRespone,
                       QByteArray expectedResponseMask);
 
 signals:
@@ -48,21 +44,21 @@ public slots:
 
 private:
     struct Command {
-        Command(QString name_,
-                QByteArray command_,
-                QByteArray expectedResponse_) :
+        Command(QString name_, QByteArray command_, QByteArray expectedResponse_) :
             name(name_),
             commandData(command_),
-            expectedResponse(expectedResponse_) {}
+            expectedResponse(expectedResponse_)
+        {
+        }
 
-        Command(QString name_,
-                QByteArray command_,
-                QByteArray expectedResponse_,
+        Command(QString name_, QByteArray command_, QByteArray expectedResponse_,
                 QByteArray expectedResponseMask_) :
             name(name_),
             commandData(command_),
             expectedResponse(expectedResponse_),
-            expectedResponseMask(expectedResponseMask_) {}
+            expectedResponseMask(expectedResponseMask_)
+        {
+        }
 
         QString name;                   ///< Human-readable description of the command
         QByteArray commandData;         ///< Data to send to the bootloader

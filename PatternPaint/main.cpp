@@ -13,10 +13,10 @@
 #include "winsparkleautoupdater.h"
 #endif
 
-
-
-#define OSX_RELEASE_APPCAST_DEFAULT "http://software.blinkinlabs.com/patternpaint/patternpaint-osx.xml"
-#define WINDOWS_RELEASE_APPCAST_DEFAULT "http://software.blinkinlabs.com/patternpaint/patternpaint-windows.xml"
+#define OSX_RELEASE_APPCAST_DEFAULT \
+    "http://software.blinkinlabs.com/patternpaint/patternpaint-osx.xml"
+#define WINDOWS_RELEASE_APPCAST_DEFAULT \
+    "http://software.blinkinlabs.com/patternpaint/patternpaint-windows.xml"
 
 int main(int argc, char *argv[])
 {
@@ -27,12 +27,11 @@ int main(int argc, char *argv[])
 
     qSetMessagePattern("%{type} %{function}: %{message}");
 
-    AutoUpdater* updater = 0;
+    AutoUpdater *updater = 0;
 
 #if defined(Q_OS_MACX)
     CocoaInitializer cocoaInitiarizer;
-#endif //Q_OS_MACX
-
+#endif // Q_OS_MACX
 
 #if defined(DISABLE_UPDATE_CHECKS)
 
@@ -42,17 +41,19 @@ int main(int argc, char *argv[])
 
 #if defined(Q_OS_MACX)
     QSettings settings;
-    QString updateUrl = settings.value("Updates/releaseAppcastUrl", OSX_RELEASE_APPCAST_DEFAULT).toString();
+    QString updateUrl
+        = settings.value("Updates/releaseAppcastUrl", OSX_RELEASE_APPCAST_DEFAULT).toString();
     updater = new SparkleAutoUpdater(updateUrl);
 #endif // Q_OS__MACX
 
 #if defined(Q_OS_WIN)
     QSettings settings;
-    QString updateUrl = settings.value("Updates/releaseAppcastUrl", WINDOWS_RELEASE_APPCAST_DEFAULT).toString();
+    QString updateUrl
+        = settings.value("Updates/releaseAppcastUrl", WINDOWS_RELEASE_APPCAST_DEFAULT).toString();
     updater = new WinSparkleAutoUpdater(updateUrl);
 #endif // Q_OS_WIN
 
-#endif  //DISABLE_UPDATE_CHECKSS
+#endif  // DISABLE_UPDATE_CHECKSS
 
     if (updater) {
         // TODO: Defer this until after the app opens on Windows (to prevent the dialog from being hidden?)

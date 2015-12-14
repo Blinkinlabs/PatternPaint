@@ -11,10 +11,10 @@ class BlinkyPendantUploader : public BlinkyUploader
     Q_OBJECT
 
 public:
-    BlinkyPendantUploader(QObject *parent=0);
+    BlinkyPendantUploader(QObject *parent = 0);
 
-    bool startUpload(BlinkyController& controller, std::vector<PatternWriter> patterns);
-    bool upgradeFirmware(BlinkyController& controller);
+    bool startUpload(BlinkyController &controller, std::vector<PatternWriter> patterns);
+    bool upgradeFirmware(BlinkyController &controller);
     bool upgradeFirmware(int timeout);
     QString getErrorString() const;
 

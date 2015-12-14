@@ -12,15 +12,14 @@ class PatternCollectionListView : public QListView
 {
     Q_OBJECT
 public:
-    PatternCollectionListView(QWidget* parent);
+    PatternCollectionListView(QWidget *parent);
     ~PatternCollectionListView();
 
-//    // Handle re-ordering patterns by dragging, as well as file URLs dropped from other programs
-//    void dragEnterEvent(QDragEnterEvent *event);
-//    void dropEvent(QDropEvent *event);
+//// Handle re-ordering patterns by dragging, as well as file URLs dropped from other programs
+// void dragEnterEvent(QDragEnterEvent *event);
+// void dropEvent(QDropEvent *event);
 
 private:
-
 };
 
 #endif // PATTERNCOLLECTIONLISTVIEW_H

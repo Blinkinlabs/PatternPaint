@@ -24,19 +24,21 @@ public:
 
     Qt::DropActions supportedDropActions() const;
 
-    bool setData(const QModelIndex &index, const QVariant &value,
-                 int role = Qt::EditRole);
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
     bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex());
     bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex());
 
-    QUndoStack* getUndoStack() {return &undoStack;}
+    QUndoStack *getUndoStack()
+    {
+        return &undoStack;
+    }
 
     friend class PatternFrameUndoCommand;
 
 private:
     QList<QImage> frames;
-    QUndoStack  undoStack;      ///< Undo stack for this pattern
+    QUndoStack undoStack;       ///< Undo stack for this pattern
     QSize frameSize;            ///< Resolution of this pattern, in pixels
     float frameSpeed;           ///< Speed to play back the pattern
     QString fileInfo;           ///< Filename for the pattern

@@ -40,15 +40,18 @@ class LineInstrument : public CustomCursorInstrument
 
 public:
     explicit LineInstrument(QObject *parent = 0);
-    
-    void mousePressEvent(QMouseEvent *event, FrameEditor&, const QPoint&);
-    void mouseMoveEvent(QMouseEvent *event, FrameEditor&, const QPoint&);
-    void mouseReleaseEvent(QMouseEvent *event, FrameEditor&, const QPoint&);
 
-    QCursor cursor() const { return Qt::CrossCursor; }
+    void mousePressEvent(QMouseEvent *event, FrameEditor &, const QPoint &);
+    void mouseMoveEvent(QMouseEvent *event, FrameEditor &, const QPoint &);
+    void mouseReleaseEvent(QMouseEvent *event, FrameEditor &, const QPoint &);
+
+    QCursor cursor() const
+    {
+        return Qt::CrossCursor;
+    }
+
 protected:
-    void paint(FrameEditor&);
-    
+    void paint(FrameEditor &);
 };
 
 #endif // LINEINSTRUMENT_H

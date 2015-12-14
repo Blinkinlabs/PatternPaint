@@ -39,16 +39,20 @@ class FillInstrument : public CustomCursorInstrument
     Q_OBJECT
 public:
     explicit FillInstrument(QObject *parent = 0);
-    
-    void mousePressEvent(QMouseEvent *event, FrameEditor&, const QPoint&);
-    void mouseMoveEvent(QMouseEvent *event, FrameEditor&, const QPoint&);
-    void mouseReleaseEvent(QMouseEvent *event, FrameEditor&, const QPoint&);
-    bool showPreview() const { return false; }
+
+    void mousePressEvent(QMouseEvent *event, FrameEditor &, const QPoint &);
+    void mouseMoveEvent(QMouseEvent *event, FrameEditor &, const QPoint &);
+    void mouseReleaseEvent(QMouseEvent *event, FrameEditor &, const QPoint &);
+    bool showPreview() const
+    {
+        return false;
+    }
+
 protected:
-    void paint(FrameEditor&);
+    void paint(FrameEditor &);
 
 private:
-    void fill(const QPoint&, QRgb newColor, QRgb oldColor, QImage& pattern);
+    void fill(const QPoint &, QRgb newColor, QRgb oldColor, QImage &pattern);
 };
 
 #endif // FILLINSTRUMENT_H

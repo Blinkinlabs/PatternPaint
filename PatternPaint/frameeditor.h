@@ -10,7 +10,6 @@ class QUndoStack;
 class PatternFrameUndoCommand;
 class AbstractInstrument;
 
-
 class FrameEditor : public QWidget
 {
     Q_OBJECT
@@ -19,25 +18,31 @@ public:
 
     /// Get the image data for the current pattern
     /// @return QImage containing the current pattern
-    const QImage& getPatternAsImage() const;
+    const QImage &getPatternAsImage() const;
 
     /// Instrument interface
 
-    QColor getPrimaryColor() const { return toolColor; }
-    int getPenSize() const { return toolSize; }
+    QColor getPrimaryColor() const
+    {
+        return toolColor;
+    }
+
+    int getPenSize() const
+    {
+        return toolSize;
+    }
 
     /// Update the pattern with the given changes.
     /// @param update RGBA QImage to draw on top of the current
-    void applyInstrument(QImage& update);
+    void applyInstrument(QImage &update);
 
     /// Re-size the display grid and selector based on new widget geometery
-    void resizeEvent(QResizeEvent * resizeEvent);
+    void resizeEvent(QResizeEvent *resizeEvent);
 
     // Pass messages to the selected instrument
-    void mousePressEvent(QMouseEvent * event);
-    void mouseMoveEvent(QMouseEvent * event);
-    void mouseReleaseEvent(QMouseEvent*);
-
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *);
 
     // Handle file URLs dropped from other programs
     void dragEnterEvent(QDragEnterEvent *event);
@@ -80,8 +85,8 @@ signals:
 public slots:
     void setToolColor(QColor color);
     void setToolSize(int size);
-    void setInstrument(AbstractInstrument*);
-    void setFixture(Fixture*);
+    void setInstrument(AbstractInstrument *);
+    void setFixture(Fixture *);
     void setShowPlaybakIndicator(bool);
 
     void setFrameData(int index, const QImage data);

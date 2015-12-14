@@ -21,7 +21,7 @@ public:
     /// data at the end may be erased.
     /// @param data QByteArray containing the data to write to the flash
     /// @param startAddress Page-aligned address to begin writing to, in bytes
-    void writeFlash(QByteArray& data, int startAddress);
+    void writeFlash(QByteArray &data, int startAddress);
 
     /// These functions are direct implementations of the bootloader interface
 

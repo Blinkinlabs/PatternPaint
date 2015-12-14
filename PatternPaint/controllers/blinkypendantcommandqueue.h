@@ -3,7 +3,6 @@
 
 #include "serialcommandqueue.h"
 
-
 class BlinkyPendantCommandQueue : public SerialCommandQueue
 {
     Q_OBJECT
@@ -13,7 +12,7 @@ public:
 
     void startWrite();
 
-    void writeData(QByteArray& data);
+    void writeData(QByteArray &data);
 
     void stopWrite();
 };

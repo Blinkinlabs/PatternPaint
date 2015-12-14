@@ -7,17 +7,17 @@
 
 class WinSparkleAutoUpdater : public AutoUpdater
 {
-    public:
-        WinSparkleAutoUpdater(const QString& url);
-        ~WinSparkleAutoUpdater();
+public:
+    WinSparkleAutoUpdater(const QString &url);
+    ~WinSparkleAutoUpdater();
 
-        void checkForUpdates();
+    void checkForUpdates();
 
-        bool getAutomatic();
-        void setAutomatic(bool setting);
-    private:
-        class Private;
-        Private* d;
+    bool getAutomatic();
+    void setAutomatic(bool setting);
+private:
+    class Private;
+    Private *d;
 };
 
 #endif // WINSPARKLEAUTOUPDATER_H

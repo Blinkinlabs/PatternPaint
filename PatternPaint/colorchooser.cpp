@@ -31,7 +31,7 @@
 #include <QColorDialog>
 #include <QDebug>
 
-ColorChooser::ColorChooser(const QColor& color, QWidget *parent) :
+ColorChooser::ColorChooser(const QColor &color, QWidget *parent) :
     QLabel(parent),
     colorDialog(this)
 {
@@ -49,7 +49,7 @@ ColorChooser::ColorChooser(const QColor& color, QWidget *parent) :
     colorDialog.setOptions(QColorDialog::NoButtons);
 
     connect(&colorDialog, SIGNAL(currentColorChanged(const QColor &)),
-        this, SLOT(setAndSendColor(const QColor &)));
+            this, SLOT(setAndSendColor(const QColor &)));
 }
 
 ColorChooser::~ColorChooser()
@@ -58,9 +58,8 @@ ColorChooser::~ColorChooser()
 
 void ColorChooser::setColor(const QColor &color)
 {
-    if(!color.isValid()) {
+    if (!color.isValid())
         return;
-    }
 
     currentColor = color;
 
@@ -71,9 +70,8 @@ void ColorChooser::setColor(const QColor &color)
 
 void ColorChooser::setAndSendColor(const QColor &color)
 {
-    if(!color.isValid()) {
+    if (!color.isValid())
         return;
-    }
 
     setColor(color);
     emit(sendColor(color));
@@ -81,8 +79,7 @@ void ColorChooser::setAndSendColor(const QColor &color)
 
 void ColorChooser::mousePressEvent(QMouseEvent *event)
 {
-    if(event->button() == Qt::LeftButton)
-    {
+    if (event->button() == Qt::LeftButton) {
         // TODO: If the user closed the dialog, this won't toggle for some reason?
         colorDialog.setVisible(!colorDialog.isVisible());
     }

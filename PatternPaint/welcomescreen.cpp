@@ -9,9 +9,9 @@ WelcomeScreen::WelcomeScreen(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->SceneList->setIconSize(QSize(150,150));
+    ui->SceneList->setIconSize(QSize(150, 150));
 
-    for(int i = 0; i < SCENE_TEMPLATE_COUNT; i++ ) {
+    for (int i = 0; i < SCENE_TEMPLATE_COUNT; i++) {
         QListWidgetItem *item = new QListWidgetItem(sceneTemplates[i].name, ui->SceneList);
         item->setIcon(QIcon(sceneTemplates[i].photo));
     }
@@ -29,14 +29,13 @@ SceneTemplate WelcomeScreen::getSelectedTemplate()
     // Note that this assumes a 1:1 relationship between the listwidget and the scene template list
     int selected = 0;
 
-    for(int row = 0; row < ui->SceneList->count(); row++) {
-        if( ui->SceneList->item(row)->isSelected())
+    for (int row = 0; row < ui->SceneList->count(); row++) {
+        if (ui->SceneList->item(row)->isSelected())
             selected = row;
     }
 
     return sceneTemplates[selected];
 }
-
 
 void WelcomeScreen::on_SceneList_doubleClicked(const QModelIndex &index)
 {
@@ -45,7 +44,8 @@ void WelcomeScreen::on_SceneList_doubleClicked(const QModelIndex &index)
     this->accept();
 }
 
-void WelcomeScreen::accept() {
+void WelcomeScreen::accept()
+{
     QDialog::accept();
 
     // Send scene apply signal here

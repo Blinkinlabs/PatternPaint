@@ -12,7 +12,7 @@
 class SparkleAutoUpdater : public AutoUpdater
 {
 public:
-    SparkleAutoUpdater(const QString& url);
+    SparkleAutoUpdater(const QString &url);
     ~SparkleAutoUpdater();
 
     void checkForUpdates();
@@ -22,7 +22,7 @@ public:
 
 private:
     class Private;
-    Private* d;
+    Private *d;
 };
 
 #endif

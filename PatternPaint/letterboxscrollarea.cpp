@@ -1,15 +1,14 @@
 #include "letterboxscrollarea.h"
 
-LetterboxScrollArea::LetterboxScrollArea(QWidget* parent):
+LetterboxScrollArea::LetterboxScrollArea(QWidget *parent) :
     QScrollArea(parent)
 {
-
 }
 
 void LetterboxScrollArea::resizeEvent(QResizeEvent *event)
 {
     float widgetAspect = float(widget()->baseSize().width())
-            /widget()->baseSize().height();
+                         /widget()->baseSize().height();
 
     float widgetWidth = height()*widgetAspect;
 
@@ -18,4 +17,3 @@ void LetterboxScrollArea::resizeEvent(QResizeEvent *event)
 
     QScrollArea::resizeEvent(event);
 }
-

@@ -3,7 +3,6 @@
 
 #include <QScrollArea>
 
-
 /// Provides a scroll area that uses an aspect ratio hint from the child widget
 /// to enforce an aspect ratio based on the new window height
 ///

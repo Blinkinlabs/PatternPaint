@@ -9,12 +9,11 @@
 class CAppNapInhibitor
 {
 public:
-    CAppNapInhibitor(const char* strReason);
+    CAppNapInhibitor(const char *strReason);
     ~CAppNapInhibitor();
 private:
     class Private;
-    Private* d;
+    Private *d;
 };
 
 #endif // APPNAP_H
-

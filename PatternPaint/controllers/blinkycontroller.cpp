@@ -8,13 +8,11 @@
 
 BlinkyController::BlinkyController(QObject *parent) : QObject(parent)
 {
-
 }
 
 void BlinkyController::close()
 {
 }
-
 
 // TODO: Support a method for loading these from preferences file
 QList<QPointer<ControllerInfo> > BlinkyController::probe()
@@ -24,20 +22,20 @@ QList<QPointer<ControllerInfo> > BlinkyController::probe()
 
     foreach (const QSerialPortInfo &info, serialPorts) {
         // Only connect to known BlinkyTapes
-        if(info.vendorIdentifier() == BLINKYTAPE_SKETCH_VID
-           && info.productIdentifier() == BLINKYTAPE_SKETCH_PID)
+        if (info.vendorIdentifier() == BLINKYTAPE_SKETCH_VID
+            && info.productIdentifier() == BLINKYTAPE_SKETCH_PID)
             controllerInfos.push_back(new BlinkyTapeControllerInfo(info));
         // If it's a leonardo, it /may/ be a BlinkyTape running a user sketch
-        else if(info.vendorIdentifier() == LEONARDO_SKETCH_VID
-                && info.productIdentifier() == LEONARDO_SKETCH_PID)
+        else if (info.vendorIdentifier() == LEONARDO_SKETCH_VID
+                 && info.productIdentifier() == LEONARDO_SKETCH_PID)
             controllerInfos.push_back(new BlinkyTapeControllerInfo(info));
         // Also BlinkyPendants!
-        else if(info.vendorIdentifier() == BLINKYPENDANT_SKETCH_VID
-                && info.productIdentifier() == BLINKYPENDANT_SKETCH_PID)
+        else if (info.vendorIdentifier() == BLINKYPENDANT_SKETCH_VID
+                 && info.productIdentifier() == BLINKYPENDANT_SKETCH_PID)
             controllerInfos.push_back(new BlinkyTapeControllerInfo(info));
         // And Lightbuddies!
-        else if(info.vendorIdentifier() == LIGHTBUDDY_SKETCH_VID
-                && info.productIdentifier() == LIGHTBUDDY_SKETCH_PID)
+        else if (info.vendorIdentifier() == LIGHTBUDDY_SKETCH_VID
+                 && info.productIdentifier() == LIGHTBUDDY_SKETCH_PID)
             controllerInfos.push_back(new BlinkyTapeControllerInfo(info));
     }
 
@@ -52,15 +50,13 @@ QList<QSerialPortInfo> BlinkyController::probeBootloaders()
 
     foreach (const QSerialPortInfo &info, serialPorts) {
         // Only connect to known BlinkyTapes
-        if(info.vendorIdentifier() == BLINKYTAPE_BOOTLOADER_VID
-           && info.productIdentifier() == BLINKYTAPE_BOOTLOADER_PID) {
+        if (info.vendorIdentifier() == BLINKYTAPE_BOOTLOADER_VID
+            && info.productIdentifier() == BLINKYTAPE_BOOTLOADER_PID)
             tapes.push_back(info);
-        }
         // If it's a leonardo, it /may/ be a BlinkyTape running a user sketch
-        else if(info.vendorIdentifier() == LEONARDO_BOOTLOADER_VID
-                && info.productIdentifier() == LEONARDO_BOOTLOADER_PID) {
-                 tapes.push_back(info);
-        }
+        else if (info.vendorIdentifier() == LEONARDO_BOOTLOADER_VID
+                 && info.productIdentifier() == LEONARDO_BOOTLOADER_PID)
+            tapes.push_back(info);
     }
 
     return tapes;

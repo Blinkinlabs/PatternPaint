@@ -9,7 +9,6 @@
 #include <QtSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 
-
 /// Interval between scans to see if the device is still connected
 #define CONNECTION_SCANNER_INTERVAL 100
 
@@ -41,7 +40,6 @@ BlinkyTape::BlinkyTape(QSerialPortInfo info, QObject *parent) :
     connect(serial, SIGNAL(baudRateChanged(qint32, QSerialPort::Directions)),
             this, SLOT(handleBaudRateChanged(qint32, QSerialPort::Directions)));
 
-
     resetTimer.setSingleShot(true);
     connect(&resetTimer, SIGNAL(timeout()), this, SLOT(resetTimer_timeout()));
 
@@ -51,7 +49,8 @@ BlinkyTape::BlinkyTape(QSerialPortInfo info, QObject *parent) :
     // On Windows, we don't get notified if the tape was disconnected, so we have to check peroidically
 #if defined(Q_OS_WIN)
     connectionScannerTimer.setInterval(CONNECTION_SCANNER_INTERVAL);
-    connect(&connectionScannerTimer, SIGNAL(timeout()), this, SLOT(connectionScannerTimer_timeout()));
+    connect(&connectionScannerTimer, SIGNAL(timeout()), this,
+            SLOT(connectionScannerTimer_timeout()));
 #endif
 }
 
@@ -64,32 +63,28 @@ void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
 {
     // The serial library appears to emit an extraneous SerialPortError
     // when open() is called. Just ignore it.
-    if(error == QSerialPort::NoError) {
+    if (error == QSerialPort::NoError)
         return;
-    }
 
     QString errorString = serial->errorString();
 
-
-    if (error == QSerialPort::ResourceError) {
+    if (error == QSerialPort::ResourceError)
         qCritical() << "Serial resource error, device unplugged?" << errorString;
-    }
-    else {
+    else
         qCritical() << "Unrecognized serial error:" << errorString;
-    }
 
 
     close();
 }
 
-void BlinkyTape::resetTimer_timeout() {
-    if(!isConnected()) {
+void BlinkyTape::resetTimer_timeout()
+{
+    if (!isConnected())
         return;
-    }
 
     qDebug() << "Hit reset timer";
 
-    if(resetTriesRemaining < 1) {
+    if (resetTriesRemaining < 1) {
         qCritical() << "Reset timer maximum tries reached, failed to reset tape";
         return;
     }
@@ -106,23 +101,23 @@ void BlinkyTape::resetTimer_timeout() {
 void BlinkyTape::sendChunk()
 {
     // If the last bit didn't get written yet, try again shortly.
-    if(serial->bytesToWrite() > 0) {
+    if (serial->bytesToWrite() > 0) {
         qDebug() << "Busy, trying again shortly";
         serialWriteTimer.start(WRITE_BUSY_DELAY);
         return;
     }
 
-    while(!chunks.isEmpty()) {
+    while (!chunks.isEmpty()) {
         QByteArray chunk = chunks.takeFirst();
 
         int writeLength = serial->write(chunk);
-        if(writeLength != chunk.length()) {
+        if (writeLength != chunk.length()) {
             qCritical() << "Error writing all the data out, expected:" << chunk.length()
                         << ", wrote:" << writeLength;
         }
         serial->flush();
 
-        if(!chunks.isEmpty()) {
+        if (!chunks.isEmpty()) {
             serialWriteTimer.start(WRITE_CHUNK_DELAY);
             return;
         }
@@ -130,9 +125,10 @@ void BlinkyTape::sendChunk()
 }
 
 #if defined(Q_OS_WIN)
-void BlinkyTape::connectionScannerTimer_timeout() {
+void BlinkyTape::connectionScannerTimer_timeout()
+{
     // If we are already disconnected, disregard.
-    if(!isConnected()) {
+    if (!isConnected()) {
         connectionScannerTimer.stop();
         return;
     }
@@ -144,18 +140,19 @@ void BlinkyTape::connectionScannerTimer_timeout() {
     foreach (const QSerialPortInfo &info, tapes) {
         // If we get a match, reset the timer and return.
         // We consider it a match if the port is the same on both
-        if(info.portName() == currentInfo.portName()) {
+        if (info.portName() == currentInfo.portName())
             return;
-        }
     }
 
     // We seem to have lost our port, bail
     close();
 }
+
 #endif
 
-bool BlinkyTape::open() {
-    if(isConnected()) {
+bool BlinkyTape::open()
+{
+    if (isConnected()) {
         qCritical() << "Already connected to a device";
         return false;
     }
@@ -171,8 +168,9 @@ bool BlinkyTape::open() {
 #endif
     serial->setBaudRate(QSerialPort::Baud115200);
 
-    if( !serial->open(QIODevice::ReadWrite) ) {
-        qDebug() << "Could not connect to device. Error: " << serial->error() << serial->errorString();
+    if (!serial->open(QIODevice::ReadWrite)) {
+        qDebug() << "Could not connect to device. Error: " << serial->error()
+                 << serial->errorString();
         return false;
     }
 
@@ -187,10 +185,10 @@ bool BlinkyTape::open() {
     return true;
 }
 
-void BlinkyTape::close() {
-    if(isConnected()) {
+void BlinkyTape::close()
+{
+    if (isConnected())
         serial->close();
-    }
 
     resetTriesRemaining = 0;
 
@@ -205,21 +203,20 @@ void BlinkyTape::handleSerialReadData()
 
 void BlinkyTape::handleBaudRateChanged(qint32 baudRate, QSerialPort::Directions)
 {
-    if(baudRate == QSerialPort::Baud115200) {
+    if (baudRate == QSerialPort::Baud115200) {
         qDebug() << "Baud rate updated to 115200!";
-    }
-    else if(baudRate == QSerialPort::Baud1200 && resetTriesRemaining > 0) {
+    } else if (baudRate == QSerialPort::Baud1200 && resetTriesRemaining > 0) {
         qDebug() << "Baud rate updated to 1200bps, closing!";
 
         resetTimer.stop();
         close();
-    }
-    else if(baudRate == QSerialPort::Baud1200) {
+    } else if (baudRate == QSerialPort::Baud1200) {
         qDebug() << "Baud rate updated to 1200bps spuriously";
     }
 }
 
-bool BlinkyTape::isConnected() {
+bool BlinkyTape::isConnected()
+{
     return serial->isOpen();
 }
 
@@ -228,62 +225,56 @@ void BlinkyTape::sendUpdate(QByteArray ledData)
     // Ignore the update request if it came too quickly
     static qint64 lastTime = 0;
     qint64 newTime = QDateTime::currentMSecsSinceEpoch();
-    if (newTime - lastTime < MIN_UPDATE_INTERVAL) {
+    if (newTime - lastTime < MIN_UPDATE_INTERVAL)
         return;
-    }
     lastTime = newTime;
 
-    if(!isConnected()) {
+    if (!isConnected()) {
         qCritical() << "Strip not connected, not sending update!";
         return;
     }
 
     // If there is data pending to send, skip this update to prevent overflowing
     // the buffer.
-    if(!chunks.isEmpty()) {
+    if (!chunks.isEmpty()) {
         qDebug() << "Output data still in buffer, dropping this update frame";
         return;
     }
 
     // If we have a blinkyPendant, fit the data to the output device
-    if(serialInfo.vendorIdentifier() == BLINKYPENDANT_SKETCH_VID
-        && serialInfo.productIdentifier() == BLINKYPENDANT_SKETCH_PID) {
+    if (serialInfo.vendorIdentifier() == BLINKYPENDANT_SKETCH_VID
+        && serialInfo.productIdentifier() == BLINKYPENDANT_SKETCH_PID)
         ledData = ledData.leftJustified(PENDANT_MAX_PIXELS*3, (char)0x00, true);
-    }
 
     // Trim anything that's 0xff
-    for(int i = 0; i < ledData.length(); i++) {
-        if(ledData[i] == (char)255) {
+    for (int i = 0; i < ledData.length(); i++) {
+        if (ledData[i] == (char)255)
             ledData[i] = 254;
-        }
     }
 
     // Append an 0xFF to signal the flip command
     ledData.append(0xFF);
 
-    for(int chunk = 0; chunk*CHUNK_SIZE < ledData.length(); chunk++) {
-
+    for (int chunk = 0; chunk *CHUNK_SIZE < ledData.length(); chunk++) {
         int chunkLength = CHUNK_SIZE;
-        if((chunk+1)*CHUNK_SIZE > ledData.length()) {
-           chunkLength = ledData.length() - chunk*CHUNK_SIZE;
-        }
+        if ((chunk+1)*CHUNK_SIZE > ledData.length())
+            chunkLength = ledData.length() - chunk*CHUNK_SIZE;
 
-        QByteArray chunkData = ledData.mid(chunk*CHUNK_SIZE,chunkLength);
+        QByteArray chunkData = ledData.mid(chunk*CHUNK_SIZE, chunkLength);
         chunks.append(chunkData);
 
-//        qDebug() << "size=" << ledData.length() << " chunk=" << chunk << " position=" << chunk*CHUNK_SIZE << " length=" << chunkLength;
-//        qDebug() << chunkData.toHex();
+// qDebug() << "size=" << ledData.length() << " chunk=" << chunk << " position=" << chunk*CHUNK_SIZE << " length=" << chunkLength;
+// qDebug() << chunkData.toHex();
     }
 
-//    qDebug() << "Total chunks:" << chunks.size();
+// qDebug() << "Total chunks:" << chunks.size();
     sendChunk();
 }
 
-bool BlinkyTape::getPortInfo(QSerialPortInfo& info)
+bool BlinkyTape::getPortInfo(QSerialPortInfo &info)
 {
-    if(!isConnected()) {
+    if (!isConnected())
         return false;
-    }
 
     info = serialInfo;
     return true;
@@ -291,9 +282,8 @@ bool BlinkyTape::getPortInfo(QSerialPortInfo& info)
 
 void BlinkyTape::reset()
 {
-    if(!isConnected() || serial->error() != QSerialPort::NoError) {
+    if (!isConnected() || serial->error() != QSerialPort::NoError)
         return;
-    }
     qDebug() << serial->error();
 
     qDebug() << "Attempting to reset device";
@@ -302,32 +292,25 @@ void BlinkyTape::reset()
     resetTimer_timeout();
 }
 
-
-bool BlinkyTape::getUploader(QPointer<BlinkyUploader>& uploader)
+bool BlinkyTape::getUploader(QPointer<BlinkyUploader> &uploader)
 {
-    if(!isConnected()) {
+    if (!isConnected())
         return false;
-    }
 
-    if(serialInfo.vendorIdentifier() == BLINKYTAPE_SKETCH_VID
-        && serialInfo.productIdentifier() == BLINKYTAPE_SKETCH_PID) {
+    if (serialInfo.vendorIdentifier() == BLINKYTAPE_SKETCH_VID
+        && serialInfo.productIdentifier() == BLINKYTAPE_SKETCH_PID)
         uploader = new BlinkyTapeUploader(parent());
-    }
-    else if(serialInfo.vendorIdentifier() == LEONARDO_SKETCH_VID
-        && serialInfo.productIdentifier() == LEONARDO_SKETCH_PID) {
+    else if (serialInfo.vendorIdentifier() == LEONARDO_SKETCH_VID
+             && serialInfo.productIdentifier() == LEONARDO_SKETCH_PID)
         uploader = new BlinkyTapeUploader(parent());
-    }
-    else if(serialInfo.vendorIdentifier() == BLINKYPENDANT_SKETCH_VID
-        && serialInfo.productIdentifier() == BLINKYPENDANT_SKETCH_PID) {
+    else if (serialInfo.vendorIdentifier() == BLINKYPENDANT_SKETCH_VID
+             && serialInfo.productIdentifier() == BLINKYPENDANT_SKETCH_PID)
         uploader = new BlinkyPendantUploader(parent());
-    }
-    else if(serialInfo.vendorIdentifier() == LIGHTBUDDY_SKETCH_VID
-        && serialInfo.productIdentifier() == LIGHTBUDDY_SKETCH_PID) {
+    else if (serialInfo.vendorIdentifier() == LIGHTBUDDY_SKETCH_VID
+             && serialInfo.productIdentifier() == LIGHTBUDDY_SKETCH_PID)
         uploader = new LightBuddyUploader(parent());
-    }
-    else {
+    else
         return false;
-    }
 
     return true;
 }

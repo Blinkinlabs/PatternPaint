@@ -11,9 +11,8 @@ SceneConfiguration::SceneConfiguration(QWidget *parent) :
     ui->setupUi(this);
 
     // Add the scene templates
-    for(int i = 0; i < SCENE_TEMPLATE_COUNT; i++ ) {
+    for (int i = 0; i < SCENE_TEMPLATE_COUNT; i++)
         ui->sceneTemplate->addItem(sceneTemplates[i].name);
-    }
     ui->sceneTemplate->addItem("Custom");
     ui->sceneTemplate->setCurrentText("Custom");
 
@@ -25,20 +24,19 @@ SceneConfiguration::SceneConfiguration(QWidget *parent) :
     ui->controllerType->addItem("Arduino Leonardo");
 
     // Disable controller selection for now since it doesn't really matter.
-//    ui->controllerBox->setVisible(false);
+// ui->controllerBox->setVisible(false);
 
     // Add the fixture types
     // TODO: Auto configuration for this?
     ui->FixtureType->addItem("Linear");
     ui->FixtureType->addItem("Matrix");
 
-    ui->fixtureHeight->setValidator(new QIntValidator(1,std::numeric_limits<int>::max(),this));
-    ui->fixtureWidth->setValidator(new QIntValidator(1,std::numeric_limits<int>::max(),this));
+    ui->fixtureHeight->setValidator(new QIntValidator(1, std::numeric_limits<int>::max(), this));
+    ui->fixtureWidth->setValidator(new QIntValidator(1, std::numeric_limits<int>::max(), this));
 
     // Load the available color modes
-    for(int i = 0; i < COLOR_MODE_COUNT; i++) {
+    for (int i = 0; i < COLOR_MODE_COUNT; i++)
         ui->ColorType->addItem(colorModes[i].name, colorModes[i].colorMode);
-    }
 }
 
 SceneConfiguration::~SceneConfiguration()
@@ -55,13 +53,14 @@ void SceneConfiguration::setSceneTemplate(SceneTemplate sceneTemplate)
     setFixtureSize(QSize(sceneTemplate.width, sceneTemplate.height));
 }
 
-void SceneConfiguration::setColorMode(ColorMode mode) {
+void SceneConfiguration::setColorMode(ColorMode mode)
+{
     ui->ColorType->blockSignals(true);
 
-    for(int i = 0; i < ui->ColorType->count(); i++) {
+    for (int i = 0; i < ui->ColorType->count(); i++) {
         // TODO: Why not .value<ColorMode>() ?
-        //if(ui->ColorType->itemData(i).value<ColorMode>() == mode) {
-        if(ui->ColorType->itemData(i).toInt() == mode) {
+        // if(ui->ColorType->itemData(i).value<ColorMode>() == mode) {
+        if (ui->ColorType->itemData(i).toInt() == mode) {
             ui->ColorType->setCurrentIndex(i);
             break;
         }
@@ -70,7 +69,8 @@ void SceneConfiguration::setColorMode(ColorMode mode) {
     ui->ColorType->blockSignals(false);
 }
 
-void SceneConfiguration::setFixtureSize(QSize size) {
+void SceneConfiguration::setFixtureSize(QSize size)
+{
     ui->fixtureHeight->setText(QString::number(size.height()));
     ui->fixtureWidth->setText(QString::number(size.width()));
 }
@@ -108,15 +108,15 @@ void SceneConfiguration::on_sceneTemplate_activated(const QString &arg1)
 {
     qDebug() << "Selected:" << arg1;
 
-    for(int i = 0; i < SCENE_TEMPLATE_COUNT; i++ ) {
-        if(sceneTemplates[i].name == arg1)
+    for (int i = 0; i < SCENE_TEMPLATE_COUNT; i++) {
+        if (sceneTemplates[i].name == arg1)
             setSceneTemplate(sceneTemplates[i]);
     }
 }
 
 void SceneConfiguration::sceneCustomized()
 {
-    if(ui->sceneTemplate->currentText() != "Custom")
+    if (ui->sceneTemplate->currentText() != "Custom")
         ui->sceneTemplate->setCurrentText("Custom");
 }
 

@@ -5,12 +5,10 @@
 PatternFrameListView::PatternFrameListView(QWidget *parent) :
     QListView(parent)
 {
-
 }
 
 PatternFrameListView::~PatternFrameListView()
 {
-
 }
 
 void PatternFrameListView::resizeEvent(QResizeEvent *event)
@@ -20,4 +18,3 @@ void PatternFrameListView::resizeEvent(QResizeEvent *event)
 
     QListView::resizeEvent(event);
 }
-

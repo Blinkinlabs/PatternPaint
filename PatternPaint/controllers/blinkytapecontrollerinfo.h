@@ -8,14 +8,14 @@
 
 class BlinkyTapeControllerInfo : public ControllerInfo
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     BlinkyTapeControllerInfo(QSerialPortInfo info, QObject *parent = 0);
 
     QString resourceName() const;
 
-    BlinkyController* createController() const;
+    BlinkyController *createController() const;
 
 private:
     QSerialPortInfo info;

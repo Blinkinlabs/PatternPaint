@@ -3,24 +3,22 @@
 #include <QDebug>
 #include <libusb-1.0/libusb.h>
 
-
 // TODO: This returns the first matching device. Should allow side channel info to look
 // up an exact match.
-int getVersionForDevice(quint16 idVendor, quint16 idProduct) {
+int getVersionForDevice(quint16 idVendor, quint16 idProduct)
+{
     libusb_device **devs;
     int r;
     ssize_t cnt;
 
     r = libusb_init(NULL);
 
-    if (r < 0) {
+    if (r < 0)
         return -1;
-    }
 
     cnt = libusb_get_device_list(NULL, &devs);
-    if (cnt < 0) {
+    if (cnt < 0)
         return -2;
-    }
 
     int version = -3;
 

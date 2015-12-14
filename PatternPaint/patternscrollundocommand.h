@@ -26,7 +26,7 @@ private:
     QSize previousSize;
     QSize currentSize;
 
-    PatternScrollModel* patternScrollModel;
+    PatternScrollModel *patternScrollModel;
     bool firstRun;
 };
 

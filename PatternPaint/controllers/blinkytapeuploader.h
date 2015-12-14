@@ -13,10 +13,11 @@ struct FlashSection {
     /// Create a new flash section
     /// @param address Address in the flash memory where the data should be stored
     /// @param data Data to store
-    FlashSection(int address,
-                 QByteArray data) :
+    FlashSection(int address, QByteArray data) :
         address(address),
-        data(data) {}
+        data(data)
+    {
+    }
 
     /// Address to store the data
     int address;
@@ -41,10 +42,10 @@ class BlinkyTapeUploader : public BlinkyUploader
     Q_OBJECT
 
 public:
-    BlinkyTapeUploader(QObject *parent=0);
+    BlinkyTapeUploader(QObject *parent = 0);
 
-    bool startUpload(BlinkyController& tape, std::vector<PatternWriter> patterns);
-    bool upgradeFirmware(BlinkyController& tape);
+    bool startUpload(BlinkyController &tape, std::vector<PatternWriter> patterns);
+    bool upgradeFirmware(BlinkyController &tape);
     bool upgradeFirmware(int timeout);
     QString getErrorString() const;
 
@@ -74,7 +75,7 @@ private:
     /// Start an upload, using the passed blinkytape as a launching point
     /// Note that the blinkytape will be disconnected during the upload process,
     /// and will need to be reconnected manually afterwards.
-    bool startUpload(BlinkyController& tape);
+    bool startUpload(BlinkyController &tape);
 
     /// Timer used to poll for the bootloader device to show up
     QPointer<QTimer> bootloaderResetTimer;

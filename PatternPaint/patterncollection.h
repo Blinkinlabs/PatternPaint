@@ -9,7 +9,10 @@ public:
     PatternCollection();
     ~PatternCollection();
 
-    PatternCollectionModel* getModel() {return &patterns;}
+    PatternCollectionModel *getModel()
+    {
+        return &patterns;
+    }
 
     void addPattern(QPointer<Pattern> newPattern, int index);
 

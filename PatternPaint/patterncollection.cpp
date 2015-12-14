@@ -4,23 +4,20 @@
 
 PatternCollection::PatternCollection()
 {
-
 }
 
 PatternCollection::~PatternCollection()
 {
-
 }
 
 void PatternCollection::addPattern(QPointer<Pattern> newPattern, int index)
 {
     patterns.insertRow(index);
     patterns.setData(patterns.index(index),
-                     //qVariantFromValue((void *) newPattern),
+                     // qVariantFromValue((void *) newPattern),
                      QVariant::fromValue(newPattern),
                      PatternCollectionModel::PatternPointer);
 }
-
 
 void PatternCollection::removePattern(int index)
 {
@@ -34,7 +31,8 @@ bool PatternCollection::hasPattern() const
 
 QPointer<Pattern> PatternCollection::getPattern(int index)
 {
-    return qvariant_cast<QPointer<Pattern> >(patterns.index(index).data(PatternCollectionModel::PatternPointer));
+    return qvariant_cast<QPointer<Pattern> >(patterns.index(index).data(PatternCollectionModel::
+                                                                        PatternPointer));
 }
 
 int PatternCollection::count() const

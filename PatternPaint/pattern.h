@@ -11,10 +11,10 @@
 /// Representation of a pattern based on a frame model.
 class Pattern : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
-    enum PatternType{
+    enum PatternType {
         Scrolling,
         FrameBased
     };
@@ -22,12 +22,12 @@ public:
     /// Constructor for an empty pattern item
     /// @param size Size of the display, in pixels
     /// @param frameCount Length of the pattern, in frames
-    Pattern(PatternType type, QSize size, int frameCount, QListWidget* parent = 0);
+    Pattern(PatternType type, QSize size, int frameCount, QListWidget *parent = 0);
 
     /// Set the pattern image directly without resizing or setting an undo state. This
     /// is used by the undocommand and should probably be refactored.
     /// @param newImage Set the pattern to this image
-    void applyUndoState(const QImage& newImage);
+    void applyUndoState(const QImage &newImage);
 
     /// Get a pointer to the undo stack. This is used to wire the undo stack
     /// into the main window gui.
@@ -56,7 +56,7 @@ public:
     /// Resize the image
     /// @param newSize New size of the pattern, in pixels
     /// @param scale If true, scale the image to fit the new size. Otherwise crop/expand the image.
-    void resize(QSize newSize,  bool scale);
+    void resize(QSize newSize, bool scale);
 
     /// Get the size of an individual frame
     /// @return Frame size, in pixels
@@ -65,7 +65,6 @@ public:
     /// Get the number of frames contained in the animation
     /// @return Frame count
     int getFrameCount() const;
-
 
     float getFrameSpeed() const;
 
@@ -76,14 +75,14 @@ public:
     const QImage getFrameImage(int index) const;
 
     /// Apply changes to the pattern
-    void setFrameImage(int index, const QImage& update);
+    void setFrameImage(int index, const QImage &update);
 
     /// Get an image representing the current image
     /// @return an NxN QImage reperesenting the current frame data
     const QImage getEditImage(int index) const;
 
     /// Apply changes to the pattern
-    void setEditImage(int index, const QImage& update);
+    void setEditImage(int index, const QImage &update);
 
     /// Delete the frame at the given index
     /// @param frame Index of the frame to delete
@@ -98,17 +97,29 @@ public:
     bool getModified() const;
 
     /// Get the underlying data model (for connection to a view)
-    PatternModel* getModel() const {return frames;}
+    PatternModel *getModel() const
+    {
+        return frames;
+    }
 
     /// Get the UUID for this pattern
-    const QUuid getUuid() const { return uuid; }
+    const QUuid getUuid() const
+    {
+        return uuid;
+    }
 
     /// True if the pattern editor should show a playback indicator for ths
     /// pattern type
     /// TODO: Delete this
-    bool hasPlaybackIndicator() const {return playbackIndicator;}
+    bool hasPlaybackIndicator() const
+    {
+        return playbackIndicator;
+    }
 
-    bool hasTimeline() const {return timeline;}
+    bool hasTimeline() const
+    {
+        return timeline;
+    }
 
 private:
     QPointer<PatternModel> frames;   ///< Storage container for the images
@@ -123,6 +134,5 @@ private:
     // the undo and event notification stacks.
     QUuid uuid;
 };
-
 
 #endif // PATTERNITEM_H
