@@ -1,6 +1,8 @@
 #ifndef SERIALCOMMANDQUEUE_H
 #define SERIALCOMMANDQUEUE_H
 
+#include "serialcommand.h"
+
 #include <QObject>
 #include <QtSerialPort>
 #include <QTimer>
@@ -23,10 +25,9 @@ public:
     bool isConnected();
 
     // Queue a new command
-    void queueCommand(QString name, QByteArray data, QByteArray expectedRespone);
+    void queueCommand(SerialCommand command);
 
-    void queueCommand(QString name, QByteArray data, QByteArray expectedRespone,
-                      QByteArray expectedResponseMask);
+    void queueCommand(QList<SerialCommand> commands);
 
 signals:
     void error(QString error);
@@ -43,32 +44,9 @@ public slots:
     void handleCommandTimeout();
 
 private:
-    struct Command {
-        Command(QString name_, QByteArray command_, QByteArray expectedResponse_) :
-            name(name_),
-            commandData(command_),
-            expectedResponse(expectedResponse_)
-        {
-        }
-
-        Command(QString name_, QByteArray command_, QByteArray expectedResponse_,
-                QByteArray expectedResponseMask_) :
-            name(name_),
-            commandData(command_),
-            expectedResponse(expectedResponse_),
-            expectedResponseMask(expectedResponseMask_)
-        {
-        }
-
-        QString name;                   ///< Human-readable description of the command
-        QByteArray commandData;         ///< Data to send to the bootloader
-        QByteArray expectedResponse;    ///< Expected response from the bootloader
-        QByteArray expectedResponseMask;///< Mask for interpreting expected response
-    };
-
     QPointer<QSerialPort> serial;   ///< Serial device the programmer is attached to
 
-    QQueue<Command> commandQueue;   ///< Queue of commands to send
+    QQueue<SerialCommand> commandQueue;   ///< Queue of commands to send
     QByteArray responseData;        ///< Data received by the current command
 
     // Timer fires if a command has failed to complete quickly enough

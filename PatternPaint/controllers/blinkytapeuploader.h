@@ -1,13 +1,13 @@
 #ifndef AVRPATTERNUPLOADER_H
 #define AVRPATTERNUPLOADER_H
 
+#include "patternwriter.h"
+#include "blinkyuploader.h"
+#include "serialcommandqueue.h"
+
 #include <QObject>
 #include <QTimer>
 #include <iostream>
-#include "patternwriter.h"
-#include "avrprogrammer.h"
-
-#include "blinkyuploader.h"
 
 struct FlashSection {
     /// Create a new flash section
@@ -97,7 +97,7 @@ private:
     /// Update any listeners with the latest progress
     void setProgress(int newProgress);
 
-    AvrProgrammer programmer;
+    SerialCommandQueue programmer;
 
     QQueue<FlashSection> flashData; ///< Queue of memory sections to write
 };

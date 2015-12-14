@@ -44,7 +44,7 @@ void LightBuddySerialQueue::eraseFlash()
 
     // Note: only the length matters for the response, the response data
     // will be ignored.
-    queueCommand("eraseFlash", command, ret, mask);
+    queueCommand(SerialCommand("eraseFlash", command, ret, mask));
 }
 
 void LightBuddySerialQueue::fileNew(int sizeBytes)
@@ -72,7 +72,7 @@ void LightBuddySerialQueue::fileNew(int sizeBytes)
     mask.append((char)0x00);
     mask.append((char)0x00);
 
-    queueCommand("fileNew", command, ret, mask);
+    queueCommand(SerialCommand("fileNew", command, ret, mask));
 }
 
 void LightBuddySerialQueue::writePage(int sector, int offset, QByteArray data)
@@ -102,7 +102,7 @@ void LightBuddySerialQueue::writePage(int sector, int offset, QByteArray data)
 
     // Note: only the length matters for the response, the response data
     // will be ignored.
-    queueCommand("writePage", command, ret, mask);
+    queueCommand(SerialCommand("writePage", command, ret, mask));
 }
 
 void LightBuddySerialQueue::reloadAnimations()
@@ -124,5 +124,5 @@ void LightBuddySerialQueue::reloadAnimations()
 
     // Note: only the length matters for the response, the response data
     // will be ignored.
-    queueCommand("reloadAnimations", command, ret, mask);
+    queueCommand(SerialCommand("reloadAnimations", command, ret, mask));
 }

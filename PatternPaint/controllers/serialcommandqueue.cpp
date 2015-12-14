@@ -56,22 +56,23 @@ bool SerialCommandQueue::isConnected()
     return serial->isOpen();
 }
 
-void SerialCommandQueue::queueCommand(QString name, QByteArray data, QByteArray expectedRespone)
+void SerialCommandQueue::queueCommand(QList<SerialCommand> commands)
 {
-// qDebug() << "Queueing command:" << name;
-
-    commandQueue.push_back(Command(name, data, expectedRespone));
-
-    // Try to start processing commands.
-    processCommandQueue();
+    for (int i = 0; i < commands.count(); i++)
+        queueCommand(commands.at(i));
 }
 
-void SerialCommandQueue::queueCommand(QString name, QByteArray data, QByteArray expectedRespone,
-                                      QByteArray expectedResponseMask)
+void SerialCommandQueue::queueCommand(SerialCommand command)
 {
-// qDebug() << "Queueing command:" << name;
+    if (command.expectedResponseMask.count() > 0) {
+        if (command.expectedResponse.count() != command.expectedResponseMask.count()) {
+            qCritical() << "Expected response mask length incorrect!";
+            emit(error("Expected response mask length incorrect!"));
+            return;
+        }
+    }
 
-    commandQueue.push_back(Command(name, data, expectedRespone, expectedResponseMask));
+    commandQueue.push_back(command);
 
     // Try to start processing commands.
     processCommandQueue();
@@ -144,21 +145,8 @@ void SerialCommandQueue::handleReadData()
         return;
     }
 
-    // If the command was to read from flash, short-circuit the response data check.
-    if (commandQueue.front().name == "readFlash") {
-        if (responseData.at(responseData.length()-1) != '\r') {
-            qCritical() << "readFlash response didn't end with a \\r";
-            return;
-        }
-    }
     // If the expected data should be masked, do a chracter by character match
-    else if (commandQueue.front().expectedResponseMask.length() > 0) {
-        if (commandQueue.front().expectedResponseMask.length()
-            != commandQueue.front().expectedResponse.length()) {
-            qCritical() << "Expected response mask length incorrect!";
-            emit(error("Expected response mask length incorrect!"));
-            return;
-        }
+    if (commandQueue.front().expectedResponseMask.length() > 0) {
         for (int i = 0; i < responseData.length(); i++) {
             if (commandQueue.front().expectedResponseMask.at(i) != 0
                 && responseData[i] != commandQueue.front().expectedResponse.at(i)) {

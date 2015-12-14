@@ -136,8 +136,8 @@ void LightBuddyUploader::doWork()
             state = State_FileNew;
         else
             state = State_Done;
+        break;
     }
-    break;
     case State_Done:
         break;
     }

@@ -1,5 +1,6 @@
 #include "blinkytapeuploader.h"
 
+#include "avr109commands.h"
 #include "avruploaddata.h"
 #include "ProductionSketch.h"
 #include "blinkycontroller.h"
@@ -291,18 +292,19 @@ void BlinkyTapeUploader::doWork()
         qDebug() << "Connected to programmer!";
 
         // Send Check Device Signature command
-        programmer.checkDeviceSignature();
+        programmer.queueCommand(Avr109Commands::checkDeviceSignature());
 
         // Queue all of the flash sections to memory
         while (!flashData.empty()) {
             FlashSection f = flashData.front();
-            programmer.writeFlash(f.data, f.address);
+// programmer.writeFlash(f.data, f.address);
+            programmer.queueCommand(Avr109Commands::writeFlash(f.data, f.address));
             flashData.pop_front();
         }
 
         // TODO: Add verify stage?
 
-        programmer.reset();
+        programmer.queueCommand(Avr109Commands::reset());
 
         state = State_Ready;
         break;

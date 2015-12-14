@@ -509,9 +509,7 @@ void MainWindow::on_uploaderProgressChanged(float progressValue)
     if (progressValue > 1)
         progressValue = 1;
 
-    // Assume minimum() is 0.
     int newValue = progressDialog.maximum()*progressValue;
-    qDebug() << newValue;
 
     progressDialog.setValue(newValue);
 }

@@ -41,7 +41,6 @@ bool avrUploadData::init(std::vector<PatternWriter> patterns)
     while (sketch.length() % FLASH_MEMORY_PAGE_SIZE != 0)
         sketch.append(static_cast<char>(0xFF));
 
-
     // Test for the minimum/maximum patterns count
     if (patterns.size() == 0) {
         errorString = QString("No Patterns detected!");
