@@ -12,7 +12,6 @@ public:
     LightBuddySerialQueue(QObject *parent = 0);
 
     void eraseFlash();
-    void largestFile();
     void fileNew(int sizeBytes);
     void writePage(int sector, int offset, QByteArray data);
     void reloadAnimations();

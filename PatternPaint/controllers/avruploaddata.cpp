@@ -15,6 +15,14 @@
 #define FLASH_MEMORY_SKETCH_ADDRESS     0x0000  // Location of sketch
 #define FLASH_MEMORY_PATTERN_TABLE_ADDRESS (FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE) // Location of pattern table
 
+QByteArray encodeWordLSB(int data)
+{
+    QByteArray output;
+    output.append(static_cast<char>((data) & 0xFF));
+    output.append(static_cast<char>((data >> 8) & 0xFF));
+    return output;
+}
+
 bool avrUploadData::init(std::vector<PatternWriter> patterns)
 {
     char buff[BUFF_LENGTH];
@@ -51,8 +59,8 @@ bool avrUploadData::init(std::vector<PatternWriter> patterns)
     qDebug() << buff;
 
     patternTable.append(static_cast<char>(patterns.size()));       // Offset 0: Pattern count (1 byte)
-    patternTable.append(static_cast<char>((patterns[0].getLedCount()) & 0xFF));       // Offset 1: Number of LEDs connected to the controller (2 bytes)
-    patternTable.append(static_cast<char>((patterns[0].getLedCount() >> 8) & 0xFF));
+    patternTable += encodeWordLSB(patterns[0].getLedCount());         // Offset 1: Number of LEDs connected to the controller (2 bytes)
+
     // TODO: make the LED count to a separate, explicit parameter?
 
     int dataOffset = sketch.length();
@@ -71,13 +79,10 @@ bool avrUploadData::init(std::vector<PatternWriter> patterns)
         qDebug() << buff;
 
         // Build the table entry for this pattern
-        patternTable.append(static_cast<char>((pattern->getEncoding()) & 0xFF));             // Offset 0: encoding (1 byte)
-        patternTable.append(static_cast<char>((dataOffset) & 0xFF));                         // Offset 1: memory location (2 bytes)
-        patternTable.append(static_cast<char>((dataOffset >> 8) & 0xFF));
-        patternTable.append(static_cast<char>((pattern->getFrameCount()) & 0xFF));           // Offset 3: frame count (2 bytes)
-        patternTable.append(static_cast<char>((pattern->getFrameCount() >> 8) & 0xFF));
-        patternTable.append(static_cast<char>((pattern->getFrameDelay()) & 0xFF));           // Offset 5: frame delay (2 bytes)
-        patternTable.append(static_cast<char>((pattern->getFrameDelay() >> 8) & 0xFF));
+        patternTable.append((char)((pattern->getEncoding()) & 0xFF));   // Offset 0: encoding (1 byte)
+        patternTable += encodeWordLSB(dataOffset);                         // Offset 1: memory location (2 bytes)
+        patternTable += encodeWordLSB(pattern->getFrameCount());           // Offset 3: frame count (2 bytes)
+        patternTable += encodeWordLSB(pattern->getFrameDelay());           // Offset 5: frame delay (2 bytes)
 
         // and append the image data
         patternData += pattern->getData();

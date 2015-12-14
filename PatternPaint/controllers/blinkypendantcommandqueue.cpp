@@ -16,18 +16,18 @@ void BlinkyPendantCommandQueue::startWrite()
 {
     QByteArray command;
     for (int i = 0; i < 10; i++)
-        command.append(0xFF);
-    command.append(COMMAND_START_WRITE);
+        command.append((char)0xFF);
+    command.append((char)COMMAND_START_WRITE);
 
     QByteArray response;
     response.append('P');
-    response.append((char)0);
-    response.append((char)0);
+    response.append((char)0x00);
+    response.append((char)0x00);
 
     QByteArray responseMask;
-    responseMask.append((char)1);
-    responseMask.append((char)0);
-    responseMask.append((char)0);
+    responseMask.append((char)0xFF);
+    responseMask.append((char)0xFF);
+    responseMask.append((char)0x00);
 
     queueCommand("startWrite", command, response, responseMask);
 }
@@ -55,13 +55,13 @@ void BlinkyPendantCommandQueue::writeData(QByteArray &data)
 
         QByteArray response;
         response.append('P');
-        response.append((char)0);
-        response.append((char)0);
+        response.append((char)0x00);
+        response.append((char)0x00);
 
         QByteArray responseMask;
-        responseMask.append((char)1);
-        responseMask.append((char)0);
-        responseMask.append((char)0);
+        responseMask.append((char)0xFF);
+        responseMask.append((char)0xFF);
+        responseMask.append((char)0x00);
 
         queueCommand("write", command, response, responseMask);
     }
@@ -76,13 +76,13 @@ void BlinkyPendantCommandQueue::stopWrite()
 
     QByteArray response;
     response.append('P');
-    response.append((char)0);
-    response.append((char)0);
+    response.append((char)0x00);
+    response.append((char)0x00);
 
     QByteArray responseMask;
-    responseMask.append((char)1);
-    responseMask.append((char)0);
-    responseMask.append((char)0);
+    responseMask.append((char)0xFF);
+    responseMask.append((char)0xFF);
+    responseMask.append((char)0x00);
 
     queueCommand("stopWrite", command, response, responseMask);
 }
