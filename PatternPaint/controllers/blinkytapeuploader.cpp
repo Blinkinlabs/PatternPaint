@@ -20,18 +20,15 @@
 
 /// How long to wait between receiving notification that the programmer has been
 /// reset, and notifying the caller that we are finished
-#define PROGRAMMER_RESET_DELAY 1
+#define BOOTLOADER_SETTLING_DELAY 500
 
 /// Length of character buffer for debug messages
 #define BUFF_LENGTH 100
 
 BlinkyTapeUploader::BlinkyTapeUploader(QObject *parent) :
-    BlinkyUploader(parent)
+    BlinkyUploader(parent),
+    state(State_Ready)
 {
-    bootloaderResetTimer = new QTimer(this);
-
-    state = State_Ready;
-
     connect(&commandQueue, SIGNAL(error(QString)),
             this, SLOT(handleProgrammerError(QString)));
     connect(&commandQueue, SIGNAL(commandFinished(QString, QByteArray)),
@@ -54,15 +51,13 @@ void BlinkyTapeUploader::cancel()
     }
 
     state = State_Ready;
-    bootloaderResetTimer.clear();
 }
 
 void BlinkyTapeUploader::handleProgrammerError(QString error)
 {
     qCritical() << error;
 
-    if (commandQueue.isConnected())
-        commandQueue.close();
+    commandQueue.close();
 
     emit(finished(false));
 }
@@ -77,14 +72,10 @@ void BlinkyTapeUploader::handleProgrammerCommandFinished(QString command, QByteA
     // we know reset is the last command, so the BlinkyTape should be ready soon.
     // Schedule a timer to emit the message shortly.
     // TODO: Let the receiver handle this instead.
-    if (command == "reset")
-        QTimer::singleShot(PROGRAMMER_RESET_DELAY, this, SLOT(handleResetTimer()));
-}
-
-void BlinkyTapeUploader::handleResetTimer()
-{
-    commandQueue.close();
-    emit(finished(true));
+    if (command == "reset") {
+        commandQueue.close();
+        emit(finished(true));
+    }
 }
 
 void BlinkyTapeUploader::setProgress(int newProgress)
@@ -136,34 +127,6 @@ bool BlinkyTapeUploader::startUpload(BlinkyController &tape, std::vector<Pattern
     return startUpload(tape);
 }
 
-bool BlinkyTapeUploader::upgradeFirmware(BlinkyController &tape)
-{
-    QByteArray sketch = QByteArray(reinterpret_cast<const char *>(PRODUCTION_DATA),
-                                   PRODUCTION_LENGTH);
-
-    char buff[BUFF_LENGTH];
-    snprintf(buff, BUFF_LENGTH, "Sketch size: %iB",
-             sketch.length()),
-    qDebug() << buff;
-
-    // The entire sketch must fit into the available memory, minus a single page
-    // at the end of flash for the configuration header
-    if (sketch.length() > FLASH_MEMORY_AVAILABLE) {
-        qDebug() << "sketch can't fit into memory!";
-
-        errorString = QString(
-            "Sorry! The Pattern is a bit too big to fit in BlinkyTape memory right now. We're working on improving this! Avaiable space=%1, Pattern size=%2")
-                      .arg(FLASH_MEMORY_AVAILABLE)
-                      .arg(sketch.length());
-        return false;
-    }
-
-    // Put the sketch, pattern, and metadata into the programming queue.
-    flashData.push_back(FlashSection(PRODUCTION_ADDRESS, sketch));
-
-    return startUpload(tape);
-}
-
 bool BlinkyTapeUploader::upgradeFirmware(int timeout)
 {
     QByteArray sketch = QByteArray(reinterpret_cast<const char *>(PRODUCTION_DATA),
@@ -201,11 +164,40 @@ bool BlinkyTapeUploader::upgradeFirmware(int timeout)
 
     stateStartTime = QDateTime::currentDateTime();
     state = State_WaitForBootloaderPort;
-    bootloaderResetTimer->singleShot(0, this, SLOT(doWork()));
+
+    QTimer::singleShot(0, this, SLOT(doWork()));
     return true;
 }
 
-bool BlinkyTapeUploader::startUpload(BlinkyController &tape)
+bool BlinkyTapeUploader::upgradeFirmware(BlinkyController &blinky)
+{
+    QByteArray sketch = QByteArray(reinterpret_cast<const char *>(PRODUCTION_DATA),
+                                   PRODUCTION_LENGTH);
+
+    char buff[BUFF_LENGTH];
+    snprintf(buff, BUFF_LENGTH, "Sketch size: %iB",
+             sketch.length()),
+    qDebug() << buff;
+
+    // The entire sketch must fit into the available memory, minus a single page
+    // at the end of flash for the configuration header
+    if (sketch.length() > FLASH_MEMORY_AVAILABLE) {
+        qDebug() << "sketch can't fit into memory!";
+
+        errorString = QString(
+            "Sorry! The Pattern is a bit too big to fit in BlinkyTape memory right now. We're working on improving this! Avaiable space=%1, Pattern size=%2")
+                      .arg(FLASH_MEMORY_AVAILABLE)
+                      .arg(sketch.length());
+        return false;
+    }
+
+    // Put the sketch, pattern, and metadata into the programming queue.
+    flashData.push_back(FlashSection(PRODUCTION_ADDRESS, sketch));
+
+    return startUpload(blinky);
+}
+
+bool BlinkyTapeUploader::startUpload(BlinkyController &blinky)
 {
     maxProgress = 1;    // checkDeviceSignature
     for (int i = 0; i < flashData.count(); i++)
@@ -216,17 +208,19 @@ bool BlinkyTapeUploader::startUpload(BlinkyController &tape)
 
     // Now, start the polling processes to detect a new bootloader
     // We can't reset if we weren't already connected...
-    if (!tape.isConnected()) {
+    if (!blinky.isConnected()) {
         errorString = "Not connected to a tape, cannot upload again";
         return false;
     }
 
     // Next, tell the tape to reset.
-    tape.reset();
+    blinky.reset();
 
     stateStartTime = QDateTime::currentDateTime();
     state = State_WaitForBootloaderPort;
-    bootloaderResetTimer->singleShot(0, this, SLOT(doWork()));
+
+    QTimer::singleShot(0, this, SLOT(doWork()));
+
     return true;
 }
 
@@ -259,15 +253,16 @@ void BlinkyTapeUploader::doWork()
                 return;
             }
 
-            bootloaderResetTimer->singleShot(BOOTLOADER_POLL_INTERVAL, this, SLOT(doWork()));
+            QTimer::singleShot(BOOTLOADER_POLL_INTERVAL, this, SLOT(doWork()));
             return;
         }
 
         qDebug() << "Bootloader waiting on: " << postResetTapes.at(0).portName();
 
         // Don't connect immediately, the device might need a short time to settle down
-        bootloaderResetTimer->singleShot(PROGRAMMER_RESET_DELAY, this, SLOT(doWork()));
+        QTimer::singleShot(BOOTLOADER_SETTLING_DELAY, this, SLOT(doWork()));
         state = State_WaitAfterBootloaderPort;
+
         break;
     }
 

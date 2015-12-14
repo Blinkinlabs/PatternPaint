@@ -3,6 +3,7 @@
 #include <QDebug>
 
 namespace LightBuddyCommands {
+
 QByteArray commandHeader()
 {
     QByteArray output;
@@ -24,7 +25,7 @@ QByteArray encodeInt(int data)
 SerialCommand eraseFlash()
 {
     QByteArray command;
-    command + commandHeader();
+    command += commandHeader();
 
     command.append((char)0x20); // Erase flash
     command.append('E');        // Checksum sequence
@@ -42,16 +43,17 @@ SerialCommand eraseFlash()
 
     // Note: only the length matters for the response, the response data
     // will be ignored.
-    return SerialCommand("eraseFlash", command, ret, mask);
+    return SerialCommand("eraseFlash", command, ret, mask, 20000);
 }
 
 SerialCommand fileNew(int sizeBytes)
 {
     QByteArray command;
-    command + commandHeader();
+    command += commandHeader();
 
     command.append((char)0x18);   // New file
     command.append((char)0x12);   // filetype = animation
+
     command += encodeInt(sizeBytes);
 
     QByteArray ret;
@@ -70,7 +72,7 @@ SerialCommand fileNew(int sizeBytes)
     mask.append((char)0x00);
     mask.append((char)0x00);
 
-    return SerialCommand("fileNew", command, ret, mask);
+    return SerialCommand("fileNew", command, ret, mask, 5000);
 }
 
 SerialCommand writePage(int sector, int offset, QByteArray data)
@@ -81,7 +83,7 @@ SerialCommand writePage(int sector, int offset, QByteArray data)
     }
 
     QByteArray command;
-    command + commandHeader();
+    command += commandHeader();
 
     command.append((char)0x19);     // Write page
     command += encodeInt(sector);
@@ -98,15 +100,13 @@ SerialCommand writePage(int sector, int offset, QByteArray data)
     mask.append((char)0xFF);
     mask.append((char)0x00);
 
-    // Note: only the length matters for the response, the response data
-    // will be ignored.
     return SerialCommand("writePage", command, ret, mask);
 }
 
 SerialCommand reloadAnimations()
 {
     QByteArray command;
-    command + commandHeader();
+    command += commandHeader();
 
     command.append((char)0x02);     // Reload animations
 
@@ -120,8 +120,6 @@ SerialCommand reloadAnimations()
     mask.append((char)0xFF);
     mask.append((char)0x00);
 
-    // Note: only the length matters for the response, the response data
-    // will be ignored.
     return SerialCommand("reloadAnimations", command, ret, mask);
 }
 }

@@ -2,6 +2,7 @@
 
 #include "usbutils.h"
 #include "blinkycontroller.h"
+#include "blinkypendantcommands.h"
 
 #define BLINKY_PENDANT_VERSION_1 256
 #define BLINKY_PENDANT_VERSION_2 512
@@ -103,13 +104,13 @@ bool BlinkyPendantUploader::startUpload(BlinkyController &controller,
 
     // Queue the following commands:
     // 1. start write
-    commandQueue.startWrite();
+    commandQueue.enqueue(BlinkyPendantCommands::startWrite());
 
     // 2-n. write data (aligned to 1024-byte sectors, 64 bytes at a time)
-    commandQueue.writeData(data);
+    commandQueue.enqueue(BlinkyPendantCommands::writeData(data));
 
     // n+1 stop write
-    commandQueue.stopWrite();
+    commandQueue.enqueue(BlinkyPendantCommands::stopWrite());
 
     return true;
 }
@@ -149,8 +150,7 @@ void BlinkyPendantUploader::handleProgrammerError(QString error)
 {
     qCritical() << error;
 
-    if (commandQueue.isConnected())
-        commandQueue.close();
+    commandQueue.close();
 
     emit(finished(false));
 }

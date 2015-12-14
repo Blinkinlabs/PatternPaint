@@ -180,8 +180,7 @@ void LightBuddyUploader::handleProgrammerError(QString error)
 {
     qCritical() << error;
 
-    if (commandQueue.isConnected())
-        commandQueue.close();
+    commandQueue.close();
 
     emit(finished(false));
 }
@@ -190,10 +189,7 @@ void LightBuddyUploader::handleProgrammerCommandFinished(QString command, QByteA
 {
     Q_UNUSED(returnData);
 
-// qDebug() << "Command finished:" << command;
     setProgress(progress + 1);
-
-    // TODO: This is poor logic.
 
     if (command == "eraseFlash")
         doWork();
@@ -201,14 +197,7 @@ void LightBuddyUploader::handleProgrammerCommandFinished(QString command, QByteA
     if (command == "fileNew") {
         // record sector for new file here.
         for (int i = 0; i < returnData.count(); i++)
-            qDebug() << i << ": " << (int)returnData.at(i)
-                     << "(" << returnData.at(i) << ")";
-
         sector = decodeInt(returnData.mid(2, 4));
-// sector = ((int)returnData.at(2) << 24)
-// + ((int)returnData.at(3) << 16)
-// + ((int)returnData.at(4) << 8)
-// + ((int)returnData.at(5) << 0);
         qDebug() << "sector: " << sector;
 
         doWork();
@@ -228,8 +217,6 @@ void LightBuddyUploader::handleProgrammerCommandFinished(QString command, QByteA
 
 void LightBuddyUploader::setProgress(int newProgress)
 {
-    qDebug() << "new progress: " << newProgress;
-
     progress = newProgress;
     emit(progressChanged(static_cast<float>(newProgress)/maxProgress));
 }

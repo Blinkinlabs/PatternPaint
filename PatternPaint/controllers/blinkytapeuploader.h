@@ -44,8 +44,8 @@ class BlinkyTapeUploader : public BlinkyUploader
 public:
     BlinkyTapeUploader(QObject *parent = 0);
 
-    bool startUpload(BlinkyController &tape, std::vector<PatternWriter> patterns);
-    bool upgradeFirmware(BlinkyController &tape);
+    bool startUpload(BlinkyController &blinky, std::vector<PatternWriter> patterns);
+    bool upgradeFirmware(BlinkyController &blinky);
     bool upgradeFirmware(int timeout);
     QString getErrorString() const;
 
@@ -61,10 +61,6 @@ private slots:
 
     void handleProgrammerCommandFinished(QString command, QByteArray returnData);
 
-    /// Delay timer, lets us wait some time between receiving a finished command, and
-    /// passing the message along (to give the serial device some time to reset itself).
-    void handleResetTimer();
-
 private:
     enum State {
         State_Ready,                    ///< Ready for a command.
@@ -76,9 +72,6 @@ private:
     /// Note that the blinkytape will be disconnected during the upload process,
     /// and will need to be reconnected manually afterwards.
     bool startUpload(BlinkyController &tape);
-
-    /// Timer used to poll for the bootloader device to show up
-    QPointer<QTimer> bootloaderResetTimer;
 
     qint64 bootloaderPollTimeout;
 

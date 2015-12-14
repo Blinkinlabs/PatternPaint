@@ -1,4 +1,6 @@
-#include "blinkypendantcommandqueue.h"
+#include "blinkypendantcommands.h"
+
+#include <QDebug>
 
 #define COMMAND_START_WRITE 0x01
 #define COMMAND_WRITE       0x02
@@ -7,16 +9,21 @@
 #define PAGE_SIZE_BYTES     1024    // Size unit for writes to flash
 #define WRITE_SIZE_BYTES    64      // Number of bytes the write command requires per call
 
-BlinkyPendantCommandQueue::BlinkyPendantCommandQueue(QObject *parent) :
-    SerialCommandQueue(parent)
+namespace BlinkyPendantCommands {
+
+QByteArray commandHeader()
 {
+    QByteArray output;
+    for (int i = 0; i < 10; i++)
+        output.append((char)0xFF);
+    return output;
 }
 
-void BlinkyPendantCommandQueue::startWrite()
+SerialCommand startWrite()
 {
     QByteArray command;
-    for (int i = 0; i < 10; i++)
-        command.append((char)0xFF);
+    command += commandHeader();
+
     command.append((char)COMMAND_START_WRITE);
 
     QByteArray response;
@@ -29,14 +36,39 @@ void BlinkyPendantCommandQueue::startWrite()
     responseMask.append((char)0xFF);
     responseMask.append((char)0x00);
 
-    enqueue(SerialCommand("startWrite", command, response, responseMask));
+    return SerialCommand("startWrite", command, response, responseMask, 2000);
 }
 
-void BlinkyPendantCommandQueue::writeData(QByteArray &data)
+SerialCommand writeFlashPage(QByteArray data)
 {
+    QByteArray command;
+    command += commandHeader();
+
+    command.append(COMMAND_WRITE);
+
+    command += data;
+
+    QByteArray response;
+    response.append('P');
+    response.append((char)0x00);
+    response.append((char)0x00);
+
+    QByteArray responseMask;
+    responseMask.append((char)0xFF);
+    responseMask.append((char)0xFF);
+    responseMask.append((char)0x00);
+
+    return SerialCommand("writePage", command, response, responseMask);
+}
+
+QList<SerialCommand> writeData(QByteArray &data)
+{
+    QList<SerialCommand> commands;
+
     if (data.length() == 0) {
+        // TODO: How to report an error here?
         qCritical() << "No data to write";
-        return;
+        return commands;
     }
 
     // Pad the data to the page size
@@ -46,32 +78,18 @@ void BlinkyPendantCommandQueue::writeData(QByteArray &data)
     for (int currentChunkPosition = 0;
          currentChunkPosition < data.length();
          currentChunkPosition += WRITE_SIZE_BYTES) {
-        QByteArray command;
-        for (int i = 0; i < 10; i++)
-            command.append(0xFF);
-        command.append(COMMAND_WRITE);
 
-        command += data.mid(currentChunkPosition, WRITE_SIZE_BYTES);
-
-        QByteArray response;
-        response.append('P');
-        response.append((char)0x00);
-        response.append((char)0x00);
-
-        QByteArray responseMask;
-        responseMask.append((char)0xFF);
-        responseMask.append((char)0xFF);
-        responseMask.append((char)0x00);
-
-        enqueue(SerialCommand("write", command, response, responseMask));
+        commands.append(writeFlashPage(data.mid(currentChunkPosition, WRITE_SIZE_BYTES)));
     }
+
+    return commands;
 }
 
-void BlinkyPendantCommandQueue::stopWrite()
+SerialCommand stopWrite()
 {
     QByteArray command;
-    for (int i = 0; i < 10; i++)
-        command.append(0xFF);
+    command += commandHeader();
+
     command.append(COMMAND_STOP_WRITE);
 
     QByteArray response;
@@ -84,5 +102,6 @@ void BlinkyPendantCommandQueue::stopWrite()
     responseMask.append((char)0xFF);
     responseMask.append((char)0x00);
 
-    enqueue(SerialCommand("stopWrite", command, response, responseMask));
+    return SerialCommand("stopWrite", command, response, responseMask);
+}
 }

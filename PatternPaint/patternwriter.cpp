@@ -97,7 +97,7 @@ int PatternWriter::QRgbTo565(QColor color)
 
 void PatternWriter::encodeImageRGB565_RLE(const Pattern *pattern)
 {
-    qDebug() << "Encoding pattern as RGB565";
+//    qDebug() << "Encoding pattern as RGB565";
 
     data.clear();
     header.clear(); // TODO: Move the header builder somewhere else?
@@ -161,7 +161,7 @@ void PatternWriter::encodeImageRGB565_RLE(const Pattern *pattern)
 
 void PatternWriter::encodeImageRGB24(const Pattern *pattern)
 {
-    qDebug() << "Encoding pattern as RGB24";
+//    qDebug() << "Encoding pattern as RGB24";
 
     header.clear();
     data.clear();

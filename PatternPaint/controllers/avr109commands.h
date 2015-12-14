@@ -22,7 +22,7 @@ QList<SerialCommand> writeFlash(QByteArray &data, int startAddress);
 /// Note that the address must be set by running setAddress() before this
 /// command.
 /// @param page Page data to write
-SerialCommand writeFlashPage(QByteArray page);
+SerialCommand writeFlashPage(QByteArray data);
 
 /// Set the current read/write address for flash/EEPROM reading/writing
 /// Note: The address needs to be divisble by 2, because it is interpreted

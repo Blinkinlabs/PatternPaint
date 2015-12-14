@@ -65,19 +65,19 @@ SerialCommand setAddress(int address)
 // return SerialCommand("readFlash", command, response, responseMask);
 // }
 
-SerialCommand writeFlashPage(QByteArray page)
+SerialCommand writeFlashPage(QByteArray data)
 {
     QByteArray command;
     command.append('B'); // command: write memory
-    command.append((page.count() >> 8) & 0xFF); // read size (high)
-    command.append((page.count())      & 0xFF); // read size (low)
+    command.append((data.count() >> 8) & 0xFF); // read size (high)
+    command.append((data.count())      & 0xFF); // read size (low)
     command.append('F'); // memory type: flash
-    command += page;
+    command += data;
 
     QByteArray response;
     response.append("\r");
 
-    return SerialCommand("writeFlash", command, response);
+    return SerialCommand("writeFlashPage", command, response);
 }
 
 QList<SerialCommand> writeFlash(QByteArray &data, int startAddress)

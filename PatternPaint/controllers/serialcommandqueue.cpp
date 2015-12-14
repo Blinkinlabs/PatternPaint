@@ -1,7 +1,5 @@
 #include "serialcommandqueue.h"
 
-#define COMMAND_TIMEOUT_TIME 20000
-
 SerialCommandQueue::SerialCommandQueue(QObject *parent) : QObject(parent)
 {
     serial = new QSerialPort(this);
@@ -68,8 +66,8 @@ void SerialCommandQueue::enqueue(QList<SerialCommand> commands)
 
 void SerialCommandQueue::enqueue(SerialCommand command)
 {
-    qDebug() << "queuing command:" << command.name
-             << "length:" << command.data.count();
+// qDebug() << "queuing command:" << command.name
+// << "length:" << command.data.count();
 
     if (command.expectedResponseMask.count() > 0) {
         if (command.expectedResponse.count() != command.expectedResponseMask.count()) {
@@ -87,9 +85,6 @@ void SerialCommandQueue::enqueue(SerialCommand command)
 
 void SerialCommandQueue::processQueue()
 {
-// for(int i = 0; i < commandQueue.count(); i++)
-// qDebug() << i << ": " << commandQueue.at(i).name;
-
     // Nothing to do if we don't have any commands...
     if (queue.count() == 0)
         return;
@@ -103,7 +98,7 @@ void SerialCommandQueue::processQueue()
         return;
     }
 
-    qDebug() << "Starting Command:" << queue.front().name;
+// qDebug() << "Starting Command:" << queue.front().name;
     responseData.clear();
 
     if (serial->write(queue.front().data)
@@ -112,15 +107,10 @@ void SerialCommandQueue::processQueue()
         return;
     }
 
-// for(int i = 0; i < commandQueue.front().commandData.count(); i++)
-// qDebug() << "Data at " << i << ": "
-// << (int)commandQueue.front().commandData.at(i)
-// << "(" << commandQueue.front().commandData.at(i) << ")";
-
     // Start the timer; the command must complete before it fires, or it
     // is considered an error. This is to prevent a misbehaving device from hanging
     // the programmer code.
-    commandTimeoutTimer.start(COMMAND_TIMEOUT_TIME);
+    commandTimeoutTimer.start(queue.front().timeout);
 }
 
 void SerialCommandQueue::handleReadData()
@@ -175,14 +165,13 @@ void SerialCommandQueue::handleReadData()
     }
 
 // qDebug() << "Command completed successfully: " << commandQueue.front().name;
-    emit(commandFinished(queue.front().name, responseData));
+
+    QMetaObject::invokeMethod(this, "commandFinished", Qt::QueuedConnection,
+                              Q_ARG(QString, queue.front().name), Q_ARG(QByteArray, responseData));
 
     // At this point, we've gotten all of the data that we expected.
     commandTimeoutTimer.stop();
 
-    // TODO: There's some danger of an out-of-order operation here.
-    // if processCommandQueue() is run by anything else before the command
-    // is popped, the current command could be run twice.
     queue.pop_front();
 
     // Start another command, if there is one.
@@ -208,7 +197,9 @@ void SerialCommandQueue::handleSerialError(QSerialPort::SerialPortError serialEr
 
 void SerialCommandQueue::handleCommandTimeout()
 {
-    qCritical() << "Command timed out, disconnecting from programmer";
+    qCritical() << "Command " << queue.front().name
+                << " timed out, disconnecting from programmer";
+
     emit(error("Command timed out, disconnecting from programmer"));
 
     close();
