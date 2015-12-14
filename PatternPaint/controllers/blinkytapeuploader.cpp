@@ -20,7 +20,7 @@
 
 /// How long to wait between receiving notification that the programmer has been
 /// reset, and notifying the caller that we are finished
-#define PROGRAMMER_RESET_DELAY 500
+#define PROGRAMMER_RESET_DELAY 1
 
 /// Length of character buffer for debug messages
 #define BUFF_LENGTH 100
@@ -32,9 +32,9 @@ BlinkyTapeUploader::BlinkyTapeUploader(QObject *parent) :
 
     state = State_Ready;
 
-    connect(&programmer, SIGNAL(error(QString)),
+    connect(&commandQueue, SIGNAL(error(QString)),
             this, SLOT(handleProgrammerError(QString)));
-    connect(&programmer, SIGNAL(commandFinished(QString, QByteArray)),
+    connect(&commandQueue, SIGNAL(commandFinished(QString, QByteArray)),
             this, SLOT(handleProgrammerCommandFinished(QString, QByteArray)));
 }
 
@@ -61,8 +61,8 @@ void BlinkyTapeUploader::handleProgrammerError(QString error)
 {
     qCritical() << error;
 
-    if (programmer.isConnected())
-        programmer.close();
+    if (commandQueue.isConnected())
+        commandQueue.close();
 
     emit(finished(false));
 }
@@ -83,6 +83,7 @@ void BlinkyTapeUploader::handleProgrammerCommandFinished(QString command, QByteA
 
 void BlinkyTapeUploader::handleResetTimer()
 {
+    commandQueue.close();
     emit(finished(true));
 }
 
@@ -284,7 +285,7 @@ void BlinkyTapeUploader::doWork()
         }
 
         // Try to create a new programmer by connecting to the port
-        if (!programmer.open(postResetTapes.at(0))) {
+        if (!commandQueue.open(postResetTapes.at(0))) {
             handleProgrammerError("could not connect to programmer!");
             return;
         }
@@ -292,19 +293,18 @@ void BlinkyTapeUploader::doWork()
         qDebug() << "Connected to programmer!";
 
         // Send Check Device Signature command
-        programmer.queueCommand(Avr109Commands::checkDeviceSignature());
+        commandQueue.enqueue(Avr109Commands::checkDeviceSignature());
 
         // Queue all of the flash sections to memory
         while (!flashData.empty()) {
             FlashSection f = flashData.front();
-// programmer.writeFlash(f.data, f.address);
-            programmer.queueCommand(Avr109Commands::writeFlash(f.data, f.address));
+            commandQueue.enqueue(Avr109Commands::writeFlash(f.data, f.address));
             flashData.pop_front();
         }
 
         // TODO: Add verify stage?
 
-        programmer.queueCommand(Avr109Commands::reset());
+        commandQueue.enqueue(Avr109Commands::reset());
 
         state = State_Ready;
         break;

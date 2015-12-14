@@ -1,9 +1,29 @@
 #include "lightbuddyuploader.h"
 
 #include "blinkycontroller.h"
+#include "lightbuddycommands.h"
 
 #define FLASH_PAGE_SIZE 256
 #define MAX_PATTERN_SIZE 507648
+
+// TODO: Dupe in lightbuddycommands.cpp
+QByteArray encodeInt(int data)
+{
+    QByteArray output;
+    output.append((char)((data >> 24) & 0xFF));
+    output.append((char)((data >> 16) & 0xFF));
+    output.append((char)((data >>  8) & 0xFF));
+    output.append((char)((data) & 0xFF));
+    return output;
+}
+
+int decodeInt(QByteArray data)
+{
+    return ((int)data.at(0) << 24)
+           + ((int)data.at(1) << 16)
+           + ((int)data.at(2) << 8)
+           + ((int)data.at(3) << 0);
+}
 
 LightBuddyUploader::LightBuddyUploader(QObject *parent) :
     BlinkyUploader(parent)
@@ -51,23 +71,12 @@ bool LightBuddyUploader::startUpload(BlinkyController &controller,
         }
 
         QByteArray data;
+
         // Build the header
-        data.append((char)((patternWriter->getLedCount() >> 24) & 0xFF));
-        data.append((char)((patternWriter->getLedCount() >> 16) & 0xFF));
-        data.append((char)((patternWriter->getLedCount() >>  8) & 0xFF));
-        data.append((char)((patternWriter->getLedCount()) & 0xFF));
-        data.append((char)((patternWriter->getFrameCount() >> 24) & 0xFF));
-        data.append((char)((patternWriter->getFrameCount() >> 16) & 0xFF));
-        data.append((char)((patternWriter->getFrameCount() >>  8) & 0xFF));
-        data.append((char)((patternWriter->getFrameCount()) & 0xFF));
-        data.append((char)((patternWriter->getFrameDelay() >> 24) & 0xFF));
-        data.append((char)((patternWriter->getFrameDelay() >> 16) & 0xFF));
-        data.append((char)((patternWriter->getFrameDelay() >>  8) & 0xFF));
-        data.append((char)((patternWriter->getFrameDelay()) & 0xFF));
-        data.append((char)((patternWriter->getEncoding() >> 24) & 0xFF));
-        data.append((char)((patternWriter->getEncoding() >> 16) & 0xFF));
-        data.append((char)((patternWriter->getEncoding() >>  8) & 0xFF));
-        data.append((char)((patternWriter->getEncoding()) & 0xFF));
+        data += encodeInt(patternWriter->getLedCount());
+        data += encodeInt(patternWriter->getFrameCount());
+        data += encodeInt(patternWriter->getFrameDelay());
+        data += encodeInt(patternWriter->getEncoding());
 
         data += patternWriter->getData();
 
@@ -112,14 +121,14 @@ void LightBuddyUploader::doWork()
 
     case State_EraseFlash:
     {
-        commandQueue.eraseFlash();
-        // serialCommands.largestFile();
+        commandQueue.enqueue(LightBuddyCommands::eraseFlash());
+
         state = State_FileNew;
         break;
     }
     case State_FileNew:
     {
-        commandQueue.fileNew(flashData.front().size());
+        commandQueue.enqueue(LightBuddyCommands::fileNew(flashData.front().size()));
         // serialCommands.fileNew(256);
         state = State_WriteFileData;
         break;
@@ -127,10 +136,13 @@ void LightBuddyUploader::doWork()
     case State_WriteFileData:
     {
         for (int offset = 0; offset < flashData.front().size(); offset += FLASH_PAGE_SIZE)
-            commandQueue.writePage(sector, offset, flashData.front().mid(offset, FLASH_PAGE_SIZE));
+            commandQueue.enqueue(LightBuddyCommands::writePage(sector, offset,
+                                                               flashData.front().mid(offset,
+                                                                                     FLASH_PAGE_SIZE)));
+
         flashData.pop_front();
 
-        commandQueue.reloadAnimations();
+        commandQueue.enqueue(LightBuddyCommands::reloadAnimations());
 
         if (flashData.size() > 0)
             state = State_FileNew;
@@ -192,10 +204,11 @@ void LightBuddyUploader::handleProgrammerCommandFinished(QString command, QByteA
             qDebug() << i << ": " << (int)returnData.at(i)
                      << "(" << returnData.at(i) << ")";
 
-        sector = ((int)returnData.at(2) << 24)
-                 + ((int)returnData.at(3) << 16)
-                 + ((int)returnData.at(4) << 8)
-                 + ((int)returnData.at(5) << 0);
+        sector = decodeInt(returnData.mid(2, 4));
+// sector = ((int)returnData.at(2) << 24)
+// + ((int)returnData.at(3) << 16)
+// + ((int)returnData.at(4) << 8)
+// + ((int)returnData.at(5) << 0);
         qDebug() << "sector: " << sector;
 
         doWork();

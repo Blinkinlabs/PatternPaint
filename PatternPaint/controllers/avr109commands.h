@@ -1,5 +1,5 @@
-#ifndef AVR_PROGRAMMER_COMMANDS
-#define AVR_PROGRAMMER_COMMANDS
+#ifndef AVR_109_COMMANDS_H
+#define AVR_109_COMMANDS_H
 
 #include "serialcommand.h"
 
@@ -38,4 +38,4 @@ SerialCommand checkDeviceSignature();
 SerialCommand reset();
 }
 
-#endif // AVR_PROGRAMMER_COMMANDS
+#endif // AVR_109_COMMANDS_H

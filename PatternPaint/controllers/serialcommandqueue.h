@@ -25,9 +25,9 @@ public:
     bool isConnected();
 
     // Queue a new command
-    void queueCommand(SerialCommand command);
+    void enqueue(SerialCommand command);
 
-    void queueCommand(QList<SerialCommand> commands);
+    void enqueue(QList<SerialCommand> commands);
 
 signals:
     void error(QString error);
@@ -46,16 +46,14 @@ public slots:
 private:
     QPointer<QSerialPort> serial;   ///< Serial device the programmer is attached to
 
-    QQueue<SerialCommand> commandQueue;   ///< Queue of commands to send
+    QQueue<SerialCommand> queue;   ///< Queue of commands to send
     QByteArray responseData;        ///< Data received by the current command
 
     // Timer fires if a command has failed to complete quickly enough
-    QPointer<QTimer> commandTimeoutTimer;
+    QTimer commandTimeoutTimer;
 
     // If there is another command in the queue, start processing it.
-    void processCommandQueue();
-
-    void resetState();
+    void processQueue();
 };
 
 #endif // SERIALCOMMANDQUEUE_H

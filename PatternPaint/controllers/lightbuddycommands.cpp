@@ -1,5 +1,8 @@
-#include "lightbuddycommandqueue.h"
+#include "lightbuddycommands.h"
 
+#include <QDebug>
+
+namespace LightBuddyCommands {
 QByteArray commandHeader()
 {
     QByteArray output;
@@ -18,12 +21,7 @@ QByteArray encodeInt(int data)
     return output;
 }
 
-LightBuddySerialQueue::LightBuddySerialQueue(QObject *parent) :
-    SerialCommandQueue(parent)
-{
-}
-
-void LightBuddySerialQueue::eraseFlash()
+SerialCommand eraseFlash()
 {
     QByteArray command;
     command + commandHeader();
@@ -44,10 +42,10 @@ void LightBuddySerialQueue::eraseFlash()
 
     // Note: only the length matters for the response, the response data
     // will be ignored.
-    queueCommand(SerialCommand("eraseFlash", command, ret, mask));
+    return SerialCommand("eraseFlash", command, ret, mask);
 }
 
-void LightBuddySerialQueue::fileNew(int sizeBytes)
+SerialCommand fileNew(int sizeBytes)
 {
     QByteArray command;
     command + commandHeader();
@@ -72,14 +70,14 @@ void LightBuddySerialQueue::fileNew(int sizeBytes)
     mask.append((char)0x00);
     mask.append((char)0x00);
 
-    queueCommand(SerialCommand("fileNew", command, ret, mask));
+    return SerialCommand("fileNew", command, ret, mask);
 }
 
-void LightBuddySerialQueue::writePage(int sector, int offset, QByteArray data)
+SerialCommand writePage(int sector, int offset, QByteArray data)
 {
     if (data.size() != 256) {
         // TODO: How to error out here?
-        return;
+        qCritical() << "Data size not multiple of page size!";
     }
 
     QByteArray command;
@@ -102,10 +100,10 @@ void LightBuddySerialQueue::writePage(int sector, int offset, QByteArray data)
 
     // Note: only the length matters for the response, the response data
     // will be ignored.
-    queueCommand(SerialCommand("writePage", command, ret, mask));
+    return SerialCommand("writePage", command, ret, mask);
 }
 
-void LightBuddySerialQueue::reloadAnimations()
+SerialCommand reloadAnimations()
 {
     QByteArray command;
     command + commandHeader();
@@ -124,5 +122,6 @@ void LightBuddySerialQueue::reloadAnimations()
 
     // Note: only the length matters for the response, the response data
     // will be ignored.
-    queueCommand(SerialCommand("reloadAnimations", command, ret, mask));
+    return SerialCommand("reloadAnimations", command, ret, mask);
+}
 }

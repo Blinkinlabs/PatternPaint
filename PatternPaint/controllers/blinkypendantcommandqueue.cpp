@@ -29,7 +29,7 @@ void BlinkyPendantCommandQueue::startWrite()
     responseMask.append((char)0xFF);
     responseMask.append((char)0x00);
 
-    queueCommand(SerialCommand("startWrite", command, response, responseMask));
+    enqueue(SerialCommand("startWrite", command, response, responseMask));
 }
 
 void BlinkyPendantCommandQueue::writeData(QByteArray &data)
@@ -63,7 +63,7 @@ void BlinkyPendantCommandQueue::writeData(QByteArray &data)
         responseMask.append((char)0xFF);
         responseMask.append((char)0x00);
 
-        queueCommand(SerialCommand("write", command, response, responseMask));
+        enqueue(SerialCommand("write", command, response, responseMask));
     }
 }
 
@@ -84,5 +84,5 @@ void BlinkyPendantCommandQueue::stopWrite()
     responseMask.append((char)0xFF);
     responseMask.append((char)0x00);
 
-    queueCommand(SerialCommand("stopWrite", command, response, responseMask));
+    enqueue(SerialCommand("stopWrite", command, response, responseMask));
 }

@@ -1,9 +1,10 @@
 #ifndef LIGHTBUDDYUPLOADER_H
 #define LIGHTBUDDYUPLOADER_H
 
-#include <QObject>
 #include "blinkyuploader.h"
-#include "lightbuddycommandqueue.h"
+#include "serialcommandqueue.h"
+
+#include <QObject>
 
 class LightBuddyUploader : public BlinkyUploader
 {
@@ -32,7 +33,7 @@ private slots:
 private:
     QString errorString;
 
-    LightBuddySerialQueue commandQueue;
+    SerialCommandQueue commandQueue;
 
     /// Update any listeners with the latest progress
     void setProgress(int newProgress);

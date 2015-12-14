@@ -13,7 +13,7 @@ public:
                   QByteArray expectedResponseMask_);
 
     QString name;                   ///< Human-readable description of the command
-    QByteArray commandData;         ///< Data to send to the bootloader
+    QByteArray data;         ///< Data to send to the bootloader
     QByteArray expectedResponse;    ///< Expected response from the bootloader
     QByteArray expectedResponseMask;///< Mask for interpreting expected response
 };

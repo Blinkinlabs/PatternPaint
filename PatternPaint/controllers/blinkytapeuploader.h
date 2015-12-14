@@ -97,7 +97,7 @@ private:
     /// Update any listeners with the latest progress
     void setProgress(int newProgress);
 
-    SerialCommandQueue programmer;
+    SerialCommandQueue commandQueue;
 
     QQueue<FlashSection> flashData; ///< Queue of memory sections to write
 };
