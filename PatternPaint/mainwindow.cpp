@@ -156,6 +156,7 @@ MainWindow::MainWindow(QWidget *parent) :
     progressDialog.setMaximum(1000);
     progressDialog.setWindowModality(Qt::WindowModal);
     progressDialog.setAutoClose(false);
+    progressDialog.setAutoReset(false);
 
     // Workaround for bug in QT 5.5.1
 #if defined(PROGRESS_DIALOG_WORKAROUND)
@@ -505,11 +506,9 @@ void MainWindow::on_uploaderProgressChanged(float progressValue)
         return;
     }
 
-    // Clip the progress to maximum, until we work out a better way to estimate it.
-    if (progressValue > 1)
-        progressValue = 1;
-
     int newValue = progressDialog.maximum()*progressValue;
+//    if(newValue > progressDialog.maximum())
+//        newValue = progressDialog.maximum();
 
     progressDialog.setValue(newValue);
 }
