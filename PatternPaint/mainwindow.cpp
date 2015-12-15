@@ -449,7 +449,6 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered()
 void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
 {
     qDebug() << "status changed, connected=" << connected;
-    actionSave_to_Blinky->setEnabled(connected);
 
     if (connected) {
         mode = Connected;
@@ -478,6 +477,8 @@ void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
         }
 #endif
     }
+
+    actionSave_to_Blinky->setEnabled(mode == Connected && !patternCollection.isEmpty());
 }
 
 void MainWindow::on_actionAbout_triggered()
@@ -980,6 +981,9 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
         frameEditor->setShowPlaybakIndicator(false);
         timeline->setVisible(false);
         patternSpeed->setValue(1);
+
+        actionSave_to_Blinky->setEnabled(false);
+
         return;
     }
 
@@ -994,6 +998,8 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
     frameEditor->setShowPlaybakIndicator(newpattern->hasPlaybackIndicator());
     timeline->setVisible(newpattern->hasTimeline());
     patternSpeed->setValue(newpattern->getFrameSpeed());
+
+    actionSave_to_Blinky->setEnabled(mode == Connected);
 
     // TODO: Should we unregister these eventually?
     connect(timeline->selectionModel(),
@@ -1130,12 +1136,6 @@ void MainWindow::on_actionNew_ScrollingPattern_triggered()
 
 void MainWindow::on_actionNew_FramePattern_triggered()
 {
-    qDebug() << "Patterns:" << patternCollection.patterns().count();
-
-    foreach (const Pattern *pattern, patternCollection.patterns()) {
-        qDebug() << pattern->getName() << " " << pattern->getUndoStack()->count();
-    }
-
     loadPattern(Pattern::FrameBased, QString());
 }
 
