@@ -15,12 +15,12 @@ Pattern::Pattern(PatternType type, QSize patternSize, int frameCount, QListWidge
     // TODO: Choose a pattern type!
     switch (type) {
     case FrameBased:
-        frames = new PatternFrameModel(patternSize, this);
+        model = new PatternFrameModel(patternSize, this);
         playbackIndicator = false;
         timeline = true;
         break;
     case Scrolling:
-        frames = new PatternScrollModel(patternSize, this);
+        model = new PatternScrollModel(patternSize, this);
         playbackIndicator = true;
         timeline = false;
         break;
@@ -29,22 +29,21 @@ Pattern::Pattern(PatternType type, QSize patternSize, int frameCount, QListWidge
         break;
     }
 
-    frames->insertRows(0, frameCount);
-    frames->setData(frames->index(0), false, PatternModel::Modified);
+    model->insertRows(0, frameCount);
 
     // TODO: MVC way of handling this?
     getUndoStack()->clear();
-    frames->setData(frames->index(0), false, PatternModel::Modified);
+    model->setData(model->index(0), false, PatternModel::Modified);
 }
 
-QUndoStack *Pattern::getUndoStack()
+QUndoStack *Pattern::getUndoStack() const
 {
-    return frames->getUndoStack();
+    return model->getUndoStack();
 }
 
 bool Pattern::hasValidFilename() const
 {
-    QString filename = frames->data(frames->index(0), PatternModel::FileName).toString();
+    QString filename = model->data(model->index(0), PatternModel::FileName).toString();
 
     if (filename.isEmpty())
         return false;
@@ -56,9 +55,9 @@ bool Pattern::hasValidFilename() const
     return true;
 }
 
-QString Pattern::getPatternName() const
+QString Pattern::getName() const
 {
-    QFileInfo fileInfo(frames->data(frames->index(0), PatternModel::FileName).toString());
+    QFileInfo fileInfo(model->data(model->index(0), PatternModel::FileName).toString());
 
     if (fileInfo.baseName() == "")
         return "Untitled";
@@ -77,14 +76,14 @@ bool Pattern::load(const QString &newFileName)
     switch (type) {
     case FrameBased:
     {
-        QSize frameSize = frames->data(frames->index(0), PatternModel::FrameSize).toSize();
+        QSize frameSize = model->data(model->index(0), PatternModel::FrameSize).toSize();
 
         // TODO: Warn if the source image wasn't of the expected aperture?
         sourceImage = sourceImage.scaledToHeight(frameSize.height());
         int newFrameCount = sourceImage.width()/frameSize.width();
 
-        frames->removeRows(0, frames->rowCount());
-        frames->insertRows(0, newFrameCount);
+        model->removeRows(0, model->rowCount());
+        model->insertRows(0, newFrameCount);
 
         QPainter painter;
         for (int i = 0; i < newFrameCount; i++) {
@@ -94,32 +93,32 @@ bool Pattern::load(const QString &newFileName)
             painter.drawImage(QPoint(0, 0), sourceImage,
                               QRect(frameSize.width()*i, 0, frameSize.width(), frameSize.height()));
             painter.end();
-            frames->setData(frames->index(i), newFrameData, PatternModel::FrameImage);
+            model->setData(model->index(i), newFrameData, PatternModel::FrameImage);
         }
 
         // If successful, record the filename and clear the undo stack.
-        frames->setData(frames->index(0), newFileName, PatternModel::FileName);
-        frames->setData(frames->index(0), false, PatternModel::Modified);
+        model->setData(model->index(0), newFileName, PatternModel::FileName);
+        model->setData(model->index(0), false, PatternModel::Modified);
 
         break;
     }
     case Scrolling:
     {
-        QSize frameSize = frames->data(frames->index(0), PatternModel::FrameSize).toSize();
+        QSize frameSize = model->data(model->index(0), PatternModel::FrameSize).toSize();
 
         // TODO: Warn if the source image wasn't of the expected aperture?
         sourceImage = sourceImage.scaledToHeight(frameSize.height());
         int newFrameCount = sourceImage.width();
 
-        frames->removeRows(0, frames->rowCount());
+        model->removeRows(0, model->rowCount());
 
-        frames->insertRows(0, newFrameCount);
+        model->insertRows(0, newFrameCount);
 
-        frames->setData(frames->index(0), sourceImage, PatternModel::EditImage);
+        model->setData(model->index(0), sourceImage, PatternModel::EditImage);
 
         // If successful, record the filename and clear the undo stack.
-        frames->setData(frames->index(0), newFileName, PatternModel::FileName);
-        frames->setData(frames->index(0), false, PatternModel::Modified);
+        model->setData(model->index(0), newFileName, PatternModel::FileName);
+        model->setData(model->index(0), false, PatternModel::Modified);
 
         break;
     }
@@ -135,7 +134,7 @@ bool Pattern::saveAs(const QString newFileName)
 {
     // Attempt to save to this location
 
-    QSize frameSize = frames->data(frames->index(0), PatternModel::FrameSize).toSize();
+    QSize frameSize = model->data(model->index(0), PatternModel::FrameSize).toSize();
     QImage output;
 
     switch (type) {
@@ -159,7 +158,7 @@ bool Pattern::saveAs(const QString newFileName)
     case Scrolling:
     {
         // Just grab the edit image.
-        output = frames->data(frames->index(0), PatternModel::EditImage).value<QImage>();
+        output = model->data(model->index(0), PatternModel::EditImage).value<QImage>();
         break;
     }
     }
@@ -167,67 +166,72 @@ bool Pattern::saveAs(const QString newFileName)
     if (!output.save(newFileName))
         return false;
 
-    frames->setData(frames->index(0), newFileName, PatternModel::FileName);
-    frames->setData(frames->index(0), false, PatternModel::Modified);
+    model->setData(model->index(0), newFileName, PatternModel::FileName);
+    model->setData(model->index(0), false, PatternModel::Modified);
 
     return true;
 }
 
 bool Pattern::save()
 {
-    return saveAs(frames->data(frames->index(0), PatternModel::FileName).toString());
+    return saveAs(model->data(model->index(0), PatternModel::FileName).toString());
 }
 
 bool Pattern::getModified() const
 {
-    return frames->data(frames->index(0), PatternModel::Modified).toBool();
+    return model->data(model->index(0), PatternModel::Modified).toBool();
 }
 
 void Pattern::resize(QSize newSize, bool scale)
 {
     Q_UNUSED(scale);
 
-    frames->setData(frames->index(0), newSize, PatternModel::FrameSize);
+    model->setData(model->index(0), newSize, PatternModel::FrameSize);
 }
 
 QSize Pattern::getFrameSize() const
 {
-    return frames->data(frames->index(0), PatternModel::FrameSize).toSize();
+    return model->data(model->index(0), PatternModel::FrameSize).toSize();
 }
 
 const QImage Pattern::getFrameImage(int index) const
 {
-    return frames->index(index).data(PatternModel::FrameImage).value<QImage>();
+    return model->index(index).data(PatternModel::FrameImage).value<QImage>();
 }
 
 void Pattern::setFrameImage(int index, const QImage &update)
 {
-    frames->setData(frames->index(index), QVariant(update), PatternModel::FrameImage);
+    model->setData(model->index(index), QVariant(update), PatternModel::FrameImage);
 }
 
 const QImage Pattern::getEditImage(int index) const
 {
-    return frames->index(index).data(PatternModel::EditImage).value<QImage>();
+    return model->index(index).data(PatternModel::EditImage).value<QImage>();
 }
 
 void Pattern::setEditImage(int index, const QImage &update)
 {
-    frames->setData(frames->index(index), QVariant(update), PatternModel::EditImage);
+    model->setData(model->index(index), QVariant(update), PatternModel::EditImage);
+}
+
+PatternModel * Pattern::getModel() const
+{
+    return model;
 }
 
 int Pattern::getFrameCount() const
 {
-    return frames->rowCount();
+    return model->rowCount();
 }
 
 float Pattern::getFrameSpeed() const
 {
-    return frames->index(0).data(PatternModel::FrameSpeed).toFloat();
+    return model->index(0).data(PatternModel::FrameSpeed).toFloat();
 }
 
 void Pattern::setFrameSpeed(float speed)
 {
-    frames->setData(frames->index(0), speed, PatternModel::FrameSpeed);
+    model->setData(model->index(0), speed, PatternModel::FrameSpeed);
 }
 
 void Pattern::deleteFrame(int index)
@@ -235,10 +239,10 @@ void Pattern::deleteFrame(int index)
     if (getFrameCount() == 1)
         return;
 
-    frames->removeRow(index);
+    model->removeRow(index);
 }
 
 void Pattern::addFrame(int index)
 {
-    frames->insertRow(index);
+    model->insertRow(index);
 }

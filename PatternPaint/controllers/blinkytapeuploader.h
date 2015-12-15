@@ -44,7 +44,7 @@ class BlinkyTapeUploader : public BlinkyUploader
 public:
     BlinkyTapeUploader(QObject *parent = 0);
 
-    bool startUpload(BlinkyController &blinky, std::vector<PatternWriter> patterns);
+    bool startUpload(BlinkyController &blinky, QList<PatternWriter> &patternWriters);
     bool upgradeFirmware(BlinkyController &blinky);
     bool upgradeFirmware(int timeout);
     QString getErrorString() const;

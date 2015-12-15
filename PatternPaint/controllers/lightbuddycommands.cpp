@@ -7,8 +7,7 @@ namespace LightBuddyCommands {
 QByteArray commandHeader()
 {
     QByteArray output;
-    for (int i = 0; i < 12; i++)
-        output.append((char)0xFF);
+    output.fill((char)0xFF,12);
     return output;
 }
 

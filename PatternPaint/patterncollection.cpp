@@ -10,32 +10,41 @@ PatternCollection::~PatternCollection()
 {
 }
 
-void PatternCollection::addPattern(QPointer<Pattern> newPattern, int index)
+QList<Pattern *> PatternCollection::patterns()
 {
-    patterns.insertRow(index);
-    patterns.setData(patterns.index(index),
+    QList<Pattern * > patterns;
+    for (int i = 0; i < count(); i++)
+        patterns.append(at(i));
+
+    return patterns;
+}
+
+void PatternCollection::add(QPointer<Pattern> newPattern, int index)
+{
+    model.insertRow(index);
+    model.setData(model.index(index),
                      // qVariantFromValue((void *) newPattern),
                      QVariant::fromValue(newPattern),
                      PatternCollectionModel::PatternPointer);
 }
 
-void PatternCollection::removePattern(int index)
+void PatternCollection::remove(int index)
 {
-    patterns.removeRow(index);
+    model.removeRow(index);
 }
 
-bool PatternCollection::hasPattern() const
+QPointer<Pattern> PatternCollection::at(int index)
 {
-    return count() > 0;
-}
-
-QPointer<Pattern> PatternCollection::getPattern(int index)
-{
-    return qvariant_cast<QPointer<Pattern> >(patterns.index(index).data(PatternCollectionModel::
+    return qvariant_cast<QPointer<Pattern> >(model.index(index).data(PatternCollectionModel::
                                                                         PatternPointer));
 }
 
 int PatternCollection::count() const
 {
-    return patterns.rowCount();
+    return model.rowCount();
+}
+
+bool PatternCollection::isEmpty() const
+{
+    return count() == 0;
 }

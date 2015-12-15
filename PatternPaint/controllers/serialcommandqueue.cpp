@@ -60,8 +60,8 @@ bool SerialCommandQueue::isConnected()
 
 void SerialCommandQueue::enqueue(QList<SerialCommand> commands)
 {
-    for (int i = 0; i < commands.count(); i++)
-        enqueue(commands.at(i));
+    foreach (SerialCommand command, commands)
+        enqueue(command);
 }
 
 void SerialCommandQueue::enqueue(SerialCommand command)

@@ -31,7 +31,7 @@ public:
 
     /// Get a pointer to the undo stack. This is used to wire the undo stack
     /// into the main window gui.
-    QUndoStack *getUndoStack();
+    QUndoStack *getUndoStack() const;
 
     /// Check if the animation has a valid filename
     /// @return true if the animation filename has been set
@@ -39,7 +39,7 @@ public:
 
     /// Get the pattern filename, or a default if one is not set
     /// @return Pattern name
-    QString getPatternName() const;
+    QString getName() const;
 
     /// Initialize the pattern from an image file
     /// @param newFileInfo URL of file to load
@@ -97,10 +97,7 @@ public:
     bool getModified() const;
 
     /// Get the underlying data model (for connection to a view)
-    PatternModel *getModel() const
-    {
-        return frames;
-    }
+    PatternModel *getModel() const;
 
     /// Get the UUID for this pattern
     const QUuid getUuid() const
@@ -122,7 +119,7 @@ public:
     }
 
 private:
-    QPointer<PatternModel> frames;   ///< Storage container for the images
+    QPointer<PatternModel> model;   ///< Storage container for the images
 
     // TODO: Push these into the model?
     PatternType type;

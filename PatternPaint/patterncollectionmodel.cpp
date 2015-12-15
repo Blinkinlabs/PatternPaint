@@ -89,9 +89,9 @@ bool PatternCollectionModel::setData(const QModelIndex &index, const QVariant &v
     } else if (role == Qt::EditRole) {
         // Find the UUID
         QPointer<Pattern> source;
-        for (int i = 0; i < patterns.count(); i++) {
-            if (patterns.at(i)->getUuid() == value.toUuid()) {
-                source = patterns.at(i);
+        foreach(QPointer<Pattern> pattern, patterns) {
+            if (pattern->getUuid() == value.toUuid()) {
+                source = pattern;
                 break;
             }
         }

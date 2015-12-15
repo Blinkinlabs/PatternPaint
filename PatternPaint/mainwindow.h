@@ -166,7 +166,7 @@ private:
     void stopPlayback();
 
     bool promptForSave(Pattern *item);
-    bool promptForSave(std::vector<Pattern *> item);
+    bool promptForSave(QList<Pattern *> patterns);
 
     bool savePattern(Pattern *item);
     bool savePatternAs(Pattern *item);

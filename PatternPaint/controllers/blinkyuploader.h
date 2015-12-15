@@ -33,8 +33,8 @@ public:
     /// Note that the blinkytape will be disconnected during the upload process,
     /// and will need to be reconnected manually afterwards.
     /// @param tape BlinkyTape to upload to (must already be connected)
-    /// @param pattern Pattern to upload to the BlinkyTape
-    virtual bool startUpload(BlinkyController &controller, std::vector<PatternWriter> patterns) = 0;
+    /// @param patternWriters Patterns to upload to the BlinkyTape
+    virtual bool startUpload(BlinkyController &controller, QList<PatternWriter> &patternWriters) = 0;
 
     /// Update/restore the firmware on the specificed device
     /// @param tape BlinkyTape to upload to (must already be connected)

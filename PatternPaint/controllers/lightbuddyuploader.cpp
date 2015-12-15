@@ -51,7 +51,7 @@ void LightBuddyUploader::cancel()
 }
 
 bool LightBuddyUploader::startUpload(BlinkyController &controller,
-                                     std::vector<PatternWriter> patternWriters)
+                                     QList<PatternWriter> &patternWriters)
 {
     // 1. Make the patterns into data and store them in a vector
     // 2. Check that they will fit in the BlinkyTile memory
@@ -60,29 +60,27 @@ bool LightBuddyUploader::startUpload(BlinkyController &controller,
     maxProgress = 1;    // For the initial erase command
 
     // For each pattern, append the image data to the sketch
-    for (std::vector<PatternWriter>::iterator patternWriter = patternWriters.begin();
-         patternWriter != patternWriters.end();
-         ++patternWriter) {
-        if (patternWriter->getEncoding() != PatternWriter::RGB24) {
+    foreach(PatternWriter patternWriter, patternWriters) {
+        if (patternWriter.getEncoding() != PatternWriter::RGB24) {
             errorString = "Lightbuddy only supports RGB24 encoding";
             return false;
         }
 
-        if (patternWriter->getData().count() > MAX_PATTERN_SIZE) {
+        if (patternWriter.getData().count() > MAX_PATTERN_SIZE) {
             errorString = QString("Pattern too big to fit in memory! Size=%1, Max size=%2").arg(
-                patternWriter->getData().count()).arg(MAX_PATTERN_SIZE);
+                patternWriter.getData().count()).arg(MAX_PATTERN_SIZE);
             return false;
         }
 
         QByteArray data;
 
         // Build the header
-        data += encodeInt(patternWriter->getLedCount());
-        data += encodeInt(patternWriter->getFrameCount());
-        data += encodeInt(patternWriter->getFrameDelay());
-        data += encodeInt(patternWriter->getEncoding());
+        data += encodeInt(patternWriter.getLedCount());
+        data += encodeInt(patternWriter.getFrameCount());
+        data += encodeInt(patternWriter.getFrameDelay());
+        data += encodeInt(patternWriter.getEncoding());
 
-        data += patternWriter->getData();
+        data += patternWriter.getData();
 
         while (data.count()%FLASH_PAGE_SIZE != 0)
             data.append((char)0x255);
@@ -103,7 +101,6 @@ bool LightBuddyUploader::startUpload(BlinkyController &controller,
 
     commandQueue.open(info);
     state = State_EraseFlash;
-// state = State_FileNew;
     doWork();
 
     return true;
@@ -199,8 +196,6 @@ void LightBuddyUploader::handleCommandFinished(QString command, QByteArray retur
         doWork();
 
     if (command == "fileNew") {
-        // record sector for new file here.
-        for (int i = 0; i < returnData.count(); i++)
         sector = decodeInt(returnData.mid(2, 4));
         qDebug() << "sector: " << sector;
 

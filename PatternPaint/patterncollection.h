@@ -11,20 +11,23 @@ public:
 
     PatternCollectionModel *getModel()
     {
-        return &patterns;
+        return &model;
     }
 
-    void addPattern(QPointer<Pattern> newPattern, int index);
+    void add(QPointer<Pattern> newPattern, int index);
 
-    void removePattern(int index);
+    void remove(int index);
 
-    QPointer<Pattern> getPattern(int index);
+    QPointer<Pattern> at(int index);
+
+    QList<Pattern*> patterns();
 
     int count() const;
-    bool hasPattern() const;
+
+    bool isEmpty() const;
 
 private:
-    PatternCollectionModel patterns;
+    PatternCollectionModel model;
 };
 
 #endif // PATTERNCOLLECTION_H

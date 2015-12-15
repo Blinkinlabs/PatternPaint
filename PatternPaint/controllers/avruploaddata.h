@@ -9,7 +9,7 @@
 class avrUploadData
 {
 public:
-    bool init(std::vector<PatternWriter> patterns);
+    bool init(QList<PatternWriter> &patterns);
 
     QByteArray sketch;
     QByteArray patternData;

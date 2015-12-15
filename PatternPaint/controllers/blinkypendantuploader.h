@@ -13,7 +13,7 @@ class BlinkyPendantUploader : public BlinkyUploader
 public:
     BlinkyPendantUploader(QObject *parent = 0);
 
-    bool startUpload(BlinkyController &controller, std::vector<PatternWriter> patterns);
+    bool startUpload(BlinkyController &controller, QList<PatternWriter> &patternWriters);
     bool upgradeFirmware(BlinkyController &controller);
     bool upgradeFirmware(int timeout);
     QString getErrorString() const;

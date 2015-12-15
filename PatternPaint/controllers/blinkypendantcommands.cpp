@@ -14,8 +14,7 @@ namespace BlinkyPendantCommands {
 QByteArray commandHeader()
 {
     QByteArray output;
-    for (int i = 0; i < 10; i++)
-        output.append((char)0xFF);
+    output.fill((char)0xFF,10);
     return output;
 }
 

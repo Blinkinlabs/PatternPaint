@@ -40,7 +40,7 @@ BlinkyPendantUploader::BlinkyPendantUploader(QObject *parent) :
 }
 
 bool BlinkyPendantUploader::startUpload(BlinkyController &controller,
-                                        std::vector<PatternWriter> patterns)
+                                        QList<PatternWriter> &patternWriters)
 {
     // TODO: push the image conversions into here so they are less awkward.
     #define PIXEL_COUNT 10
@@ -61,16 +61,16 @@ bool BlinkyPendantUploader::startUpload(BlinkyController &controller,
         qDebug() << "Using version 1 upload mechanism, please update firmware!";
 
         // Make sure we have an image compatible with the BlinkyPendant
-        if (patterns.at(0).getLedCount() != 10) {
+        if (patternWriters.front().getLedCount() != 10) {
             errorString = "Wrong pattern size- must be 10 pixels high!";
             return false;
         }
-        if (patterns.at(0).getEncoding() != PatternWriter::RGB24) {
+        if (patternWriters.front().getEncoding() != PatternWriter::RGB24) {
             errorString = "Wrong encoding type- must be RGB24!";
             return false;
         }
 
-        if(patterns.at(0).getFrameCount() > 255) {
+        if(patternWriters.front().getFrameCount() > 255) {
             errorString = "Pattern too long, must be < 256 frames";
             return false;
         }
@@ -78,8 +78,8 @@ bool BlinkyPendantUploader::startUpload(BlinkyController &controller,
         // Create the data structure to write to the device memory
         data.append((char)0x13);    // header
         data.append((char)0x37);
-        data.append((char)patterns.at(0).getFrameCount());  // frame count
-        data += patterns.at(0).getData();       // image data (RGB24, uncompressed)
+        data.append((char)patternWriters.front().getFrameCount());  // frame count
+        data += patternWriters.front().getData();       // image data (RGB24, uncompressed)
     } else {
         // Create the data structure to write to the device memory
         // Animation table
@@ -88,23 +88,21 @@ bool BlinkyPendantUploader::startUpload(BlinkyController &controller,
 
         data.append((char)0x31);    // header
         data.append((char)0x23);
-        data.append((char)patterns.size()); // Number of patterns in the table
+        data.append((char)patternWriters.size()); // Number of patterns in the table
         data.append((char)PIXEL_COUNT);     // Number of LEDs in the pattern
 
-        for (std::vector<PatternWriter>::iterator pattern = patterns.begin();
-             pattern != patterns.end();
-             ++pattern) {
+        foreach (PatternWriter pattern, patternWriters) {
             // Make sure we have an image compatible with the BlinkyPendant
-            if (pattern->getLedCount() != 10) {
+            if (pattern.getLedCount() != 10) {
                 errorString = "Wrong pattern size- must be 10 pixels high!";
                 return false;
             }
-            if (pattern->getEncoding() != PatternWriter::RGB24) {
+            if (pattern.getEncoding() != PatternWriter::RGB24) {
                 errorString = "Wrong encoding type- must be RGB24!";
                 return false;
             }
 
-            if(pattern->getFrameCount() > 65535) {
+            if(pattern.getFrameCount() > 65535) {
                 errorString = "Pattern too long, must be < 65535 frames";
                 return false;
             }
@@ -112,11 +110,11 @@ bool BlinkyPendantUploader::startUpload(BlinkyController &controller,
             // Animation entry
             data.append((char)0);             // Encoding type (1 byte) (RGB24, uncompressed) (TODO)
             data += encodeInt(patternData.length());        // Data offset (4 bytes)
-            data += encodeWord(pattern->getFrameCount());   // Frame count (2 bytes)
+            data += encodeWord(pattern.getFrameCount());   // Frame count (2 bytes)
             data += encodeWord(0);                          // Frame delay (2 bytes) TODO
 
             // Make sure we have an image compatible with the BlinkyPendant
-            patternData += pattern->getData();       // image data (RGB24, uncompressed)
+            patternData += pattern.getData();       // image data (RGB24, uncompressed)
         }
 
         data += patternData;

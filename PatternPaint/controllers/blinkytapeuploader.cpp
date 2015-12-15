@@ -85,11 +85,11 @@ void BlinkyTapeUploader::setProgress(int newProgress)
     emit(progressChanged(static_cast<float>(progress)/maxProgress));
 }
 
-bool BlinkyTapeUploader::startUpload(BlinkyController &tape, std::vector<PatternWriter> patterns)
+bool BlinkyTapeUploader::startUpload(BlinkyController &tape, QList<PatternWriter> &patternWriters)
 {
     /// Create the compressed image and check if it will fit into the device memory
     avrUploadData data;
-    if (!data.init(patterns)) {
+    if (!data.init(patternWriters)) {
         errorString = data.errorString;
         return false;
     }
@@ -158,8 +158,8 @@ bool BlinkyTapeUploader::upgradeFirmware(int timeout)
 
     // TODO: This is duplicated in startUpload...
     maxProgress = 1;    // checkDeviceSignature
-    for (int i = 0; i < flashData.count(); i++)
-        maxProgress += flashData.at(i).data.count()/PAGE_SIZE_BYTES;
+    foreach (FlashSection flashSection, flashData)
+        maxProgress += flashSection.data.count()/PAGE_SIZE_BYTES;
     setProgress(0);
 
     stateStartTime = QDateTime::currentDateTime();
@@ -200,8 +200,9 @@ bool BlinkyTapeUploader::upgradeFirmware(BlinkyController &blinky)
 bool BlinkyTapeUploader::startUpload(BlinkyController &blinky)
 {
     maxProgress = 1;    // checkDeviceSignature
-    for (int i = 0; i < flashData.count(); i++)
-        maxProgress += flashData.at(i).data.count()/PAGE_SIZE_BYTES;
+    foreach (FlashSection flashSection, flashData)
+        maxProgress += flashSection.data.count()/PAGE_SIZE_BYTES;
+
     setProgress(0);
 
     bootloaderPollTimeout = BOOTLOADER_POLL_TIMEOUT;
