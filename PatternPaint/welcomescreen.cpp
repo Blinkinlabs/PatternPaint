@@ -2,12 +2,21 @@
 #include "ui_welcomescreen.h"
 
 #include <QDebug>
+#include <QSettings>
 
 WelcomeScreen::WelcomeScreen(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::WelcomeScreen)
 {
     ui->setupUi(this);
+
+    QSettings settings;
+
+    ui->showWelcomeScreen->setChecked(settings.value("WelcomeScreen/showAtStartup",
+                                                     true).toBool());
+
+    ui->loadExamplePatterns->setChecked(settings.value("WelcomeScreen/loadExamplePatterns",
+                                                     true).toBool());
 
     ui->SceneList->setIconSize(QSize(150, 150));
 
@@ -48,6 +57,16 @@ void WelcomeScreen::accept()
 {
     QDialog::accept();
 
+    QSettings settings;
+
+    settings.setValue("WelcomeScreen/showAtStartup", ui->showWelcomeScreen->isChecked());
+    settings.setValue("WelcomeScreen/loadExamplePatterns", ui->loadExamplePatterns->isChecked());
+
+    SceneTemplate scene = getSelectedTemplate();
+
+    if(!ui->loadExamplePatterns->isChecked())
+        scene.examples = "";
+
     // Send scene apply signal here
-    emit(sceneSelected(getSelectedTemplate()));
+    emit(sceneSelected(scene));
 }

@@ -202,7 +202,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     timeline->setItemDelegate(new PatternDelegate(this));
 
-    if (settings.value("MainWindow/showWelcomeScreenAtStartup", true).toBool())
+    if (settings.value("WelcomeScreen/showAtStartup", true).toBool())
         connect(this, SIGNAL(windowLoaded()), this, SLOT(on_actionWelcome_triggered()));
 
     // Refresh the display for no pattern selected

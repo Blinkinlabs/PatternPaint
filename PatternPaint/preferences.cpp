@@ -18,10 +18,10 @@ Preferences::Preferences(QWidget *parent) :
 
     QSettings settings;
 
-    ui->gridLayout->setColumnMinimumWidth(0, 150);
-
-    ui->showWelcomeScreen->setChecked(settings.value("MainWindow/showWelcomeScreenAtStartup",
+    ui->showWelcomeScreen->setChecked(settings.value("WelcomeScreen/showAtStartup",
                                                      true).toBool());
+
+    ui->gridLayout->setColumnMinimumWidth(0, 150);
 
 #if defined(Q_OS_MACX)
     ui->automaticUpdateCheck->hide();
@@ -45,9 +45,11 @@ Preferences::~Preferences()
 
 void Preferences::accept()
 {
+    QDialog::accept();
+
     QSettings settings;
 
-    settings.setValue("MainWindow/showWelcomeScreenAtStartup", ui->showWelcomeScreen->isChecked());
+    settings.setValue("WelcomeScreen/showAtStartup", ui->showWelcomeScreen->isChecked());
 
 #if defined(Q_OS_MACX)
     if (ui->updateURL->text() != OSX_RELEASE_APPCAST_DEFAULT)
@@ -58,6 +60,4 @@ void Preferences::accept()
         settings.setValue("Updates/releaseAppcastUrl", ui->updateURL->text());
 
 #endif
-
-    QDialog::accept();
 }
