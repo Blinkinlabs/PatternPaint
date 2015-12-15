@@ -7,6 +7,29 @@
 #define BLINKY_PENDANT_VERSION_1 256
 #define BLINKY_PENDANT_VERSION_2 512
 
+namespace {
+
+// TODO: Dupe in lightbuddycommands.cpp
+QByteArray encodeInt(int data)
+{
+    QByteArray output;
+    output.append((char)((data >> 24) & 0xFF));
+    output.append((char)((data >> 16) & 0xFF));
+    output.append((char)((data >>  8) & 0xFF));
+    output.append((char)((data) & 0xFF));
+    return output;
+}
+
+QByteArray encodeWord(int data)
+{
+    QByteArray output;
+    output.append((char)((data >>  8) & 0xFF));
+    output.append((char)((data) & 0xFF));
+    return output;
+}
+
+}
+
 BlinkyPendantUploader::BlinkyPendantUploader(QObject *parent) :
     BlinkyUploader(parent)
 {
@@ -47,6 +70,11 @@ bool BlinkyPendantUploader::startUpload(BlinkyController &controller,
             return false;
         }
 
+        if(patterns.at(0).getFrameCount() > 255) {
+            errorString = "Pattern too long, must be < 256 frames";
+            return false;
+        }
+
         // Create the data structure to write to the device memory
         data.append((char)0x13);    // header
         data.append((char)0x37);
@@ -76,16 +104,16 @@ bool BlinkyPendantUploader::startUpload(BlinkyController &controller,
                 return false;
             }
 
+            if(pattern->getFrameCount() > 65535) {
+                errorString = "Pattern too long, must be < 65535 frames";
+                return false;
+            }
+
             // Animation entry
             data.append((char)0);             // Encoding type (1 byte) (RGB24, uncompressed) (TODO)
-            data.append((char)((patternData.length() >> 24) &0xFF)); // Data offset (4 bytes)
-            data.append((char)((patternData.length() >> 16) &0xFF));
-            data.append((char)((patternData.length() >>  8) &0xFF));
-            data.append((char)((patternData.length() >>  0) &0xFF));
-            data.append((char)((pattern->getFrameCount() >> 8)&0xFF));   // Frame count (2 bytes)
-            data.append((char)((pattern->getFrameCount())&0xFF));
-            data.append((char)0);             // Frame delay (2 bytes) TODO
-            data.append((char)0);
+            data += encodeInt(patternData.length());        // Data offset (4 bytes)
+            data += encodeWord(pattern->getFrameCount());   // Frame count (2 bytes)
+            data += encodeWord(0);                          // Frame delay (2 bytes) TODO
 
             // Make sure we have an image compatible with the BlinkyPendant
             patternData += pattern->getData();       // image data (RGB24, uncompressed)
@@ -146,7 +174,7 @@ void BlinkyPendantUploader::cancel()
     qDebug() << "Cancel signalled, but not supported";
 }
 
-void BlinkyPendantUploader::handleProgrammerError(QString error)
+void BlinkyPendantUploader::handleError(QString error)
 {
     qCritical() << error;
 
@@ -155,7 +183,7 @@ void BlinkyPendantUploader::handleProgrammerError(QString error)
     emit(finished(false));
 }
 
-void BlinkyPendantUploader::handleProgrammerCommandFinished(QString command, QByteArray returnData)
+void BlinkyPendantUploader::handleCommandFinished(QString command, QByteArray returnData)
 {
     Q_UNUSED(command);
     Q_UNUSED(returnData);

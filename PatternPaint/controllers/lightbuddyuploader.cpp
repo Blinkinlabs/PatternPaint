@@ -6,6 +6,8 @@
 #define FLASH_PAGE_SIZE 256
 #define MAX_PATTERN_SIZE 507648
 
+namespace {
+
 // TODO: Dupe in lightbuddycommands.cpp
 QByteArray encodeInt(int data)
 {
@@ -25,13 +27,15 @@ int decodeInt(QByteArray data)
            + ((int)data.at(3) << 0);
 }
 
+}
+
 LightBuddyUploader::LightBuddyUploader(QObject *parent) :
     BlinkyUploader(parent)
 {
     connect(&commandQueue, SIGNAL(error(QString)),
-            this, SLOT(handleProgrammerError(QString)));
+            this, SLOT(handleError(QString)));
     connect(&commandQueue, SIGNAL(commandFinished(QString, QByteArray)),
-            this, SLOT(handleProgrammerCommandFinished(QString, QByteArray)));
+            this, SLOT(handleCommandFinished(QString, QByteArray)));
 }
 
 QList<PatternWriter::Encoding> LightBuddyUploader::getSupportedEncodings() const
@@ -176,7 +180,7 @@ QString LightBuddyUploader::getErrorString() const
     return errorString;
 }
 
-void LightBuddyUploader::handleProgrammerError(QString error)
+void LightBuddyUploader::handleError(QString error)
 {
     qCritical() << error;
 
@@ -185,7 +189,7 @@ void LightBuddyUploader::handleProgrammerError(QString error)
     emit(finished(false));
 }
 
-void LightBuddyUploader::handleProgrammerCommandFinished(QString command, QByteArray returnData)
+void LightBuddyUploader::handleCommandFinished(QString command, QByteArray returnData)
 {
     Q_UNUSED(returnData);
 

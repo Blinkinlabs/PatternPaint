@@ -24,9 +24,9 @@ public slots:
     void cancel();
 
 private slots:
-    void handleProgrammerError(QString error);
+    void handleError(QString error);
 
-    void handleProgrammerCommandFinished(QString command, QByteArray returnData);
+    void handleCommandFinished(QString command, QByteArray returnData);
 
 private:
     /// Update any listeners with the latest progress

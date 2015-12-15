@@ -30,9 +30,9 @@ BlinkyTapeUploader::BlinkyTapeUploader(QObject *parent) :
     state(State_Ready)
 {
     connect(&commandQueue, SIGNAL(error(QString)),
-            this, SLOT(handleProgrammerError(QString)));
+            this, SLOT(handleError(QString)));
     connect(&commandQueue, SIGNAL(commandFinished(QString, QByteArray)),
-            this, SLOT(handleProgrammerCommandFinished(QString, QByteArray)));
+            this, SLOT(handleCommandFinished(QString, QByteArray)));
 }
 
 QList<PatternWriter::Encoding> BlinkyTapeUploader::getSupportedEncodings() const
@@ -53,7 +53,7 @@ void BlinkyTapeUploader::cancel()
     state = State_Ready;
 }
 
-void BlinkyTapeUploader::handleProgrammerError(QString error)
+void BlinkyTapeUploader::handleError(QString error)
 {
     qCritical() << error;
 
@@ -62,7 +62,7 @@ void BlinkyTapeUploader::handleProgrammerError(QString error)
     emit(finished(false));
 }
 
-void BlinkyTapeUploader::handleProgrammerCommandFinished(QString command, QByteArray returnData)
+void BlinkyTapeUploader::handleCommandFinished(QString command, QByteArray returnData)
 {
     Q_UNUSED(returnData);
 
@@ -249,7 +249,7 @@ void BlinkyTapeUploader::doWork()
             if ((bootloaderPollTimeout > 0)
                 && (stateStartTime.msecsTo(QDateTime::currentDateTime())
                     > bootloaderPollTimeout)) {
-                handleProgrammerError("Timeout waiting for a bootloader device");
+                handleError("Timeout waiting for a bootloader device");
                 return;
             }
 
@@ -275,13 +275,13 @@ void BlinkyTapeUploader::doWork()
         // If we didn't detect a bootloader and still have time, then queue the timer and
         // wait. Otherwise, we timed out, so fail.
         if (postResetTapes.count() == 0) {
-            handleProgrammerError("Bootloader dissappeared!");
+            handleError("Bootloader dissappeared!");
             return;
         }
 
         // Try to create a new programmer by connecting to the port
         if (!commandQueue.open(postResetTapes.at(0))) {
-            handleProgrammerError("could not connect to programmer!");
+            handleError("could not connect to programmer!");
             return;
         }
 
