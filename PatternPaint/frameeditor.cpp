@@ -325,3 +325,14 @@ void FrameEditor::applyInstrument(QImage &update)
 
     emit(dataEdited(frameIndex, frameData));
 }
+
+
+QColor FrameEditor::getPrimaryColor() const
+{
+    return toolColor;
+}
+
+int FrameEditor::getPenSize() const
+{
+    return toolSize;
+}

@@ -61,10 +61,10 @@ QVariant PatternCollectionModel::data(const QModelIndex &index, int role) const
     if (role == Qt::EditRole)
         return patterns.at(index.row())->getUuid();
 
-// else if (role == Qt::ToolTipRole)
-// return patterns.at(index.row())->getPatternName();
+//    if (role == Qt::ToolTipRole)
+//        return patterns.at(index.row())->getName();
 
-    else if (role == PreviewImage)
+    if (role == PreviewImage)
         return patterns.at(index.row())->getEditImage(0);
 
     return QVariant();
@@ -86,7 +86,9 @@ bool PatternCollectionModel::setData(const QModelIndex &index, const QVariant &v
         roles.append(role);
         emit dataChanged(index, index, roles);
         return true;
-    } else if (role == Qt::EditRole) {
+    }
+
+    if (role == Qt::EditRole) {
         // Find the UUID
         QPointer<Pattern> source;
         foreach(QPointer<Pattern> pattern, patterns) {

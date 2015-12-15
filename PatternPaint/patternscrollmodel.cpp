@@ -97,17 +97,22 @@ QVariant PatternScrollModel::data(const QModelIndex &index, int role) const
 
         painter.end();
         return frame;
-    } else if (role == EditImage) {
-        return image;
-    } else if (role == FrameSize) {
-        return frameSize;
-    } else if (role == FrameSpeed) {
-        return frameSpeed;
-    } else if (role == FileName) {
-        return fileInfo;
-    } else if (role == Modified) {
-        return modified;
     }
+
+    if (role == EditImage)
+        return image;
+
+    if (role == FrameSize)
+        return frameSize;
+
+    if (role == FrameSpeed)
+        return frameSpeed;
+
+    if (role == FileName)
+        return fileInfo;
+
+    if (role == Modified)
+        return modified;
 
     return QVariant();
 }
@@ -150,7 +155,9 @@ bool PatternScrollModel::setData(const QModelIndex &index, const QVariant &value
 // emit dataChanged(index, index, roles);
 // return true;
         return false;
-    } else if (role == EditImage) {
+    }
+
+    if (role == EditImage) {
         // TODO: enforce size scaling here?
 
         QPainter painter;
@@ -162,7 +169,9 @@ bool PatternScrollModel::setData(const QModelIndex &index, const QVariant &value
         roles.append(FrameImage);
         emit dataChanged(index, index, roles);
         return true;
-    } else if (role == FrameSize) {
+    }
+
+    if (role == FrameSize) {
         // TODO: Implement me
 
         frameSize = value.toSize();
@@ -189,21 +198,27 @@ bool PatternScrollModel::setData(const QModelIndex &index, const QVariant &value
 
         emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
         return true;
-    } else if (role == FrameSpeed) {
+    }
+
+    if (role == FrameSpeed) {
         frameSpeed = value.toFloat();
 
         QVector<int> roles;
         roles.append(FrameSpeed);
         emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
         return true;
-    } else if (role == FileName) {
+    }
+
+    if (role == FileName) {
         fileInfo = value.toString();
 
         QVector<int> roles;
         roles.append(FileName);
         emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
         return true;
-    } else if (role == Modified) {
+    }
+
+    if (role == Modified) {
         modified = value.toBool();
 
         QVector<int> roles;

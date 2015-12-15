@@ -1,10 +1,11 @@
 #ifndef PATTERNDITOR_H
 #define PATTERNDITOR_H
 
-#include <QWidget>
-#include <QPointer>
 #include "fixture.h"
 #include "pattern.h"
+
+#include <QWidget>
+#include <QPointer>
 
 class QUndoStack;
 class PatternFrameUndoCommand;
@@ -22,15 +23,9 @@ public:
 
     /// Instrument interface
 
-    QColor getPrimaryColor() const
-    {
-        return toolColor;
-    }
+    QColor getPrimaryColor() const;
 
-    int getPenSize() const
-    {
-        return toolSize;
-    }
+    int getPenSize() const;
 
     /// Update the pattern with the given changes.
     /// @param update RGBA QImage to draw on top of the current
@@ -66,6 +61,10 @@ private:
     QColor toolColor;      ///< Color of the current drawing tool (TODO: This should be a pointer to a tool)
     int toolSize;          ///< Size of the current drawing tool (TODO: This should be a pointer to a tool)
 
+    bool showPlaybackIndicator;
+
+    QPointer<Fixture> fixture;
+
     /// Redraw the gridPattern to fit the current widget size.
     void updateGridSize();
 
@@ -74,10 +73,6 @@ private:
 
     /// True if the editor has an image to edit
     bool hasImage();
-
-    bool showPlaybackIndicator;
-
-    QPointer<Fixture> fixture;
 
 signals:
     void dataEdited(int index, const QImage data);

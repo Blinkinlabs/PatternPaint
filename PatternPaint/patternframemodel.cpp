@@ -39,13 +39,14 @@ void PatternFrameModel::pushUndoState()
 {
     undoStack.push(new PatternFrameUndoCommand(this));
 
-    if (modified != true) {
-        modified = true;
+    if (modified == true)
+        return;
 
-        QVector<int> roles;
-        roles.append(Modified);
-        emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
-    }
+    modified = true;
+
+    QVector<int> roles;
+    roles.append(Modified);
+    emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
 }
 
 void PatternFrameModel::applyUndoState(QList<QImage> &newFrames, QSize newSize)
@@ -74,16 +75,16 @@ QVariant PatternFrameModel::data(const QModelIndex &index, int role) const
     if (role == FrameImage || role == Qt::EditRole || role == EditImage)
         return frames.at(index.row());
 
-    else if (role == FrameSize)
+    if (role == FrameSize)
         return frameSize;
 
-    else if (role == FrameSpeed)
+    if (role == FrameSpeed)
         return frameSpeed;
 
-    else if (role == FileName)
+    if (role == FileName)
         return fileInfo;
 
-    else if (role == Modified)
+    if (role == Modified)
         return modified;
 
     return QVariant();
@@ -103,7 +104,9 @@ bool PatternFrameModel::setData(const QModelIndex &index, const QVariant &value,
         roles.append(FrameImage);
         emit dataChanged(index, index, roles);
         return true;
-    } else if (role == FrameSize) {
+    }
+
+    if (role == FrameSize) {
         for (int row = 0; row < rowCount(); row++) {
             frameSize = value.toSize();
             QImage newImage;
@@ -130,21 +133,27 @@ bool PatternFrameModel::setData(const QModelIndex &index, const QVariant &value,
 
         emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
         return true;
-    } else if (role == FrameSpeed) {
+    }
+
+    if (role == FrameSpeed) {
         frameSpeed = value.toFloat();
 
         QVector<int> roles;
         roles.append(FrameSpeed);
         emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
         return true;
-    } else if (role == FileName) {
+    }
+
+    if (role == FileName) {
         fileInfo = value.toString();
 
         QVector<int> roles;
         roles.append(FileName);
         emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
         return true;
-    } else if (role == Modified) {
+    }
+
+    if (role == Modified) {
         // TODO: This should only be accessable through the undo stack?
         modified = value.toBool();
 
