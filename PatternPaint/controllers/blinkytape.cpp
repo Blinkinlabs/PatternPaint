@@ -135,11 +135,11 @@ void BlinkyTape::connectionScannerTimer_timeout()
     // Check if our serial port is on the list
     QSerialPortInfo currentInfo = QSerialPortInfo(*serial);
 
-    QList<QSerialPortInfo> tapes = probe();
-    foreach (const QSerialPortInfo &info, tapes) {
+    QList<QPointer<ControllerInfo> > tapes = probe();
+    foreach (ControllerInfo *info, tapes) {
         // If we get a match, reset the timer and return.
         // We consider it a match if the port is the same on both
-        if (info.portName() == currentInfo.portName())
+        if (info->resourceName() == currentInfo.portName())
             return;
     }
 
