@@ -23,7 +23,7 @@ public:
     PatternWriter(const Pattern *pattern, Encoding encoding, Fixture *fixture);
 
     Encoding getEncoding() const;
-    QByteArray getData() const;
+    QByteArray &getData();
     QString getHeader() const;
 
     int colorCount() const;  /// Number of unique colors in the original image

@@ -72,6 +72,16 @@ bool LightBuddyUploader::startUpload(BlinkyController &controller,
             return false;
         }
 
+        // Workaround for color order swap on lightbuddy- change RGB to BGR.
+        // TODO: Update the lightbuddy firmware so we don't need to do this.
+        qDebug() << "size: " << patternWriter.getData().count()/3;
+        QByteArray mungedPatternData;
+        for(int pixel = 0; pixel < patternWriter.getData().count()/3; pixel++) {
+            mungedPatternData.append(patternWriter.getData().at(pixel*3+2));
+            mungedPatternData.append(patternWriter.getData().at(pixel*3+1));
+            mungedPatternData.append(patternWriter.getData().at(pixel*3+0));
+        }
+
         QByteArray data;
 
         // Build the header
@@ -80,7 +90,8 @@ bool LightBuddyUploader::startUpload(BlinkyController &controller,
         data += encodeInt(patternWriter.getFrameDelay());
         data += encodeInt(patternWriter.getEncoding());
 
-        data += patternWriter.getData();
+        //data += patternWriter.getData();
+        data += mungedPatternData;
 
         while (data.count()%FLASH_PAGE_SIZE != 0)
             data.append((char)0x255);

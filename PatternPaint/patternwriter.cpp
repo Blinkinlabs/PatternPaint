@@ -34,7 +34,7 @@ PatternWriter::Encoding PatternWriter::getEncoding() const
     return encoding;
 }
 
-QByteArray PatternWriter::getData() const
+QByteArray& PatternWriter::getData()
 {
     return data;
 }

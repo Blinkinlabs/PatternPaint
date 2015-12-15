@@ -295,8 +295,6 @@ void MainWindow::connectionScannerTimer_timeout()
     QList<QPointer<ControllerInfo> > controllerInfos = BlinkyController::probe();
 
     if (controllerInfos.count() > 0) {
-        qDebug() << "Controllers found:" << controllerInfos.count();
-
         // TODO: Try another one if this one fails?
         qDebug() << "Attempting to connect to controller at:" << controllerInfos.front()->resourceName();
 
