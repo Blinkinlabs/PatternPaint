@@ -9,18 +9,15 @@ public:
     PatternCollection();
     ~PatternCollection();
 
-    PatternCollectionModel *getModel()
-    {
-        return &model;
-    }
+    PatternCollectionModel *getModel();
 
     void add(QPointer<Pattern> newPattern, int index);
 
     void remove(int index);
 
-    QPointer<Pattern> at(int index);
+    QPointer<Pattern> at(int index) const;
 
-    QList<Pattern*> patterns();
+    QList<Pattern*> patterns() const;
 
     int count() const;
 

@@ -298,9 +298,9 @@ void MainWindow::connectionScannerTimer_timeout()
         qDebug() << "Controllers found:" << controllerInfos.count();
 
         // TODO: Try another one if this one fails?
-        qDebug() << "Attempting to connect to controller at:" << controllerInfos[0]->resourceName();
+        qDebug() << "Attempting to connect to controller at:" << controllerInfos.front()->resourceName();
 
-        controller = controllerInfos[0]->createController();
+        controller = controllerInfos.front()->createController();
 
         // Modify our UI when the tape connection status changes
         connect(controller, SIGNAL(connectionStatusChanged(bool)),
@@ -314,9 +314,8 @@ void MainWindow::connectionScannerTimer_timeout()
 
 void MainWindow::patternSpeed_valueChanged(int value)
 {
-    if (patternCollection.isEmpty())
-        return;
-    patternCollection.at(getCurrentPatternIndex())->setFrameSpeed(value);
+    if(patternCollection.at(getCurrentPatternIndex())->getFrameSpeed() != value)
+        patternCollection.at(getCurrentPatternIndex())->setFrameSpeed(value);
 
     drawTimer.setInterval(1000/value);
 }
@@ -506,8 +505,6 @@ void MainWindow::on_uploaderProgressChanged(float progressValue)
     }
 
     int newValue = progressDialog.maximum()*progressValue;
-// if(newValue > progressDialog.maximum())
-// newValue = progressDialog.maximum();
 
     progressDialog.setValue(newValue);
 }
@@ -895,7 +892,6 @@ bool MainWindow::loadPattern(Pattern::PatternType type, const QString fileName)
     patternCollection.add(pattern, newPosition);
     patternCollectionListView->setCurrentIndex(patternCollectionListView->model()->index(newPosition,
                                                                                          0));
-    patternCollection.at(newPosition);
 
     return true;
 }
@@ -909,6 +905,7 @@ void MainWindow::setNewFrame(int newFrame)
 
     if (newFrame > getFrameCount())
         newFrame = getFrameCount() - 1;
+
     if (newFrame < 0)
         newFrame = 0;
 
@@ -1140,7 +1137,6 @@ void MainWindow::on_actionNew_FramePattern_triggered()
     foreach (const Pattern *pattern, patternCollection.patterns()) {
         qDebug() << pattern->getName() << " " << pattern->getUndoStack()->count();
     }
-
 
     loadPattern(Pattern::FrameBased, QString());
 }
