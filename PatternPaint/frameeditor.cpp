@@ -163,9 +163,6 @@ void FrameEditor::mouseMoveEvent(QMouseEvent *event)
     int x = event->x()/pixelScale;
     int y = event->y()/pixelScale;
 
-    qDebug() << "X,y:" << event->x() << ", " << event->y();
-    qDebug() << "pos:" << event->pos();
-
     // If the position hasn't changed, don't do anything.
     // This is to avoid expensive reprocessing of the tool preview window.
     if (x == oldX && y == oldY)

@@ -178,8 +178,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QSettings settings;
 
-    resize(settings.value("MainWindow/size", QSize(880, 450)).toSize());
-    move(settings.value("MainWindow/pos", QPoint(100, 100)).toPoint());
+    restoreGeometry(settings.value("MainWindow/geometry").toByteArray());
+    restoreState(settings.value("MainWindow/state").toByteArray());
 
     fixture
         = new MatrixFixture(settings.value("Fixture/DisplaySize",
@@ -686,23 +686,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
             unsavedPatterns.append(pattern);
     }
 
-    if (unsavedPatterns.size() == 1) {
-        // If we only have one pattern, show the regular prompt for save dialog
-        if (!promptForSave(unsavedPatterns.first())) {
-            event->ignore();
-            return;
-        }
-    } else if (unsavedPatterns.size() > 1) {
-        // If we only have one pattern, show the regular prompt for save dialog
-        if (!promptForSave(unsavedPatterns)) {
-            event->ignore();
-            return;
-        }
+    // If we only have one pattern, show the regular prompt for save dialog
+    if (!promptForSave(unsavedPatterns)) {
+        event->ignore();
+        return;
     }
-
-    QSettings settings;
-    settings.setValue("MainWindow/size", size());
-    settings.setValue("MainWindow/pos", pos());
 
     // If we are connected to a blinky, try to reset it so that it will start playing back its pattern
     if (!controller.isNull()) {
@@ -710,13 +698,22 @@ void MainWindow::closeEvent(QCloseEvent *event)
         controller->reset();
     }
 
-    event->accept();
+    QSettings settings;
+    settings.setValue("MainWindow/geometry", saveGeometry());
+    settings.setValue("MainWindow/windowState", saveState());
+
+    QMainWindow::closeEvent(event);
 }
 
 void MainWindow::showEvent(QShowEvent *event)
 {
     QMainWindow::showEvent(event);
-    emit windowLoaded();
+
+    static bool firstLoad = true;
+    if(firstLoad) {
+        firstLoad = false;
+        emit windowLoaded();
+    }
 }
 
 void MainWindow::on_instrumentSelected(bool)
@@ -738,40 +735,24 @@ void MainWindow::on_colorPicked(QColor color)
 
 bool MainWindow::promptForSave(Pattern *item)
 {
-    if (item->getModified() == false)
-        return true;
-
-    QString messageText = tr("The pattern %1 has been modified.")
-                          .arg(item->getName());
-
-    QMessageBox msgBox(this);
-    msgBox.setWindowModality(Qt::WindowModal);
-    msgBox.setIconPixmap(QPixmap::fromImage(item->getEditImage(0)));
-    msgBox.setText(messageText);
-    msgBox.setInformativeText(tr("Do you want to save your changes?"));
-    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Save);
-    int ans = msgBox.exec();
-
-    if (ans == QMessageBox::Save)
-        return savePattern(item);
-
-    if (ans == QMessageBox::Cancel)
-        return false;
-
-    if (ans == QMessageBox::Discard)
-        return true;
-
-    return false;
+    QList<Pattern *> patterns;
+    patterns.append(item);
+    return promptForSave(patterns);
 }
 
 bool MainWindow::promptForSave(QList<Pattern *> patterns)
 {
-    QString messageText = tr("The following patterns have been modified:\n");
+    QString messageText;
 
-    foreach(Pattern *pattern, patterns) {
-        messageText += pattern->getName();
-        messageText += "\n";
+    if(patterns.count() == 1) {
+        messageText += tr("The pattern %1 has been modified.")
+                .arg(patterns.first()->getName());
+    }
+    else {
+        messageText += tr("The following patterns have been modified:\n");
+
+        foreach(Pattern *pattern, patterns)
+            messageText += pattern->getName() + "\n";
     }
 
     QMessageBox msgBox(this);
@@ -783,16 +764,16 @@ bool MainWindow::promptForSave(QList<Pattern *> patterns)
     int ans = msgBox.exec();
 
     if (ans == QMessageBox::Save) {
-        foreach(Pattern *pattern, patterns) {
+        foreach(Pattern *pattern, patterns)
             if (!savePattern(pattern))
                 return false;
-        }
         return true;
-    } else if (ans == QMessageBox::Discard) {
-        return true;
-    } else { // Cancel
-        return false;
     }
+
+    if (ans == QMessageBox::Discard)
+        return true;
+
+    return false;
 }
 
 void MainWindow::applyScene(SceneTemplate sceneTemplate)
@@ -803,10 +784,9 @@ void MainWindow::applyScene(SceneTemplate sceneTemplate)
     // Test if any patterns need to be resized
     QList<Pattern *> needToResize;
 
-    foreach(Pattern* pattern, patternCollection.patterns()) {
+    foreach(Pattern* pattern, patternCollection.patterns())
         if (pattern->getFrameSize() != newDisplaySize)
             needToResize.append(pattern);
-    }
 
     if (needToResize.count() > 0) {
         QString messageText = tr("Some patterns have a different size than the fixture. Rescale "
