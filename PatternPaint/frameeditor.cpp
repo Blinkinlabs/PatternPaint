@@ -137,7 +137,7 @@ void FrameEditor::mousePressEvent(QMouseEvent *event)
         return;
 
     setCursor(instrument->cursor());
-    instrument->mousePressEvent(event, *this, event->pos()/pixelScale);
+    instrument->mousePressEvent(event, *this, QPoint(event->x()/pixelScale, event->y()/pixelScale));
     lazyUpdate();
 }
 
@@ -154,18 +154,27 @@ void FrameEditor::mouseMoveEvent(QMouseEvent *event)
 
     lastTime = newTime;
 
-    static QPoint lastPos;
+    static int oldX = -1;
+    static int oldY = -1;
 
-    QPoint pos = event->pos()/pixelScale;
+    Q_UNUSED(oldX);
+    Q_UNUSED(oldY);
+
+    int x = event->x()/pixelScale;
+    int y = event->y()/pixelScale;
+
+    qDebug() << "X,y:" << event->x() << ", " << event->y();
+    qDebug() << "pos:" << event->pos();
 
     // If the position hasn't changed, don't do anything.
     // This is to avoid expensive reprocessing of the tool preview window.
-    if (pos == lastPos)
+    if (x == oldX && y == oldY)
         return;
 
-    lastPos = pos;
+    oldX = x;
+    oldY = y;
 
-    instrument->mouseMoveEvent(event, *this, pos);
+    instrument->mouseMoveEvent(event, *this, QPoint(x, y));
 
     lazyUpdate();
 }
@@ -177,7 +186,7 @@ void FrameEditor::mouseReleaseEvent(QMouseEvent *event)
     if (!hasImage() || instrument.isNull())
         return;
 
-    instrument->mouseReleaseEvent(event, *this, event->pos()/pixelScale);
+    instrument->mouseReleaseEvent(event, *this, QPoint(event->x()/pixelScale, event->y()/pixelScale));
     lazyUpdate();
 }
 
