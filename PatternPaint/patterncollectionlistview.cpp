@@ -30,7 +30,7 @@ PatternCollectionListView::~PatternCollectionListView()
 // {
 // if(event->source() == this) {
 //// Note: Implement this by hand on Windows, to work around a bug in QT 5.4.1
-// #if defined Q_OS_WIN
+// #if defined(Q_OS_WIN)
 // if(event->mimeData()->formats().at(0) == "application/x-qabstractitemmodeldatalist") {
 // QByteArray itemData =
 // event->mimeData()->data("application/x-qabstractitemmodeldatalist");

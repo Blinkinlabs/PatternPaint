@@ -20,7 +20,7 @@
 
 #include "ui_mainwindow.h"
 
-#if defined Q_OS_MAC
+#if defined(Q_OS_MAC)
 #include "appnap.h"
 #include "fixture.h"
 #endif
