@@ -43,7 +43,7 @@ public:
     void mousePressEvent(QMouseEvent *event, FrameEditor &, const QPoint &);
     void mouseMoveEvent(QMouseEvent *event, FrameEditor &, const QPoint &);
     void mouseReleaseEvent(QMouseEvent *event, FrameEditor &, const QPoint &);
-    bool showPreview() const
+    bool hasPreview() const
     {
         return false;
     }

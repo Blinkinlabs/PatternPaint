@@ -17,20 +17,6 @@ class FrameEditor : public QWidget
 public:
     explicit FrameEditor(QWidget *parent = 0);
 
-    /// Get the image data for the current pattern
-    /// @return QImage containing the current pattern
-    const QImage &getPatternAsImage() const;
-
-    /// Instrument interface
-
-    QColor getPrimaryColor() const;
-
-    int getPenSize() const;
-
-    /// Update the pattern with the given changes.
-    /// @param update RGBA QImage to draw on top of the current
-    void applyInstrument(QImage &update);
-
     /// Re-size the display grid and selector based on new widget geometery
     void resizeEvent(QResizeEvent *resizeEvent);
 
@@ -42,6 +28,22 @@ public:
     // Handle file URLs dropped from other programs
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
+
+public:
+
+    /// Instrument interface
+
+    /// Get the image data for the current pattern
+    /// @return QImage containing the current pattern
+    const QImage &getPatternAsImage() const;
+
+    /// Update the pattern with the given changes.
+    /// @param update RGBA QImage to draw on top of the current
+    void applyInstrument(QImage &update);
+
+    QColor getPrimaryColor() const;
+
+    int getPenSize() const;
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -55,8 +57,7 @@ private:
 
     QImage gridPattern;    ///< Holds the pre-rendered grid overlay
 
-    float xScale;          ///< Number of pixels in the grid pattern per pattern pixel.
-    float yScale;          ///< Number of pixels in the grid pattern per pattern pixel.
+    float pixelScale;      ///< Number of pixels in the grid pattern per pattern pixel.
 
     QColor toolColor;      ///< Color of the current drawing tool (TODO: This should be a pointer to a tool)
     int toolSize;          ///< Size of the current drawing tool (TODO: This should be a pointer to a tool)

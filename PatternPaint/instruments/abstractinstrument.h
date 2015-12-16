@@ -70,24 +70,14 @@ public:
 
     /// Check if the tool has preview data to display
     /// @return true if the instrument has preview data to display
-    virtual bool showPreview() const
-    {
-        return drawing;
-    }
+    virtual bool hasPreview() const;
 
-    virtual const QImage &getPreview() const
-    {
-        return toolPreview;
-    }
-
-signals:
+    virtual const QImage &getPreview() const;
 
 protected:
     QPoint mStartPoint, mEndPoint; ///< Point for events.
     QImage toolPreview; ///< Scratch space to draw tool output onto
     bool drawing;       ///< True if we have an unsaved
-
-    virtual void paint(FrameEditor &) = 0;
 };
 
 /// Class for managing the mouse cursor

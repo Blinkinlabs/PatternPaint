@@ -20,10 +20,11 @@ void ColorpickerInstrument::mousePressEvent(QMouseEvent *event, FrameEditor &edi
 
 void ColorpickerInstrument::mouseMoveEvent(QMouseEvent *, FrameEditor &editor, const QPoint &pt)
 {
-    if (drawing) {
-        mStartPoint = mEndPoint = pt;
-        paint(editor);
-    }
+    if(!drawing)
+        return;
+
+    mStartPoint = mEndPoint = pt;
+    paint(editor);
 }
 
 void ColorpickerInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &, const QPoint &)

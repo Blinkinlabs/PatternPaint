@@ -29,11 +29,12 @@ void LineInstrument::mousePressEvent(QMouseEvent *event, FrameEditor &editor, co
 
 void LineInstrument::mouseMoveEvent(QMouseEvent *, FrameEditor &editor, const QPoint &pt)
 {
-    if (drawing) {
-        mEndPoint = pt;
-        toolPreview.fill(QColor(0, 0, 0, 0));
-        paint(editor);
-    }
+    if (!drawing)
+        return;
+
+    mEndPoint = pt;
+    toolPreview.fill(QColor(0, 0, 0, 0));
+    paint(editor);
 }
 
 void LineInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QPoint &)

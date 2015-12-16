@@ -28,12 +28,13 @@ void PencilInstrument::mousePressEvent(QMouseEvent *event, FrameEditor &editor, 
 
 void PencilInstrument::mouseMoveEvent(QMouseEvent *event, FrameEditor &editor, const QPoint &pt)
 {
-    if (drawing) {
-        mEndPoint = pt;
-        if (event->buttons() & Qt::LeftButton)
-            paint(editor);
-        mStartPoint = pt;
-    }
+    if (!drawing)
+        return;
+
+    mEndPoint = pt;
+    if (event->buttons() & Qt::LeftButton)
+        paint(editor);
+    mStartPoint = pt;
 }
 
 void PencilInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QPoint &)

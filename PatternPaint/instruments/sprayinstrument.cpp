@@ -28,11 +28,12 @@ void SprayInstrument::mousePressEvent(QMouseEvent *event, FrameEditor &editor, c
 
 void SprayInstrument::mouseMoveEvent(QMouseEvent *, FrameEditor &editor, const QPoint &pt)
 {
-    if (drawing) {
-        mEndPoint = pt;
-        paint(editor);
-        mStartPoint = pt;
-    }
+    if (!drawing)
+        return;
+
+    mEndPoint = pt;
+    paint(editor);
+    mStartPoint = pt;
 }
 
 void SprayInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QPoint &)

@@ -8,6 +8,16 @@ AbstractInstrument::AbstractInstrument(QObject *parent) :
 {
 }
 
+bool AbstractInstrument::hasPreview() const
+{
+    return drawing;
+}
+
+const QImage &AbstractInstrument::getPreview() const
+{
+    return toolPreview;
+}
+
 CustomCursorInstrument::CustomCursorInstrument(const QString &resource, QObject *parent) :
     AbstractInstrument(parent),
     mpm(resource)

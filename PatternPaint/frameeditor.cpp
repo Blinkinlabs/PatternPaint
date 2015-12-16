@@ -97,17 +97,14 @@ void FrameEditor::updateGridSize()
     // cast float to int to save rounded scale
     QSize frameSize = frameData.size();
 
-    float scale = static_cast<int>(float(size().height() - 1)/frameSize.height()*10);
-    scale /= 10;
-
-    // Use a square aspect to display the grid
-    xScale = scale;
-    yScale = scale;
+    // TODO Why?
+    pixelScale = static_cast<int>(float(size().height() - 1)/frameSize.height()*10);
+    pixelScale /= 10;
 
     // If the drawing space is large enough, make a grid pattern to superimpose over the image
-    if (yScale >= GRID_MIN_Y_SCALE) {
-        gridPattern = QImage(frameSize.width()*xScale  +.5 + 1,
-                             frameSize.height()*yScale +.5 + 1,
+    if (pixelScale >= GRID_MIN_Y_SCALE) {
+        gridPattern = QImage(frameSize.width()*pixelScale  +.5 + 1,
+                             frameSize.height()*pixelScale +.5 + 1,
                              QImage::Format_ARGB32_Premultiplied);
         gridPattern.fill(COLOR_CLEAR);
 
@@ -118,18 +115,18 @@ void FrameEditor::updateGridSize()
         // Draw vertical lines
         painter.setPen(COLOR_GRID_LINES);
         for (int x = 0; x <= frameSize.width(); x++) {
-            painter.drawLine(x*xScale+.5,
+            painter.drawLine(x*pixelScale+.5,
                              0,
-                             x*xScale+.5,
+                             x*pixelScale+.5,
                              gridPattern.height());
         }
 
         // Draw horizontal lines
         for (int y = 0; y <= frameSize.height(); y++) {
             painter.drawLine(0,
-                             y*yScale+.5,
+                             y*pixelScale+.5,
                              gridPattern.width(),
-                             y*yScale+.5);
+                             y*pixelScale+.5);
         }
     }
 }
@@ -140,7 +137,7 @@ void FrameEditor::mousePressEvent(QMouseEvent *event)
         return;
 
     setCursor(instrument->cursor());
-    instrument->mousePressEvent(event, *this, QPoint(event->x()/xScale, event->y()/yScale));
+    instrument->mousePressEvent(event, *this, event->pos()/pixelScale);
     lazyUpdate();
 }
 
@@ -157,24 +154,18 @@ void FrameEditor::mouseMoveEvent(QMouseEvent *event)
 
     lastTime = newTime;
 
-    static int oldX = -1;
-    static int oldY = -1;
+    static QPoint lastPos;
 
-    Q_UNUSED(oldX);
-    Q_UNUSED(oldY);
-
-    int x = event->x()/xScale;
-    int y = event->y()/yScale;
+    QPoint pos = event->pos()/pixelScale;
 
     // If the position hasn't changed, don't do anything.
     // This is to avoid expensive reprocessing of the tool preview window.
-    if (x == oldX && y == oldY)
+    if (pos == lastPos)
         return;
 
-    oldX = x;
-    oldY = y;
+    lastPos = pos;
 
-    instrument->mouseMoveEvent(event, *this, QPoint(x, y));
+    instrument->mouseMoveEvent(event, *this, pos);
 
     lazyUpdate();
 }
@@ -186,7 +177,7 @@ void FrameEditor::mouseReleaseEvent(QMouseEvent *event)
     if (!hasImage() || instrument.isNull())
         return;
 
-    instrument->mouseReleaseEvent(event, *this, QPoint(event->x()/xScale, event->y()/yScale));
+    instrument->mouseReleaseEvent(event, *this, event->pos()/pixelScale);
     lazyUpdate();
 }
 
@@ -217,6 +208,10 @@ void FrameEditor::setShowPlaybakIndicator(bool newShowPlaybackIndicator)
 
 void FrameEditor::setFrameData(int index, const QImage data)
 {
+    // Don't update if we are currently in a draw operation
+    if(!instrument.isNull() && instrument->hasPreview())
+        return;
+
     if (data.isNull()) {
         frameData = data;
         frameIndex = index;
@@ -269,15 +264,15 @@ void FrameEditor::paintEvent(QPaintEvent *)
 
     // Draw the image and tool preview
     painter.drawImage(QRect(0, 0,
-                            frameData.width()*xScale+.5,
-                            frameData.height()*yScale),
+                            frameData.width()*pixelScale+.5,
+                            frameData.height()*pixelScale),
                       frameData);
 
-    if (!instrument.isNull() && instrument->showPreview())
-        painter.drawImage(QRect(0, 0, frameData.width()*xScale+.5, frameData.height()*yScale),
+    if (!instrument.isNull() && instrument->hasPreview())
+        painter.drawImage(QRect(0, 0, frameData.width()*pixelScale+.5, frameData.height()*pixelScale),
                           (instrument->getPreview()));
 
-    if (yScale >= GRID_MIN_Y_SCALE)
+    if (pixelScale >= GRID_MIN_Y_SCALE)
         painter.drawImage(0, 0, gridPattern);
 
     // TODO: How to do this more generically?
@@ -294,24 +289,24 @@ void FrameEditor::paintEvent(QPaintEvent *)
         // Note that we need to compute the correct width based on the rounding error of
         // the current cell, otherwise it won't line up correctly with the actual image.
         painter.setPen(COLOR_PLAYBACK_EDGE);
-        painter.drawRect(playbackRow*xScale +.5,
+        painter.drawRect(playbackRow*pixelScale +.5,
                          0,
-                         int((playbackRow+fixtureWidth)*xScale +.5) - int(playbackRow*xScale +.5),
-                         fixtureHeight*yScale);
-        painter.fillRect(playbackRow*xScale +.5,
+                         int((playbackRow+fixtureWidth)*pixelScale +.5) - int(playbackRow*pixelScale +.5),
+                         fixtureHeight*pixelScale);
+        painter.fillRect(playbackRow*pixelScale +.5,
                          0,
-                         int((playbackRow+fixtureWidth)*xScale +.5) - int(playbackRow*xScale +.5),
-                         fixtureHeight*yScale,
+                         int((playbackRow+fixtureWidth)*pixelScale +.5) - int(playbackRow*pixelScale +.5),
+                         fixtureHeight*pixelScale,
                          COLOR_PLAYBACK_TOP);
 
-        painter.drawRect((playbackRow-frameData.width())*xScale +.5,
+        painter.drawRect((playbackRow-frameData.width())*pixelScale +.5,
                          0,
-                         int((playbackRow+fixtureWidth)*xScale +.5) - int(playbackRow*xScale +.5),
-                         fixtureHeight*yScale);
-        painter.fillRect((playbackRow-frameData.width())*xScale +.5,
+                         int((playbackRow+fixtureWidth)*pixelScale +.5) - int(playbackRow*pixelScale +.5),
+                         fixtureHeight*pixelScale);
+        painter.fillRect((playbackRow-frameData.width())*pixelScale +.5,
                          0,
-                         int((playbackRow+fixtureWidth)*xScale +.5) - int(playbackRow*xScale +.5),
-                         fixtureHeight*yScale,
+                         int((playbackRow+fixtureWidth)*pixelScale +.5) - int(playbackRow*pixelScale +.5),
+                         fixtureHeight*pixelScale,
                          COLOR_PLAYBACK_TOP);
     }
 }
