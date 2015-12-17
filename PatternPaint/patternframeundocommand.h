@@ -28,6 +28,7 @@
 
 #include <QUndoCommand>
 #include <QImage>
+#include <QPointer>
 
 // TODO: Base this on actions, not blindly storing/restoring the state.
 
@@ -42,8 +43,8 @@ class PatternFrameUndoCommand : public QUndoCommand
 public:
     PatternFrameUndoCommand(PatternFrameModel *item, QUndoCommand *parent = 0);
 
-    virtual void undo();
-    virtual void redo();
+    void undo();
+    void redo();
 
 private:
     QList<QImage> previousFrames;
@@ -51,7 +52,7 @@ private:
     QSize previousSize;
     QSize currentSize;
 
-    PatternFrameModel *patternFrameModel;
+    QPointer<PatternFrameModel> patternFrameModel;
     bool firstRun;
 };
 

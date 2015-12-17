@@ -26,7 +26,7 @@
 #ifndef ABSTRACTINSTRUMENT_H
 #define ABSTRACTINSTRUMENT_H
 
-#include <QtCore/QObject>
+#include <QObject>
 #include <QMouseEvent>
 #include <QImage>
 #include <QCursor>

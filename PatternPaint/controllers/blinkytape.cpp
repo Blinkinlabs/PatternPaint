@@ -5,8 +5,8 @@
 #include "blinkytape.h"
 
 #include <QDebug>
-#include <QTime>
 #include <QtSerialPort>
+#include <eventratelimiter.h>
 #include <QtSerialPort/QSerialPortInfo>
 
 /// Interval between scans to see if the device is still connected
@@ -222,11 +222,10 @@ bool BlinkyTape::isConnected()
 void BlinkyTape::sendUpdate(QByteArray ledData)
 {
     // Ignore the update request if it came too quickly
-    static qint64 lastTime = 0;
-    qint64 newTime = QDateTime::currentMSecsSinceEpoch();
-    if (newTime - lastTime < MIN_UPDATE_INTERVAL)
+    static intervalFilter rateLimiter(MIN_UPDATE_INTERVAL);
+
+    if(!rateLimiter.check())
         return;
-    lastTime = newTime;
 
     if (!isConnected()) {
         qCritical() << "Strip not connected, not sending update!";

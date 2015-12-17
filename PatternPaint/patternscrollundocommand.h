@@ -3,6 +3,7 @@
 
 #include <QUndoCommand>
 #include <QImage>
+#include <QPointer>
 
 // TODO: Base this on actions, not blindly storing/restoring the state.
 
@@ -17,8 +18,8 @@ class PatternScrollUndoCommand : public QUndoCommand
 public:
     PatternScrollUndoCommand(PatternScrollModel *item, QUndoCommand *parent = 0);
 
-    virtual void undo();
-    virtual void redo();
+    void undo();
+    void redo();
 
 private:
     QImage previousImage;
@@ -26,7 +27,7 @@ private:
     QSize previousSize;
     QSize currentSize;
 
-    PatternScrollModel *patternScrollModel;
+    QPointer<PatternScrollModel> patternScrollModel;
     bool firstRun;
 };
 

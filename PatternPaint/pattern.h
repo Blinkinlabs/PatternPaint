@@ -35,7 +35,7 @@ public:
 
     /// Check if the animation has a valid filename
     /// @return true if the animation filename has been set
-    bool hasValidFilename() const;
+    bool hasFilename() const;
 
     /// Get the pattern filename, or a default if one is not set
     /// @return Pattern name
@@ -66,6 +66,7 @@ public:
     /// @return Frame count
     int getFrameCount() const;
 
+    /// Get the speed of the
     float getFrameSpeed() const;
 
     void setFrameSpeed(float speed);

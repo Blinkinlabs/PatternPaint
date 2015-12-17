@@ -16,8 +16,7 @@
 #include "addressprogrammer.h"
 #include "colorchooser.h"
 #include "patterncollection.h"
-#include "welcomescreen.h"  // for SceneTemplate
-
+#include "welcomescreen.h"
 #include "ui_mainwindow.h"
 
 #if defined(Q_OS_MAC)

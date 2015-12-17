@@ -12,7 +12,8 @@
 PatternScrollModel::PatternScrollModel(QSize size, QObject *parent) :
     PatternModel(parent),
     frameSize(size),
-    frameSpeed(PATTERN_FRAME_SPEED_DEFAULT_VALUE)
+    frameSpeed(PATTERN_FRAME_SPEED_DEFAULT_VALUE),
+    modified(false)
 {
     undoStack.setUndoLimit(50);
 

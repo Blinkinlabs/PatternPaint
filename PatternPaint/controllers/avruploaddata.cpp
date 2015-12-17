@@ -52,7 +52,7 @@ bool avrUploadData::init(QList<PatternWriter> &patterns)
         return false;
     }
 
-    snprintf(buff, BUFF_LENGTH, "Building pattern array. Pattern Count: %zu, led count: %i",
+    snprintf(buff, BUFF_LENGTH, "Building pattern array. Pattern Count: %i, led count: %i",
              patterns.count(),
              patterns.first().getLedCount());
     qDebug() << buff;

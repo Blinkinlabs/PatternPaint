@@ -19,6 +19,7 @@
 #include "sprayinstrument.h"
 #include "fillinstrument.h"
 
+#include "eventratelimiter.h"
 #include "pattern.h"
 #include "patterncollectiondelegate.h"
 
@@ -373,7 +374,7 @@ bool MainWindow::savePatternAs(Pattern *item)
 
 bool MainWindow::savePattern(Pattern *item)
 {
-    if (!item->hasValidFilename()) {
+    if (!item->hasFilename()) {
         return savePatternAs(item);
     } else {
         if (!item->save()) {
@@ -680,8 +681,8 @@ void MainWindow::on_actionAddress_programmer_triggered()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
 #if defined(Q_OS_MACX)    // Workaround for issue #114, multile close events are sent when closing from the dock
-    static qint64 lastTime = 0;
-    if (QDateTime::currentMSecsSinceEpoch() - lastTime < 200) {
+    static intervalFilter rateLimiter(200);
+    if (!rateLimiter.check()) {
         event->ignore();
         return;
     }
@@ -711,7 +712,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     settings.setValue("MainWindow/windowState", saveState());
 
 #if defined(Q_OS_MACX)    // Workaround for issue #114, multile close events are sent when closing from the dock
-    lastTime = QDateTime::currentMSecsSinceEpoch();
+    rateLimiter.force();
 #endif
 
     QMainWindow::closeEvent(event);

@@ -1,5 +1,6 @@
 #include "frameeditor.h"
 #include "abstractinstrument.h"
+#include "eventratelimiter.h"
 
 #include <cmath>
 #include <QtWidgets>
@@ -147,12 +148,10 @@ void FrameEditor::mouseMoveEvent(QMouseEvent *event)
         return;
 
     // Ignore the update request if it came too quickly
-    static qint64 lastTime = 0;
-    qint64 newTime = QDateTime::currentMSecsSinceEpoch();
-    if (newTime - lastTime < MIN_MOUSE_INTERVAL)
-        return;
+    static intervalFilter rateLimiter(MIN_MOUSE_INTERVAL);
 
-    lastTime = newTime;
+    if(!rateLimiter.check())
+        return;
 
     static int oldX = -1;
     static int oldY = -1;
@@ -246,12 +245,10 @@ void FrameEditor::setFrameData(int index, const QImage data)
 void FrameEditor::lazyUpdate()
 {
     // Ignore the update request if it came too quickly
-    static qint64 lastTime = 0;
-    qint64 newTime = QDateTime::currentMSecsSinceEpoch();
-    if (newTime - lastTime < MIN_UPDATE_INTERVAL)
-        return;
+    static intervalFilter rateLimiter(MIN_UPDATE_INTERVAL);
 
-    lastTime = newTime;
+    if(!rateLimiter.check())
+        return;
 
     update();
 }

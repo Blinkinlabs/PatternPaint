@@ -17,6 +17,8 @@ class Fixture : public QObject
 public:
     Fixture(QObject *parent = 0);
 
+    virtual ~Fixture();
+
     virtual QString getName() const = 0;
 
     virtual QList<QColor> getColorStreamForFrame(const QImage frame) const = 0;

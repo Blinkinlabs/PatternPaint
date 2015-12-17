@@ -41,7 +41,7 @@ QUndoStack *Pattern::getUndoStack() const
     return model->getUndoStack();
 }
 
-bool Pattern::hasValidFilename() const
+bool Pattern::hasFilename() const
 {
     QString filename = model->data(model->index(0), PatternModel::FileName).toString();
 

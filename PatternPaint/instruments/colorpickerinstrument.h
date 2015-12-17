@@ -28,7 +28,7 @@
 
 #include "abstractinstrument.h"
 
-#include <QtCore/QObject>
+#include <QObject>
 
 /**
  * @brief Colorpicker instrument class.
