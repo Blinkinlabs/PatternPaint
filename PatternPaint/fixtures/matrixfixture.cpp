@@ -9,6 +9,12 @@ MatrixFixture::MatrixFixture(
 {
 }
 
+MatrixFixture::~MatrixFixture()
+{
+    if(brightnessModel != NULL)
+        free(brightnessModel);
+}
+
 QString MatrixFixture::getName() const
 {
     return QString("Matrix");

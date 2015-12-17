@@ -13,6 +13,8 @@ public:
     MatrixFixture(QSize size, ColorMode colorMode, BrightnessModel *brightnessModel,
                   QObject *parent = 0);
 
+    ~MatrixFixture();
+
     QString getName() const;
 
     QList<QColor> getColorStreamForFrame(const QImage frame) const;
