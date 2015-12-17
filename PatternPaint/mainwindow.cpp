@@ -709,7 +709,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
     QSettings settings;
     settings.setValue("MainWindow/geometry", saveGeometry());
-    settings.setValue("MainWindow/windowState", saveState());
+    settings.setValue("MainWindow/state", saveState());
 
 #if defined(Q_OS_MACX)    // Workaround for issue #114, multile close events are sent when closing from the dock
     rateLimiter.force();
