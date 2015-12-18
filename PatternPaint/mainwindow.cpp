@@ -192,6 +192,7 @@ MainWindow::MainWindow(QWidget *parent) :
                             (ColorMode)settings.value("Fixture/ColorOrder", RGB).toInt(),
                             new ExponentialBrightness(1.8, 1.8, 2.1));
     frameEditor->setFixture(fixture);
+    outputPreview->setFixture(fixture);
 
     patternCollectionListView->setItemDelegate(new PatternCollectionDelegate(this));
     patternCollectionListView->setModel(patternCollection.getModel());
@@ -905,7 +906,7 @@ void MainWindow::setNewFrame(int newFrame)
 
     pFrame.setText(QString::number(getCurrentFrameIndex()+1));
 
-    setPatternData(getCurrentFrameIndex(),
+    setFrameData(getCurrentFrameIndex(),
                    patternCollection.at(getCurrentPatternIndex())->getEditImage(newFrame));
 }
 
@@ -970,7 +971,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
 
         setPatternName("()");
         setPatternModified(false);
-        setPatternData(0, QImage());
+        setFrameData(0, QImage());
         frameEditor->setShowPlaybakIndicator(false);
         timeline->setVisible(false);
         patternSpeed->setValue(1);
@@ -987,7 +988,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
 
     setPatternName(newpattern->getName());
     setPatternModified(newpattern->getModified());
-    setPatternData(getCurrentFrameIndex(), newpattern->getEditImage(getCurrentPatternIndex()));
+    setFrameData(getCurrentFrameIndex(), newpattern->getEditImage(getCurrentPatternIndex()));
     frameEditor->setShowPlaybakIndicator(newpattern->hasPlaybackIndicator());
     timeline->setVisible(newpattern->hasTimeline());
     patternSpeed->setValue(newpattern->getFrameSpeed());
@@ -1023,7 +1024,7 @@ void MainWindow::on_PatternDataChanged(const QModelIndex &topLeft, const QModelI
         } else if (role == PatternModel::FrameImage) {
             // If the current selection changed, refresh so that the FrameEditor contents will be redrawn
             if (currentIndex >= topLeft.row() && currentIndex <= bottomRight.row()) {
-                setPatternData(getCurrentFrameIndex(),
+                setFrameData(getCurrentFrameIndex(),
                                patternCollection.at(getCurrentPatternIndex())->getEditImage(
                                    getCurrentFrameIndex()));
             }
@@ -1031,9 +1032,15 @@ void MainWindow::on_PatternDataChanged(const QModelIndex &topLeft, const QModelI
     }
 }
 
-void MainWindow::setPatternData(int index, QImage data)
+void MainWindow::setFrameData(int index, QImage data)
 {
     frameEditor->setFrameData(index, data);
+
+
+    //outputPreview->setFrameData(index, data);
+    if(!patternCollection.isEmpty())
+        outputPreview->setFrameData(index, patternCollection.at(getCurrentPatternIndex())->getFrameImage(
+                                    index));
 
     updateBlinky();
 }
@@ -1041,11 +1048,11 @@ void MainWindow::setPatternData(int index, QImage data)
 void MainWindow::on_patternSizeUpdated()
 {
     if (patternCollection.isEmpty()) {
-        setPatternData(0, QImage());
+        setFrameData(0, QImage());
         return;
     }
 
-    setPatternData(getCurrentFrameIndex(),
+    setFrameData(getCurrentFrameIndex(),
                    patternCollection.at(getCurrentPatternIndex())->getEditImage(
                        getCurrentFrameIndex()));
 

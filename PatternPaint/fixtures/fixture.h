@@ -23,6 +23,8 @@ public:
 
     virtual QList<QColor> getColorStreamForFrame(const QImage frame) const = 0;
 
+    virtual QList<QPoint> getOutputLocations() const = 0;
+
     virtual int getLedCount() const = 0;
 
     // TODO: Push these to individual classes?

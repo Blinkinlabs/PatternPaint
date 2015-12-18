@@ -175,7 +175,7 @@ private:
 
     void setPatternName(QString name);
 
-    void setPatternData(int index, QImage data);
+    void setFrameData(int index, QImage data);
 
     void setPatternModified(bool modified);
 

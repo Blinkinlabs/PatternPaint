@@ -37,6 +37,19 @@ QList<QColor> MatrixFixture::getColorStreamForFrame(const QImage frame) const
     return colorStream;
 }
 
+QList<QPoint> MatrixFixture::getOutputLocations() const
+{
+    QList<QPoint> locations;
+
+    for (int x = 0; x < size.width(); x++) {
+        for (int y = 0; y < size.height(); y++) {
+            locations.append(QPoint(x, x%2 ? size.height()-1-y : y));
+        }
+    }
+
+    return locations;
+}
+
 int MatrixFixture::getLedCount() const
 {
     return size.height()*size.width();

@@ -18,6 +18,9 @@ public:
     QString getName() const;
 
     QList<QColor> getColorStreamForFrame(const QImage frame) const;
+
+    QList<QPoint> getOutputLocations() const;
+
     int getLedCount() const;
 
     QSize getSize() const;

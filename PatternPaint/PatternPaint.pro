@@ -82,7 +82,8 @@ SOURCES += \
     sceneconfiguration.cpp \
     scenetemplate.cpp \
     patternframelistview.cpp \
-    eventratelimiter.cpp
+    eventratelimiter.cpp \
+    outputpreview.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -110,7 +111,8 @@ HEADERS  += \
     defaults.h \
     scenetemplate.h \
     patternframelistview.h \
-    eventratelimiter.h
+    eventratelimiter.h \
+    outputpreview.h
 
 
 FORMS    += \
