@@ -1,15 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QProgressDialog>
-#include <QMessageBox>
-#include <QUndoGroup>
-#include <QToolButton>
-#include <QSpinBox>
-#include <QLineEdit>
-#include <QTimer>
-
 #include "blinkycontroller.h"
 #include "blinkyuploader.h"
 #include "frameeditor.h"
@@ -18,6 +9,15 @@
 #include "patterncollection.h"
 #include "welcomescreen.h"
 #include "ui_mainwindow.h"
+
+#include <QMainWindow>
+#include <QProgressDialog>
+#include <QMessageBox>
+#include <QUndoGroup>
+#include <QToolButton>
+#include <QSpinBox>
+#include <QLineEdit>
+#include <QTimer>
 
 #if defined(Q_OS_MAC)
 #include "appnap.h"
@@ -139,10 +139,11 @@ private:
     QTimer drawTimer;
     QTimer connectionScannerTimer;
 
+    QProgressDialog progressDialog;
+
     QPointer<BlinkyController> controller;
     QPointer<BlinkyUploader> uploader;
-
-    QProgressDialog progressDialog;
+    QPointer<Fixture> fixture;
 
     PatternCollection patternCollection;
 
@@ -154,8 +155,6 @@ private:
     Modes mode;
 
     QUndoGroup undoGroup;
-
-    QPointer<Fixture> fixture;
 
     void populateExamplesMenu(QString directory, QMenu *menu);
 

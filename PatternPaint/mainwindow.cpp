@@ -182,6 +182,9 @@ MainWindow::MainWindow(QWidget *parent) :
     restoreGeometry(settings.value("MainWindow/geometry").toByteArray());
     restoreState(settings.value("MainWindow/state").toByteArray());
 
+    // Fill the examples menu using the examples resource
+    populateExamplesMenu(":/examples", menuExamples);
+
     fixture
         = new MatrixFixture(settings.value("Fixture/DisplaySize",
                                            QSize(DEFAULT_FIXTURE_WIDTH,
@@ -189,9 +192,6 @@ MainWindow::MainWindow(QWidget *parent) :
                             (ColorMode)settings.value("Fixture/ColorOrder", RGB).toInt(),
                             new ExponentialBrightness(1.8, 1.8, 2.1));
     frameEditor->setFixture(fixture);
-
-    // Fill the examples menu using the examples resource
-    populateExamplesMenu(":/examples", menuExamples);
 
     patternCollectionListView->setItemDelegate(new PatternCollectionDelegate(this));
     patternCollectionListView->setModel(patternCollection.getModel());
@@ -292,7 +292,7 @@ void MainWindow::connectionScannerTimer_timeout()
     if ((!controller.isNull()) || mode == Uploading)
         return;
 
-    // First look for Blinky devices
+    // Look for controllers
     QList<QPointer<ControllerInfo> > controllerInfos = BlinkyController::probe();
 
     if (controllerInfos.count() > 0) {
