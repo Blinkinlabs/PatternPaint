@@ -30,19 +30,18 @@
 #include <QMouseEvent>
 #include <QColorDialog>
 #include <QDebug>
+#include <QPainter>
+#include <QFrame>
+
+#define ICON_SIZE 32
 
 ColorChooser::ColorChooser(const QColor &color, QWidget *parent) :
-    QLabel(parent),
+    QWidget(parent),
     colorDialog(this)
 {
-    setFrameStyle(QFrame::StyledPanel | QFrame::Box);
-    pixmap = QPixmap(30, 30);
-
-    setMargin(2);
-    setAlignment(Qt::AlignCenter);
+    this->setMinimumSize(ICON_SIZE,ICON_SIZE);
 
     setColor(color);
-    setPixmap(pixmap);
 
     setToolTip(tr("Drawing color"));
 
@@ -52,9 +51,19 @@ ColorChooser::ColorChooser(const QColor &color, QWidget *parent) :
             this, SLOT(setAndSendColor(const QColor &)));
 }
 
-ColorChooser::~ColorChooser()
+void ColorChooser::paintEvent(QPaintEvent *)
 {
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
+    painter.setRenderHint(QPainter::Antialiasing, false);
+
+    int offsetY = 0;
+    if(this->height()>ICON_SIZE)
+        offsetY = (this->height()-32)/2;
+
+    painter.fillRect(0, offsetY, ICON_SIZE, ICON_SIZE, currentColor);
 }
+
 
 void ColorChooser::setColor(const QColor &color)
 {
@@ -64,8 +73,8 @@ void ColorChooser::setColor(const QColor &color)
     currentColor = color;
 
     colorDialog.setCurrentColor(currentColor);
-    pixmap.fill(currentColor);
-    setPixmap(pixmap);
+
+    update();
 }
 
 void ColorChooser::setAndSendColor(const QColor &color)

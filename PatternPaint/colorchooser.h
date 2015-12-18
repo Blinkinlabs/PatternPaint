@@ -26,17 +26,13 @@
 #ifndef COLORCHOOSER_H
 #define COLORCHOOSER_H
 
-#include <QLabel>
+#include <QWidget>
 #include <QColorDialog>
-
-QT_BEGIN_NAMESPACE
-class QColor;
-class QPixmap;
-class QMouseEvent;
-QT_END_NAMESPACE
+#include <QColor>
+#include <QMouseEvent>
 
 /// @brief Widget for selecting color.
-class ColorChooser : public QLabel
+class ColorChooser : public QWidget
 {
     Q_OBJECT
 
@@ -45,11 +41,11 @@ public:
     /// @param color Default color
     /// @param parent Pointer for parent.
     explicit ColorChooser(const QColor &color, QWidget *parent = 0);
-    ~ColorChooser();
 
 private:
+    void paintEvent(QPaintEvent *event);
+
     QColor currentColor;
-    QPixmap pixmap;
 
     QColorDialog colorDialog;
 
