@@ -54,14 +54,16 @@ ColorChooser::ColorChooser(const QColor &color, QWidget *parent) :
 void ColorChooser::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
-    painter.setRenderHint(QPainter::Antialiasing, false);
 
     int offsetY = 0;
     if(this->height()>ICON_SIZE)
         offsetY = (this->height()-32)/2;
 
     painter.fillRect(0, offsetY, ICON_SIZE, ICON_SIZE, currentColor);
+
+    painter.setPen(QPen(Qt::black));
+    painter.drawRect(0, offsetY, ICON_SIZE-1, ICON_SIZE-1);
+    painter.drawRect(1, offsetY+1, ICON_SIZE-3, ICON_SIZE-3);
 }
 
 
