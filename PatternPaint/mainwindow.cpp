@@ -755,6 +755,9 @@ bool MainWindow::promptForSave(Pattern *item)
 
 bool MainWindow::promptForSave(QList<Pattern *> patterns)
 {
+    if(patterns.count() == 0)
+        return true;
+
     QString messageText;
 
     if(patterns.count() == 1) {
