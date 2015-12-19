@@ -4,7 +4,7 @@
 
 #include <QList>
 #include <QSerialPortInfo>
-#include <QPOinter>
+#include <QPointer>
 
 BlinkyController::BlinkyController(QObject *parent) : QObject(parent)
 {

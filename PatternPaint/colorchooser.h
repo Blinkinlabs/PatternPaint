@@ -26,17 +26,13 @@
 #ifndef COLORCHOOSER_H
 #define COLORCHOOSER_H
 
-#include <QLabel>
+#include <QWidget>
 #include <QColorDialog>
-
-QT_BEGIN_NAMESPACE
-class QColor;
-class QPixmap;
-class QMouseEvent;
-QT_END_NAMESPACE
+#include <QColor>
+#include <QMouseEvent>
 
 /// @brief Widget for selecting color.
-class ColorChooser : public QLabel
+class ColorChooser : public QWidget
 {
     Q_OBJECT
 
@@ -44,31 +40,30 @@ public:
     /// Constructor
     /// @param color Default color
     /// @param parent Pointer for parent.
-    explicit ColorChooser(const QColor &color, QWidget *parent = 0);
-    ~ColorChooser();
+    explicit ColorChooser(QWidget *parent = 0);
 
 private:
+    void paintEvent(QPaintEvent *event);
+
     QColor currentColor;
-    QPixmap pixmap;
 
     QColorDialog colorDialog;
 
+    void mousePressEvent(QMouseEvent *event);
+
 public slots:
-    /// Set a new color for the widget, but don't re-emit sendColor()
+    /// Set a new color for the widget
     /// @param color new color
     void setColor(const QColor &color);
 
-    /// Set a new color for the widget, and also emit sendColor()
+    /// Handler for the color changed event from QColorDialog
     /// @param color new color
-    void setAndSendColor(const QColor &color);
+    void on_currentColorChanged(const QColor &color);
 
 signals:
     /// Signal for sending choosen color
     /// @param Color to send
     void sendColor(const QColor &);
-
-protected:
-    void mousePressEvent(QMouseEvent *event);
 };
 
 #endif // COLORCHOOSER_H
