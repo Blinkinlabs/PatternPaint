@@ -27,11 +27,11 @@ QList<QColor> MatrixFixture::getColorStreamForFrame(const QImage frame) const
     if (frame.isNull())
         return colorStream;
 
-    for (int x = 0; x < size.width(); x++) {
-        for (int y = 0; y < size.height(); y++) {
-            QColor pixel = frame.pixel(x, x%2 ? size.height()-1-y : y);
-            colorStream.append(brightnessModel->correct(pixel));
-        }
+    QList<QPoint> locations = getOutputLocations();
+
+    foreach(QPoint point, locations) {
+        QColor pixel = frame.pixel(point);
+        colorStream.append(brightnessModel->correct(pixel));
     }
 
     return colorStream;
