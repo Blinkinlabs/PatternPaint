@@ -40,7 +40,7 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    colorChooser(COLOR_TOOL_DEFAULT, this),
+    colorChooser(this),
     progressDialog(this)
 {
     setupUi(this);
@@ -70,14 +70,21 @@ MainWindow::MainWindow(QWidget *parent) :
     menuEdit->addSeparator();
 
     QAction *undoAction = undoGroup.createUndoAction(this, tr("&Undo"));
-    undoAction->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Z")));
     undoAction->setEnabled(false);
+    undoAction->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Z")));
+    undoAction->setIcon(QIcon(":/icons/images/icons/Undo-100.png"));
+    undoAction->setIconVisibleInMenu(false);
     menuEdit->addAction(undoAction);
+    instrumentToolbar->insertAction(actionPen, undoAction);
+
 
     QAction *redoAction = undoGroup.createRedoAction(this, tr("&Redo"));
     redoAction->setEnabled(false);
     redoAction->setShortcut(QKeySequence(QString::fromUtf8("Ctrl+Y")));
+    redoAction->setIcon(QIcon(":/icons/images/icons/Redo-100.png"));
+    redoAction->setIconVisibleInMenu(false);
     menuEdit->addAction(redoAction);
+   instrumentToolbar->insertAction(actionPen, redoAction);
 
     // instruments
     ColorpickerInstrument *cpi = new ColorpickerInstrument(this);
@@ -97,6 +104,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     instrumentToolbar->addWidget(&colorChooser);
     frameEditor->setToolColor(COLOR_TOOL_DEFAULT);
+    colorChooser.setColor(COLOR_TOOL_DEFAULT);
 
     QSpinBox *penSizeSpin = new QSpinBox(this);
     penSizeSpin->setRange(DRAWING_SIZE_MINIMUM_VALUE, DRAWING_SIZE_MAXIMUM_VALUE);

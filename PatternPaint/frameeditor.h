@@ -45,9 +45,6 @@ public:
 
     int getPenSize() const;
 
-protected:
-    void paintEvent(QPaintEvent *event);
-
 private:
 
     QImage frameData;     ///< Frame image
@@ -74,6 +71,8 @@ private:
 
     /// True if the editor has an image to edit
     bool hasImage();
+
+    void paintEvent(QPaintEvent *event);
 
 signals:
     void dataEdited(int index, const QImage data);

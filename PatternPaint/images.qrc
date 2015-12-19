@@ -28,6 +28,8 @@
         <file>images/icons/Add Image-100.png</file>
         <file>images/icons/Remove Image-100.png</file>
         <file>images/icons/Minus-100.png</file>
+        <file>images/icons/Redo-100.png</file>
+        <file>images/icons/Undo-100.png</file>
     </qresource>
     <qresource prefix="/scenetemplates">
         <file>images/scenetemplates/matrix.jpg</file>
