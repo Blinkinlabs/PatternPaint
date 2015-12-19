@@ -35,20 +35,16 @@
 
 #define ICON_SIZE 32
 
-ColorChooser::ColorChooser(const QColor &color, QWidget *parent) :
+ColorChooser::ColorChooser(QWidget *parent) :
     QWidget(parent),
     colorDialog(this)
 {
     this->setMinimumSize(ICON_SIZE,ICON_SIZE);
 
-    setColor(color);
-
-    setToolTip(tr("Drawing color"));
-
     colorDialog.setOptions(QColorDialog::NoButtons);
 
     connect(&colorDialog, SIGNAL(currentColorChanged(const QColor &)),
-            this, SLOT(setAndSendColor(const QColor &)));
+            this, SLOT(on_currentColorChanged(const QColor &)));
 }
 
 void ColorChooser::paintEvent(QPaintEvent *)
@@ -73,18 +69,19 @@ void ColorChooser::setColor(const QColor &color)
         return;
 
     currentColor = color;
+    update();
 
     colorDialog.setCurrentColor(currentColor);
-
-    update();
 }
 
-void ColorChooser::setAndSendColor(const QColor &color)
+void ColorChooser::on_currentColorChanged(const QColor &color)
 {
     if (!color.isValid())
         return;
 
-    setColor(color);
+    currentColor = color;
+    update();
+
     emit(sendColor(color));
 }
 

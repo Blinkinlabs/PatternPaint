@@ -40,7 +40,7 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    colorChooser(COLOR_TOOL_DEFAULT, this),
+    colorChooser(this),
     progressDialog(this)
 {
     setupUi(this);
@@ -97,6 +97,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     instrumentToolbar->addWidget(&colorChooser);
     frameEditor->setToolColor(COLOR_TOOL_DEFAULT);
+    colorChooser.setColor(COLOR_TOOL_DEFAULT);
 
     QSpinBox *penSizeSpin = new QSpinBox(this);
     penSizeSpin->setRange(DRAWING_SIZE_MINIMUM_VALUE, DRAWING_SIZE_MAXIMUM_VALUE);
