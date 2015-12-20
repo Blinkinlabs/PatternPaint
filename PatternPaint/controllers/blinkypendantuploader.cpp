@@ -34,9 +34,9 @@ BlinkyPendantUploader::BlinkyPendantUploader(QObject *parent) :
     BlinkyUploader(parent)
 {
     connect(&commandQueue, SIGNAL(error(QString)),
-            this, SLOT(handlecommandQueueError(QString)));
+            this, SLOT(handleError(QString)));
     connect(&commandQueue, SIGNAL(commandFinished(QString, QByteArray)),
-            this, SLOT(handlecommandQueueCommandFinished(QString, QByteArray)));
+            this, SLOT(handleCommandFinished(QString, QByteArray)));
 }
 
 bool BlinkyPendantUploader::startUpload(BlinkyController &controller,
