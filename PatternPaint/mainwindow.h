@@ -147,7 +147,7 @@ private:
 
     PatternCollection patternCollection;
 
-    QLineEdit pFrame;
+    QLineEdit currentFrame;
 
     enum Modes {
         Disconnected, Connected, Uploading

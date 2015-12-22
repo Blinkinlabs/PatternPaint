@@ -84,7 +84,7 @@ MainWindow::MainWindow(QWidget *parent) :
     redoAction->setIcon(QIcon(":/icons/images/icons/Redo-100.png"));
     redoAction->setIconVisibleInMenu(false);
     menuEdit->addAction(redoAction);
-   instrumentToolbar->insertAction(actionPen, redoAction);
+    instrumentToolbar->insertAction(actionPen, redoAction);
 
     // instruments
     ColorpickerInstrument *cpi = new ColorpickerInstrument(this);
@@ -113,12 +113,12 @@ MainWindow::MainWindow(QWidget *parent) :
     instrumentToolbar->addWidget(penSizeSpin);
 
     // tools
-    pFrame.setMaximumWidth(30);
-    pFrame.setMinimumWidth(30);
-    pFrame.setValidator(new QIntValidator(1, std::numeric_limits<int>::max(), this));
-    pFrame.setToolTip(tr("Current frame"));
-    playbackToolbar->insertWidget(actionStepForward, &pFrame);
-    connect(&pFrame, SIGNAL(textEdited(QString)), this, SLOT(frameIndex_valueChanged(QString)));
+    currentFrame.setMaximumWidth(30);
+    currentFrame.setMinimumWidth(30);
+    currentFrame.setValidator(new QIntValidator(1, std::numeric_limits<int>::max(), this));
+    currentFrame.setToolTip(tr("Current frame"));
+    playbackToolbar->insertWidget(actionStepForward, &currentFrame);
+    connect(&currentFrame, SIGNAL(textEdited(QString)), this, SLOT(frameIndex_valueChanged(QString)));
     frameIndex_valueChanged("1");
 
     // Pattern info
@@ -146,6 +146,8 @@ MainWindow::MainWindow(QWidget *parent) :
             actionStepBackward, SLOT(setEnabled(bool)));
     connect(this, SIGNAL(patternStatusChanged(bool)),
             patternSpeed, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(patternStatusChanged(bool)),
+            &currentFrame, SLOT(setEnabled(bool)));
 
     mode = Disconnected;
 
@@ -917,7 +919,7 @@ void MainWindow::setNewFrame(int newFrame)
 
     timeline->setCurrentIndex(timeline->model()->index(newFrame, 0));
 
-    pFrame.setText(QString::number(getCurrentFrameIndex()+1));
+    currentFrame.setText(QString::number(getCurrentFrameIndex()+1));
 
     setPatternData(getCurrentFrameIndex(),
                    patternCollection.at(getCurrentPatternIndex())->getEditImage(newFrame));
@@ -988,6 +990,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
         frameEditor->setShowPlaybakIndicator(false);
         timeline->setVisible(false);
         patternSpeed->setValue(1);
+        currentFrame.setText("");
 
         actionSave_to_Blinky->setEnabled(false);
 
@@ -999,6 +1002,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
     undoGroup.setActiveStack(newpattern->getUndoStack());
     timeline->setModel(newpattern->getModel());
 
+    setNewFrame(getCurrentFrameIndex());
     setPatternName(newpattern->getName());
     setPatternModified(newpattern->getModified());
     setPatternData(getCurrentFrameIndex(), newpattern->getEditImage(getCurrentPatternIndex()));
