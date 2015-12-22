@@ -699,7 +699,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QList<Pattern *> unsavedPatterns;
 
     foreach(Pattern* pattern, patternCollection.patterns()) {
-        if (pattern->getModified() == true)
+        if (pattern->getModified())
             unsavedPatterns.append(pattern);
     }
 
@@ -754,15 +754,21 @@ void MainWindow::on_colorPicked(QColor color)
     frameEditor->setToolColor(color);
 }
 
-bool MainWindow::promptForSave(Pattern *item)
+bool MainWindow::promptForSave(Pattern *pattern)
 {
+    if (!pattern->getModified())
+        return true;
+
     QList<Pattern *> patterns;
-    patterns.append(item);
+    patterns.append(pattern);
     return promptForSave(patterns);
 }
 
 bool MainWindow::promptForSave(QList<Pattern *> patterns)
 {
+    if(patterns.count() == 0)
+        return true;
+
     QString messageText;
 
     if(patterns.count() == 1) {

@@ -163,7 +163,7 @@ private:
     void startPlayback();
     void stopPlayback();
 
-    bool promptForSave(Pattern *item);
+    bool promptForSave(Pattern *pattern);
     bool promptForSave(QList<Pattern *> patterns);
 
     bool savePattern(Pattern *item);
