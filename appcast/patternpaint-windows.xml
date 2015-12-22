@@ -6,6 +6,31 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
       <item>
+        <title>PatternPaint 2.0.3</title>
+        <pubDate>Tue, 22 Dec 2015 12:00:00 +0000</pubDate>
+        <description>
+          <![CDATA[
+<b>Introducing PatternPaint 2.0. New support for BlinkyTile, BlinkyMatrix, and BlinkyPendant!<b>
+<br>Changelog:<br>
+<ul>
+<li>Save to BlinkyTile now working</li>
+<li>Store multiple patterns to a BlinkyPendant</li>
+<li>Now supports frame-based patterns in addition to scrolling ones- designed for matrix-style displays</li>
+<li>Load multiple patterns and play them in slideshow format</li>
+<li>Welcome screen to configure the device type, and load sample patterns</li>
+<li>Sample patterns!</li>
+<li>Improved firmware recovery mode for BlinkyTape</li>
+</ul>
+          ]]>
+        </description>
+        <enclosure url="https://github.com/Blinkinlabs/PatternPaint/releases/download/2.0.3/PatternPaint_Installer_2.0.3.exe"
+          sparkle:version="2.0.3"
+          length=""
+          type="application/octet-stream"
+        />
+
+      </item>
+      <item>
         <title>PatternPaint 1.8.0</title>
         <pubDate>Mon, 27 Jul 2015 8:32:00 +0000</pubDate>
         <description>
