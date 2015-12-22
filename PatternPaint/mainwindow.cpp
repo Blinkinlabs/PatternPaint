@@ -1045,6 +1045,8 @@ void MainWindow::on_PatternDataChanged(const QModelIndex &topLeft, const QModelI
                                patternCollection.at(getCurrentPatternIndex())->getEditImage(
                                    getCurrentFrameIndex()));
             }
+        } else if (role == PatternModel::FrameSpeed) {
+            patternSpeed->setValue(patternCollection.at(getCurrentPatternIndex())->getFrameSpeed());
         }
     }
 }

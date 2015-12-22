@@ -6,26 +6,23 @@ PatternFrameUndoCommand::PatternFrameUndoCommand(PatternFrameModel *item, QUndoC
     QUndoCommand(parent),
     patternFrameModel(item)
 {
-    previousFrames = patternFrameModel->frames;
-    previousSize = patternFrameModel->frameSize;
+    previousState = patternFrameModel->state;
 
     firstRun = true;
 }
 
 void PatternFrameUndoCommand::undo()
 {
-    currentFrames = patternFrameModel->frames;
-    currentSize = patternFrameModel->frameSize;
-    patternFrameModel->applyUndoState(previousFrames, previousSize);
+    currentState = patternFrameModel->state;
+    patternFrameModel->applyUndoState(previousState);
 }
 
 void PatternFrameUndoCommand::redo()
 {
-    // TODO: We're likely not handling undo/redo correctly if we need this?
     if (firstRun) {
         firstRun = false;
         return;
     }
 
-    patternFrameModel->applyUndoState(currentFrames, currentSize);
+    patternFrameModel->applyUndoState(currentState);
 }

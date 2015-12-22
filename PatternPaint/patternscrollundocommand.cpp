@@ -6,26 +6,23 @@ PatternScrollUndoCommand::PatternScrollUndoCommand(PatternScrollModel *item, QUn
     QUndoCommand(parent),
     patternScrollModel(item)
 {
-    previousImage = patternScrollModel->image;
-    previousSize = patternScrollModel->frameSize;
+    previousState = patternScrollModel->state;
 
     firstRun = true;
 }
 
 void PatternScrollUndoCommand::undo()
 {
-    currentImage = patternScrollModel->image;
-    currentSize = patternScrollModel->frameSize;
-    patternScrollModel->applyUndoState(previousImage, previousSize);
+    currentState = patternScrollModel->state;
+    patternScrollModel->applyUndoState(previousState);
 }
 
 void PatternScrollUndoCommand::redo()
 {
-    // TODO: We're likely not handling undo/redo correctly if we need this?
     if (firstRun) {
         firstRun = false;
         return;
     }
 
-    patternScrollModel->applyUndoState(currentImage, currentSize);
+    patternScrollModel->applyUndoState(currentState);
 }

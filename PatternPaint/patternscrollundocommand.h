@@ -1,13 +1,13 @@
 #ifndef PATTERNSCROLLUNDOCOMMAND_H
 #define PATTERNSCROLLUNDOCOMMAND_H
 
+#include "patternscrollmodel.h"
+
 #include <QUndoCommand>
 #include <QImage>
 #include <QPointer>
 
 // TODO: Base this on actions, not blindly storing/restoring the state.
-
-class PatternScrollModel;
 
 /**
  * @brief Class which provides undo/redo actions
@@ -22,10 +22,8 @@ public:
     void redo();
 
 private:
-    QImage previousImage;
-    QImage currentImage;
-    QSize previousSize;
-    QSize currentSize;
+    PatternScrollModel::State previousState;
+    PatternScrollModel::State currentState;
 
     QPointer<PatternScrollModel> patternScrollModel;
     bool firstRun;

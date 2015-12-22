@@ -26,13 +26,13 @@
 #ifndef UNDOCOMMAND_H
 #define UNDOCOMMAND_H
 
+#include "patternframemodel.h"
+
 #include <QUndoCommand>
 #include <QImage>
 #include <QPointer>
 
 // TODO: Base this on actions, not blindly storing/restoring the state.
-
-class PatternFrameModel;
 
 /**
  * @brief Class which provides undo/redo actions
@@ -47,10 +47,8 @@ public:
     void redo();
 
 private:
-    QList<QImage> previousFrames;
-    QList<QImage> currentFrames;
-    QSize previousSize;
-    QSize currentSize;
+    PatternFrameModel::State previousState;
+    PatternFrameModel::State currentState;
 
     QPointer<PatternFrameModel> patternFrameModel;
     bool firstRun;
