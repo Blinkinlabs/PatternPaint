@@ -56,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
 
     // Build the new pattern drop-down menu
+    // Open question: Why doesn't this->menuNew work?
     QMenu *menu = new QMenu(this);
     menu->addAction(this->actionNew_FramePattern);
     menu->addAction(this->actionNew_ScrollingPattern);
@@ -395,14 +396,14 @@ bool MainWindow::savePattern(Pattern *item)
     }
 }
 
-void MainWindow::on_actionSave_File_as_triggered()
+void MainWindow::on_actionSave_as_triggered()
 {
     if (patternCollection.isEmpty())
         return;
     savePatternAs(patternCollection.at(getCurrentPatternIndex()));
 }
 
-void MainWindow::on_actionSave_File_triggered()
+void MainWindow::on_actionSave_triggered()
 {
     if (patternCollection.isEmpty())
         return;
@@ -1123,7 +1124,7 @@ void MainWindow::on_actionDeleteFrame_triggered()
 
 void MainWindow::setPatternModified(bool modified)
 {
-    actionSave_File->setEnabled(modified);
+    actionSave->setEnabled(modified);
 }
 
 void MainWindow::on_ExampleSelected(QAction *action)

@@ -49,8 +49,8 @@ private slots:
 
     void connectionScannerTimer_timeout();
 
-    void on_actionSave_File_triggered();
-    void on_actionSave_File_as_triggered();
+    void on_actionSave_triggered();
+    void on_actionSave_as_triggered();
 
     void on_actionExit_triggered();
 
