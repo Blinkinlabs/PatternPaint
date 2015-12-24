@@ -21,7 +21,8 @@ void PatternCollectionDelegate::paint(QPainter *painter, const QStyleOptionViewI
     painter->save();
     QImage img = qvariant_cast<QImage>(index.data(PatternCollectionModel::PreviewImage));
 
-    QImage scaled = img.scaled(ITEM_WIDTH - 2*ITEM_LETTERBOX, ITEM_HEIGHT - 2*ITEM_LETTERBOX);
+    QSize previewSize(ITEM_WIDTH - 2*ITEM_LETTERBOX, ITEM_HEIGHT - 2*ITEM_LETTERBOX);
+    QImage scaled = img.scaled(previewSize, Qt::KeepAspectRatioByExpanding);
 
 // QStyledItemDelegate::paint(painter, option, index);
 
@@ -37,11 +38,13 @@ void PatternCollectionDelegate::paint(QPainter *painter, const QStyleOptionViewI
     // Draw the frame
     painter->fillRect(QRect(option.rect.x()+ITEM_LETTERBOX-FRAME_SIZE,
                             option.rect.y()+ITEM_LETTERBOX-FRAME_SIZE,
-                            scaled.width()+2*FRAME_SIZE,
-                            scaled.height()+2*FRAME_SIZE), frameColor);
+                            previewSize.width()+2*FRAME_SIZE,
+                            previewSize.height()+2*FRAME_SIZE), frameColor);
 
     // Draw the image
-    painter->drawImage(option.rect.x()+ITEM_LETTERBOX, option.rect.y()+ITEM_LETTERBOX, scaled);
+    painter->drawImage(option.rect.x()+ITEM_LETTERBOX, option.rect.y()+ITEM_LETTERBOX, scaled,
+                       (scaled.width() - previewSize.width())/2, (scaled.height() - previewSize.height())/2,
+                       previewSize.width(), previewSize.height());
 
     painter->restore();
 }

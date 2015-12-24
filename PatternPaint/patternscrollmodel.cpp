@@ -132,35 +132,6 @@ bool PatternScrollModel::setData(const QModelIndex &index, const QVariant &value
     pushUndoState();
 
     if (role == FrameImage || role == Qt::EditRole) {
-////TODO: enforce size scaling here?
-
-// QPainter painter;
-// painter.begin(&image);
-
-// if(index.row() < image.width() - frameSize.width())
-// painter.drawImage(index.row(),0,
-// value.value<QImage>(),
-// 0,0,
-// frameSize.width(),frameSize.height());
-
-// else {
-// painter.drawImage(index.row(),0,
-// value.value<QImage>(),
-// 0,0,
-// image.width() - index.row(),frameSize.height());
-
-// painter.drawImage(0,0,
-// value.value<QImage>(),
-// image.width()-index.row(),0,
-// frameSize.width() - image.width() + index.row(),frameSize.height());
-// }
-
-// painter.end();
-
-// QVector<int> roles;
-// roles.append(FrameImage);
-// emit dataChanged(index, index, roles);
-// return true;
         return false;
     }
 
