@@ -6,7 +6,8 @@ set -e
 VERSION="2.0.2"
 
 # Pull in the QT tools
-export QTDIR=~/Qt/5.4/clang_64/
+#export QTDIR=~/Qt/5.4/clang_64/
+export QTDIR=~/Qt/5.5/clang_64/
 
 OUTPUTDIR=`pwd`
 echo "Output to: " ${OUTPUTDIR}
@@ -40,7 +41,7 @@ codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" P
 # Deploy and sign the release
 # Note: macdeployqt seems to freeze in Qt 5.5.1. Using workaround.
 # TODO: This is a workaround for toolchain changes in 5.5.1
-#export QTDIR=~/Qt5.4.1/5.4/clang_64/
+export QTDIR=~/Qt5.4.1/5.4/clang_64/
 ${QTDIR}/bin/macdeployqt PatternPaint/PatternPaint.app/ -codesign="Developer ID Application: Blinkinlabs, LLC" -dmg
 
 # Perform a quick verification of the application signature
