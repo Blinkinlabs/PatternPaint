@@ -3,7 +3,7 @@
 # Stop at any error
 set -e
 
-VERSION="2.0.2"
+VERSION="2.0.3"
 
 # Pull in the QT tools
 #export QTDIR=~/Qt/5.4/clang_64/
@@ -31,12 +31,12 @@ codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" P
 
 # And the system frameworks 
 # TODO: This is a workaround for toolchain changes in 5.5.1
-#codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/QtCore.framework/Versions/5
-#codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/QtDBus.framework/Versions/5
-#codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/QtGui.framework/Versions/5
-#codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/QtPrintSupport.framework/Versions/5
-#codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/QtWidgets.framework/Versions/5
-#codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/QtSerialPort.framework/Versions/5
+codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/QtCore.framework/Versions/5
+codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/QtDBus.framework/Versions/5
+codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/QtGui.framework/Versions/5
+codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/QtPrintSupport.framework/Versions/5
+codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/QtWidgets.framework/Versions/5
+codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/QtSerialPort.framework/Versions/5
 
 # Deploy and sign the release
 # Note: macdeployqt seems to freeze in Qt 5.5.1. Using workaround.

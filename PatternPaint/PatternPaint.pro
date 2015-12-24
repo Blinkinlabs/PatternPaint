@@ -21,7 +21,7 @@ TEMPLATE = app
 #Application version
 VERSION_MAJOR = 2
 VERSION_MINOR = 0
-VERSION_BUILD = 2
+VERSION_BUILD = 3
 
 #Target version and application information
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
