@@ -144,7 +144,7 @@ defineTest(copySystemFrameworks) {
 
     for(FILE, files) {
         # If the libraries were already there, remove them.
-        QMAKE_POST_LINK += rm -R $$quote($$DDIR/$$FILE) $$escape_expand(\\n\\t)
+        QMAKE_POST_LINK += if [ -d $$quote($$DDIR/$$FILE) ] ; then rm -R $$quote($$DDIR/$$FILE); fi $$escape_expand(\\n\\t)
 
         # Copy the library directory, recursively
         QMAKE_POST_LINK += cp -R $$quote($$SOURCE_DIR/$$FILE) $$quote($$DDIR) $$escape_expand(\\n\\t)
