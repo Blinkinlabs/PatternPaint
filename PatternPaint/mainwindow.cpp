@@ -976,10 +976,6 @@ void MainWindow::on_actionClose_triggered()
 
 void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, const QModelIndex &)
 {
-    emit(patternStatusChanged(current.isValid()));
-
-    on_patternSizeUpdated();
-
     // TODO: we're going to have to unload our references, but for now skip that.
     if (!current.isValid()) {
         undoGroup.setActiveStack(NULL);
@@ -1022,6 +1018,10 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
             this,
             SLOT(on_PatternDataChanged(const QModelIndex &, const QModelIndex &,
                                        const QVector<int> &)));
+
+    emit(patternStatusChanged(current.isValid()));
+
+    on_patternSizeUpdated();
 }
 
 void MainWindow::on_timelineSelectedChanged(const QModelIndex &current, const QModelIndex &)
@@ -1069,10 +1069,6 @@ void MainWindow::on_patternSizeUpdated()
     setPatternData(getCurrentFrameIndex(),
                    patternCollection.at(getCurrentPatternIndex())->getEditImage(
                        getCurrentFrameIndex()));
-
-    // And kick the scroll area so that it will size itself
-    // scrollArea->resize(scrollArea->width()+1, scrollArea->height());
-    // this->patternsplitter->refresh();
 }
 
 void MainWindow::on_frameDataEdited(int index, QImage update)
@@ -1129,8 +1125,6 @@ void MainWindow::setPatternModified(bool modified)
 
 void MainWindow::on_ExampleSelected(QAction *action)
 {
-    qDebug() << "Example selected:" << action->objectName();
-
     Pattern::PatternType type = Pattern::Scrolling;
     if (action->objectName().endsWith(".frames.png"))
         type = Pattern::FrameBased;
@@ -1159,9 +1153,6 @@ void MainWindow::on_actionConfigure_Fixture_triggered()
 
     // To do: save the controller and fixture types so that we can recall them here.
     SceneTemplate sceneTemplate;
-    sceneTemplate.name = "???";
-    sceneTemplate.photo = "";
-    sceneTemplate.examples = "";
     if (!controller.isNull())
         sceneTemplate.controllerType = controller->getName();
     if (!fixture.isNull()) {
