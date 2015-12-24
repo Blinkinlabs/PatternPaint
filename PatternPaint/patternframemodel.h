@@ -15,6 +15,14 @@ class PatternFrameModel : public PatternModel
     Q_OBJECT
 public:
 
+    struct State {
+        QList<QImage> frames;
+        QSize frameSize;            ///< Resolution of this pattern, in pixels
+        float frameSpeed;           ///< Speed to play back the pattern
+        QString fileName;           ///< Filename for the pattern
+        bool modified;              ///< True if the pattern has been changed since last save
+    };
+
     PatternFrameModel(QSize frameSize, QObject *parent = 0);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -37,16 +45,13 @@ public:
     friend class PatternFrameUndoCommand;
 
 private:
-    QList<QImage> frames;
     QUndoStack undoStack;       ///< Undo stack for this pattern
-    QSize frameSize;            ///< Resolution of this pattern, in pixels
-    float frameSpeed;           ///< Speed to play back the pattern
-    QString fileInfo;           ///< Filename for the pattern
-    bool modified;              ///< True if the pattern has been changed since last save
+
+    State state;
 
     void pushUndoState();
 
-    void applyUndoState(QList<QImage> &newFrames, QSize newSize);
+    void applyUndoState(State newState);
 };
 
 #endif // PATTERNFRAMEMODEL_H

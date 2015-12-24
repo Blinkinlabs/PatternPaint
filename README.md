@@ -1,6 +1,6 @@
 # PatternPaint
 
-![image](http://blinkinlabs.com/wp-content/uploads/2015/11/Screen-Shot-2015-11-17-at-5.14.06-PM.png)
+![image](https://cloud.githubusercontent.com/assets/44493/11913712/7bc560c8-a6a8-11e5-8309-70cd170a7b9e.png)
 
 Making beautiful light shows is as easy as drawing a picture with PatternPaint! Simply plug in your BlinkyTape, run PatternPaint, and draw away!
 

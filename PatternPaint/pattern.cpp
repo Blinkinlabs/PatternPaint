@@ -79,7 +79,11 @@ bool Pattern::load(const QString &newFileName)
         QSize frameSize = model->data(model->index(0), PatternModel::FrameSize).toSize();
 
         // TODO: Warn if the source image wasn't of the expected aperture?
-        sourceImage = sourceImage.scaledToHeight(frameSize.height());
+        int targetWidth = sourceImage.width()*frameSize.height()/(float)sourceImage.height();
+        if(targetWidth == 0)
+            targetWidth = 1;
+
+        sourceImage = sourceImage.scaled(targetWidth, frameSize.height());
         int newFrameCount = sourceImage.width()/frameSize.width();
 
         model->removeRows(0, model->rowCount());
@@ -106,8 +110,11 @@ bool Pattern::load(const QString &newFileName)
     {
         QSize frameSize = model->data(model->index(0), PatternModel::FrameSize).toSize();
 
-        // TODO: Warn if the source image wasn't of the expected aperture?
-        sourceImage = sourceImage.scaledToHeight(frameSize.height());
+        int targetWidth = sourceImage.width()*frameSize.height()/(float)sourceImage.height();
+        if(targetWidth == 0)
+            targetWidth = 1;
+
+        sourceImage = sourceImage.scaled(targetWidth, frameSize.height());
         int newFrameCount = sourceImage.width();
 
         model->removeRows(0, model->rowCount());

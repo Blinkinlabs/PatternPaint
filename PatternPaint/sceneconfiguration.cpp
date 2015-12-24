@@ -106,8 +106,6 @@ SceneTemplate SceneConfiguration::getSceneTemplate()
 
 void SceneConfiguration::on_sceneTemplate_activated(const QString &arg1)
 {
-    qDebug() << "Selected:" << arg1;
-
     for (int i = 0; i < SCENE_TEMPLATE_COUNT; i++) {
         if (sceneTemplates[i].name == arg1)
             setSceneTemplate(sceneTemplates[i]);

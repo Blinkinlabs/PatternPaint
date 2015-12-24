@@ -56,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
 
     // Build the new pattern drop-down menu
+    // Open question: Why doesn't this->menuNew work?
     QMenu *menu = new QMenu(this);
     menu->addAction(this->actionNew_FramePattern);
     menu->addAction(this->actionNew_ScrollingPattern);
@@ -84,7 +85,7 @@ MainWindow::MainWindow(QWidget *parent) :
     redoAction->setIcon(QIcon(":/icons/images/icons/Redo-100.png"));
     redoAction->setIconVisibleInMenu(false);
     menuEdit->addAction(redoAction);
-   instrumentToolbar->insertAction(actionPen, redoAction);
+    instrumentToolbar->insertAction(actionPen, redoAction);
 
     // instruments
     ColorpickerInstrument *cpi = new ColorpickerInstrument(this);
@@ -113,12 +114,12 @@ MainWindow::MainWindow(QWidget *parent) :
     instrumentToolbar->addWidget(penSizeSpin);
 
     // tools
-    pFrame.setMaximumWidth(30);
-    pFrame.setMinimumWidth(30);
-    pFrame.setValidator(new QIntValidator(1, std::numeric_limits<int>::max(), this));
-    pFrame.setToolTip(tr("Current frame"));
-    playbackToolbar->insertWidget(actionStepForward, &pFrame);
-    connect(&pFrame, SIGNAL(textEdited(QString)), this, SLOT(frameIndex_valueChanged(QString)));
+    currentFrame.setMaximumWidth(30);
+    currentFrame.setMinimumWidth(30);
+    currentFrame.setValidator(new QIntValidator(1, std::numeric_limits<int>::max(), this));
+    currentFrame.setToolTip(tr("Current frame"));
+    playbackToolbar->insertWidget(actionStepForward, &currentFrame);
+    connect(&currentFrame, SIGNAL(textEdited(QString)), this, SLOT(frameIndex_valueChanged(QString)));
     frameIndex_valueChanged("1");
 
     // Pattern info
@@ -146,6 +147,8 @@ MainWindow::MainWindow(QWidget *parent) :
             actionStepBackward, SLOT(setEnabled(bool)));
     connect(this, SIGNAL(patternStatusChanged(bool)),
             patternSpeed, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(patternStatusChanged(bool)),
+            &currentFrame, SLOT(setEnabled(bool)));
 
     mode = Disconnected;
 
@@ -394,14 +397,14 @@ bool MainWindow::savePattern(Pattern *item)
     }
 }
 
-void MainWindow::on_actionSave_File_as_triggered()
+void MainWindow::on_actionSave_as_triggered()
 {
     if (patternCollection.isEmpty())
         return;
     savePatternAs(patternCollection.at(getCurrentPatternIndex()));
 }
 
-void MainWindow::on_actionSave_File_triggered()
+void MainWindow::on_actionSave_triggered()
 {
     if (patternCollection.isEmpty())
         return;
@@ -700,7 +703,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QList<Pattern *> unsavedPatterns;
 
     foreach(Pattern* pattern, patternCollection.patterns()) {
-        if (pattern->getModified() == true)
+        if (pattern->getModified())
             unsavedPatterns.append(pattern);
     }
 
@@ -755,15 +758,21 @@ void MainWindow::on_colorPicked(QColor color)
     frameEditor->setToolColor(color);
 }
 
-bool MainWindow::promptForSave(Pattern *item)
+bool MainWindow::promptForSave(Pattern *pattern)
 {
+    if (!pattern->getModified())
+        return true;
+
     QList<Pattern *> patterns;
-    patterns.append(item);
+    patterns.append(pattern);
     return promptForSave(patterns);
 }
 
 bool MainWindow::promptForSave(QList<Pattern *> patterns)
 {
+    if(patterns.count() == 0)
+        return true;
+
     QString messageText;
 
     if(patterns.count() == 1) {
@@ -912,7 +921,7 @@ void MainWindow::setNewFrame(int newFrame)
 
     timeline->setCurrentIndex(timeline->model()->index(newFrame, 0));
 
-    pFrame.setText(QString::number(getCurrentFrameIndex()+1));
+    currentFrame.setText(QString::number(getCurrentFrameIndex()+1));
 
     setFrameData(getCurrentFrameIndex(),
                    patternCollection.at(getCurrentPatternIndex())->getEditImage(newFrame));
@@ -968,10 +977,6 @@ void MainWindow::on_actionClose_triggered()
 
 void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, const QModelIndex &)
 {
-    emit(patternStatusChanged(current.isValid()));
-
-    on_patternSizeUpdated();
-
     // TODO: we're going to have to unload our references, but for now skip that.
     if (!current.isValid()) {
         undoGroup.setActiveStack(NULL);
@@ -983,6 +988,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
         frameEditor->setShowPlaybakIndicator(false);
         timeline->setVisible(false);
         patternSpeed->setValue(1);
+        currentFrame.setText("");
 
         actionSave_to_Blinky->setEnabled(false);
 
@@ -994,6 +1000,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
     undoGroup.setActiveStack(newpattern->getUndoStack());
     timeline->setModel(newpattern->getModel());
 
+    setNewFrame(getCurrentFrameIndex());
     setPatternName(newpattern->getName());
     setPatternModified(newpattern->getModified());
     setFrameData(getCurrentFrameIndex(), newpattern->getEditImage(getCurrentPatternIndex()));
@@ -1012,6 +1019,10 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
             this,
             SLOT(on_PatternDataChanged(const QModelIndex &, const QModelIndex &,
                                        const QVector<int> &)));
+
+    emit(patternStatusChanged(current.isValid()));
+
+    on_patternSizeUpdated();
 }
 
 void MainWindow::on_timelineSelectedChanged(const QModelIndex &current, const QModelIndex &)
@@ -1036,6 +1047,8 @@ void MainWindow::on_PatternDataChanged(const QModelIndex &topLeft, const QModelI
                                patternCollection.at(getCurrentPatternIndex())->getEditImage(
                                    getCurrentFrameIndex()));
             }
+        } else if (role == PatternModel::FrameSpeed) {
+            patternSpeed->setValue(patternCollection.at(getCurrentPatternIndex())->getFrameSpeed());
         }
     }
 }
@@ -1063,10 +1076,6 @@ void MainWindow::on_patternSizeUpdated()
     setFrameData(getCurrentFrameIndex(),
                    patternCollection.at(getCurrentPatternIndex())->getEditImage(
                        getCurrentFrameIndex()));
-
-    // And kick the scroll area so that it will size itself
-    // scrollArea->resize(scrollArea->width()+1, scrollArea->height());
-    // this->patternsplitter->refresh();
 }
 
 void MainWindow::on_frameDataEdited(int index, QImage update)
@@ -1118,13 +1127,11 @@ void MainWindow::on_actionDeleteFrame_triggered()
 
 void MainWindow::setPatternModified(bool modified)
 {
-    actionSave_File->setEnabled(modified);
+    actionSave->setEnabled(modified);
 }
 
 void MainWindow::on_ExampleSelected(QAction *action)
 {
-    qDebug() << "Example selected:" << action->objectName();
-
     Pattern::PatternType type = Pattern::Scrolling;
     if (action->objectName().endsWith(".frames.png"))
         type = Pattern::FrameBased;
@@ -1153,9 +1160,6 @@ void MainWindow::on_actionConfigure_Fixture_triggered()
 
     // To do: save the controller and fixture types so that we can recall them here.
     SceneTemplate sceneTemplate;
-    sceneTemplate.name = "???";
-    sceneTemplate.photo = "";
-    sceneTemplate.examples = "";
     if (!controller.isNull())
         sceneTemplate.controllerType = controller->getName();
     if (!fixture.isNull()) {

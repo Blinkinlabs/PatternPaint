@@ -10,16 +10,18 @@
 #define PATTERN_FRAME_SPEED_DEFAULT_VALUE 10
 
 PatternFrameModel::PatternFrameModel(QSize size, QObject *parent) :
-    PatternModel(parent),
-    frameSize(size),
-    frameSpeed(PATTERN_FRAME_SPEED_DEFAULT_VALUE)
+    PatternModel(parent)
 {
+    state.frameSize = size;
+    state.frameSpeed = PATTERN_FRAME_SPEED_DEFAULT_VALUE;
+    state.modified = false;
+
     undoStack.setUndoLimit(50);
 }
 
 int PatternFrameModel::rowCount(const QModelIndex &) const
 {
-    return frames.count();
+    return state.frames.count();
 }
 
 Qt::ItemFlags PatternFrameModel::flags(const QModelIndex &index) const
@@ -39,28 +41,33 @@ void PatternFrameModel::pushUndoState()
 {
     undoStack.push(new PatternFrameUndoCommand(this));
 
-    if (modified == true)
+    if (state.modified == true)
         return;
 
-    modified = true;
+    state.modified = true;
 
     QVector<int> roles;
     roles.append(Modified);
     emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
 }
 
-void PatternFrameModel::applyUndoState(QList<QImage> &newFrames, QSize newSize)
+void PatternFrameModel::applyUndoState(State newState)
 {
-    // TODO: Handle the whole state, not just the frames...
-    frames = newFrames;
-    frameSize = newSize;
-
-    modified = true;
-
     QVector<int> roles;
-    roles.append(FrameSize);
-    roles.append(FrameImage);
-    roles.append(Modified);
+
+    if(state.frames != newState.frames)
+        roles.append(FrameImage);
+    if(state.frameSize != newState.frameSize)
+        roles.append(FrameSize);
+    if(state.frameSpeed != newState.frameSpeed)
+        roles.append(FrameSpeed);
+    if(state.fileName != newState.fileName)
+        roles.append(FileName);
+    if(state.modified != newState.modified)
+        roles.append(Modified);
+
+    state = newState;
+
     emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
 }
 
@@ -69,23 +76,23 @@ QVariant PatternFrameModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    if (index.row() >= frames.count() || index.row() < 0)
+    if (index.row() >= state.frames.count() || index.row() < 0)
         return QVariant();
 
     if (role == FrameImage || role == Qt::EditRole || role == EditImage)
-        return frames.at(index.row());
+        return state.frames.at(index.row());
 
     if (role == FrameSize)
-        return frameSize;
+        return state.frameSize;
 
     if (role == FrameSpeed)
-        return frameSpeed;
+        return state.frameSpeed;
 
     if (role == FileName)
-        return fileInfo;
+        return state.fileName;
 
     if (role == Modified)
-        return modified;
+        return state.modified;
 
     return QVariant();
 }
@@ -99,7 +106,7 @@ bool PatternFrameModel::setData(const QModelIndex &index, const QVariant &value,
 
     if (role == FrameImage || role == Qt::EditRole || role == EditImage) {
         // TODO: enforce size scaling here?
-        frames.replace(index.row(), value.value<QImage>());
+        state.frames.replace(index.row(), value.value<QImage>());
         QVector<int> roles;
         roles.append(FrameImage);
         emit dataChanged(index, index, roles);
@@ -108,22 +115,22 @@ bool PatternFrameModel::setData(const QModelIndex &index, const QVariant &value,
 
     if (role == FrameSize) {
         for (int row = 0; row < rowCount(); row++) {
-            frameSize = value.toSize();
+            state.frameSize = value.toSize();
             QImage newImage;
             bool scale = true;      // Enforce scaling...
 
             if (scale) {
-                newImage = frames.at(row).scaled(frameSize);
+                newImage = state.frames.at(row).scaled(state.frameSize);
             } else {
-                newImage = QImage(frameSize,
+                newImage = QImage(state.frameSize,
                                   QImage::Format_ARGB32_Premultiplied);
                 newImage.fill(FRAME_COLOR_DEFAULT);
 
                 QPainter painter(&newImage);
-                painter.drawImage(0, 0, frames.at(row));
+                painter.drawImage(0, 0, state.frames.at(row));
             }
 
-            frames.replace(row, newImage);
+            state.frames.replace(row, newImage);
         }
 
         QVector<int> roles;
@@ -136,7 +143,7 @@ bool PatternFrameModel::setData(const QModelIndex &index, const QVariant &value,
     }
 
     if (role == FrameSpeed) {
-        frameSpeed = value.toFloat();
+        state.frameSpeed = value.toFloat();
 
         QVector<int> roles;
         roles.append(FrameSpeed);
@@ -145,7 +152,7 @@ bool PatternFrameModel::setData(const QModelIndex &index, const QVariant &value,
     }
 
     if (role == FileName) {
-        fileInfo = value.toString();
+        state.fileName = value.toString();
 
         QVector<int> roles;
         roles.append(FileName);
@@ -155,7 +162,7 @@ bool PatternFrameModel::setData(const QModelIndex &index, const QVariant &value,
 
     if (role == Modified) {
         // TODO: This should only be accessable through the undo stack?
-        modified = value.toBool();
+        state.modified = value.toBool();
 
         QVector<int> roles;
         roles.append(Modified);
@@ -172,9 +179,9 @@ bool PatternFrameModel::insertRows(int position, int rows, const QModelIndex &)
     beginInsertRows(QModelIndex(), position, position+rows-1);
 
     for (int row = 0; row < rows; ++row) {
-        QImage newImage(frameSize, QImage::Format_ARGB32_Premultiplied);
+        QImage newImage(state.frameSize, QImage::Format_ARGB32_Premultiplied);
         newImage.fill(FRAME_COLOR_DEFAULT);
-        frames.insert(position, newImage);
+        state.frames.insert(position, newImage);
     }
 
     endInsertRows();
@@ -192,7 +199,7 @@ bool PatternFrameModel::removeRows(int position, int rows, const QModelIndex &)
     beginRemoveRows(QModelIndex(), position, position+rows-1);
 
     for (int row = 0; row < rows; ++row)
-        frames.removeAt(position);
+        state.frames.removeAt(position);
 
     endRemoveRows();
 

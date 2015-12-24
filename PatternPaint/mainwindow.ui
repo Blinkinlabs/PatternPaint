@@ -114,6 +114,9 @@
       <property name="dragDropMode">
        <enum>QAbstractItemView::InternalMove</enum>
       </property>
+      <property name="uniformItemSizes">
+       <bool>true</bool>
+      </property>
      </widget>
     </item>
     <item>
@@ -643,8 +646,8 @@
     <addaction name="menuExamples"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
-    <addaction name="actionSave_File"/>
-    <addaction name="actionSave_File_as"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionSave_as"/>
     <addaction name="separator"/>
     <addaction name="actionExport_pattern_for_Arduino"/>
     <addaction name="separator"/>
@@ -721,7 +724,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionClose"/>
-   <addaction name="actionSave_File"/>
+   <addaction name="actionSave"/>
    <addaction name="actionSave_to_Blinky"/>
   </widget>
   <widget class="QToolBar" name="playbackToolbar">
@@ -768,7 +771,7 @@
    <addaction name="actionPipette"/>
    <addaction name="actionFill"/>
   </widget>
-  <action name="actionSave_File">
+  <action name="actionSave">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -961,7 +964,7 @@
     <bool>false</bool>
    </property>
   </action>
-  <action name="actionSave_File_as">
+  <action name="actionSave_as">
    <property name="enabled">
     <bool>true</bool>
    </property>

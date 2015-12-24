@@ -49,8 +49,8 @@ private slots:
 
     void connectionScannerTimer_timeout();
 
-    void on_actionSave_File_triggered();
-    void on_actionSave_File_as_triggered();
+    void on_actionSave_triggered();
+    void on_actionSave_as_triggered();
 
     void on_actionExit_triggered();
 
@@ -147,7 +147,7 @@ private:
 
     PatternCollection patternCollection;
 
-    QLineEdit pFrame;
+    QLineEdit currentFrame;
 
     enum Modes {
         Disconnected, Connected, Uploading
@@ -163,7 +163,7 @@ private:
     void startPlayback();
     void stopPlayback();
 
-    bool promptForSave(Pattern *item);
+    bool promptForSave(Pattern *pattern);
     bool promptForSave(QList<Pattern *> patterns);
 
     bool savePattern(Pattern *item);

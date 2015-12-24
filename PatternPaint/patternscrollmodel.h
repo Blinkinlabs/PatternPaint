@@ -15,6 +15,14 @@ class PatternScrollModel : public PatternModel
     Q_OBJECT
 public:
 
+    struct State {
+        QImage image;
+        QSize frameSize;            ///< Resolution of this pattern, in pixels
+        float frameSpeed;           ///< Speed to play back the pattern
+        QString fileName;           ///< Filename for the pattern
+        bool modified;              ///< True if the pattern has been changed since last save
+    };
+
     PatternScrollModel(QSize frameSize, QObject *parent = 0);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -37,17 +45,13 @@ public:
     friend class PatternScrollUndoCommand;
 
 private:
-    QImage image;
-
     QUndoStack undoStack;       ///< Undo stack for this pattern
-    QSize frameSize;            ///< Resolution of this pattern, in pixels
-    float frameSpeed;           ///< Speed to play back the pattern
-    QString fileInfo;           ///< Filename for the pattern
-    bool modified;              ///< True if the pattern has been changed since last save
+
+    State state;
 
     void pushUndoState();
 
-    void applyUndoState(QImage newImage, QSize newSize);
+    void applyUndoState(State newState);
 };
 
 #endif // PATTERNSCROLLMODEL_H
