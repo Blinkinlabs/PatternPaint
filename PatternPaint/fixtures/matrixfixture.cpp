@@ -1,5 +1,7 @@
 #include "matrixfixture.h"
 
+#include <limits>
+
 MatrixFixture::MatrixFixture(
     QSize size, ColorMode colorMode, BrightnessModel *brightnessModel, QObject *parent) :
     Fixture(parent),

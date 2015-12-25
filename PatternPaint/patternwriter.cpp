@@ -109,7 +109,7 @@ void PatternWriter::encodeImageRGB565_RLE(const Pattern *pattern)
 
         QList<QColor> colorStream = fixture->getColorStreamForFrame(pattern->getFrameImage(frame));
 
-        int currentColor;
+        int currentColor = 0;
         int runCount = 0;
 
         for (int pixel = 0; pixel < colorStream.count(); pixel++) {
