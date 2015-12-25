@@ -21,6 +21,8 @@ public:
 
     QList<QPoint> getOutputLocations() const;
 
+    QRect getExtents() const;
+
     int getLedCount() const;
 
     QSize getSize() const;
@@ -36,6 +38,9 @@ private:
     QSize size;
     ColorMode colormode;
     BrightnessModel *brightnessModel;
+
+    QList<QPoint> locations;
+    QRect extents;
 };
 
 #endif // MATRIXFIXTURE_H

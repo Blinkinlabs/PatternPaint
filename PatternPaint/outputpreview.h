@@ -29,6 +29,7 @@ private:
 
     QList<QPoint> outputLocations;
     QList<QColor> colorStream;
+    QRect extents;
 };
 
 #endif // OUTPUTPREVIEW_H

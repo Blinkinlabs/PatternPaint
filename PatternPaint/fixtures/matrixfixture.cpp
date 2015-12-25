@@ -3,10 +3,10 @@
 MatrixFixture::MatrixFixture(
     QSize size, ColorMode colorMode, BrightnessModel *brightnessModel, QObject *parent) :
     Fixture(parent),
-    size(size),
     colormode(colorMode),
     brightnessModel(brightnessModel)
 {
+    setSize(size);
 }
 
 MatrixFixture::~MatrixFixture()
@@ -39,15 +39,12 @@ QList<QColor> MatrixFixture::getColorStreamForFrame(const QImage frame) const
 
 QList<QPoint> MatrixFixture::getOutputLocations() const
 {
-    QList<QPoint> locations;
-
-    for (int x = 0; x < size.width(); x++) {
-        for (int y = 0; y < size.height(); y++) {
-            locations.append(QPoint(x, x%2 ? size.height()-1-y : y));
-        }
-    }
-
     return locations;
+}
+
+QRect MatrixFixture::getExtents() const
+{
+    return extents;
 }
 
 int MatrixFixture::getLedCount() const
@@ -63,6 +60,29 @@ QSize MatrixFixture::getSize() const
 void MatrixFixture::setSize(QSize newSize)
 {
     size = newSize;
+
+    locations.clear();
+
+    extents.setLeft(std::numeric_limits<int>::max());
+    extents.setRight(std::numeric_limits<int>::min());
+    extents.setTop(std::numeric_limits<int>::max());
+    extents.setBottom(std::numeric_limits<int>::min());
+
+    for (int x = 0; x < size.width(); x++) {
+        for (int y = 0; y < size.height(); y++) {
+            QPoint point (x, x%2 ? size.height()-1-y : y);
+            locations.append(point);
+
+            if(extents.left() > point.x())
+                extents.setLeft(point.x());
+            if(extents.right() < point.x())
+                extents.setRight(point.x());
+            if(extents.top() > point.y())
+                extents.setTop(point.y());
+            if(extents.bottom() < point.y())
+                extents.setBottom(point.y());
+        }
+    }
 }
 
 ColorMode MatrixFixture::getColorMode() const

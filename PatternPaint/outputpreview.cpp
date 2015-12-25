@@ -2,6 +2,9 @@
 
 #include <QPainter>
 
+
+#define PIXEL_WIDTH .7
+
 OutputPreview::OutputPreview(QWidget *parent) : QWidget(parent)
 {
 
@@ -22,6 +25,7 @@ void OutputPreview::setFrameData(int, const QImage data)
     if(fixture.isNull())
         return;
 
+    extents = fixture->getExtents();
     outputLocations = fixture->getOutputLocations();
     colorStream = fixture->getColorStreamForFrame(data);
 
@@ -31,25 +35,28 @@ void OutputPreview::setFrameData(int, const QImage data)
 void OutputPreview::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
-    painter.setRenderHint(QPainter::Antialiasing, false);
+    painter.setRenderHint(QPainter::Antialiasing, true);
 
     painter.fillRect(0, 0, this->width(), this->height(), QColor(100, 100, 100, 255));
+
+    qreal width = extents.right()-extents.left() + 1 + PIXEL_WIDTH;
+    qreal height = extents.bottom()-extents.top() + 1 + PIXEL_WIDTH;
+
+    qreal scale = this->geometry().width()/width;
+
+    if(scale > this->geometry().height()/height) {
+        scale = this->geometry().height()/height;
+    }
+
+    painter.setViewTransformEnabled(true);
+    painter.scale(scale,scale);
 
     if(outputLocations.count() != colorStream.count())
         return;
 
     for(int i = 0; i < outputLocations.count(); i++) {
-//        painter.setPen(colorStream.at(i));
-        painter.fillRect(QRect(outputLocations.at(i).x()*5,outputLocations.at(i).y()*5,
-                               3,3),
+        painter.fillRect(QRectF(outputLocations.at(i).x()+.5,outputLocations.at(i).y()+.5,
+                               PIXEL_WIDTH, PIXEL_WIDTH),
                          colorStream.at(i));
     }
-
-//    // Draw the image and tool preview
-//    painter.drawImage(QRect(0, 0,
-//                            preview.width(),
-//                            preview.height()),
-//                      preview);
 }
-

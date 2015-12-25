@@ -215,6 +215,21 @@ MainWindow::MainWindow(QWidget *parent) :
 
     timeline->setItemDelegate(new PatternDelegate(this));
 
+    connect(actionOutput_Preview,SIGNAL(triggered(bool)),outputPreviewFrame,SLOT(setVisible(bool)));
+    this->actionOutput_Preview->setChecked(settings.value("MainWindow/outputPreview", true).toBool());
+    outputPreviewFrame->setVisible(settings.value("MainWindow/outputPreview", true).toBool());
+
+    QList<QToolBar *> toolbars = this->findChildren<QToolBar *>();
+    foreach (QToolBar *toolbar, toolbars) {
+        QAction *action = new QAction(this);
+        action->setText(toolbar->windowTitle());
+        action->setCheckable(true);
+        connect(action,SIGNAL(triggered(bool)),toolbar,SLOT(setVisible(bool)));
+        connect(toolbar,SIGNAL(visibilityChanged(bool)),action,SLOT(setChecked(bool)));
+        this->menuToolbars->addAction(action);
+    }
+
+
     if (settings.value("WelcomeScreen/showAtStartup", true).toBool())
         connect(this, SIGNAL(windowLoaded()), this, SLOT(on_actionWelcome_triggered()));
 
@@ -722,6 +737,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QSettings settings;
     settings.setValue("MainWindow/geometry", saveGeometry());
     settings.setValue("MainWindow/state", saveState());
+
+    settings.setValue("MainWindow/outputPreview", this->actionOutput_Preview->isChecked());
 
 #if defined(Q_OS_MACX)    // Workaround for issue #114, multile close events are sent when closing from the dock
     rateLimiter.force();
