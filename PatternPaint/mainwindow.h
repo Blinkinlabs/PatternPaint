@@ -125,6 +125,10 @@ private slots:
 
     void on_actionWelcome_triggered();
 
+    void on_actionSave_All_triggered();
+
+    void on_actionClose_All_triggered();
+
 signals:
 
     /// Signalled when an editable pattern is selected in the editor

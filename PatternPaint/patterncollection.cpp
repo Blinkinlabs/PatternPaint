@@ -37,6 +37,11 @@ void PatternCollection::remove(int index)
     model.removeRow(index);
 }
 
+void PatternCollection::clear()
+{
+    model.removeRows(0,count());
+}
+
 QPointer<Pattern> PatternCollection::at(int index) const
 {
     return qvariant_cast<QPointer<Pattern> >(model.index(index).data(PatternCollectionModel::

@@ -722,7 +722,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
             unsavedPatterns.append(pattern);
     }
 
-    // If we only have one pattern, show the regular prompt for save dialog
     if (!promptForSave(unsavedPatterns)) {
         event->ignore();
         return;
@@ -1247,4 +1246,26 @@ void MainWindow::on_actionWelcome_triggered()
 
     welcomeScreen->setAttribute(Qt::WA_DeleteOnClose, true);
     welcomeScreen->show();
+}
+
+void MainWindow::on_actionSave_All_triggered()
+{
+    foreach(Pattern *pattern, patternCollection.patterns())
+        if (!savePattern(pattern))
+            return;
+}
+
+void MainWindow::on_actionClose_All_triggered()
+{
+    QList<Pattern *> unsavedPatterns;
+
+    foreach(Pattern* pattern, patternCollection.patterns()) {
+        if (pattern->getModified())
+            unsavedPatterns.append(pattern);
+    }
+
+    if(!promptForSave(unsavedPatterns))
+        return;
+
+    patternCollection.clear();
 }

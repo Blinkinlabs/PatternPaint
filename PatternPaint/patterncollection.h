@@ -15,6 +15,8 @@ public:
 
     void remove(int index);
 
+    void clear();
+
     QPointer<Pattern> at(int index) const;
 
     QList<Pattern*> patterns() const;
