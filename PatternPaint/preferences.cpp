@@ -4,7 +4,7 @@
 #include <QSettings>
 #include <QDebug>
 
-// TODO: These are redefined from main.cpp
+// TODO: These are redefined from MainWindow.cpp
 #define OSX_RELEASE_APPCAST_DEFAULT \
     "http://software.blinkinlabs.com/patternpaint/patternpaint-osx.xml"
 #define WINDOWS_RELEASE_APPCAST_DEFAULT \
@@ -20,27 +20,40 @@ Preferences::Preferences(QWidget *parent) :
 
     ui->showWelcomeScreen->setChecked(settings.value("WelcomeScreen/showAtStartup",
                                                      true).toBool());
-
     ui->gridLayout->setColumnMinimumWidth(0, 150);
 
 #if defined(Q_OS_MACX)
-    ui->automaticUpdateCheck->hide();
-
     ui->updateURL->setText(settings.value("Updates/releaseAppcastUrl",
                                           OSX_RELEASE_APPCAST_DEFAULT).toString());
 #elif defined(Q_OS_WIN)
-    ui->automaticUpdateCheck->hide();
-
     ui->updateURL->setText(settings.value("Updates/releaseAppcastUrl",
                                           WINDOWS_RELEASE_APPCAST_DEFAULT).toString());
-#else
-    ui->updateURL->setEnabled(false);
 #endif
+
+    setUpdater(NULL);
 }
 
 Preferences::~Preferences()
 {
     delete ui;
+}
+
+void Preferences::setUpdater(AutoUpdater *newAutoUpdater)
+{
+    autoUpdater = newAutoUpdater;
+
+    if(autoUpdater == NULL) {
+        ui->automaticUpdateCheck->setEnabled(false);
+        ui->updateURL->setEnabled(false);
+        ui->checkForUpdates->setEnabled(false);
+    }
+    else {
+        ui->automaticUpdateCheck->setEnabled(true);
+        ui->updateURL->setEnabled(true);
+        ui->checkForUpdates->setEnabled(true);
+
+        ui->automaticUpdateCheck->setChecked(autoUpdater->getAutomatic());
+    }
 }
 
 void Preferences::accept()
@@ -51,6 +64,7 @@ void Preferences::accept()
 
     settings.setValue("WelcomeScreen/showAtStartup", ui->showWelcomeScreen->isChecked());
 
+    // Only store the appcast URL if it's different from the default
 #if defined(Q_OS_MACX)
     if (ui->updateURL->text() != OSX_RELEASE_APPCAST_DEFAULT)
         settings.setValue("Updates/releaseAppcastUrl", ui->updateURL->text());
@@ -58,11 +72,18 @@ void Preferences::accept()
 #elif defined(Q_OS_WIN)
     if (ui->updateURL->text() != WINDOWS_RELEASE_APPCAST_DEFAULT)
         settings.setValue("Updates/releaseAppcastUrl", ui->updateURL->text());
-
 #endif
+
+    if(autoUpdater != NULL) {
+        // TODO: Does the updater store this on or behalf, or should we restore it at program start?
+        autoUpdater->setAutomatic(ui->automaticUpdateCheck->isChecked());
+    }
 }
 
 void Preferences::on_checkForUpdates_clicked()
 {
-    emit checkForUpdates();
+    if(autoUpdater == NULL)
+        return;
+
+    autoUpdater->checkForUpdates();
 }

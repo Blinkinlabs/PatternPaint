@@ -28,9 +28,6 @@ TEMPLATE = app
 
 include(gitversion.pri)
 
-VERSION = $$GIT_VERSION
-
-
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 DEFINES += APPLICATION_NAME=\\\"$${TARGET}\\\"
 DEFINES += ORGANIZATION_NAME=\\\"Blinkinlabs\\\"

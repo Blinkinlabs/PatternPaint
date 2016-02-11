@@ -244,24 +244,24 @@ MainWindow::MainWindow(QWidget *parent) :
     // Refresh the display for no pattern selected
     on_patternCollectionCurrentChanged(QModelIndex(), QModelIndex());
 
-    updater = NULL;
+    autoUpdater = NULL;
 
 #if defined(DISABLE_UPDATE_CHECKS)
 
-#warning Updater initialization disabled
+#warning Debug mode detected, update checking mechanism disabled
 
 #else
 
 #if defined(Q_OS_MACX)
     QString updateUrl
         = settings.value("Updates/releaseAppcastUrl", OSX_RELEASE_APPCAST_DEFAULT).toString();
-    updater = new SparkleAutoUpdater(updateUrl);
+    autoUpdater = new SparkleAutoUpdater(updateUrl);
 #endif // Q_OS__MACX
 
 #if defined(Q_OS_WIN)
     QString updateUrl
         = settings.value("Updates/releaseAppcastUrl", WINDOWS_RELEASE_APPCAST_DEFAULT).toString();
-    updater = new WinSparkleAutoUpdater(updateUrl);
+    autoUpdater = new WinSparkleAutoUpdater(updateUrl);
 #endif // Q_OS_WIN
 
 #endif  // DISABLE_UPDATE_CHECKS
@@ -271,19 +271,12 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::on_windowLoaded()
 {
     // Events that should only be kicked off after the window has been displayed
-    if (updater)
-        updater->init();
+    if (autoUpdater)
+        autoUpdater->init();
 
     QSettings settings;
     if (settings.value("WelcomeScreen/showAtStartup", true).toBool())
         on_actionWelcome_triggered();
-}
-
-void MainWindow::checkForUpdates()
-{
-    // TODO: Put the updater in a global singleton, similar to settings?
-    if (updater)
-        updater->checkForUpdates();
 }
 
 void MainWindow::populateExamplesMenu(QString directory, QMenu *menu)
@@ -1284,7 +1277,7 @@ void MainWindow::on_actionPreferences_triggered()
 {
     Preferences *preferences = new Preferences(this);
 
-    connect(preferences,SIGNAL(checkForUpdates()),this,SLOT(checkForUpdates()));
+    preferences->setUpdater(autoUpdater);
 
     preferences->show();
 }

@@ -138,7 +138,6 @@ private slots:
 
     void on_windowLoaded();
 
-    void checkForUpdates();
 signals:
 
     /// Signalled when an editable pattern is selected in the editor
@@ -148,7 +147,7 @@ signals:
     void windowLoaded();
 
 private:
-    AutoUpdater *updater;
+    AutoUpdater *autoUpdater;
 
     ColorChooser colorChooser;
 
