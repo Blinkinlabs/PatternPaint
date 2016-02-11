@@ -15,6 +15,12 @@ public:
     explicit Preferences(QWidget *parent = 0);
     ~Preferences();
 
+signals:
+    void checkForUpdates();
+
+private slots:
+    void on_checkForUpdates_clicked();
+
 private:
     Ui::Preferences *ui;
 

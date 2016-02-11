@@ -29,10 +29,15 @@ WinSparkleAutoUpdater::WinSparkleAutoUpdater(const QString &url)
         W(VERSION_STRING));
 }
 
-void WinSparkleAutoUpdater::checkForUpdates()
+void WinSparkleAutoUpdater::init()
 {
     // Initialize the updater and start auto-updating
     win_sparkle_init();
+}
+
+void WinSparkleAutoUpdater::checkForUpdates()
+{
+    win_sparkle_check_update_with_ui();
 }
 
 // TODO: Test in Windows

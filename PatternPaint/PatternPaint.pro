@@ -19,12 +19,17 @@ TARGET = PatternPaint
 TEMPLATE = app
 
 #Application version
-VERSION_MAJOR = 2
-VERSION_MINOR = 0
-VERSION_BUILD = 3
+#VERSION_MAJOR = 2
+#VERSION_MINOR = 0
+#VERSION_BUILD = 3
 
 #Target version and application information
-VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
+#VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
+
+include(gitversion.pri)
+
+VERSION = $$GIT_VERSION
+
 
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 DEFINES += APPLICATION_NAME=\\\"$${TARGET}\\\"
@@ -199,4 +204,5 @@ win32 {
 }
 
 DISTFILES += \
-    ../uncrustify.cfg
+    ../uncrustify.cfg \
+    gitversion.pri

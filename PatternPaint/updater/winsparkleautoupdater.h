@@ -11,6 +11,8 @@ public:
     WinSparkleAutoUpdater(const QString &url);
     ~WinSparkleAutoUpdater();
 
+    void init();
+
     void checkForUpdates();
 
     bool getAutomatic();

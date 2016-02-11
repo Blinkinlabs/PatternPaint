@@ -8,6 +8,8 @@
 #include "colorchooser.h"
 #include "patterncollection.h"
 #include "welcomescreen.h"
+#include "fixture.h"
+#include "autoupdater.h"
 #include "ui_mainwindow.h"
 
 #include <QMainWindow>
@@ -19,10 +21,15 @@
 #include <QLineEdit>
 #include <QTimer>
 
-#if defined(Q_OS_MAC)
+
+#if defined(Q_OS_MACX)
+#include "CocoaInitializer.h"
 #include "appnap.h"
-#include "fixture.h"
+#include "SparkleAutoUpdater.h"
+#elif defined(Q_OS_WIN)
+#include "winsparkleautoupdater.h"
 #endif
+
 
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
@@ -129,6 +136,9 @@ private slots:
 
     void on_actionClose_All_triggered();
 
+    void on_windowLoaded();
+
+    void checkForUpdates();
 signals:
 
     /// Signalled when an editable pattern is selected in the editor
@@ -138,6 +148,8 @@ signals:
     void windowLoaded();
 
 private:
+    AutoUpdater *updater;
+
     ColorChooser colorChooser;
 
     QTimer drawTimer;

@@ -61,3 +61,8 @@ void Preferences::accept()
 
 #endif
 }
+
+void Preferences::on_checkForUpdates_clicked()
+{
+    emit checkForUpdates();
+}

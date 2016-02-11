@@ -33,9 +33,15 @@ SparkleAutoUpdater::~SparkleAutoUpdater()
     delete d;
 }
 
+void SparkleAutoUpdater::init()
+{
+    // TODO: Do we actually have to call this?
+    [d->updater checkForUpdatesInBackground];
+}
+
 void SparkleAutoUpdater::checkForUpdates()
 {
-    [d->updater checkForUpdatesInBackground];
+    [d->updater checkForUpdates: 0];
 }
 
 bool SparkleAutoUpdater::getAutomatic()

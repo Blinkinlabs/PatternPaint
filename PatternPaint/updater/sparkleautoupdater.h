@@ -15,10 +15,12 @@ public:
     SparkleAutoUpdater(const QString &url);
     ~SparkleAutoUpdater();
 
+    void init();
+
     void checkForUpdates();
 
     bool getAutomatic();
-    void setAutomatic(bool);
+    void setAutomatic(bool setting);
 
 private:
     class Private;

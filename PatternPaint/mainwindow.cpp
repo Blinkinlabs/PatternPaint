@@ -38,6 +38,14 @@
 #include <QtWidgets>
 #include <QDebug>
 
+
+#define OSX_RELEASE_APPCAST_DEFAULT \
+    "http://software.blinkinlabs.com/patternpaint/patternpaint-osx.xml"
+#define WINDOWS_RELEASE_APPCAST_DEFAULT \
+    "http://software.blinkinlabs.com/patternpaint/patternpaint-windows.xml"
+
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     colorChooser(this),
@@ -46,6 +54,8 @@ MainWindow::MainWindow(QWidget *parent) :
     setupUi(this);
 
 #if defined(Q_OS_MACX)
+    CocoaInitializer cocoaInitiarizer;  // TODO: We only need to call this temporarily, right?
+
     appNap = NULL;
 #endif
 
@@ -229,12 +239,51 @@ MainWindow::MainWindow(QWidget *parent) :
         this->menuToolbars->addAction(action);
     }
 
-
-    if (settings.value("WelcomeScreen/showAtStartup", true).toBool())
-        connect(this, SIGNAL(windowLoaded()), this, SLOT(on_actionWelcome_triggered()));
+    connect(this, SIGNAL(windowLoaded()), this, SLOT(on_windowLoaded()));
 
     // Refresh the display for no pattern selected
     on_patternCollectionCurrentChanged(QModelIndex(), QModelIndex());
+
+    updater = NULL;
+
+#if defined(DISABLE_UPDATE_CHECKS)
+
+#warning Updater initialization disabled
+
+#else
+
+#if defined(Q_OS_MACX)
+    QString updateUrl
+        = settings.value("Updates/releaseAppcastUrl", OSX_RELEASE_APPCAST_DEFAULT).toString();
+    updater = new SparkleAutoUpdater(updateUrl);
+#endif // Q_OS__MACX
+
+#if defined(Q_OS_WIN)
+    QString updateUrl
+        = settings.value("Updates/releaseAppcastUrl", WINDOWS_RELEASE_APPCAST_DEFAULT).toString();
+    updater = new WinSparkleAutoUpdater(updateUrl);
+#endif // Q_OS_WIN
+
+#endif  // DISABLE_UPDATE_CHECKS
+}
+
+
+void MainWindow::on_windowLoaded()
+{
+    // Events that should only be kicked off after the window has been displayed
+    if (updater)
+        updater->init();
+
+    QSettings settings;
+    if (settings.value("WelcomeScreen/showAtStartup", true).toBool())
+        on_actionWelcome_triggered();
+}
+
+void MainWindow::checkForUpdates()
+{
+    // TODO: Put the updater in a global singleton, similar to settings?
+    if (updater)
+        updater->checkForUpdates();
 }
 
 void MainWindow::populateExamplesMenu(QString directory, QMenu *menu)
@@ -265,7 +314,7 @@ void MainWindow::populateExamplesMenu(QString directory, QMenu *menu)
 MainWindow::~MainWindow()
 {
 #if defined(Q_OS_MACX)
-    // start the app nap inhibitor
+    // stop the app nap inhibitor
     if (appNap != NULL) {
         delete appNap;
         appNap = NULL;
@@ -1234,6 +1283,9 @@ void MainWindow::on_actionOpen_Frame_based_Pattern_triggered()
 void MainWindow::on_actionPreferences_triggered()
 {
     Preferences *preferences = new Preferences(this);
+
+    connect(preferences,SIGNAL(checkForUpdates()),this,SLOT(checkForUpdates()));
+
     preferences->show();
 }
 
