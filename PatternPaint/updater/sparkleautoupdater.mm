@@ -51,7 +51,5 @@ bool SparkleAutoUpdater::getAutomatic()
 
 void SparkleAutoUpdater::setAutomatic(bool setting)
 {
-    qDebug() << "     *** [Lib] {MegaUp}: set automatic update checking";
     [d->updater setAutomaticallyChecksForUpdates: setting];
-    qDebug() << "     ***                 done";
 }
