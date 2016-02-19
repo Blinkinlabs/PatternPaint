@@ -8,12 +8,13 @@
 
 // Pattern table definitions
 #define PATTERN_TABLE_ADDRESS  (0x7000 - 0x80)   // Location of the pattern table in the flash memory
-#define PATTERN_TABLE_HEADER_LENGTH     3        // Length of the header, in bytes
+#define PATTERN_TABLE_HEADER_LENGTH     11       // Length of the header, in bytes
 #define PATTERN_TABLE_ENTRY_LENGTH      7        // Length of each entry, in bytes
 
 // Header data sections
 #define PATTERN_COUNT_OFFSET    0    // Number of patterns in the pattern table (1 byte)
 #define LED_COUNT_OFFSET        1    // Number of LEDs in the pattern (2 bytes)
+#define BRIGHTNESS_OFFSET       2    // Brightness table (8 bytes)
 
 // Entry data sections
 #define ENCODING_TYPE_OFFSET    0    // Encoding (1 byte)
@@ -23,18 +24,20 @@
 
 
 // LED data array
-struct CRGB leds[LED_COUNT];   // Space to hold the pattern
-uint16_t ledCount;             // Actual number of LEDs present
+struct CRGB leds[MAX_LEDS];   // Space to hold the pattern
+CLEDController* controller;   // LED controller
 
 // Pattern information
-volatile uint8_t patternCount;         // Number of available patterns
-volatile uint8_t currentPattern;         // Index of the current patter
+uint8_t patternCount;         // Number of available patterns
+uint8_t currentPattern;       // Index of the current patter
 Animation pattern;            // Current pattern
-int frameDelay = 30;          // Number of ms each frame should be displayed.
+uint16_t frameDelay = 30;     // Number of ms each frame should be displayed.
+
+uint16_t ledCount;            // Number of LEDs used in the current sketch
 
 #define BRIGHT_STEP_COUNT 8
 #define STARTING_BRIGHTNESS 4
-volatile uint8_t brightnesSteps[BRIGHT_STEP_COUNT] = {5,15,40,70,93, 70, 40, 15};
+uint8_t brightnesSteps[BRIGHT_STEP_COUNT];
 
 uint8_t brightness = STARTING_BRIGHTNESS;
 uint8_t lastBrightness = STARTING_BRIGHTNESS;
@@ -129,12 +132,22 @@ void setup()
   // First, load the pattern count and LED geometry from the pattern table
   patternCount = pgm_read_byte(PATTERN_TABLE_ADDRESS + PATTERN_COUNT_OFFSET);
   ledCount     = pgm_read_word(PATTERN_TABLE_ADDRESS + LED_COUNT_OFFSET);
+
+  // Bounds check for the LED count
+  if(ledCount > MAX_LEDS) {
+    ledCount = MAX_LEDS;
+  }
+
+  // Next, read the brightness table.
+  for(uint8_t i = 0; i < BRIGHT_STEP_COUNT; i++) {
+    brightnesSteps[i] = pgm_read_byte(PATTERN_TABLE_ADDRESS + BRIGHTNESS_OFFSET + i);
+  }
   
   // Now, read the first pattern from the table
   // TODO: Read a different pattern?
   loadPattern(0);
 
-  LEDS.addLeds<WS2811, LED_OUT, GRB>(leds, LED_COUNT);
+  LEDS.addLeds<WS2811, LED_OUT, GRB>(leds, ledCount);
   LEDS.setBrightness(brightnesSteps[brightness]);
   LEDS.show();
 }

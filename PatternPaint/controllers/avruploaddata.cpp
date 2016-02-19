@@ -58,9 +58,16 @@ bool avrUploadData::init(QList<PatternWriter> &patterns)
     qDebug() << buff;
 
     patternTable.append(static_cast<char>(patterns.count()));       // Offset 0: Pattern count (1 byte)
-    patternTable += encodeWordLSB(patterns.first().getLedCount());         // Offset 1: Number of LEDs connected to the controller (2 bytes)
-
     // TODO: make the LED count to a separate, explicit parameter?
+    patternTable += encodeWordLSB(patterns.first().getLedCount());  // Offset 1: Number of LEDs connected to the controller (2 bytes)
+    patternTable.append(static_cast<char>(1));       // Offset 2: Brightness steps (8 bytes)
+    patternTable.append(static_cast<char>(5));
+    patternTable.append(static_cast<char>(10));
+    patternTable.append(static_cast<char>(20));
+    patternTable.append(static_cast<char>(40));
+    patternTable.append(static_cast<char>(80));
+    patternTable.append(static_cast<char>(160));
+    patternTable.append(static_cast<char>(240));
 
     int dataOffset = sketch.length();
 

@@ -3,6 +3,6 @@
 
 #include <FastLED.h>
 
-extern void serialLoop(CRGB* leds);
+void serialLoop(CRGB* leds);
 
 #endif

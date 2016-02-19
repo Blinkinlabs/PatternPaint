@@ -3,18 +3,12 @@
 
 #include <FastLED.h>
 
-#define LED_COUNT 300    // Number of LEDs connected to the board. This is also the maximum number of LEDs that can be controlled via serial
+const uint16_t MAX_LEDS = 512;       // Maximum number of LEDs that can be controlled
 
 #define LED_OUT       13
 #define BUTTON_IN     10
 #define ANALOG_INPUT  A9
 #define EXTRA_PIN_A    7
 #define EXTRA_PIN_B   11
-
-class Pattern {
-  public:
-    virtual void draw(CRGB * leds);
-    virtual void reset();
-};
 
 #endif
