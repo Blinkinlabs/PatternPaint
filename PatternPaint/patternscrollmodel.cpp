@@ -86,8 +86,10 @@ QVariant PatternScrollModel::data(const QModelIndex &index, int role) const
     if (role == FrameImage || role == Qt::EditRole) {
         // TODO: Handle splits!
         QImage frame(state.frameSize, QImage::Format_ARGB32_Premultiplied);
-        QPainter painter;
-        painter.begin(&frame);
+        QPainter painter(&frame);
+
+        painter.setBrush(QBrush(QColor(0,0,0,255)));
+        painter.drawRect(0,0,frame.width(),frame.height());
 
         if (index.row() < state.image.width() - state.frameSize.width()) {
             painter.drawImage(0, 0, state.image, index.row(), 0, state.frameSize.width(), state.frameSize.height());
