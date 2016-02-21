@@ -1,5 +1,6 @@
 #include <animation.h>
 
+#include <EEPROM.h>
 #include <FastLED.h>
 #include <avr/pgmspace.h>
 
@@ -24,7 +25,7 @@
 
 
 // LED data array
-struct CRGB leds[MAX_LEDS];   // Space to hold the pattern
+struct CRGB leds[MAX_LEDS];   // Space to hold the current LED data
 CLEDController* controller;   // LED controller
 
 // Pattern information
@@ -35,12 +36,11 @@ uint16_t frameDelay = 30;     // Number of ms each frame should be displayed.
 
 uint16_t ledCount;            // Number of LEDs used in the current sketch
 
-#define BRIGHT_STEP_COUNT 8
-#define STARTING_BRIGHTNESS 4
-uint8_t brightnesSteps[BRIGHT_STEP_COUNT];
+const uint8_t brightnessCount = 8;
+uint8_t brightnesSteps[brightnessCount];
 
-uint8_t brightness = STARTING_BRIGHTNESS;
-uint8_t lastBrightness = STARTING_BRIGHTNESS;
+uint8_t currentBrightness;
+uint8_t lastBrightness;
 
 // Button interrupt variables and Interrupt Service Routine
 uint8_t buttonState = 0;
@@ -51,9 +51,19 @@ long buttonPressTime = 0;
 #define BUTTON_BRIGHTNESS_SWITCH_TIME  1     // Time to hold the button down to switch brightness
 #define BUTTON_PATTERN_SWITCH_TIME    1000   // Time to hold the button down to switch patterns
 
+#define EEPROM_START_ADDRESS  0
+#define EEPROM_MAGIG_BYTE_0   0x12
+#define EEPROM_MAGIC_BYTE_1   0x34
+#define PATTERN_EEPROM_ADDRESS EEPROM_START_ADDRESS + 2
+#define BRIGHTNESS_EEPROM_ADDRESS EEPROM_START_ADDRESS + 3
+
 // Read the pattern data from the end of the program memory, and construct a new Pattern from it.
-void loadPattern(uint8_t newPattern) {
-  currentPattern = newPattern;
+void setPattern(uint8_t newPattern) {
+  currentPattern = newPattern%patternCount;
+
+  if(EEPROM.read(PATTERN_EEPROM_ADDRESS) != newPattern) {
+    EEPROM.write(PATTERN_EEPROM_ADDRESS, newPattern);
+  }
   
   uint16_t patternEntryAddress =
         PATTERN_TABLE_ADDRESS
@@ -68,6 +78,16 @@ void loadPattern(uint8_t newPattern) {
   frameDelay = pgm_read_word(patternEntryAddress + FRAME_DELAY_OFFSET);
 
   pattern.init(frameCount, frameData, encodingType, ledCount);
+}
+
+void setBrightness(uint8_t newBrightness) {
+  currentBrightness = newBrightness%brightnessCount;
+
+  if(EEPROM.read(BRIGHTNESS_EEPROM_ADDRESS) != currentBrightness) {
+    EEPROM.write(BRIGHTNESS_EEPROM_ADDRESS, currentBrightness);
+  }
+  
+  LEDS.setBrightness(brightnesSteps[currentBrightness]);
 }
 
 // Called when the button is both pressed and released.
@@ -98,9 +118,9 @@ ISR(TIMER4_OVF_vect) {
   // If the user is still holding down the button after the first cycle, they were serious about it.
   if(buttonDebounced == false) {
     buttonDebounced = true;
-    lastBrightness = brightness;
-    brightness = (brightness + 1) % BRIGHT_STEP_COUNT;
-    LEDS.setBrightness(brightnesSteps[brightness]);
+
+    lastBrightness = currentBrightness;
+    setBrightness(currentBrightness+1);
   }
   
   // If we've waited long enough, switch the pattern
@@ -108,10 +128,9 @@ ISR(TIMER4_OVF_vect) {
   buttonPressTime = millis() - buttonDownTime;
   if(buttonPressTime > BUTTON_PATTERN_SWITCH_TIME) {
     // first unroll the brightness!
-    brightness = lastBrightness;
-    LEDS.setBrightness(brightnesSteps[brightness]);
+    setBrightness(lastBrightness);
     
-    loadPattern((currentPattern+1)%patternCount);
+    setPattern(currentPattern+1);
     
     // Finally, reset the button down time, so we don't advance again too quickly
     buttonDownTime = millis();
@@ -133,22 +152,35 @@ void setup()
   patternCount = pgm_read_byte(PATTERN_TABLE_ADDRESS + PATTERN_COUNT_OFFSET);
   ledCount     = pgm_read_word(PATTERN_TABLE_ADDRESS + LED_COUNT_OFFSET);
 
+  // Next, read the brightness table.
+  for(uint8_t i = 0; i < brightnessCount; i++) {
+    brightnesSteps[i] = pgm_read_byte(PATTERN_TABLE_ADDRESS + BRIGHTNESS_OFFSET + i);
+  }
+
   // Bounds check for the LED count
+  // Note that if this is out of bounds,the patterns will be displayed incorrectly.
   if(ledCount > MAX_LEDS) {
     ledCount = MAX_LEDS;
   }
 
-  // Next, read the brightness table.
-  for(uint8_t i = 0; i < BRIGHT_STEP_COUNT; i++) {
-    brightnesSteps[i] = pgm_read_byte(PATTERN_TABLE_ADDRESS + BRIGHTNESS_OFFSET + i);
+  // If the EEPROM hasn't been initialized, do so now
+  if((EEPROM.read(EEPROM_START_ADDRESS) != EEPROM_MAGIG_BYTE_0)
+     || (EEPROM.read(EEPROM_START_ADDRESS + 1) != EEPROM_MAGIC_BYTE_1)) {
+    EEPROM.write(EEPROM_START_ADDRESS, EEPROM_MAGIG_BYTE_0);
+    EEPROM.write(EEPROM_START_ADDRESS + 1, EEPROM_MAGIC_BYTE_1);
+    EEPROM.write(PATTERN_EEPROM_ADDRESS, 0);
+    EEPROM.write(BRIGHTNESS_EEPROM_ADDRESS, 0);
   }
+
+  // Read in the last-used pattern and brightness
+  currentPattern = EEPROM.read(PATTERN_EEPROM_ADDRESS);
+  currentBrightness = EEPROM.read(BRIGHTNESS_EEPROM_ADDRESS);
   
   // Now, read the first pattern from the table
-  // TODO: Read a different pattern?
-  loadPattern(0);
+  setPattern(currentPattern);
+  setBrightness(currentBrightness);
 
-  LEDS.addLeds<WS2811, LED_OUT, GRB>(leds, ledCount);
-  LEDS.setBrightness(brightnesSteps[brightness]);
+  controller = &(LEDS.addLeds<WS2811, LED_OUT, GRB>(leds, ledCount));
   LEDS.show();
 }
 
@@ -162,6 +194,7 @@ void loop()
   }
   
   pattern.draw(leds);
+  
   // TODO: More sophisticated wait loop to get constant framerate.
   delay(frameDelay);
 }
