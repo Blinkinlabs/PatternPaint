@@ -3,7 +3,7 @@
 # Pattern Paint
 # http://blinkinlabs.com/patternpaint
 #
-# Copyright 2013, 2014, 2015 Blinkinlabs, LLC
+# Copyright 2013, 2014, 2015, 2016 Blinkinlabs, LLC
 #
 #-------------------------------------------------
 
@@ -17,11 +17,6 @@ UI_DIR = $$OBJECTS_DIR/uic
 
 TARGET = PatternPaint
 TEMPLATE = app
-
-#Application version
-#VERSION_MAJOR = 2
-#VERSION_MINOR = 0
-#VERSION_BUILD = 3
 
 #Target version and application information
 #VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
