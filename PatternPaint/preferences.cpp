@@ -10,6 +10,9 @@
 #define WINDOWS_RELEASE_APPCAST_DEFAULT \
     "http://software.blinkinlabs.com/patternpaint/patternpaint-windows.xml"
 
+// TODO: This comes from avruploaddata.cpp
+#define BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT 36
+
 Preferences::Preferences(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Preferences)
@@ -29,6 +32,10 @@ Preferences::Preferences(QWidget *parent) :
     ui->updateURL->setText(settings.value("Updates/releaseAppcastUrl",
                                           WINDOWS_RELEASE_APPCAST_DEFAULT).toString());
 #endif
+
+    ui->blinkyTapeMaxBrightness->setMaximum(100);
+    ui->blinkyTapeMaxBrightness->setMinimum(1);
+    ui->blinkyTapeMaxBrightness->setValue(settings.value("BlinkyTape/maxBrightness", BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT).toInt());
 
     setUpdater(NULL);
 }
@@ -78,6 +85,9 @@ void Preferences::accept()
         // TODO: Does the updater store this on or behalf, or should we restore it at program start?
         autoUpdater->setAutomatic(ui->automaticUpdateCheck->isChecked());
     }
+
+    if(ui->blinkyTapeMaxBrightness->value() != settings.value("BlinkyTape/maxBrightness", BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT).toInt())
+        settings.setValue("BlinkyTape/maxBrightness", ui->blinkyTapeMaxBrightness->value());
 }
 
 void Preferences::on_checkForUpdates_clicked()

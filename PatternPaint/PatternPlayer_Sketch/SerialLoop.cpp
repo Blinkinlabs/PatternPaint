@@ -20,7 +20,7 @@ void serialLoop(CRGB* leds) {
         
         // Check if we need to enable more output LEDs
         if(currentPixel > controller->size()) {
-          controller->setLeds(leds, currentPixel - 1);
+          controller->setLeds(leds, currentPixel);
         }
         
         LEDS.show();

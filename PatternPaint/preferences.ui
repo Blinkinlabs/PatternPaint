@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>574</width>
-    <height>207</height>
+    <height>231</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -98,7 +98,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="spinBox"/>
+        <widget class="QSpinBox" name="blinkyTapeMaxBrightness"/>
        </item>
       </layout>
      </item>
