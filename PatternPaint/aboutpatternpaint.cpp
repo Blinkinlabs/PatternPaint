@@ -25,7 +25,7 @@ AboutPatternPaint::AboutPatternPaint(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->versionLabel->setText(QString("Version %1").arg(VERSION_STRING));
+    ui->versionLabel->setText(QString("Version %1").arg(GIT_VERSION));
 
     // Fit all the label text inside the label
     fitTextToLabel(ui->versionLabel);

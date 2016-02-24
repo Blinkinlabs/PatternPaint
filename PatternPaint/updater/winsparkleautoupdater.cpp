@@ -26,7 +26,7 @@ WinSparkleAutoUpdater::WinSparkleAutoUpdater(const QString &url)
     win_sparkle_set_app_details(
         W(ORGANIZATION_NAME),
         W(APPLICATION_NAME),
-        W(VERSION_STRING));
+        W(GIT_VERSION));
 }
 
 void WinSparkleAutoUpdater::init()
