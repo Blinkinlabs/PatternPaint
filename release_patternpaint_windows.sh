@@ -40,7 +40,7 @@ OUTDIR='PatternPaintWindows/'
 TEMPDIR='TempWindowsBuild'
 
 
-VERSION='2.0.3'
+VERSION='0.1.0'
 
 
 ################## New directory #################################
@@ -87,6 +87,17 @@ else
 	git pull
 	cd ..
 fi
+
+################### Extract the version info ###################
+cd ${PATTERNPAINT}/PatternPaint
+
+GIT_COMMAND="git -C ${PWD}"
+GIT_VERSION=`${GIT_COMMAND} describe --always --tags 2> /dev/null`
+VERSION=`echo ${GIT_VERSION} | sed 's/-/\./g' | sed 's/g//g'`
+
+echo "PatternPaint version: " ${VERSION}
+
+cd ../../
 
 ################## Build PatternPaint ###################
 cd ${PATTERNPAINT}/PatternPaint
