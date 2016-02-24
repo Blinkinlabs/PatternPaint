@@ -3,7 +3,6 @@
 # Stop at any error
 set -e
 
-VERSION="2.0.3"
 
 # Pull in the QT tools
 export QTDIR=~/Qt5.4.1/5.4/clang_64/
@@ -18,9 +17,16 @@ echo "Building in: " `pwd`
 
 # Get the repository
 git clone https://github.com/Blinkinlabs/PatternPaint.git
+cd PatternPaint/PatternPaint
+
+# Extract the version
+GIT_COMMAND="git -C ${PWD}"
+GIT_VERSION=`${GIT_COMMAND} describe --always --tags 2> /dev/null`
+VERSION=`echo ${GIT_VERSION} | sed 's/-/\./g' | sed 's/g//g'`
+
+echo "PatternPaint version: " ${VERSION}
 
 # Build PatternPaint
-cd PatternPaint/PatternPaint
 ${QTDIR}/bin/qmake -config release OBJECTS_DIR=build MOC_DIR=build/moc RCC_DIR=build/rcc UI_DIR=build/uic
 make -j
 cd ..
