@@ -39,12 +39,10 @@
 #include <QDebug>
 
 
-#define OSX_RELEASE_APPCAST_DEFAULT \
-    "http://software.blinkinlabs.com/patternpaint/patternpaint-osx.xml"
-#define WINDOWS_RELEASE_APPCAST_DEFAULT \
-    "http://software.blinkinlabs.com/patternpaint/patternpaint-windows.xml"
-
-
+#define OSX_RELEASE_APPCAST_URL \
+    "https://software.blinkinlabs.com/patternpaint/patternpaint-osx.xml"
+#define WINDOWS_RELEASE_APPCAST_URL \
+    "https://software.blinkinlabs.com/patternpaint/patternpaint-windows.xml"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -253,15 +251,11 @@ MainWindow::MainWindow(QWidget *parent) :
 #else
 
 #if defined(Q_OS_MACX)
-    QString updateUrl
-        = settings.value("Updates/releaseAppcastUrl", OSX_RELEASE_APPCAST_DEFAULT).toString();
-    autoUpdater = new SparkleAutoUpdater(updateUrl);
+    autoUpdater = new SparkleAutoUpdater(OSX_RELEASE_APPCAST_URL);
 #endif // Q_OS__MACX
 
 #if defined(Q_OS_WIN)
-    QString updateUrl
-        = settings.value("Updates/releaseAppcastUrl", WINDOWS_RELEASE_APPCAST_DEFAULT).toString();
-    autoUpdater = new WinSparkleAutoUpdater(updateUrl);
+    autoUpdater = new WinSparkleAutoUpdater(WINDOWS_RELEASE_APPCAST_URL);
 #endif // Q_OS_WIN
 
 #endif  // DISABLE_UPDATE_CHECKS
