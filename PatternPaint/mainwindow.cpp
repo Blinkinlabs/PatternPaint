@@ -180,6 +180,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Workaround for bug in QT 5.5.1
 #if defined(PROGRESS_DIALOG_WORKAROUND)
+#warning Progress dialog workaround enabled
     progressDialog.reset();
     progressDialog.hide();
 #endif
