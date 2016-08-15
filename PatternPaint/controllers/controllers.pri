@@ -8,7 +8,11 @@ HEADERS += \
     $$PWD/avr109commands.h \
     $$PWD/serialcommand.h \
     $$PWD/lightbuddycommands.h \
-    $$PWD/blinkypendantcommands.h
+    $$PWD/blinkypendantcommands.h \
+    $$PWD/leoblinky.h \
+    $$PWD/leoblinkycontrollerinfo.h \
+    $$PWD/leoblinkyuploader.h \
+    $$PWD/leoblinkycommands.h
 
 SOURCES += \
     $$PWD/blinkycontroller.cpp \
@@ -17,7 +21,11 @@ SOURCES += \
     $$PWD/avr109commands.cpp \
     $$PWD/serialcommand.cpp \
     $$PWD/lightbuddycommands.cpp \
-    $$PWD/blinkypendantcommands.cpp
+    $$PWD/blinkypendantcommands.cpp \
+    $$PWD/leoblinky.cpp \
+    $$PWD/leoblinkycontrollerinfo.cpp \
+    $$PWD/leoblinkyuploader.cpp \
+    $$PWD/leoblinkycommands.cpp
 
 # For platforms that have serial ports
 # TODO: Pull hard-coded references to BlinkyTape from the gui, allowing this section to be switchable

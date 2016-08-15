@@ -28,6 +28,7 @@
 #include "patterncollection.h"
 #include "fixture.h"
 #include "matrixfixture.h"
+#include "leoblinky2016.h"
 #include "preferences.h"
 #include "defaults.h"
 
@@ -50,6 +51,9 @@ MainWindow::MainWindow(QWidget *parent) :
     progressDialog(this)
 {
     setupUi(this);
+
+    //    // TODO: Why?
+    this->setVisible(true);
 
 #if defined(Q_OS_MACX)
     CocoaInitializer cocoaInitiarizer;  // TODO: We only need to call this temporarily, right?
@@ -199,18 +203,35 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QSettings settings;
 
-    restoreGeometry(settings.value("MainWindow/geometry").toByteArray());
-    restoreState(settings.value("MainWindow/state").toByteArray());
+    // TODO: re-enable once this is showing correctly
+//    const QByteArray geometry = settings.value("MainWindow/geometry", QByteArray()).toByteArray();
+//    if (geometry.isEmpty()) {
+//        const QRect availableGeometry = QApplication::desktop()->availableGeometry(this);
+//        resize(availableGeometry.width() / 3, availableGeometry.height() / 2);
+//        move((availableGeometry.width() - width()) / 2,
+//             (availableGeometry.height() - height()) / 2);
+//    } else {
+//        restoreGeometry(geometry);
+//    }
+
+//    restoreState(settings.value("MainWindow/state").toByteArray());
 
     // Fill the examples menu using the examples resource
     populateExamplesMenu(":/examples", menuExamples);
 
+//    fixture
+//        = new MatrixFixture(settings.value("Fixture/DisplaySize",
+//                                           QSize(DEFAULT_FIXTURE_WIDTH,
+//                                                 DEFAULT_FIXTURE_HEIGHT)).toSize(),
+//                            (ColorMode)settings.value("Fixture/ColorOrder", RGB).toInt(),
+//                            new ExponentialBrightness(1.8, 1.8, 2.1));
     fixture
-        = new MatrixFixture(settings.value("Fixture/DisplaySize",
+        = new LeoBlinky2016(settings.value("Fixture/DisplaySize",
                                            QSize(DEFAULT_FIXTURE_WIDTH,
                                                  DEFAULT_FIXTURE_HEIGHT)).toSize(),
                             (ColorMode)settings.value("Fixture/ColorOrder", RGB).toInt(),
                             new ExponentialBrightness(1.8, 1.8, 2.1));
+
     frameEditor->setFixture(fixture);
     outputPreview->setFixture(fixture);
 

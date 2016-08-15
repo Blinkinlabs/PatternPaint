@@ -1,6 +1,7 @@
 #include "blinkycontroller.h"
 #include "controllerinfo.h"
 #include "blinkytapecontrollerinfo.h"
+#include "leoblinkycontrollerinfo.h"
 
 #include <QList>
 #include <QSerialPortInfo>
@@ -37,6 +38,10 @@ QList<QPointer<ControllerInfo> > BlinkyController::probe()
         else if (info.vendorIdentifier() == LIGHTBUDDY_SKETCH_VID
                  && info.productIdentifier() == LIGHTBUDDY_SKETCH_PID)
             controllerInfos.push_back(new BlinkyTapeControllerInfo(info));
+        // Even LeoBlinkies!
+        else if (info.vendorIdentifier() == LEOBLINKY2016_SKETCH_VID
+                 && info.productIdentifier() == LEOBLINKY2016_SKETCH_PID)
+            controllerInfos.push_back(new LeoBlinkyControllerInfo(info));
     }
 
     return controllerInfos;

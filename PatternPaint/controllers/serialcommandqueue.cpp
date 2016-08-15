@@ -98,7 +98,7 @@ void SerialCommandQueue::processQueue()
         return;
     }
 
-// qDebug() << "Starting Command:" << queue.front().name;
+    qDebug() << "Starting Command:" << queue.front().name;
     responseData.clear();
 
     if (serial->write(queue.front().data)
@@ -124,10 +124,10 @@ void SerialCommandQueue::handleReadData()
     if (isConnected())
         responseData.append(serial->readAll());
 
-// for(int i = 0; i < responseData.count(); i++)
-// qDebug() << "Data at " << i << ": "
-// << (int)responseData.at(i)
-// << "(" << responseData.at(i) << ")";
+ for(int i = 0; i < responseData.count(); i++)
+     qDebug() << "Data at " << i << ": "
+        << (int)responseData.at(i)
+        << "(" << responseData.at(i) << ")";
 
     if (responseData.length() > queue.front().expectedResponse.length()) {
         // TODO: error, we got unexpected data.
