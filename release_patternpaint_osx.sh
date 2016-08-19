@@ -5,18 +5,21 @@ set -e
 
 
 # Pull in the QT tools
-export QTDIR=~/Qt5.4.1/5.4/clang_64/
 #export QTDIR=~/Qt/5.5/clang_64/
+#export QTDIR=~/Qt5.4.1/5.4/clang_64/
+export QTDIR=~/Qt5.7.0/5.7/clang_64/
 
 OUTPUTDIR=`pwd`
 echo "Output to: " ${OUTPUTDIR}
 
 # Move to a temporary directory
 pushd $(mktemp -d -t PatternPaint)
-echo "Building in: " `pwd`
+
+BUILDDIR=`pwd`
+echo "Building in: " ${BUILDDIR}
 
 # Get the repository
-git clone https://github.com/Blinkinlabs/PatternPaint.git
+git clone --depth 1 -b leoblinky https://github.com/Blinkinlabs/PatternPaint.git 
 cd PatternPaint/PatternPaint
 
 # Extract the version
@@ -48,7 +51,8 @@ codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" P
 # Note: macdeployqt seems to freeze in Qt 5.5.1. Using workaround.
 # TODO: This is a workaround for toolchain changes in 5.5.1
 #export QTDIR=~/Qt5.4.1/5.4/clang_64/
-${QTDIR}/bin/macdeployqt PatternPaint/PatternPaint.app/ -codesign="Developer ID Application: Blinkinlabs, LLC" -dmg
+#${QTDIR}/bin/macdeployqt PatternPaint/PatternPaint.app/ -codesign="Developer ID Application: Blinkinlabs, LLC" -dmg
+cd ${QTDIR}/bin/ && ./macdeployqt ${BUILDDIR}/PatternPaint/PatternPaint/PatternPaint.app/ -codesign="Developer ID Application: Blinkinlabs, LLC" -dmg
 
 # Perform a quick verification of the application signature
 codesign --verify --verbose=4 PatternPaint/PatternPaint.app

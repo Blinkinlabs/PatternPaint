@@ -7,7 +7,7 @@
 #
 #-------------------------------------------------
 
-QT += widgets gui core multimedia
+QT += widgets gui core
 
 # Specificy where to place the object files so they don't clutter the source tree
 OBJECTS_DIR = tmp
