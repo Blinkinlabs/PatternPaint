@@ -16,7 +16,7 @@ Pattern::Pattern(PatternType type, QSize patternSize, int frameCount, QListWidge
     // TODO: Choose a pattern type!
     switch (type) {
     case FrameBased:
-    case VideoBased:
+    case ImageSequence:
         model = new PatternFrameModel(patternSize, this);
         playbackIndicator = false;
         timeline = true;
@@ -66,7 +66,7 @@ QString Pattern::getName() const
 }
 
 // TODO: Rework as a factory?
-bool Pattern::load(const QString &newFileName)
+bool Pattern::load(const QStringList &newFileList)
 {
 
     switch (type) {
@@ -74,7 +74,7 @@ bool Pattern::load(const QString &newFileName)
     {
         // Attempt to load the iamge
         QImage sourceImage;
-        if (!sourceImage.load(newFileName))
+        if (!sourceImage.load(newFileList[0]))
             return false;
 
         QSize frameSize = model->data(model->index(0), PatternModel::FrameSize).toSize();
@@ -102,7 +102,7 @@ bool Pattern::load(const QString &newFileName)
         }
 
         // If successful, record the filename and clear the undo stack.
-        model->setData(model->index(0), newFileName, PatternModel::FileName);
+        model->setData(model->index(0), newFileList[0], PatternModel::FileName);
         model->setData(model->index(0), false, PatternModel::Modified);
 
         break;
@@ -111,7 +111,7 @@ bool Pattern::load(const QString &newFileName)
     {
         // Attempt to load the iamge
         QImage sourceImage;
-        if (!sourceImage.load(newFileName))
+        if (!sourceImage.load(newFileList[0]))
             return false;
 
         QSize frameSize = model->data(model->index(0), PatternModel::FrameSize).toSize();
@@ -130,22 +130,52 @@ bool Pattern::load(const QString &newFileName)
         model->setData(model->index(0), sourceImage, PatternModel::EditImage);
 
         // If successful, record the filename and clear the undo stack.
-        model->setData(model->index(0), newFileName, PatternModel::FileName);
+        model->setData(model->index(0), newFileList[0], PatternModel::FileName);
         model->setData(model->index(0), false, PatternModel::Modified);
 
         break;
     }
-    case VideoBased:
+    case ImageSequence:
     {
-        // Importing a video using QMediaPlayer is a couple step process. We need to
+        // Attempt to load the images as a series of frames
+        QImage sourceImage;
+        if (!sourceImage.load(newFileList[0]))
+            return false;
 
-        QMediaPlayer player;
-//        connect(player, SIGNAL(positionChanged(qint64)), this, SLOT(positionChanged(qint64)));
-        player.setMedia(QUrl::fromLocalFile(newFileName));
-        player.pause();
+        QSize frameSize = model->data(model->index(0), PatternModel::FrameSize).toSize();
 
-        player.
+        // TODO: Warn if the source image wasn't of the expected aperture?
+        int targetWidth = sourceImage.width()*frameSize.height()/(float)sourceImage.height();
+        if(targetWidth == 0)
+            targetWidth = 1;
 
+        sourceImage = sourceImage.scaled(targetWidth, frameSize.height());
+        int newFrameCount = newFileList.length();
+
+        model->removeRows(0, model->rowCount());
+        model->insertRows(0, newFrameCount);
+
+        QPainter painter;
+        for (int i = 0; i < newFrameCount; i++) {
+            if (!sourceImage.load(newFileList[i]))
+                return false;
+
+            sourceImage = sourceImage.scaled(targetWidth, frameSize.height());
+
+            QImage newFrameData(frameSize, QImage::Format_ARGB32_Premultiplied);
+            painter.begin(&newFrameData);
+            painter.fillRect(newFrameData.rect(), QColor(0, 0, 0));
+            painter.drawImage(QPoint(0, 0), sourceImage,
+                              QRect(0, 0, frameSize.width(), frameSize.height()));
+            painter.end();
+            model->setData(model->index(i), newFrameData, PatternModel::FrameImage);
+        }
+
+        // If successful, record the filename and clear the undo stack.
+        model->setData(model->index(0), newFileList[0], PatternModel::FileName);
+        model->setData(model->index(0), false, PatternModel::Modified);
+
+        break;
     }
         break;
     }

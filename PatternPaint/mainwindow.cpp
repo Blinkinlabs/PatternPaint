@@ -934,8 +934,11 @@ void MainWindow::applyScene(SceneTemplate sceneTemplate)
                 if (fileinfo.fileName().endsWith(".frames.png"))
                     type = Pattern::FrameBased;
 
+                QStringList list;
+                list.append(sceneTemplate.examples + "/" + fileinfo.fileName());
+
                 loadPattern(type,
-                            sceneTemplate.examples + "/" + fileinfo.fileName());
+                            list);
             }
         }
 
@@ -953,7 +956,7 @@ void MainWindow::connectUploader()
             uploader, SLOT(cancel()));
 }
 
-bool MainWindow::loadPattern(Pattern::PatternType type, const QString fileName)
+bool MainWindow::loadPattern(Pattern::PatternType type, const QStringList fileList)
 {
     QSettings settings;
     int frameCount = settings.value("Options/FrameCount", DEFAULT_FRAME_COUNT).toUInt();
@@ -965,8 +968,8 @@ bool MainWindow::loadPattern(Pattern::PatternType type, const QString fileName)
     Pattern *pattern = new Pattern(type, displaySize, frameCount);
 
     // TODO: Fix load procedure fit the pattern type
-    if (!fileName.isEmpty())
-        if (!pattern->load(fileName))
+    if (!fileList.isEmpty())
+        if (!pattern->load(fileList))
             return false;
 
     int newPosition = 0;
@@ -1209,8 +1212,9 @@ void MainWindow::on_ExampleSelected(QAction *action)
     Pattern::PatternType type = Pattern::Scrolling;
     if (action->objectName().endsWith(".frames.png"))
         type = Pattern::FrameBased;
-
-    if (!loadPattern(type, action->objectName())) {
+    QStringList list;
+    list.append(action->objectName());
+    if (!loadPattern(type, list)) {
         showError("Could not open file "
                   + action->objectName()
                   + ". Perhaps it has a formatting problem?");
@@ -1220,12 +1224,12 @@ void MainWindow::on_ExampleSelected(QAction *action)
 
 void MainWindow::on_actionNew_ScrollingPattern_triggered()
 {
-    loadPattern(Pattern::Scrolling, QString());
+    loadPattern(Pattern::Scrolling, QStringList());
 }
 
 void MainWindow::on_actionNew_FramePattern_triggered()
 {
-    loadPattern(Pattern::FrameBased, QString());
+    loadPattern(Pattern::FrameBased, QStringList());
 }
 
 void MainWindow::on_actionConfigure_Fixture_triggered()
@@ -1265,27 +1269,30 @@ void MainWindow::openPattern(Pattern::PatternType type)
     switch(type) {
     case Pattern::Scrolling:
     case Pattern::FrameBased:
-        fileExtension = tr("Pattern Files (*.png *.jpg *.bmp *.gif)");
+        fileExtension = tr("Pattern Files (*.png *.jpg *.bmp)");
         break;
-    case Pattern::VideoBased:
-        fileExtension = tr("Video files (*.avi *.mpg *.mpeg)");
+    case Pattern::ImageSequence:
+        fileExtension = tr("Pattern Frames (*.png *.jpg *.bmp)");
         break;
     }
 
-    QString fileName = QFileDialog::getOpenFileName(this,
-                                                    tr("Open Pattern"), lastDirectory,
-                                                    fileExtension);
+    QStringList fileList = QFileDialog::getOpenFileNames(this,
+                                              tr("Open Pattern"), lastDirectory,
+                                              fileExtension);
 
-    if (fileName.length() == 0)
+//    QString fileName = QFileDialog::getOpenFileName(this,
+//                                                    tr("Open Pattern"), lastDirectory,
+//                                                    fileExtension);
+
+    if (fileList.length() == 0)
         return;
 
-    QFileInfo fileInfo(fileName);
-    settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
+//    QFileInfo fileInfo(fileName);
+//    settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
 
     // TODO: choose scrolling/frame-based
-    if (!loadPattern(type, fileName)) {
-        showError(tr("Could not open file %1. Perhaps it has a formatting problem?")
-                  .arg(fileName));
+    if (!loadPattern(type, fileList)) {
+        showError(tr("Could not open file. Perhaps it has a formatting problem?"));
         return;
     }
 }
@@ -1303,7 +1310,7 @@ void MainWindow::on_actionOpen_Frame_based_Pattern_triggered()
 
 void MainWindow::on_actionOpen_Video_triggered()
 {
-    openPattern(Pattern::VideoBased);
+    openPattern(Pattern::ImageSequence);
 }
 
 

@@ -1143,7 +1143,7 @@
   </action>
   <action name="actionOpen_Video">
    <property name="text">
-    <string>Video...</string>
+    <string>Images as Pattern Frames...</string>
    </property>
   </action>
  </widget>

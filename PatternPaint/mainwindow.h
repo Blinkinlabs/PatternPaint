@@ -188,7 +188,7 @@ private:
 
     void connectUploader();
 
-    bool loadPattern(Pattern::PatternType type, const QString fileName);
+    bool loadPattern(Pattern::PatternType type, const QStringList fileList);
 
     void setPatternName(QString name);
 

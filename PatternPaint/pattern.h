@@ -17,7 +17,7 @@ public:
     enum PatternType {
         Scrolling,
         FrameBased,
-        VideoBased
+        ImageSequence
     };
 
     /// Constructor for an empty pattern item
@@ -43,8 +43,8 @@ public:
     QString getName() const;
 
     /// Initialize the pattern from an image file
-    /// @param newFileInfo URL of file to load
-    bool load(const QString &newFileName);
+    /// @param newFileList URL of file to load
+    bool load(const QStringList &newFileList);
 
     /// Save the pattern
     /// Note: The file must already have a filename, otherwise use saveAs
