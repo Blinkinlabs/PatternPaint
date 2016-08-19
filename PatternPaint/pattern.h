@@ -16,7 +16,8 @@ class Pattern : public QObject
 public:
     enum PatternType {
         Scrolling,
-        FrameBased
+        FrameBased,
+        VideoBased
     };
 
     /// Constructor for an empty pattern item

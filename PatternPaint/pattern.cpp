@@ -5,6 +5,7 @@
 
 #include <QDebug>
 #include <QPainter>
+#include <QMediaPlayer>
 
 Pattern::Pattern(PatternType type, QSize patternSize, int frameCount, QListWidget *parent) :
     QObject(parent),
@@ -15,6 +16,7 @@ Pattern::Pattern(PatternType type, QSize patternSize, int frameCount, QListWidge
     // TODO: Choose a pattern type!
     switch (type) {
     case FrameBased:
+    case VideoBased:
         model = new PatternFrameModel(patternSize, this);
         playbackIndicator = false;
         timeline = true;
@@ -25,7 +27,6 @@ Pattern::Pattern(PatternType type, QSize patternSize, int frameCount, QListWidge
         timeline = false;
         break;
     default:
-        // ??
         break;
     }
 
@@ -64,18 +65,18 @@ QString Pattern::getName() const
     return fileInfo.baseName();
 }
 
+// TODO: Rework as a factory?
 bool Pattern::load(const QString &newFileName)
 {
-    QImage sourceImage;
-
-    // Attempt to load the iamge
-    if (!sourceImage.load(newFileName))
-        return false;
-
 
     switch (type) {
     case FrameBased:
     {
+        // Attempt to load the iamge
+        QImage sourceImage;
+        if (!sourceImage.load(newFileName))
+            return false;
+
         QSize frameSize = model->data(model->index(0), PatternModel::FrameSize).toSize();
 
         // TODO: Warn if the source image wasn't of the expected aperture?
@@ -108,6 +109,11 @@ bool Pattern::load(const QString &newFileName)
     }
     case Scrolling:
     {
+        // Attempt to load the iamge
+        QImage sourceImage;
+        if (!sourceImage.load(newFileName))
+            return false;
+
         QSize frameSize = model->data(model->index(0), PatternModel::FrameSize).toSize();
 
         int targetWidth = sourceImage.width()*frameSize.height()/(float)sourceImage.height();
@@ -129,6 +135,19 @@ bool Pattern::load(const QString &newFileName)
 
         break;
     }
+    case VideoBased:
+    {
+        // Importing a video using QMediaPlayer is a couple step process. We need to
+
+        QMediaPlayer player;
+//        connect(player, SIGNAL(positionChanged(qint64)), this, SLOT(positionChanged(qint64)));
+        player.setMedia(QUrl::fromLocalFile(newFileName));
+        player.pause();
+
+        player.
+
+    }
+        break;
     }
 
     // TODO: MVC way of handling this?

@@ -1261,9 +1261,20 @@ void MainWindow::openPattern(Pattern::PatternType type)
     if (!dir.isReadable())
         lastDirectory = QDir::homePath();
 
+    QString fileExtension;
+    switch(type) {
+    case Pattern::Scrolling:
+    case Pattern::FrameBased:
+        fileExtension = tr("Pattern Files (*.png *.jpg *.bmp *.gif)");
+        break;
+    case Pattern::VideoBased:
+        fileExtension = tr("Video files (*.avi *.mpg *.mpeg)");
+        break;
+    }
+
     QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("Open Pattern"), lastDirectory,
-                                                    tr("Pattern Files (*.png *.jpg *.bmp *.gif)"));
+                                                    fileExtension);
 
     if (fileName.length() == 0)
         return;
@@ -1288,6 +1299,13 @@ void MainWindow::on_actionOpen_Frame_based_Pattern_triggered()
 {
     openPattern(Pattern::FrameBased);
 }
+
+
+void MainWindow::on_actionOpen_Video_triggered()
+{
+    openPattern(Pattern::VideoBased);
+}
+
 
 void MainWindow::on_actionPreferences_triggered()
 {

@@ -138,6 +138,8 @@ private slots:
 
     void on_windowLoaded();
 
+    void on_actionOpen_Video_triggered();
+
 signals:
 
     /// Signalled when an editable pattern is selected in the editor

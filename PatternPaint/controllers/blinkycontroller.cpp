@@ -39,6 +39,9 @@ QList<QPointer<ControllerInfo> > BlinkyController::probe()
                  && info.productIdentifier() == LIGHTBUDDY_SKETCH_PID)
             controllerInfos.push_back(new BlinkyTapeControllerInfo(info));
         // Even LeoBlinkies!
+        else if (info.vendorIdentifier() == LEOBLINKY2016_SKETCH_VID_PROTOTYPE
+                 && info.productIdentifier() == LEOBLINKY2016_SKETCH_PID_PROTOTYPE)
+            controllerInfos.push_back(new LeoBlinkyControllerInfo(info));
         else if (info.vendorIdentifier() == LEOBLINKY2016_SKETCH_VID
                  && info.productIdentifier() == LEOBLINKY2016_SKETCH_PID)
             controllerInfos.push_back(new LeoBlinkyControllerInfo(info));

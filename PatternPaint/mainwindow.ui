@@ -670,6 +670,7 @@
      </property>
      <addaction name="actionOpen_Scrolling_Pattern"/>
      <addaction name="actionOpen_Frame_based_Pattern"/>
+     <addaction name="actionOpen_Video"/>
     </widget>
     <addaction name="menuNew"/>
     <addaction name="menuOpen"/>
@@ -1138,6 +1139,11 @@
   <action name="actionSave_All">
    <property name="text">
     <string>Save All</string>
+   </property>
+  </action>
+  <action name="actionOpen_Video">
+   <property name="text">
+    <string>Video...</string>
    </property>
   </action>
  </widget>
