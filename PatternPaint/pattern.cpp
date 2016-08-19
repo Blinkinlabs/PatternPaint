@@ -5,7 +5,7 @@
 
 #include <QDebug>
 #include <QPainter>
-#include <QMediaPlayer>
+//#include <QMediaPlayer>
 
 Pattern::Pattern(PatternType type, QSize patternSize, int frameCount, QListWidget *parent) :
     QObject(parent),
