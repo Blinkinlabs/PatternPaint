@@ -1,12 +1,12 @@
 #include "leoblinky2016.h"
 
 LeoBlinky2016::LeoBlinky2016(
-        QSize size, ColorMode colorMode, BrightnessModel *brightnessModel, QObject *parent) :
+        ColorMode colorMode, BrightnessModel *brightnessModel, QObject *parent) :
         Fixture(parent),
         colormode(colorMode),
         brightnessModel(brightnessModel)
 {
-    setSize(size);
+    setSize(QSize());
 }
 
 LeoBlinky2016::~LeoBlinky2016()
@@ -59,9 +59,10 @@ QSize LeoBlinky2016::getSize() const
 
 void LeoBlinky2016::setSize(QSize newSize)
 {
-    // What to do with this? scale the points to the size?
+    Q_UNUSED(newSize);
 
-    size = newSize;
+    // Fix the size to 100x100
+    size = QSize(100,100);
 
     locations.clear();
 

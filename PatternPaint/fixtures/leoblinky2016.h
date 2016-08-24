@@ -10,7 +10,7 @@ class LeoBlinky2016 : public Fixture
     Q_OBJECT
 
 public:
-    LeoBlinky2016(QSize size, ColorMode colorMode, BrightnessModel *brightnessModel,
+    LeoBlinky2016(ColorMode colorMode, BrightnessModel *brightnessModel,
                   QObject *parent = 0);
 
     ~LeoBlinky2016();

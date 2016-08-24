@@ -226,10 +226,7 @@ MainWindow::MainWindow(QWidget *parent) :
 //                            (ColorMode)settings.value("Fixture/ColorOrder", RGB).toInt(),
 //                            new ExponentialBrightness(1.8, 1.8, 2.1));
     fixture
-        = new LeoBlinky2016(settings.value("Fixture/DisplaySize",
-                                           QSize(DEFAULT_FIXTURE_WIDTH,
-                                                 DEFAULT_FIXTURE_HEIGHT)).toSize(),
-                            (ColorMode)settings.value("Fixture/ColorOrder", RGB).toInt(),
+        = new LeoBlinky2016((ColorMode)settings.value("Fixture/ColorOrder", RGB).toInt(),
                             new ExponentialBrightness(1.8, 1.8, 2.1));
 
     frameEditor->setFixture(fixture);
