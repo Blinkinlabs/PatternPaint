@@ -25,6 +25,16 @@ public:
 
     bool isEmpty() const;
 
+    bool getModified() const;
+
+    /// Initialize the pattern collection from an image file
+    /// @param newFile URL of file to load
+    bool load(const QString newFileName);
+
+    /// Save the pattern collection to a new file
+    /// newFileInfo URL of the new file to save to.
+    bool saveAs(const QString newFileName);
+
 private:
     PatternCollectionModel model;
 };

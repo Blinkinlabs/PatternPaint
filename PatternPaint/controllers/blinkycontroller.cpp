@@ -11,6 +11,11 @@ BlinkyController::BlinkyController(QObject *parent) : QObject(parent)
 {
 }
 
+BlinkyController::~BlinkyController()
+{
+
+}
+
 void BlinkyController::close()
 {
 }

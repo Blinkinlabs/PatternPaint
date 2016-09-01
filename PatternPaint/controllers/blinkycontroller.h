@@ -44,6 +44,7 @@ public:
     static QList<QSerialPortInfo> probeBootloaders();
 
     BlinkyController(QObject *parent);
+    virtual ~BlinkyController();
 
     virtual QString getName() const = 0;
 

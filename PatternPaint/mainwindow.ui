@@ -666,21 +666,24 @@
     </widget>
     <widget class="QMenu" name="menuOpen">
      <property name="title">
-      <string>Open</string>
+      <string>Import</string>
      </property>
      <addaction name="actionOpen_Scrolling_Pattern"/>
      <addaction name="actionOpen_Frame_based_Pattern"/>
      <addaction name="actionOpen_Video"/>
     </widget>
+    <addaction name="actionOpen_Project"/>
+    <addaction name="separator"/>
     <addaction name="menuNew"/>
     <addaction name="menuOpen"/>
     <addaction name="menuExamples"/>
     <addaction name="separator"/>
+    <addaction name="actionClose_Project"/>
     <addaction name="actionClose"/>
     <addaction name="actionClose_All"/>
     <addaction name="separator"/>
-    <addaction name="actionSave"/>
-    <addaction name="actionSave_as"/>
+    <addaction name="actionSave_Project"/>
+    <addaction name="actionExportAnimation"/>
     <addaction name="actionSave_All"/>
     <addaction name="separator"/>
     <addaction name="actionExport_pattern_for_Arduino"/>
@@ -720,6 +723,8 @@
     </property>
     <addaction name="actionConfigure_Fixture"/>
     <addaction name="separator"/>
+    <addaction name="actionConnect"/>
+    <addaction name="actionDisconnect"/>
     <addaction name="actionSave_to_Blinky"/>
     <addaction name="separator"/>
     <addaction name="actionRestore_firmware"/>
@@ -773,7 +778,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionClose"/>
-   <addaction name="actionSave"/>
+   <addaction name="actionSave_Project"/>
    <addaction name="actionSave_to_Blinky"/>
   </widget>
   <widget class="QToolBar" name="playbackToolbar">
@@ -820,7 +825,7 @@
    <addaction name="actionPipette"/>
    <addaction name="actionFill"/>
   </widget>
-  <action name="actionSave">
+  <action name="actionExportAnimation">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -829,13 +834,10 @@
      <normaloff>:/icons/images/icons/Save-100.png</normaloff>:/icons/images/icons/Save-100.png</iconset>
    </property>
    <property name="text">
-    <string>Save</string>
+    <string>Export Animation...</string>
    </property>
    <property name="iconText">
     <string>Save</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+S</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
@@ -902,6 +904,9 @@
    </property>
    <property name="text">
     <string>Save to Blinky</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+U</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
@@ -1013,31 +1018,13 @@
     <bool>false</bool>
    </property>
   </action>
-  <action name="actionSave_as">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>:/resources/images/save.png</normaloff>:/resources/images/save.png</iconset>
-   </property>
-   <property name="text">
-    <string>Save As...</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+S</string>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>false</bool>
-   </property>
-  </action>
   <action name="actionClose">
    <property name="icon">
     <iconset resource="images.qrc">
      <normaloff>:/icons/images/icons/Minus-100.png</normaloff>:/icons/images/icons/Minus-100.png</iconset>
    </property>
    <property name="text">
-    <string>Close</string>
+    <string>Close Animation</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
@@ -1144,6 +1131,47 @@
   <action name="actionOpen_Video">
    <property name="text">
     <string>Images as Pattern Frames...</string>
+   </property>
+  </action>
+  <action name="actionOpen_Project">
+   <property name="text">
+    <string>Open Project...</string>
+   </property>
+  </action>
+  <action name="actionSave_Project">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/icons/images/icons/Save-100.png</normaloff>:/icons/images/icons/Save-100.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save Project</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionClose_Project">
+   <property name="text">
+    <string>Close Project</string>
+   </property>
+  </action>
+  <action name="actionConnect">
+   <property name="text">
+    <string>Connect</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionDisconnect">
+   <property name="text">
+    <string>Disconnect</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
    </property>
   </action>
  </widget>

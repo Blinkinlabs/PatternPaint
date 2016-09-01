@@ -37,6 +37,10 @@ public:
     bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex());
     bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex());
 
+    bool seriaize(QDataStream& stream);
+    bool deseriaize(QDataStream& stream);
+
+
     QUndoStack *getUndoStack()
     {
         return &undoStack;

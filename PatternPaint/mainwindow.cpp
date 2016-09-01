@@ -196,7 +196,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&connectionScannerTimer, SIGNAL(timeout()), this,
             SLOT(connectionScannerTimer_timeout()));
     connectionScannerTimer.setInterval(CONNECTION_SCANNER_INTERVAL);
-    connectionScannerTimer.start();
+//    connectionScannerTimer.start();
 
     actionPen->setChecked(true);
     frameEditor->setInstrument(qvariant_cast<AbstractInstrument *>(actionPen->data()));
@@ -262,6 +262,9 @@ MainWindow::MainWindow(QWidget *parent) :
     on_patternCollectionCurrentChanged(QModelIndex(), QModelIndex());
 
     autoUpdater = NULL;
+
+// TODO: Clear me
+#define DISABLE_UPDATE_CHECKS
 
 #if defined(DISABLE_UPDATE_CHECKS)
 
@@ -428,7 +431,7 @@ void MainWindow::stopPlayback()
     actionPlay->setIcon(QIcon(":/icons/images/icons/Play-100.png"));
 }
 
-bool MainWindow::savePatternAs(Pattern *item)
+bool MainWindow::exportPatternAs(Pattern *item)
 {
     QSettings settings;
     QString lastDirectory = settings.value("File/SaveDirectory").toString();
@@ -454,31 +457,45 @@ bool MainWindow::savePatternAs(Pattern *item)
     return !item->getModified();
 }
 
-bool MainWindow::savePattern(Pattern *item)
+bool MainWindow::saveProjectAs()
 {
-    if (!item->hasFilename()) {
-        return savePatternAs(item);
-    } else {
-        if (!item->save()) {
-            showError(tr("Error saving pattern %1. Try saving it somewhere else?")
-                      .arg(item->getName()));
-        }
-        return !item->getModified();
-    }
+    QSettings settings;
+    QString lastDirectory = settings.value("File/SaveDirectory").toString();
+
+    QDir dir(lastDirectory);
+    if (!dir.isReadable())
+        lastDirectory = QDir::homePath();
+
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    tr("Save Project"), lastDirectory,
+                                                    tr("Project File (*.pat)"));
+
+    if (fileName.length() == 0)
+        return false;
+
+    QFileInfo fileInfo(fileName);
+    settings.setValue("File/SaveDirectory", fileInfo.absolutePath());
+
+    if (!patternCollection.saveAs(fileInfo.absoluteFilePath()))
+        showError(tr("Error saving project. Try saving it somewhere else?"));
+
+    return !patternCollection.getModified();
 }
 
-void MainWindow::on_actionSave_as_triggered()
+bool MainWindow::saveProject()
 {
-    if (patternCollection.isEmpty())
-        return;
-    savePatternAs(patternCollection.at(getCurrentPatternIndex()));
-}
+    // TODO: Test if there's a project filename yet
+    return saveProjectAs();
 
-void MainWindow::on_actionSave_triggered()
-{
-    if (patternCollection.isEmpty())
-        return;
-    savePattern(patternCollection.at(getCurrentPatternIndex()));
+//    if (!item->hasFilename()) {
+//        return savePatternAs(item);
+//    } else {
+//        if (!item->save()) {
+//            showError(tr("Error saving pattern %1. Try saving it somewhere else?")
+//                      .arg(item->getName()));
+//        }
+//        return !item->getModified();
+//    }
 }
 
 void MainWindow::on_actionExit_triggered()
@@ -547,10 +564,9 @@ void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
         mode = Disconnected;
         stopPlayback();
 
-        // TODO: Does this delete the serial object reliably?
         controller.clear();
 
-        connectionScannerTimer.start();
+//        connectionScannerTimer.start();
 
 #if defined(Q_OS_MACX)
         // start the app nap inhibitor
@@ -770,14 +786,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 #endif
 
-    QList<Pattern *> unsavedPatterns;
-
-    foreach(Pattern* pattern, patternCollection.patterns()) {
-        if (pattern->getModified())
-            unsavedPatterns.append(pattern);
-    }
-
-    if (!promptForSave(unsavedPatterns)) {
+    if (!promptForSave()) {
         event->ignore();
         return;
     }
@@ -829,46 +838,71 @@ void MainWindow::on_colorPicked(QColor color)
     frameEditor->setToolColor(color);
 }
 
-bool MainWindow::promptForSave(Pattern *pattern)
-{
-    if (!pattern->getModified())
+//bool MainWindow::promptForSave(Pattern *pattern)
+//{
+//    if (!pattern->getModified())
+//        return true;
+
+//    QList<Pattern *> patterns;
+//    patterns.append(pattern);
+//    return promptForSave(patterns);
+//}
+
+//bool MainWindow::promptForSave(QList<Pattern *> patterns)
+//{
+//    if(patterns.count() == 0)
+//        return true;
+
+//    QString messageText;
+
+//    if(patterns.count() == 1) {
+//        messageText += tr("The pattern %1 has been modified.")
+//                .arg(patterns.first()->getName());
+//    }
+//    else {
+//        messageText += tr("The following patterns have been modified:\n");
+
+//        foreach(Pattern *pattern, patterns)
+//            messageText += pattern->getName() + "\n";
+//    }
+
+//    QMessageBox msgBox(this);
+//    msgBox.setWindowModality(Qt::WindowModal);
+//    msgBox.setText(messageText);
+//    msgBox.setInformativeText("Do you want to save your changes?");
+//    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+//    msgBox.setDefaultButton(QMessageBox::Save);
+//    int ans = msgBox.exec();
+
+//    if (ans == QMessageBox::Save) {
+//        foreach(Pattern *pattern, patterns)
+//            if (!savePattern(pattern))
+//                return false;
+//        return true;
+//    }
+
+//    if (ans == QMessageBox::Discard)
+//        return true;
+
+//    return false;
+//}
+
+bool MainWindow::promptForSave() {
+    if (!patternCollection.getModified())
         return true;
-
-    QList<Pattern *> patterns;
-    patterns.append(pattern);
-    return promptForSave(patterns);
-}
-
-bool MainWindow::promptForSave(QList<Pattern *> patterns)
-{
-    if(patterns.count() == 0)
-        return true;
-
-    QString messageText;
-
-    if(patterns.count() == 1) {
-        messageText += tr("The pattern %1 has been modified.")
-                .arg(patterns.first()->getName());
-    }
-    else {
-        messageText += tr("The following patterns have been modified:\n");
-
-        foreach(Pattern *pattern, patterns)
-            messageText += pattern->getName() + "\n";
-    }
 
     QMessageBox msgBox(this);
     msgBox.setWindowModality(Qt::WindowModal);
-    msgBox.setText(messageText);
+    msgBox.setText(tr("The project has been modified."));
     msgBox.setInformativeText("Do you want to save your changes?");
     msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Save);
     int ans = msgBox.exec();
 
     if (ans == QMessageBox::Save) {
-        foreach(Pattern *pattern, patterns)
-            if (!savePattern(pattern))
-                return false;
+        if(!saveProject())
+            return false;
+
         return true;
     }
 
@@ -1042,7 +1076,7 @@ void MainWindow::on_actionClose_triggered()
     if (patternCollection.isEmpty())
         return;
 
-    if (!promptForSave(patternCollection.at(getCurrentPatternIndex())))
+    if (!promptForSave())
         return;
 
     // TODO: remove the undo stack from the undo group?
@@ -1201,7 +1235,7 @@ void MainWindow::on_actionDeleteFrame_triggered()
 
 void MainWindow::setPatternModified(bool modified)
 {
-    actionSave->setEnabled(modified);
+//    actionSave_Project->setEnabled(modified);
 }
 
 void MainWindow::on_ExampleSelected(QAction *action)
@@ -1331,24 +1365,61 @@ void MainWindow::on_actionWelcome_triggered()
     welcomeScreen->show();
 }
 
-void MainWindow::on_actionSave_All_triggered()
-{
-    foreach(Pattern *pattern, patternCollection.patterns())
-        if (!savePattern(pattern))
-            return;
-}
-
 void MainWindow::on_actionClose_All_triggered()
 {
-    QList<Pattern *> unsavedPatterns;
-
-    foreach(Pattern* pattern, patternCollection.patterns()) {
-        if (pattern->getModified())
-            unsavedPatterns.append(pattern);
-    }
-
-    if(!promptForSave(unsavedPatterns))
+    if(!promptForSave())
         return;
 
     patternCollection.clear();
+}
+
+void MainWindow::on_actionSave_Project_triggered()
+{
+    saveProject();
+}
+
+void MainWindow::on_actionOpen_Project_triggered()
+{
+    QSettings settings;
+    QString lastDirectory = settings.value("File/LoadDirectory").toString();
+
+    QDir dir(lastDirectory);
+    if (!dir.isReadable())
+        lastDirectory = QDir::homePath();
+
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Open Project"), lastDirectory,
+                                                    tr("Project Files (*.pat)"));
+
+    if (fileName.length() == 0)
+        return;
+
+    QFileInfo fileInfo(fileName);
+    settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
+
+    if (!patternCollection.load(fileName)) {
+        showError(tr("Could not open file. Perhaps it has a formatting problem?"));
+        return;
+    }
+}
+
+void MainWindow::on_actionExportAnimation_triggered()
+{
+    if (patternCollection.isEmpty())
+        return;
+    exportPatternAs(patternCollection.at(getCurrentPatternIndex()));
+}
+
+void MainWindow::on_actionConnect_triggered()
+{
+    connectionScannerTimer_timeout();
+}
+
+void MainWindow::on_actionDisconnect_triggered()
+{
+    if(controller.isNull())
+        return;
+
+    controller->close();
+    controller.clear();
 }

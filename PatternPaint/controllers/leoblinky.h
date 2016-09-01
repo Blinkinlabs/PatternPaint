@@ -17,6 +17,8 @@ class LeoBlinky : public BlinkyController
     Q_OBJECT
 public:
     LeoBlinky(QSerialPortInfo info, QObject *parent);
+    ~LeoBlinky();
+
 
     QString getName() const;
 

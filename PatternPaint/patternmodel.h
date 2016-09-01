@@ -5,6 +5,10 @@
 #include <QObject>
 #include <QUndoStack>
 
+// TODO: Think about these some more.
+#define SCROLL_MODEL 0x0010
+#define FRAME_MODEL 0x0011
+
 /// Interface for accessing a pattern model.
 class PatternModel : public QAbstractListModel
 {
@@ -37,6 +41,9 @@ public:
 
     virtual bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex()) = 0;
     virtual bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex()) = 0;
+
+    virtual bool seriaize(QDataStream& stream) = 0;
+    virtual bool deseriaize(QDataStream& stream) = 0;
 
     virtual QUndoStack *getUndoStack() = 0;
 };

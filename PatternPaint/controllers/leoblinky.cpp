@@ -27,9 +27,6 @@ LeoBlinky::LeoBlinky(QSerialPortInfo info, QObject *parent) :
 
     connect(serial, SIGNAL(readyRead()), this, SLOT(handleSerialReadData()));
 
-    connect(serial, SIGNAL(baudRateChanged(qint32, QSerialPort::Directions)),
-            this, SLOT(handleBaudRateChanged(qint32, QSerialPort::Directions)));
-
     serialWriteTimer.setSingleShot(true);
     connect(&serialWriteTimer, SIGNAL(timeout()), this, SLOT(sendChunk()));
 
@@ -39,6 +36,10 @@ LeoBlinky::LeoBlinky(QSerialPortInfo info, QObject *parent) :
     connect(&connectionScannerTimer, SIGNAL(timeout()), this,
             SLOT(connectionScannerTimer_timeout()));
 #endif
+}
+
+LeoBlinky::~LeoBlinky()
+{
 }
 
 QString LeoBlinky::getName() const

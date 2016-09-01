@@ -73,6 +73,7 @@ void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
     else
         qCritical() << "Unrecognized serial error:" << errorString;
 
+    qCritical() << "Connected: " << isConnected();
     close();
 }
 

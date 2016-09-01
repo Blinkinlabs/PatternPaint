@@ -49,6 +49,9 @@ private:
 
     State state;
 
+    bool seriaize(QDataStream& stream);
+    bool deseriaize(QDataStream& stream);
+
     void pushUndoState();
 
     void applyUndoState(State newState);

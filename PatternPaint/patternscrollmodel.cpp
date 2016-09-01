@@ -55,6 +55,29 @@ void PatternScrollModel::pushUndoState()
     }
 }
 
+bool PatternScrollModel::seriaize(QDataStream& stream)
+{
+    // TODO: push these into the state definition.
+    stream << (quint32)SCROLL_MODEL;
+    stream << state.frameSize;
+    stream << state.fileName;
+    stream << state.frameSpeed;
+    stream << state.image;
+
+    return true;
+}
+
+bool PatternScrollModel::deseriaize(QDataStream& stream)
+{
+    // TODO: push these into the state definition.
+    stream >> state.frameSize;
+    stream >> state.fileName;
+    stream >> state.frameSpeed;
+    stream >> state.image;
+
+    return true;
+}
+
 void PatternScrollModel::applyUndoState(State newState)
 {
     QVector<int> roles;

@@ -56,8 +56,8 @@ private slots:
 
     void connectionScannerTimer_timeout();
 
-    void on_actionSave_triggered();
-    void on_actionSave_as_triggered();
+//    void on_actionSave_triggered();
+//    void on_actionSave_as_triggered();
 
     void on_actionExit_triggered();
 
@@ -132,13 +132,23 @@ private slots:
 
     void on_actionWelcome_triggered();
 
-    void on_actionSave_All_triggered();
+//    void on_actionSave_All_triggered();
 
     void on_actionClose_All_triggered();
 
     void on_windowLoaded();
 
     void on_actionOpen_Video_triggered();
+
+    void on_actionSave_Project_triggered();
+
+    void on_actionOpen_Project_triggered();
+
+    void on_actionExportAnimation_triggered();
+
+    void on_actionConnect_triggered();
+
+    void on_actionDisconnect_triggered();
 
 signals:
 
@@ -167,7 +177,7 @@ private:
     QLineEdit currentFrame;
 
     enum Modes {
-        Disconnected, Connected, Uploading
+        Disconnected, Connected, Uploading,
     };
     Modes mode;
 
@@ -180,11 +190,12 @@ private:
     void startPlayback();
     void stopPlayback();
 
-    bool promptForSave(Pattern *pattern);
-    bool promptForSave(QList<Pattern *> patterns);
+    bool promptForSave();
 
-    bool savePattern(Pattern *item);
-    bool savePatternAs(Pattern *item);
+    bool exportPatternAs(Pattern *item);
+
+    bool saveProject();
+    bool saveProjectAs();
 
     void connectUploader();
 
