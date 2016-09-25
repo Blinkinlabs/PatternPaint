@@ -54,7 +54,7 @@ cd ${TEMPDIR}
 
 ################## Get PatternPaint ###################
 if [ ! -d "${PATTERNPAINT}" ]; then
-	git clone https://github.com/Blinkinlabs/PatternPaint.git ${PATTERNPAINT}
+	git clone --depth 1 https://github.com/Blinkinlabs/PatternPaint.git ${PATTERNPAINT}
 else
 	cd ${PATTERNPAINT}
 	git pull

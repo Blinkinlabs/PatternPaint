@@ -22,15 +22,25 @@ We use [Github Issues](https://github.com/Blinkinlabs/PatternPaint/issues) for b
 
 PatternPaint is written in C++ with QT (5.4.1) libraries. The easiest way to get started is to download QT Creator, and run the project through there.
 
-First download QT Creator 5.4.1.
+First download QT Creator 5.7.0
 
 For OS X:
 
-    http://download.qt.io/archive/qt/5.4/5.4.1/qt-opensource-mac-x64-clang-5.4.1.dmg
+    http://download.qt.io/archive/qt/5.7/5.7.0/qt-opensource-mac-x64-clang-5.7.0.dmg
+
+Note: for Mac users, you will also need to obtain an updated version of qtSerialPort, to get this patch: https://codereview.qt-project.org/#/c/170601/
+
+	git clone git://code.qt.io/qt/qtserialport.git
+	cd qtserialport/
+	git checkout dee818e7
+	~/Qt5.7.0/5.7/clang_64/bin/qmake
+	make
+	rm -R ~/Qt5.7.0/5.7/clang_64/lib/QtSerialPort.framework/
+	mv lib/QtSerialPort.framework/ ~/Qt5.7.0/5.7/clang_64/lib/
 
 For Windows:
 
-	http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-mingw491_opengl-5.4.1.exe
+    http://download.qt.io/archive/qt/5.7/5.7.0/qt-opensource-windows-x86-mingw530-5.7.0.exe
 	
 For Ubuntu (tested with 14.4):
 
@@ -61,9 +71,7 @@ Xcode (for clang compiler and git)
 
 	https://itunes.apple.com/us/app/xcode/id497799835?ls=1&mt=12
 
-QT dev environment (Qt 5.4.1 for Mac):
-
-	http://download.qt.io/archive/qt/5.4/5.4.1/qt-opensource-mac-x64-clang-5.4.1.dmg
+QT dev environment from ## Getting started
 
 Developer certificate (for signing the application)
 
@@ -103,9 +111,7 @@ msysgit:
 
 Note: be sure to check 'Run Git from the Windows Command Prompt' and 'Checkout Windows-style'.
 
-The QT dev environment (Qt 5.5.1 for Windows 32-bit (MinGW 4.9.2, OpenGL):
-
-	http://download.qt.io/official_releases/qt/5.5/5.5.1/qt-opensource-windows-x86-mingw492-5.5.1.exe
+QT dev environment from ## Getting started
 
 NSIS (3.0b2), for generating the installer:
 

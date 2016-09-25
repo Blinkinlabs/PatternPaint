@@ -132,35 +132,6 @@ include(controllers/controllers.pri)
 include(fixtures/fixtures.pri)
 include(updater/updater.pri)
 
-
-# Copies the given files to the destination directory
-# Using QMAKE_BUNDLE_DATA would be better here, but it fails because it tries
-# to interpret the library links as files instead of directories.
-defineTest(copySystemFrameworks) {
-    files = $$1
-    SOURCE_DIR = ~/qt/5.5/clang_64/lib
-    DDIR = PatternPaint.app/Contents/Frameworks
-
-    QMAKE_POST_LINK += mkdir -p $$quote($$DDIR) $$escape_expand(\\n\\t)
-
-    for(FILE, files) {
-        # If the libraries were already there, remove them.
-        QMAKE_POST_LINK += if [ -d $$quote($$DDIR/$$FILE) ] ; then rm -R $$quote($$DDIR/$$FILE); fi $$escape_expand(\\n\\t)
-
-        # Copy the library directory, recursively
-        QMAKE_POST_LINK += cp -R $$quote($$SOURCE_DIR/$$FILE) $$quote($$DDIR) $$escape_expand(\\n\\t)
-
-        # and remove the .prl files since they will cause the signing process to fail
-        QMAKE_POST_LINK += rm $$quote($$DDIR/$$FILE/*.prl) $$escape_expand(\\n\\t)
-        QMAKE_POST_LINK += rm $$quote($$DDIR/$$FILE/*_debug) $$escape_expand(\\n\\t)
-        QMAKE_POST_LINK += rm $$quote($$DDIR/$$FILE/Versions/5/*_debug) $$escape_expand(\\n\\t)
-        QMAKE_POST_LINK += rm $$quote($$DDIR/$$FILE/Headers) $$escape_expand(\\n\\t)
-        QMAKE_POST_LINK += rm -R $$quote($$DDIR/$$FILE/Versions/5/Headers/) $$escape_expand(\\n\\t)
-    }
-
-    export(QMAKE_POST_LINK)
-}
-
 macx {
     # OS X: Specify icon resource to use
     ICON = images/patternpaint.icns
@@ -173,23 +144,6 @@ macx {
 
     OBJECTIVE_SOURCES += \
         appnap.mm
-
-    # Workaround for broken macdeployqt on Qt 5.5.1: Copy in the system
-    # libraries manually. Unfortunately this is pretty broken.
-    equals(QT_VERSION, 5.5.1){
-        SYSTEM_LIBS += \
-            QtCore.framework \
-            QtDBus.framework \
-            QtGui.framework \
-            QtPrintSupport.framework \
-            QtSerialPort.framework \
-            QtWidgets.framework
-
-        copySystemFrameworks($$SYSTEM_LIBS)
-
-        # And add frameworks to the rpath so that the app can find the framework.
-        QMAKE_RPATHDIR += @executable_path/../Frameworks
-    }
 }
 
 win32 {
