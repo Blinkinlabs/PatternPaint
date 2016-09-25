@@ -20,12 +20,6 @@ PatternWriter::PatternWriter(const Pattern *pattern, Encoding encoding, Fixture 
     case RGB24:
         encodeImageRGB24(pattern);
         break;
-// case INDEXED:
-// encodeImageIndexed(pattern);
-// break;
-// case INDEXED_RLE:
-// encodeImageIndexed_RLE(pattern);
-// break;
     }
 }
 
@@ -154,7 +148,7 @@ void PatternWriter::encodeImageRGB565_RLE(const Pattern *pattern)
     }
 
     header.append("};\n\n");
-    header.append(QString("Animation animation(%1, animationData, ENCODING_RGB565_RLE, %2);\n")
+    header.append(QString("Animation animation(%1, animationData, Animation::RGB565_RLE, %2);\n")
                   .arg(pattern->getFrameCount())
                   .arg(fixture->getLedCount()));
 }
@@ -220,166 +214,7 @@ void PatternWriter::encodeImageRGB24(const Pattern *pattern)
 
     header.append("};\n");
     header.append("\n");
-    header.append(QString("Animation animation(%1, animationData, ENCODING_RGB24, %2);")
+    header.append(QString("Animation animation(%1, animationData, Animation::RGB24, %2);")
                   .arg(pattern->getFrameCount())
                   .arg(fixture->getLedCount()));
 }
-
-// void PatternWriter::encodeImageIndexed(const Pattern *pattern) {
-//// TODO: Add color mode support
-
-// QImage image = pattern->getFrame(0);
-
-// header.clear();
-// data.clear();
-
-//// First, convert to an indexed format. This should be non-destructive
-//// if the image had fewer than 256 colors.
-// QImage indexed = image.convertToFormat(
-// QImage::Format_Indexed8,
-// Qt::AutoColor & Qt::AvoidDither);
-// qDebug() << "Original color count:" << colorCount();
-// qDebug() << "Indexed color count: " << indexed.colorCount();
-
-// header.append("const PROGMEM prog_uint8_t patternData[]  = {\n");
-
-//// Record the length of the color table
-// header.append("// Length of the color table - 1, in bytes. length: 1 byte\n");
-// header.append(QString(" %1,\n")
-// .arg(indexed.colorCount() - 1, 3));
-
-// data.append(indexed.colorCount() - 1);
-
-//// Build the color table
-// header.append(QString("// Color table section. Each entry is 3 bytes. length: %1 bytes\n")
-// .arg(indexed.colorCount()*3));
-
-// for (int index = 0; index < indexed.colorCount(); index++) {
-// QColor color = indexed.color(index);
-
-// header.append(QString(" %1, %2, %3,\n")
-// .arg(color.red(),   3)
-// .arg(color.green(), 3)
-// .arg(color.blue(),  3));
-
-///// Colors in the color table are stored in RGB24 format
-// data.append(color.red());
-// data.append(color.green());
-// data.append(color.blue());
-// }
-
-//// Build the pixel table
-// header.append(QString("// Pixel table section. Each pixel is 1 byte. length: %1 bytes\n")
-// .arg(image.width()*image.height()));
-
-// for(int frame = 0; frame < image.width(); frame++) {
-// for(int pixel = 0; pixel < image.height(); pixel++) {
-// int index = indexed.pixelIndex(frame, pixel);
-// header.append(QString(" %1,").arg(index, 3));
-
-// if (((pixel + frame*image.height()) % 10 == 9)) {
-// header.append("\n");
-// }
-
-///// Pixel indexes are stired as 8-bit indexes
-// data.append(index);
-// }
-// }
-
-// header.append("\n};\n\n");
-// header.append(QString("Pattern pattern(%1, patternData, ENCODING_INDEXED, %2);\n")
-// .arg(image.width())
-// .arg(image.height()));
-
-// qDebug() << "Pattern size:" << data.length();
-// }
-
-// void PatternWriter::encodeImageIndexed_RLE(const Pattern *pattern) {
-//// TODO: Add color mode support
-
-// QImage image = pattern->getFrame(0);
-
-// header.clear();
-// data.clear();
-
-//// First, convert to an indexed format. This should be non-destructive
-//// if the image had fewer than 256 colors.
-// QImage indexed = image.convertToFormat(
-// QImage::Format_Indexed8,
-// Qt::AutoColor & Qt::AvoidDither);
-// qDebug() << "Original color count:" << colorCount();
-// qDebug() << "Indexed color count: " << indexed.colorCount();
-
-// header.append("const PROGMEM prog_uint8_t patternData[]  = {\n");
-
-//// Record the length of the color table
-// header.append("// Length of the color table - 1, in bytes. length: 1 byte\n");
-// header.append(QString(" %1,\n")
-// .arg(indexed.colorCount() - 1, 3));
-
-// data.append(indexed.colorCount() - 1);
-
-//// Build the color table
-// header.append(QString("// Color table section. Each entry is 3 bytes. length: %1 bytes\n")
-// .arg(indexed.colorCount()*3));
-
-// for (int index = 0; index < indexed.colorCount(); index++) {
-// QColor color = indexed.color(index);
-
-// header.append(QString(" %1, %2, %3,\n")
-// .arg(color.red(),   3)
-// .arg(color.green(), 3)
-// .arg(color.blue(),  3));
-
-///// Colors in the color table are stored in RGB24 format
-// data.append(color.red());
-// data.append(color.green());
-// data.append(color.blue());
-// }
-
-//// Build the pixel table
-// header.append(QString("// Pixel runs section. Each pixel run is 2 bytes. length: %1 bytes\n")
-// .arg(-1));
-
-// for(int frame = 0; frame < image.width(); frame++) {
-// int currentColor;
-// int runCount = 0;
-
-// for(int pixel = 0; pixel < image.height(); pixel++) {
-// int newColor = indexed.pixelIndex(frame, pixel);
-
-// if(runCount == 0) {
-// currentColor = newColor;
-// }
-
-// if(currentColor != newColor) {
-// header.append(QString(" %1, %2,\n")
-// .arg(runCount, 3)
-// .arg(currentColor, 3));
-
-// data.append(runCount);
-// data.append(currentColor);
-
-// runCount = 1;
-// currentColor = newColor;
-// }
-// else {
-// runCount++;
-// }
-// }
-
-// header.append(QString(" %1, %2,\n")
-// .arg(runCount, 3)
-// .arg(currentColor, 3));
-
-// data.append(runCount);
-// data.append(currentColor);
-// }
-
-// header.append("\n};\n\n");
-// header.append(QString("Pattern pattern(%1, patternData, ENCODING_INDEXED_RLE, %2);\n")
-// .arg(image.width())
-// .arg(image.height()));
-
-// qDebug() << "Pattern size:" << data.length();
-// }

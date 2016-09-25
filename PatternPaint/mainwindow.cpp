@@ -493,9 +493,9 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered()
     QFileInfo fileInfo(fileName);
     settings.setValue("File/ExportArduinoDirectory", fileInfo.absolutePath());
 
-    // Note: Converting frameRate to frame delay here.
     PatternWriter patternWriter(patternCollection.at(getCurrentPatternIndex()),
-                                PatternWriter::RGB24,
+//                                PatternWriter::RGB24,
+                                PatternWriter::RGB565_RLE,
                                 fixture);
 
     // Attempt to open the specified file
