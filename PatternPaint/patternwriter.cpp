@@ -148,9 +148,10 @@ void PatternWriter::encodeImageRGB565_RLE(const Pattern *pattern)
     }
 
     header.append("};\n\n");
-    header.append(QString("Animation animation(%1, animationData, Animation::RGB565_RLE, %2);\n")
+    header.append(QString("Animation animation(%1, animationData, Animation::RGB565_RLE, %2, %3);\n")
                   .arg(pattern->getFrameCount())
-                  .arg(fixture->getLedCount()));
+                  .arg(fixture->getLedCount())
+                  .arg(frameDelay));
 }
 
 void PatternWriter::encodeImageRGB24(const Pattern *pattern)
@@ -214,7 +215,8 @@ void PatternWriter::encodeImageRGB24(const Pattern *pattern)
 
     header.append("};\n");
     header.append("\n");
-    header.append(QString("Animation animation(%1, animationData, Animation::RGB24, %2);")
+    header.append(QString("Animation animation(%1, animationData, Animation::RGB24, %2, %3);")
                   .arg(pattern->getFrameCount())
-                  .arg(fixture->getLedCount()));
+                  .arg(fixture->getLedCount())
+                  .arg(frameDelay));
 }
