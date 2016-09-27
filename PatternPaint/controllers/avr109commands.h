@@ -5,6 +5,10 @@
 
 #include <QList>
 
+/// Subset of AVR109 commands supported by the Caterina bootloader
+/// -Start block flash read 'g'
+/// -Start block flash write 'g'
+
 namespace Avr109Commands {
 ///// Read the contents of the flash
 ///// @param startAddress Word-aligned address to begin reading from, in bytes
