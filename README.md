@@ -41,6 +41,8 @@ Note: for Mac users, you will also need to obtain an updated version of qtSerial
 For Windows:
 
     http://download.qt.io/archive/qt/5.7/5.7.0/qt-opensource-windows-x86-mingw530-5.7.0.exe
+    
+Note: When installing, make sure to select the 'Tools' 'MinGW 5.3.0' option.
 	
 For Ubuntu (tested with 14.4):
 
