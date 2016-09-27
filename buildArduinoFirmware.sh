@@ -4,7 +4,7 @@
 set -e
 
 # Note: Use Arduino 1.6.7
-ARDUINO="/Applications/Arduino.app/Contents/MacOS/Arduino"
+ARDUINO="/Applications/Arduino-1.6.12.app/Contents/MacOS/Arduino"
 BOARD="blinkinlabs:avr:BlinkyTape"
 HEX_CONVERTER="PatternPaint/PatternPlayer_Sketch/hex_to_header.py"
 
