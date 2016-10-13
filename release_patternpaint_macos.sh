@@ -72,7 +72,7 @@ codesign --verify --verbose=4 PatternPaint/PatternPaint.app
 
 
 # TODO: Make a dmg instead?
-cd PatternPaint; zip ${OUTPUTDIR}/PatternPaint.zip PatternPaint.app
+cd PatternPaint; zip ${OUTPUTDIR}/PatternPaint_${VERSION}.zip PatternPaint.app/ -r --symlinks
 
 #mv PatternPaint/PatternPaint.app ${OUTPUTDIR}/PatternPaint_${VERSION}.app
 
