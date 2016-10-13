@@ -1,0 +1,20 @@
+# Linux instructions from: https://forum.qt.io/topic/50340/installing-qt-5-4-dev-packages-in-travis-ci/16
+# TODO: Update linux to Qt 5.7
+# TODO: Add support for macOS builds
+
+sudo: required
+dist: trusty
+
+before_install:
+  - sudo add-apt-repository --yes ppa:beineri/opt-qt551-trusty
+  - sudo apt-get update -qq
+
+install:
+  - sudo apt-get -y install qt55[QTPACKAGE]
+
+script:
+  - source /opt/qt55/bin/qt55-env.sh
+  - /opt/qt55/bin/qmake
+  - cd PatternPaint
+  - qmake -config release
+  - make
