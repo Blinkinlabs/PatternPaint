@@ -7,8 +7,8 @@ This directory contains third-party libraries that are distributed along with th
 Pattern Paint integrates [Sparkle](http://sparkle-project.org/) for automatic app updates on OS X.
 
 ### Obtaining
-Grab version 1.13.1:
-[https://github.com/sparkle-project/Sparkle/releases/download/1.13.1/Sparkle-1.13.1.tar.bz2](https://github.com/sparkle-project/Sparkle/releases/download/1.13.1/Sparkle-1.13.1.tar.bz2)
+Grab version 1.14:
+[https://github.com/sparkle-project/Sparkle/releases/download/1.14.0/Sparkle-1.14.0.tar.bz2](https://github.com/sparkle-project/Sparkle/releases/download/1.14.0/Sparkle-1.14.0.tar.bz2)
 
 ### Building
 TODO: Instructions for how to update the rpath of the framework (?)
