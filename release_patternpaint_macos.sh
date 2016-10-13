@@ -33,6 +33,8 @@ cd ..
 # Integrate the system frameworks
 ${QTDIR}/bin/macdeployqt PatternPaint/PatternPaint.app -verbose=1
 
+# TODO: automate this instead of listing each plugin separately?
+
 # Sign the frameworks
 codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/Sparkle.framework/Versions/A
 codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" PatternPaint/PatternPaint.app/Contents/Frameworks/libusb-1.0.0.dylib
@@ -69,19 +71,9 @@ codesign --verbose --force --sign "Developer ID Application: Blinkinlabs, LLC" P
 codesign --verify --verbose=4 PatternPaint/PatternPaint.app
 
 
-# Deploy and sign the release
-#${QTDIR}/bin/macdeployqt PatternPaint/PatternPaint.app/ -codesign="Developer ID Application: Blinkinlabs, LLC" -dmg
+# TODO: Make a dmg instead?
+cd PatternPaint; zip ${OUTPUTDIR}/PatternPaint.zip PatternPaint.app
 
-
-# Test the signature
-#hdiutil mount PatternPaint/PatternPaint.dmg
-#codesign --verify --verbose=4 /Volumes/PatternPaint:PatternPaint/PatternPaint.app
-#umount /Volumes/PatternPaint\:PatternPaint/
-
-# And copy out the resulting disk image
-#mv PatternPaint/PatternPaint.dmg ${OUTPUTDIR}/PatternPaint_${VERSION}.dmg
-
-# TODO: Make DMG :-P
-mv PatternPaint/PatternPaint.app ${OUTPUTDIR}/PatternPaint_${VERSION}.app
+#mv PatternPaint/PatternPaint.app ${OUTPUTDIR}/PatternPaint_${VERSION}.app
 
 # TODO: Clean up temp dir

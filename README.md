@@ -13,7 +13,7 @@ For instructions on how to contribute to Pattern Paint development, read on!
 
 # Development
 
-PatternPaint is a cross-platform application, targetting Mac OS X, Windows, and Linux.
+PatternPaint is a cross-platform application, targetting macOS, Windows, and Linux.
 
 We use [Github Issues](https://github.com/Blinkinlabs/PatternPaint/issues) for bug tracking and feature implementation.
 
@@ -24,11 +24,11 @@ PatternPaint is written in C++ with QT (5.4.1) libraries. The easiest way to get
 
 First download QT Creator 5.7.0
 
-For OS X:
+For macOS:
 
     http://download.qt.io/archive/qt/5.7/5.7.0/qt-opensource-mac-x64-clang-5.7.0.dmg
 
-Note: for Mac users, you will also need to obtain an updated version of qtSerialPort, to get this patch: https://codereview.qt-project.org/#/c/170601/
+Note: for macOS users, you will also need to obtain an updated version of qtSerialPort, to get this patch: https://codereview.qt-project.org/#/c/170601/
 
 	git clone git://code.qt.io/qt/qtserialport.git
 	cd qtserialport/
@@ -38,6 +38,11 @@ Note: for Mac users, you will also need to obtain an updated version of qtSerial
 	rm -R ~/Qt5.7.0/5.7/clang_64/lib/QtSerialPort.framework/
 	mv lib/QtSerialPort.framework/ ~/Qt5.7.0/5.7/clang_64/lib/
 
+If you are using xcode8, you'll also need to modify a qt build script: https://forum.qt.io/topic/71119/project-error-xcode-not-set-up-properly/7
+
+	vi ~/Qt5.7.0/5.7/clang_64/mkspecs/features/mac/default_pre.prf
+	:%s/xcrun\ 2/xcodebuild\ 2/gc
+
 For Windows:
 
     http://download.qt.io/archive/qt/5.7/5.7.0/qt-opensource-windows-x86-mingw530-5.7.0.exe
@@ -46,7 +51,11 @@ Note: When installing, make sure to select the 'Tools' 'MinGW 5.3.0' option.
 	
 For Ubuntu (tested with 14.4):
 
-	sudo apt-get install qtcreator libusb-1.0-0-dev
+	sudo add-apt-repository --yes ppa:beineri/opt-qt57-trusty
+	sudo apt-get update -qq
+	sudo apt-get install qt57[QTPACKAGE] qt57serialport libusb-1.0-0-dev
+
+Note: You'll probably need to update the qt serial version, similar to the macOS instructions above
 
 Next, clone the PatternPaint repository:
 
@@ -65,7 +74,7 @@ PatternPaint is licensed under the GPL version 2
 
 These are the steps required to build a release version (installer) for PatternPaint. This is for distribution only- for hacking or modifying PatternPaint, only the steps in the above section 'Development' are necessicary.
 
-## OS X
+## macOS
 
 ### Prerequsites
 
@@ -87,15 +96,15 @@ Developer certificate (for signing the application)
 
 Once the prerequsites have been installed, the deployment script can be run:
 
-	curl -O https://raw.githubusercontent.com/Blinkinlabs/PatternPaint/master/release_patternpaint_osx.sh
-	sh ./release_patternpaint_osx.sh
+	curl -O https://raw.githubusercontent.com/Blinkinlabs/PatternPaint/master/release_patternpaint_macos.sh
+	sh ./release_patternpaint_macos.sh
 	
 If everything works, it will generate a redistributable disk image 'PatternPaint_X.Y.Z.dmg', where X.Y.Y is the current version of PatternPaint.
 
-Test this file manually on a clean OS X host.
+Test this file manually on a clean macOS host.
 
 
-Note: See the script for the spicy details of making a distributable Qt app image for OS X!
+Note: See the script for the spicy details of making a distributable Qt app image for macOS!
 Note: There might be some temporary file carnage left over after running this. Sorry about that.
 
 ## Build a release for Windows
@@ -169,7 +178,7 @@ Please contact us if you have experience releasing packages for Linux. We're par
 
 4. Write a description of the changes
 
-5. Upload the OS X and Windows distribution files from above
+5. Upload the macOS and Windows distribution files from above
 
 6. Pause and reflect on these changes
 
@@ -185,7 +194,7 @@ http://blinkinlabs.com/patternpaint
 
 ## Update the appcast files
 
-PatternPaint uses Sparkle and WinSparkle to notify PatternPaint users of new releases, and allow them to upgrade automatically. PattternPaint installs regularly check for updates by querying an XML file on the Blinkinlabs server. There are two files, one for OS X releases and one for Windows releases.
+PatternPaint uses Sparkle and WinSparkle to notify PatternPaint users of new releases, and allow them to upgrade automatically. PattternPaint installs regularly check for updates by querying an XML file on the Blinkinlabs server. There are two files, one for macOS releases and one for Windows releases.
 
 TODO: Script to autmate this procedure
 
@@ -241,7 +250,7 @@ TODO: Script to autmate this procedure
       &lt;/item&gt;
       </pre>
 
-2. The description and features should (probably) be the same for both OS X and Windows, so they can be created once and then copied into both files. The file links and lengths will need to be modified independently.
+2. The description and features should (probably) be the same for both macOS and Windows, so they can be created once and then copied into both files. The file links and lengths will need to be modified independently.
 
 3. TODO: Test locally?
 
