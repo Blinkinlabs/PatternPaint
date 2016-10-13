@@ -11,7 +11,7 @@ before_install:
 
 install:
 #  - sudo apt-get -y install qt55[QTPACKAGE] libqt5serialport5-dev
-  - sudo apt-get -y install qt57[QTPACKAGE] qt57serialport
+  - sudo apt-get -y install qt57[QTPACKAGE] qt57serialport libusb-1.0-0-dev
 
 script:
 #  - source /opt/qt55/bin/qt55-env.sh
