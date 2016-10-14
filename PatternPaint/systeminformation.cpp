@@ -29,7 +29,7 @@ void SystemInformation::on_refresh_clicked()
     QString report;
 
     report.append("Pattern Paint ");
-    report.append(VERSION_STRING);
+    report.append(GIT_VERSION);
     report.append("\r");
     report.append("  Build Date: ");
     report.append(__DATE__);
