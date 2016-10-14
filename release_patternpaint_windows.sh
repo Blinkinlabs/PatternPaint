@@ -5,16 +5,21 @@ set -e
 
 ################# Library Locations #############################
 # Location of the MINGW libraries (Installed as part of Qt)
-QT_DIR='/c/Qt/Qt5.5.1'
-QT_MINGW=${QT_DIR}'/5.5/mingw492_32/'
-QT_TOOLS=${QT_DIR}'/Tools/mingw492_32/bin/'
+QT_DIR='/c/Qt/Qt5.7.0'
+QT_MINGW=${QT_DIR}'/5.7/mingw53_32/bin/'
+QT_TOOLS=${QT_DIR}'/Tools/mingw530_32/bin/'
+QT_REDIST=${QT_DIR}'/Tools/QtCreator/bin/'
+
+# TODO: Adjust for Win32/64?
+#PROGRAMFILES='/c/Program Files (x86)'
+PROGRAMFILES='/c/Program Files'
 
 # Location of the Windows SDK and WDK
-WIN_KIT='/c/Program Files (x86)/Windows Kits/10/'
-WIN_KIT2='/c/Program Files (x86)/Windows Kits/10/'
+WIN_KIT=${PROGRAMFILES}'/Windows Kits/10/'
+WIN_KIT2=${PROGRAMFILES}'/Windows Kits/10/'
 
 # Location of NSIS
-NSIS='/c/Program Files (x86)/NSIS'
+NSIS='${PROGRAMFILES}/NSIS'
 
 # Location of the PatternPaint repository
 PATTERNPAINT='PatternPaint'
@@ -63,7 +68,7 @@ fi
 
 ################## Get BlinkyTape driver #########################
 if [ ! -d "${BLINKYTAPE}" ]; then
-	git clone https://github.com/Blinkinlabs/Blinkinlabs32u4_boards.git ${BLINKYTAPE}
+	git clone --depth 1 https://github.com/Blinkinlabs/Blinkinlabs32u4_boards.git ${BLINKYTAPE}
 else
 	cd ${BLINKYTAPE}
 	git pull
@@ -72,7 +77,7 @@ fi
 
 ################## Get BlinkyTile driver #########################
 if [ ! -d "${BLINKYTILE}" ]; then
-	git clone https://github.com/Blinkinlabs/BlinkyTile.git ${BLINKYTILE}
+	git clone --depth 1 https://github.com/Blinkinlabs/BlinkyTile.git ${BLINKYTILE}
 else
 	cd ${BLINKYTILE}
 	git pull
@@ -81,7 +86,7 @@ fi
 
 ################## Get BlinkyPendat driver #########################
 if [ ! -d "${BLINKYPENDANT}" ]; then
-	git clone https://github.com/Blinkinlabs/BlinkyPendant.git ${BLINKYPENDANT}
+	git clone --depth 1 https://github.com/Blinkinlabs/BlinkyPendant.git ${BLINKYPENDANT}
 else
 	cd ${BLINKYPENDANT}
 	git pull
@@ -102,11 +107,12 @@ cd ../../
 ################## Build PatternPaint ###################
 cd ${PATTERNPAINT}/PatternPaint
 
-PATH=${QT_TOOLS}:${PATH}
+PATH=${QT_TOOLS}:${QT_MINGW}:${PATH}
 
-${QT_MINGW}bin/qmake.exe -config release OBJECTS_DIR=build MOC_DIR=build/moc RCC_DIR=build/rcc UI_DIR=build/uic DESTDIR=bin
+qmake.exe -config release OBJECTS_DIR=build MOC_DIR=build/moc RCC_DIR=build/rcc UI_DIR=build/uic DESTDIR=bin
+#TODO
 mingw32-make.exe clean
-mingw32-make.exe -j
+mingw32-make.exe 
 
 cd ../../
 
@@ -130,26 +136,28 @@ cp ${PATTERNPAINT}/PatternPaint/bin/PatternPaint.exe ${OUTDIR}
 # Note: This list of DLLs must be determined by hand, using Dependency Walker
 # Also, the .nsi file should be synchronized with this list, otherwise the file
 # will not actually be included by the installer.
-cp ${QT_MINGW}bin/Qt5Core.dll ${OUTDIR}
-cp ${QT_MINGW}bin/Qt5Core.dll ${OUTDIR}
-cp ${QT_MINGW}bin/Qt5Gui.dll ${OUTDIR}
-cp ${QT_MINGW}bin/Qt5SerialPort.dll ${OUTDIR}
-cp ${QT_MINGW}bin/Qt5Widgets.dll ${OUTDIR}
-cp ${QT_MINGW}bin/Qt5Gui.dll ${OUTDIR}
-cp ${QT_MINGW}bin/libgcc_s_dw2-1.dll ${OUTDIR}
-cp ${QT_MINGW}bin/libstdc++-6.dll ${OUTDIR}
-cp ${QT_MINGW}bin/icuin54.dll ${OUTDIR}
-cp ${QT_MINGW}bin/icuuc54.dll ${OUTDIR}
-cp ${QT_MINGW}bin/icudt54.dll ${OUTDIR}
-cp ${QT_MINGW}bin/libgcc_s_dw2-1.dll ${OUTDIR}
-cp ${QT_MINGW}bin/libwinpthread-1.dll ${OUTDIR}
+cp ${QT_MINGW}libgcc_s_dw2-1.dll ${OUTDIR}
+cp ${QT_MINGW}libstdc++-6.dll ${OUTDIR}
+cp ${QT_MINGW}libgcc_s_dw2-1.dll ${OUTDIR}
+cp ${QT_MINGW}libwinpthread-1.dll ${OUTDIR}
 
-cp ${QT_MINGW}/plugins/platforms/qwindows.dll ${OUTDIR}platforms/
+cp ${QT_MINGW}Qt5Core.dll ${OUTDIR}
+cp ${QT_MINGW}Qt5Core.dll ${OUTDIR}
+cp ${QT_MINGW}Qt5Gui.dll ${OUTDIR}
+cp ${QT_MINGW}Qt5Widgets.dll ${OUTDIR}
+cp ${QT_MINGW}Qt5Gui.dll ${OUTDIR}
+cp ${QT_MINGW}Qt5SerialPort.dll ${OUTDIR}
 
-cp ${QT_MINGW}/plugins/imageformats/qgif.dll ${OUTDIR}imageformats/
-cp ${QT_MINGW}/plugins/imageformats/qjpeg.dll ${OUTDIR}imageformats/
-cp ${QT_MINGW}/plugins/imageformats/qsvg.dll ${OUTDIR}imageformats/
-cp ${QT_MINGW}/plugins/imageformats/qtiff.dll ${OUTDIR}imageformats/
+cp ${QT_REDIST}icuin54.dll ${OUTDIR}
+cp ${QT_REDIST}icuuc54.dll ${OUTDIR}
+cp ${QT_REDIST}icudt54.dll ${OUTDIR}
+
+cp ${QT_REDIST}plugins/platforms/qwindows.dll ${OUTDIR}platforms/
+
+cp ${QT_REDIST}plugins/imageformats/qgif.dll ${OUTDIR}imageformats/
+cp ${QT_REDIST}plugins/imageformats/qjpeg.dll ${OUTDIR}imageformats/
+cp ${QT_REDIST}plugins/imageformats/qsvg.dll ${OUTDIR}imageformats/
+cp ${QT_REDIST}plugins/imageformats/qtiff.dll ${OUTDIR}imageformats/
 
 # Winsparkle Files
 cp ${WINSPARKLE}/release/WinSparkle.dll ${OUTDIR}
