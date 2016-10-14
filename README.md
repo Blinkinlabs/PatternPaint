@@ -17,18 +17,36 @@ PatternPaint is a cross-platform application, targetting macOS, Windows, and Lin
 
 We use [Github Issues](https://github.com/Blinkinlabs/PatternPaint/issues) for bug tracking and feature implementation.
 
+PatternPaint is written in C++ with QT (5.7.0) libraries. The easiest way to get started is to download QT Creator, and run the project through there.
 
-## Getting started
+PatternPaint is licensed under the GPL version 2
 
-PatternPaint is written in C++ with QT (5.4.1) libraries. The easiest way to get started is to download QT Creator, and run the project through there.
+## macOS Prerequsites
 
-First download QT Creator 5.7.0
+macOS development requires the following software tools:
 
-For macOS:
+### OS X/macOS
+
+We're building on El Capitan and Sierra.
+
+### Xcode
+
+Use Xcode 8, available in the app store:
+
+	https://itunes.apple.com/us/app/xcode/id497799835?ls=1&mt=12
+
+Note: Be sure to run Xcode at least once to accept the license agreements.
+
+TODO: is there a way to install a specific version?
+TODO: do the command line tools need to be installed specifically anymore?
+
+### Qt dev environment
 
     http://download.qt.io/archive/qt/5.7/5.7.0/qt-opensource-mac-x64-clang-5.7.0.dmg
 
-Note: for macOS users, you will also need to obtain an updated version of qtSerialPort, to get this patch: https://codereview.qt-project.org/#/c/170601/
+Install it using the defaults (TODO: check if there is anything else necessecary here)
+
+Next, download a patched version of qtSerialPort, to fix a critical bug affecting serial disconnects. For more information, see: https://codereview.qt-project.org/#/c/170601/
 
 	git clone git://code.qt.io/qt/qtserialport.git
 	cd qtserialport/
@@ -38,36 +56,78 @@ Note: for macOS users, you will also need to obtain an updated version of qtSeri
 	rm -R ~/Qt5.7.0/5.7/clang_64/lib/QtSerialPort.framework/
 	mv lib/QtSerialPort.framework/ ~/Qt5.7.0/5.7/clang_64/lib/
 
-If you are using xcode8, you'll also need to modify a qt build script: https://forum.qt.io/topic/71119/project-error-xcode-not-set-up-properly/7
+If you are using Xcode 8, you'll also need to modify a qt build script: https://forum.qt.io/topic/71119/project-error-xcode-not-set-up-properly/7
 
 	vi ~/Qt5.7.0/5.7/clang_64/mkspecs/features/mac/default_pre.prf
 	:%s/xcrun\ 2/xcodebuild\ 2/gc
 
-For Windows:
+## Windows Prerequisites:
+
+Windows development requires the following software tools:
+
+### Windows:
+	
+Windows 10 is used internally.
+
+### msysgit:
+
+	https://git-for-windows.github.io/
+
+Note: be sure to check 'Run Git from the Windows Command Prompt', 'Checkout Windows-style, commit Unix-stlye line endings', and 'Use MinTTY'.
+
+### QT dev environment
 
     http://download.qt.io/archive/qt/5.7/5.7.0/qt-opensource-windows-x86-mingw530-5.7.0.exe
     
 Note: When installing, make sure to select the 'Tools' 'MinGW 5.3.0' option.
+
+
+
+### Windows SDK (version 10) (for signtool):
+
+	https://go.microsoft.com/fwlink/p/?LinkId=619296
 	
-For Ubuntu (tested with 14.4):
+When installing, only the 'Windoes Software Development Kit' feature is required.
+
+### Windows Driver Kit (version 10) (for dpinst):
+
+	http://go.microsoft.com/fwlink/p/?LinkId=526733
+	
+### NSIS (3.0), for generating the installer:
+
+	http://nsis.sourceforge.net/Download
+	
+	
+### (Optional) Dependency Walker, for tracking down which DLLs need to be included with the release:
+
+	http://www.dependencywalker.com/
+
+
+	
+## Ubuntu Prerequsites (tested with 14.4):
+
+### Qt, libusb
+
+There's a PPA with the latest version of Qt, Hooray!
 
 	sudo add-apt-repository --yes ppa:beineri/opt-qt57-trusty
 	sudo apt-get update -qq
 	sudo apt-get install qt57[QTPACKAGE] qt57serialport libusb-1.0-0-dev
 
-Note: You'll probably need to update the qt serial version, similar to the macOS instructions above
+Note: You'll probably need to update the qt serial version, similar to the macOS instructions above.
 
-Next, clone the PatternPaint repository:
+
+## All platforms: Build process
+
+First, clone the PatternPaint repository:
 
 	git clone https://github.com/Blinkinlabs/PatternPaint.git
 	
-Finally, open QT creator, then open the project file PatternPaint.pro, which should be located in the PatternPaint subdirectory of the repository.
+Next, open QT creator, then open the project file PatternPaint.pro, which should be located in the PatternPaint subdirectory of the repository.
 
 That's all you should need to do to build and make changes to PatternPaint. If you come up with a cool new feature or add support for a new device, please send a pull request!
 
-## License
 
-PatternPaint is licensed under the GPL version 2
 
 
 # Deployment instructions
@@ -76,15 +136,8 @@ These are the steps required to build a release version (installer) for PatternP
 
 ## macOS
 
-### Prerequsites
 
-Xcode (for clang compiler and git)
-
-	https://itunes.apple.com/us/app/xcode/id497799835?ls=1&mt=12
-
-QT dev environment from ## Getting started
-
-Developer certificate (for signing the application)
+### Developer certificate (for signing the application)
 
 - First, sign up for an Apple developer account and pay up to get the account. Then, in Xcode:
 - xcode->preference->accounts
@@ -94,51 +147,22 @@ Developer certificate (for signing the application)
 
 ### Building a Pattern Paint Release
 
+
 Once the prerequsites have been installed, the deployment script can be run:
 
 	curl -O https://raw.githubusercontent.com/Blinkinlabs/PatternPaint/master/release_patternpaint_macos.sh
 	sh ./release_patternpaint_macos.sh
 	
-If everything works, it will generate a redistributable disk image 'PatternPaint_X.Y.Z.dmg', where X.Y.Y is the current version of PatternPaint.
+If everything works, it will generate a redistributable disk image 'PatternPaint_X.Y.Z.dmg', where X.Y.Z is the current version of PatternPaint.
 
 Test this file manually on a clean macOS host.
 
 
-Note: See the script for the spicy details of making a distributable Qt app image for macOS!
+Note: See the script for the details of making a distributable Qt app image for macOS!
 Note: There might be some temporary file carnage left over after running this. Sorry about that.
 
-## Build a release for Windows
+## Windows
 
-### Prerequisites
-Windows deployment requires the following tools:
-
-Windows:
-	
-	Windows 7 is used internally, newer versions will likely work as well.
-
-msysgit:
-
-	https://git-for-windows.github.io/
-
-Note: be sure to check 'Run Git from the Windows Command Prompt' and 'Checkout Windows-style'.
-
-QT dev environment from ## Getting started
-
-NSIS (3.0b2), for generating the installer:
-
-	http://nsis.sourceforge.net/Download
-
-Windows SDK (version 10) (for signtool):
-
-	https://go.microsoft.com/fwlink/p/?LinkId=619296
-
-Windows Driver Kit (version 10) (for dpinst):
-
-	http://go.microsoft.com/fwlink/p/?LinkId=526733
-	
-(Optional) Dependency Walker, for tracking down which DLLs need to be included with the release:
-
-	http://www.dependencywalker.com/
 	
 ### Certificate setup
 
