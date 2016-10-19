@@ -11,7 +11,7 @@ OUTPUTDIR=`pwd`
 echo "Output to: " ${OUTPUTDIR}
 
 # Move to a temporary directory
-pushd $(mktemp -d -t PatternPaint)
+pushd $(mktemp -d -t com.blinkinlabs.PatternPaint)
 echo "Building in: " `pwd`
 
 # Get the repository
