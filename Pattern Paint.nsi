@@ -139,6 +139,18 @@ File "PatternPaintWindows\driver\blinkypendant\x86\WdfCoInstaller01009.dll"
 SetOutPath "$INSTDIR\driver\blinkypendant\amd64"
 File "PatternPaintWindows\driver\blinkypendant\amd64\winusbcoinstaller2.dll"
 File "PatternPaintWindows\driver\blinkypendant\amd64\WdfCoInstaller01009.dll"
+SetOutPath "$INSTDIR\driver\eightbyeight"
+File "PatternPaintWindows\driver\eightbyeight\eightbyeight_serial.inf"
+File "PatternPaintWindows\driver\eightbyeight\eightbyeight_DFU_runtime.inf"
+File "PatternPaintWindows\driver\eightbyeight\eightbyeight_DFU.inf"
+File "PatternPaintWindows\driver\eightbyeight\libusb_device.cat"
+File "PatternPaintWindows\driver\eightbyeight\blinkinlabs.cat"
+SetOutPath "$INSTDIR\driver\eightbyeight\x86"
+File "PatternPaintWindows\driver\eightbyeight\x86\winusbcoinstaller2.dll"
+File "PatternPaintWindows\driver\eightbyeight\x86\WdfCoInstaller01009.dll"
+SetOutPath "$INSTDIR\driver\eightbyeight\amd64"
+File "PatternPaintWindows\driver\eightbyeight\amd64\winusbcoinstaller2.dll"
+File "PatternPaintWindows\driver\eightbyeight\amd64\WdfCoInstaller01009.dll"
 SectionEnd
 
 ######################################################################
@@ -177,10 +189,12 @@ ${If} ${RunningX64}
        ExecWait '"$INSTDIR\driver\dpinst64.exe" /sa /sw /PATH "$INSTDIR\driver\blinkytape"'
        ExecWait '"$INSTDIR\driver\dpinst64.exe" /sa /sw /PATH "$INSTDIR\driver\lightbuddy"'
        ExecWait '"$INSTDIR\driver\dpinst64.exe" /sa /sw /PATH "$INSTDIR\driver\blinkypendant"'
+       ExecWait '"$INSTDIR\driver\dpinst64.exe" /sa /sw /PATH "$INSTDIR\driver\eightbyeight"'
 	   ${Else}
        ExecWait '"$INSTDIR\driver\dpinst32.exe" /sa /sw /PATH "$INSTDIR\driver\blinkytape"'
        ExecWait '"$INSTDIR\driver\dpinst32.exe" /sa /sw /PATH "$INSTDIR\driver\lightbuddy"'
        ExecWait '"$INSTDIR\driver\dpinst32.exe" /sa /sw /PATH "$INSTDIR\driver\blinkypendant"'
+       ExecWait '"$INSTDIR\driver\dpinst32.exe" /sa /sw /PATH "$INSTDIR\driver\eightbyeight"'
 	   ${EndIf}
 SectionEnd
 	
@@ -226,6 +240,15 @@ Delete "$INSTDIR\driver\blinkypendant\blinkypendant_DFU_runtime.inf"
 Delete "$INSTDIR\driver\blinkypendant\blinkypendant_DFU.inf"
 Delete "$INSTDIR\driver\blinkypendant\libusb_device.cat"
 Delete "$INSTDIR\driver\blinkypendant\blinkinlabs.cat"
+Delete "$INSTDIR\driver\eightbyeight\x86\winusbcoinstaller2.dll"
+Delete "$INSTDIR\driver\eightbyeight\x86\WdfCoInstaller01009.dll"
+Delete "$INSTDIR\driver\eightbyeight\amd64\winusbcoinstaller2.dll"
+Delete "$INSTDIR\driver\eightbyeight\amd64\WdfCoInstaller01009.dll"
+Delete "$INSTDIR\driver\eightbyeight\eightbyeight_serial.inf"
+Delete "$INSTDIR\driver\eightbyeight\eightbyeight_DFU_runtime.inf"
+Delete "$INSTDIR\driver\eightbyeight\eightbyeight_DFU.inf"
+Delete "$INSTDIR\driver\eightbyeight\libusb_device.cat"
+Delete "$INSTDIR\driver\\blinkinlabs.cat"
 Delete "$INSTDIR\driver\dpinst32.exe"
 Delete "$INSTDIR\driver\dpinst64.exe"
 
@@ -235,6 +258,9 @@ RmDir "$INSTDIR\driver\lightbuddy"
 RmDir "$INSTDIR\driver\blinkypendant\x86"
 RmDir "$INSTDIR\driver\blinkypendant\amd64"
 RmDir "$INSTDIR\driver\blinkypendant"
+RmDir "$INSTDIR\driver\eightbyeight\x86"
+RmDir "$INSTDIR\driver\eightbyeight\amd64"
+RmDir "$INSTDIR\driver\eightbyeight"
 RmDir "$INSTDIR\driver\blinkytape"
 RmDir "$INSTDIR\driver"
 RmDir "$INSTDIR\imageformats"

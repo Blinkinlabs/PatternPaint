@@ -5,24 +5,23 @@ set -e
 
 ################# Library Locations #############################
 # Location of the MINGW libraries (Installed as part of Qt)
-QT_DIR='/c/Qt/Qt5.7.0'
-QT_MINGW=${QT_DIR}'/5.7/mingw53_32/bin/'
-QT_TOOLS=${QT_DIR}'/Tools/mingw530_32/bin/'
-QT_REDIST=${QT_DIR}'/Tools/QtCreator/bin/'
+QT_DIR='/c/Qt/Qt5.7.0/'
+QT_MINGW=${QT_DIR}'5.7/mingw53_32/bin/'
+QT_TOOLS=${QT_DIR}'Tools/mingw530_32/bin/'
+QT_REDIST=${QT_DIR}'Tools/QtCreator/bin/'
 
 # TODO: Adjust for Win32/64?
 #PROGRAMFILES='/c/Program Files (x86)'
-PROGRAMFILES='/c/Program Files'
+PROGRAMFILES='/c/Program Files/'
 
 # Location of the Windows SDK and WDK
-WIN_KIT=${PROGRAMFILES}'/Windows Kits/10/'
-WIN_KIT2=${PROGRAMFILES}'/Windows Kits/10/'
+WIN_KIT=${PROGRAMFILES}'Windows Kits/10/'
 
 # Location of NSIS
-NSIS='${PROGRAMFILES}/NSIS'
+NSIS=${PROGRAMFILES}'NSIS/'
 
 # Location of the PatternPaint repository
-PATTERNPAINT='PatternPaint'
+PATTERNPAINT='PatternPaint/'
 
 # Blinkinlabs32u4_boards repository (for the BlinkyTape driver)
 BLINKYTAPE='Blinkinlabs32u4_boards/'
@@ -33,11 +32,14 @@ BLINKYTILE='Blinkytile/'
 # BlinkyPendant repository (for the BlinkyPendant driver)
 BLINKYPENDANT='Blinkypendant/'
 
+# EightByEight repository (for the EightByEight driver)
+EIGHTBYEIGHT='EightByEight/'
+
 # Winsparkle library release
-WINSPARKLE=${PATTERNPAINT}'/thirdparty/WinSparkle-0.4/'
+WINSPARKLE=${PATTERNPAINT}'thirdparty/WinSparkle-0.4/'
 
 # libusb library release
-LIBUSB=${PATTERNPAINT}'/thirdparty/libusb-1.0.20-win/'
+LIBUSB=${PATTERNPAINT}'thirdparty/libusb-1.0.20-win/'
 
 # Staging directory for this release
 OUTDIR='PatternPaintWindows/'
@@ -59,7 +61,7 @@ cd ${TEMPDIR}
 
 ################## Get PatternPaint ###################
 if [ ! -d "${PATTERNPAINT}" ]; then
-	git clone --depth 1 https://github.com/Blinkinlabs/PatternPaint.git ${PATTERNPAINT}
+	git clone --depth 1 -b qt57 https://github.com/Blinkinlabs/PatternPaint.git ${PATTERNPAINT}
 else
 	cd ${PATTERNPAINT}
 	git pull
@@ -93,8 +95,17 @@ else
 	cd ..
 fi
 
+################## Get EightByEight driver #########################
+if [ ! -d "${EIGHTBYEIGHT}" ]; then
+	git clone --depth 1 https://github.com/Blinkinlabs/EightByEight.git ${EIGHTBYEIGHT}
+else
+	cd ${EIGHTBYEIGHT}
+	git pull
+	cd ..
+fi
+
 ################### Extract the version info ###################
-cd ${PATTERNPAINT}/PatternPaint
+cd ${PATTERNPAINT}PatternPaint
 
 GIT_COMMAND="git -C ${PWD}"
 GIT_VERSION=`${GIT_COMMAND} describe --always --tags 2> /dev/null`
@@ -105,13 +116,13 @@ echo "PatternPaint version: " ${VERSION}
 cd ../../
 
 ################## Build PatternPaint ###################
-cd ${PATTERNPAINT}/PatternPaint
+cd ${PATTERNPAINT}PatternPaint
 
 PATH=${QT_TOOLS}:${QT_MINGW}:${PATH}
 
 qmake.exe -config release OBJECTS_DIR=build MOC_DIR=build/moc RCC_DIR=build/rcc UI_DIR=build/uic DESTDIR=bin
 #TODO
-mingw32-make.exe clean
+#mingw32-make.exe clean
 mingw32-make.exe 
 
 cd ../../
@@ -129,9 +140,12 @@ mkdir -p ${OUTDIR}driver/lightbuddy/amd64
 mkdir -p ${OUTDIR}driver/blinkypendant
 mkdir -p ${OUTDIR}driver/blinkypendant/x86
 mkdir -p ${OUTDIR}driver/blinkypendant/amd64
+mkdir -p ${OUTDIR}driver/eightbyeight
+mkdir -p ${OUTDIR}driver/eightbyeight/x86
+mkdir -p ${OUTDIR}driver/eightbyeight/amd64
 
 # Main executable
-cp ${PATTERNPAINT}/PatternPaint/bin/PatternPaint.exe ${OUTDIR}
+cp ${PATTERNPAINT}PatternPaint/bin/PatternPaint.exe ${OUTDIR}
 
 # Note: This list of DLLs must be determined by hand, using Dependency Walker
 # Also, the .nsi file should be synchronized with this list, otherwise the file
@@ -191,24 +205,35 @@ cp ${BLINKYPENDANT}driver/x86/WdfCoInstaller01009.dll ${OUTDIR}driver/blinkypend
 cp ${BLINKYPENDANT}driver/amd64/winusbcoinstaller2.dll ${OUTDIR}driver/blinkypendant/amd64/
 cp ${BLINKYPENDANT}driver/amd64/WdfCoInstaller01009.dll ${OUTDIR}driver/blinkypendant/amd64/
 
+# EightByEight Driver files
+cp ${EIGHTBYEIGHT}driver/eightbyeight_serial.inf ${OUTDIR}driver/eightbyeight/
+cp ${EIGHTBYEIGHT}driver/eightbyeight_DFU_runtime.inf ${OUTDIR}driver/eightbyeight/
+cp ${EIGHTBYEIGHT}driver/eightbyeight_DFU.inf ${OUTDIR}driver/eightbyeight/
+cp ${EIGHTBYEIGHT}driver/libusb_device.cat ${OUTDIR}driver/eightbyeight/
+cp ${EIGHTBYEIGHT}driver/blinkinlabs.cat ${OUTDIR}driver/eightbyeight/
+cp ${EIGHTBYEIGHT}driver/x86/winusbcoinstaller2.dll ${OUTDIR}driver/eightbyeight/x86/
+cp ${EIGHTBYEIGHT}driver/x86/WdfCoInstaller01009.dll ${OUTDIR}driver/eightbyeight/x86/
+cp ${EIGHTBYEIGHT}driver/amd64/winusbcoinstaller2.dll ${OUTDIR}driver/eightbyeight/amd64/
+cp ${EIGHTBYEIGHT}driver/amd64/WdfCoInstaller01009.dll ${OUTDIR}driver/eightbyeight/amd64/
+
 # Driver installer
-cp "${WIN_KIT}redist/DIFx/dpinst/MultiLin/x86/dpinst.exe" ${OUTDIR}driver/dpinst32.exe
-cp "${WIN_KIT}redist/DIFx/dpinst/MultiLin/x64/dpinst.exe" ${OUTDIR}driver/dpinst64.exe
+cp "${WIN_KIT}Redist/DIFx/dpinst/MultiLin/x86/dpinst.exe" ${OUTDIR}driver/dpinst32.exe
+cp "${WIN_KIT}Redist/DIFx/dpinst/MultiLin/x64/dpinst.exe" ${OUTDIR}driver/dpinst64.exe
 
 # Run NSIS to make an executablels
 # For some reason the NSIS file is run from the directory it's located in?
-cp ${PATTERNPAINT}/"Pattern Paint.nsi" "Pattern Paint.nsi"
+cp ${PATTERNPAINT}"Pattern Paint.nsi" "Pattern Paint.nsi"
 
 # Update the version info in the NSI, fail if it didn't change
 sed -i 's/VERSION_STRING/'${VERSION}'.0/g' "Pattern Paint.nsi"
 grep -q ${VERSION} "Pattern Paint.nsi"
 
-"${NSIS}/makensis.exe" "Pattern Paint.nsi"
+"${NSIS}makensis.exe" "Pattern Paint.nsi"
 
 rm "Pattern Paint.nsi"
 
 # Sign the installer
 # NOTE: You need to install the Blinkinlabs key for this to work
-"${WIN_KIT2}bin/x86/signtool.exe" sign //v //n "Blinkinlabs, LLC" //tr http://tsa.starfieldtech.com "PatternPaint Windows Installer.exe"
+"${WIN_KIT}bin/x86/signtool.exe" sign //v //n "Blinkinlabs, LLC" //tr http://tsa.starfieldtech.com "PatternPaint Windows Installer.exe"
 
 mv "PatternPaint Windows Installer.exe" "../PatternPaint_Installer_"${VERSION}".exe"
