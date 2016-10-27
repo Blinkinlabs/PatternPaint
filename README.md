@@ -37,14 +37,21 @@ Use Xcode 8, available in the app store:
 
 Note: Be sure to run Xcode at least once to accept the license agreements.
 
-TODO: is there a way to install a specific version?
+Note: If the current version of Xcode is not compatible, it should be possible to download an ISO from the Apple developer website.
 TODO: do the command line tools need to be installed specifically anymore?
 
 ### Qt dev environment
 
+Get Qt 5.7:
+
     http://download.qt.io/archive/qt/5.7/5.7.0/qt-opensource-mac-x64-clang-5.7.0.dmg
 
-Install it using the defaults (TODO: check if there is anything else necessecary here)
+Install it using the default options.
+
+Next, you'll also need to modify a qt build script to fix compatibility with Xcode 8. Following these instructions: https://forum.qt.io/topic/71119/project-error-xcode-not-set-up-properly/7
+
+	vi ~/Qt5.7.0/5.7/clang_64/mkspecs/features/mac/default_pre.prf
+	:%s/xcrun\ 2/xcodebuild\ 2/gc
 
 Next, download a patched version of qtSerialPort, to fix a critical bug affecting serial disconnects. For more information, see: https://codereview.qt-project.org/#/c/170601/
 
@@ -56,10 +63,6 @@ Next, download a patched version of qtSerialPort, to fix a critical bug affectin
 	rm -R ~/Qt5.7.0/5.7/clang_64/lib/QtSerialPort.framework/
 	mv lib/QtSerialPort.framework/ ~/Qt5.7.0/5.7/clang_64/lib/
 
-If you are using Xcode 8, you'll also need to modify a qt build script: https://forum.qt.io/topic/71119/project-error-xcode-not-set-up-properly/7
-
-	vi ~/Qt5.7.0/5.7/clang_64/mkspecs/features/mac/default_pre.prf
-	:%s/xcrun\ 2/xcodebuild\ 2/gc
 
 ## Windows Prerequisites:
 
