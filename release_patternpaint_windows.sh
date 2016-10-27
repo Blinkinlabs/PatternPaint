@@ -3,6 +3,13 @@
 #Stop on any error
 set -e
 
+################# Signature #####################################
+
+ROOT_CERTIFICATE='../GlobalSign_Root_CA.crt'
+TIMESTAMP_SERVER='http://timestamp.globalsign.com/scripts/timstamp.dll'
+SIGNING_ID='Blinkinlabs, LLC'
+
+
 ################# Library Locations #############################
 # Location of the MINGW libraries (Installed as part of Qt)
 QT_DIR='/c/Qt/Qt5.7.0/'
@@ -11,11 +18,12 @@ QT_TOOLS=${QT_DIR}'Tools/mingw530_32/bin/'
 QT_REDIST=${QT_DIR}'Tools/QtCreator/bin/'
 
 # TODO: Adjust for Win32/64?
-#PROGRAMFILES='/c/Program Files (x86)'
-PROGRAMFILES='/c/Program Files/'
+PROGRAMFILES='/c/Program Files (x86)/'
+#PROGRAMFILES='/c/Program Files/'
 
 # Location of the Windows SDK and WDK
-WIN_KIT=${PROGRAMFILES}'Windows Kits/10/'
+WIN_KIT_SIGNTOOL=${PROGRAMFILES}'Windows Kits/10/'
+WIN_KIT_DPINST=${PROGRAMFILES}'Windows Kits/8.1/'
 
 # Location of NSIS
 NSIS=${PROGRAMFILES}'NSIS/'
@@ -61,7 +69,7 @@ cd ${TEMPDIR}
 
 ################## Get PatternPaint ###################
 if [ ! -d "${PATTERNPAINT}" ]; then
-	git clone --depth 1 -b qt57 https://github.com/Blinkinlabs/PatternPaint.git ${PATTERNPAINT}
+	git clone -b qt57 https://github.com/Blinkinlabs/PatternPaint.git ${PATTERNPAINT}
 else
 	cd ${PATTERNPAINT}
 	git pull
@@ -217,8 +225,8 @@ cp ${EIGHTBYEIGHT}driver/amd64/winusbcoinstaller2.dll ${OUTDIR}driver/eightbyeig
 cp ${EIGHTBYEIGHT}driver/amd64/WdfCoInstaller01009.dll ${OUTDIR}driver/eightbyeight/amd64/
 
 # Driver installer
-cp "${WIN_KIT}Redist/DIFx/dpinst/MultiLin/x86/dpinst.exe" ${OUTDIR}driver/dpinst32.exe
-cp "${WIN_KIT}Redist/DIFx/dpinst/MultiLin/x64/dpinst.exe" ${OUTDIR}driver/dpinst64.exe
+cp "${WIN_KIT_DPINST}redist/DIFx/dpinst/MultiLin/x86/dpinst.exe" ${OUTDIR}driver/dpinst32.exe
+cp "${WIN_KIT_DPINST}redist/DIFx/dpinst/MultiLin/x64/dpinst.exe" ${OUTDIR}driver/dpinst64.exe
 
 # Run NSIS to make an executablels
 # For some reason the NSIS file is run from the directory it's located in?
@@ -233,7 +241,6 @@ grep -q ${VERSION} "Pattern Paint.nsi"
 rm "Pattern Paint.nsi"
 
 # Sign the installer
-# NOTE: You need to install the Blinkinlabs key for this to work
-"${WIN_KIT}bin/x86/signtool.exe" sign //v //n "Blinkinlabs, LLC" //tr http://tsa.starfieldtech.com "PatternPaint Windows Installer.exe"
+"${WIN_KIT_SIGNTOOL}bin/x86/signtool.exe" sign //v //ac ${ROOT_CERTIFICATE} //n "${SIGNING_ID}" //fd sha256 //tr ${TIMESTAMP_SERVER} //td sha256 //a PatternPaint\ Windows\ Installer.exe
 
 mv "PatternPaint Windows Installer.exe" "../PatternPaint_Installer_"${VERSION}".exe"
