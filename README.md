@@ -119,6 +119,11 @@ There's a PPA with the latest version of Qt, Hooray!
 
 Note: You'll probably need to update the qt serial version, similar to the macOS instructions above.
 
+### Serial permissions
+
+You'll need to add yourself to the dialout group in order to access the serial ports:
+
+	sudo adduser `whoami` dialout
 
 ## All platforms: Build process
 
