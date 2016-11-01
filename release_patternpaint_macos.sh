@@ -15,7 +15,7 @@ echo "Building in: " `pwd`
 
 # Get the repository
 #git clone https://github.com/Blinkinlabs/PatternPaint.git
-git clone -b qt57 /Users/matt/Blinkinlabs-Repos/PatternPaint/.git
+git clone ${OUTPUTDIR}/.git
 cd PatternPaint/PatternPaint
 
 # Extract the version
