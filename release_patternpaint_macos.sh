@@ -75,8 +75,16 @@ codesign --verify --verbose=4 PatternPaint/PatternPaint.app
 
 
 # TODO: Make a dmg instead?
-cd PatternPaint; zip ${OUTPUTDIR}/PatternPaint_${VERSION}.zip PatternPaint.app/ -r --symlinks
+#cd PatternPaint; zip ${OUTPUTDIR}/PatternPaint_${VERSION}.zip PatternPaint.app/ -r --symlinks
 
 #mv PatternPaint/PatternPaint.app ${OUTPUTDIR}/PatternPaint_${VERSION}.app
+
+DMG_NAME=PatternPaint_${VERSION}
+
+mkdir ${DMG_NAME}
+mv PatternPaint/PatternPaint.app/ ${DMG_NAME}/
+hdiutil create -volname ${DMG_NAME} -srcfolder ${DMG_NAME} -ov -format UDZO ${OUTPUTDIR}/${DMG_NAME}.dmg
+
+
 
 # TODO: Clean up temp dir
