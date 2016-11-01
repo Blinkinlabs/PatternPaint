@@ -9,14 +9,16 @@ export QTDIR=~/Qt5.7.0/5.7/clang_64/
 OUTPUTDIR=`pwd`
 echo "Output to: " ${OUTPUTDIR}
 
-# Move to a temporary directory
-pushd $(mktemp -d -t com.blinkinlabs.PatternPaint)
-echo "Building in: " `pwd`
+## Move to a temporary directory
+#pushd $(mktemp -d -t com.blinkinlabs.PatternPaint)
+#echo "Building in: " `pwd`
+#
+## Get the repository
+##git clone https://github.com/Blinkinlabs/PatternPaint.git
+#git clone ${OUTPUTDIR}/.git
+#cd PatternPaint/PatternPaint
 
-# Get the repository
-#git clone https://github.com/Blinkinlabs/PatternPaint.git
-git clone ${OUTPUTDIR}/.git
-cd PatternPaint/PatternPaint
+cd PatternPaint
 
 # Extract the version
 GIT_COMMAND="git -C ${PWD}"
@@ -85,6 +87,4 @@ mkdir ${DMG_NAME}
 mv PatternPaint/PatternPaint.app/ ${DMG_NAME}/
 hdiutil create -volname ${DMG_NAME} -srcfolder ${DMG_NAME} -ov -format UDZO ${OUTPUTDIR}/${DMG_NAME}.dmg
 
-
-
-# TODO: Clean up temp dir
+rm -R ${DMG_NAME}
