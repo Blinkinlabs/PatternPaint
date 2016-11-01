@@ -38,7 +38,10 @@ Use Xcode 8, available in the app store:
 Note: Be sure to run Xcode at least once to accept the license agreements.
 
 Note: If the current version of Xcode is not compatible, it should be possible to download an ISO from the Apple developer website.
-TODO: do the command line tools need to be installed specifically anymore?
+
+Get the command line tools:
+
+    xcode-select --install
 
 ### Qt dev environment
 
