@@ -37,7 +37,7 @@ ${QTDIR}/bin/macdeployqt PatternPaint/PatternPaint.app -verbose=1
 
 # TODO: automate this instead of listing each plugin separately?
 
-SIGNING_ID='Developer ID Application: BLINKINLABS, LLC (9NW4AWMNS6)'
+SIGNING_ID='Developer ID Application: BLINKINLABS, LLC'
 CODESIGN_FLAGS="--verbose --force"
 
 # Sign the frameworks
