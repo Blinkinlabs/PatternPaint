@@ -65,3 +65,12 @@ FORMS += \
     $$PWD/welcomescreen.ui \
     $$PWD/preferences.ui \
     $$PWD/sceneconfiguration.ui
+
+macx {
+    # App nap, to prevent macOS from sleeping PatternPaint
+    HEADERS  += \
+        $$PWD/appnap.h
+
+    OBJECTIVE_SOURCES += \
+        $$PWD/appnap.mm
+}

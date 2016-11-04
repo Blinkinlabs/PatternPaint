@@ -34,6 +34,7 @@ mac {
 
 # Disable updater checks when debugging, since the test app isn't signed and will fail anyway.
 CONFIG(debug, debug|release) {
+    message("Debug build, disabling app update checks")
     DEFINES += DISABLE_UPDATE_CHECKS
 }
 
@@ -80,11 +81,6 @@ macx {
     # OS X: Specify our developer information using a custom plist
     QMAKE_INFO_PLIST = Info.plist
 
-    HEADERS  += \
-        appnap.h
-
-    OBJECTIVE_SOURCES += \
-        appnap.mm
 }
 
 win32 {
