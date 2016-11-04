@@ -238,7 +238,8 @@ MainWindow::MainWindow(QWidget *parent) :
         this->menuToolbars->addAction(action);
     }
 
-    connect(this, SIGNAL(windowLoaded()), this, SLOT(on_windowLoaded()));
+    connect(this, SIGNAL(windowLoaded()), this, SLOT(on_windowLoaded()),
+            Qt::ConnectionType(Qt::QueuedConnection));
 
     // Refresh the display for no pattern selected
     on_patternCollectionCurrentChanged(QModelIndex(), QModelIndex());
