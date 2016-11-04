@@ -824,7 +824,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../images.qrc">
      <normaloff>:/icons/images/icons/Save-100.png</normaloff>:/icons/images/icons/Save-100.png</iconset>
    </property>
    <property name="text">
@@ -896,7 +896,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../images.qrc">
      <normaloff>:/icons/images/icons/Downloading Updates-100.png</normaloff>:/icons/images/icons/Downloading Updates-100.png</iconset>
    </property>
    <property name="text">
@@ -924,7 +924,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../images.qrc">
      <normaloff>:/icons/images/icons/Play-100.png</normaloff>:/icons/images/icons/Play-100.png</iconset>
    </property>
    <property name="text">
@@ -936,7 +936,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../images.qrc">
      <normaloff>:/icons/images/icons/Pencil-100.png</normaloff>:/icons/images/icons/Pencil-100.png</iconset>
    </property>
    <property name="text">
@@ -951,7 +951,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../images.qrc">
      <normaloff>:/icons/images/icons/Line-100.png</normaloff>:/icons/images/icons/Line-100.png</iconset>
    </property>
    <property name="text">
@@ -966,7 +966,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../images.qrc">
      <normaloff>:/icons/images/icons/Color Dropper-100.png</normaloff>:/icons/images/icons/Color Dropper-100.png</iconset>
    </property>
    <property name="text">
@@ -984,7 +984,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../images.qrc">
      <normaloff>:/icons/images/icons/Fill Color-100.png</normaloff>:/icons/images/icons/Fill Color-100.png</iconset>
    </property>
    <property name="text">
@@ -1002,7 +1002,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../images.qrc">
      <normaloff>:/icons/images/icons/Deadly Spray-100.png</normaloff>:/icons/images/icons/Deadly Spray-100.png</iconset>
    </property>
    <property name="text">
@@ -1032,7 +1032,7 @@
   </action>
   <action name="actionClose">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../images.qrc">
      <normaloff>:/icons/images/icons/Minus-100.png</normaloff>:/icons/images/icons/Minus-100.png</iconset>
    </property>
    <property name="text">
@@ -1044,7 +1044,7 @@
   </action>
   <action name="actionStepBackward">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../images.qrc">
      <normaloff>:/icons/images/icons/Rewind-100.png</normaloff>:/icons/images/icons/Rewind-100.png</iconset>
    </property>
    <property name="text">
@@ -1053,7 +1053,7 @@
   </action>
   <action name="actionStepForward">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../images.qrc">
      <normaloff>:/icons/images/icons/Fast Forward-100.png</normaloff>:/icons/images/icons/Fast Forward-100.png</iconset>
    </property>
    <property name="text">
@@ -1065,7 +1065,7 @@
   </action>
   <action name="actionAddFrame">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../images.qrc">
      <normaloff>:/icons/images/icons/Add Image-100.png</normaloff>:/icons/images/icons/Add Image-100.png</iconset>
    </property>
    <property name="text">
@@ -1077,7 +1077,7 @@
   </action>
   <action name="actionDeleteFrame">
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset resource="../images.qrc">
      <normaloff>:/icons/images/icons/Remove Image-100.png</normaloff>:/icons/images/icons/Remove Image-100.png</iconset>
    </property>
    <property name="text">
@@ -1168,7 +1168,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="images.qrc"/>
+  <include location="../images.qrc"/>
  </resources>
  <connections/>
 </ui>
