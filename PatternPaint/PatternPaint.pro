@@ -57,76 +57,17 @@ equals(QT_MAJOR_VERSION, 5){
 }
 
 SOURCES += \
-    main.cpp\
-    mainwindow.cpp \
-    systeminformation.cpp \
-    aboutpatternpaint.cpp \
-    addressprogrammer.cpp \
-    letterboxscrollarea.cpp \
-    colorchooser.cpp \
-    patternframemodel.cpp \
-    pattern.cpp \
-    patterncollectionmodel.cpp \
-    patterncollectionlistview.cpp \
-    patterncollectiondelegate.cpp \
-    patterncollection.cpp \
-    frameeditor.cpp \
-    patternwriter.cpp \
-    patternscrollmodel.cpp \
-    patterndelegate.cpp \
-    patternframeundocommand.cpp \
-    patternscrollundocommand.cpp \
-    welcomescreen.cpp \
-    preferences.cpp \
-    sceneconfiguration.cpp \
-    scenetemplate.cpp \
-    patternframelistview.cpp \
-    eventratelimiter.cpp \
-    outputpreview.cpp
+    main.cpp
 
-HEADERS  += \
-    mainwindow.h \
-    systeminformation.h \
-    aboutpatternpaint.h \
-    addressprogrammer.h \
-    letterboxscrollarea.h \
-    colorchooser.h \
-    patternframemodel.h \
-    pattern.h \
-    patterncollectionmodel.h \
-    patterncollectionlistview.h \
-    patterncollectiondelegate.h \
-    patterncollection.h \
-    frameeditor.h \
-    patternwriter.h \
-    patternscrollmodel.h \
-    patternmodel.h \
-    patterndelegate.h \
-    patternframeundocommand.h \
-    patternscrollundocommand.h \
-    welcomescreen.h \
-    preferences.h \
-    sceneconfiguration.h \
-    defaults.h \
-    scenetemplate.h \
-    patternframelistview.h \
-    eventratelimiter.h \
-    outputpreview.h
+HEADERS  += 
 
-
-FORMS    += \
-    mainwindow.ui \
-    systeminformation.ui \
-    aboutpatternpaint.ui \
-    addressprogrammer.ui \
-    welcomescreen.ui \
-    preferences.ui \
-    sceneconfiguration.ui
+FORMS    += 
 
 RESOURCES += \
     images.qrc \
     examples.qrc
 
+include(gui/gui.pri)
 include(instruments/instruments.pri)
 include(controllers/controllers.pri)
 include(fixtures/fixtures.pri)
