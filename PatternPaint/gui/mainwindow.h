@@ -4,7 +4,6 @@
 #include "blinkycontroller.h"
 #include "blinkyuploader.h"
 #include "frameeditor.h"
-#include "addressprogrammer.h"
 #include "colorchooser.h"
 #include "patterncollection.h"
 #include "welcomescreen.h"
@@ -92,8 +91,6 @@ private slots:
     void on_actionSave_to_Blinky_triggered();
 
     void on_actionClear_Pattern_triggered();
-
-    void on_actionAddress_programmer_triggered();
 
     void on_instrumentSelected(bool);
 

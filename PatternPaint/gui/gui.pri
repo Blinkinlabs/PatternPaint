@@ -4,7 +4,6 @@ HEADERS += \
     $$PWD/mainwindow.h \
     $$PWD/systeminformation.h \
     $$PWD/aboutpatternpaint.h \
-    $$PWD/addressprogrammer.h \
     $$PWD/letterboxscrollarea.h \
     $$PWD/colorchooser.h \
     $$PWD/patternframemodel.h \
@@ -34,7 +33,6 @@ SOURCES += \
     $$PWD/mainwindow.cpp \
     $$PWD/systeminformation.cpp \
     $$PWD/aboutpatternpaint.cpp \
-    $$PWD/addressprogrammer.cpp \
     $$PWD/letterboxscrollarea.cpp \
     $$PWD/colorchooser.cpp \
     $$PWD/patternframemodel.cpp \
@@ -61,7 +59,6 @@ FORMS += \
     $$PWD/mainwindow.ui \
     $$PWD/systeminformation.ui \
     $$PWD/aboutpatternpaint.ui \
-    $$PWD/addressprogrammer.ui \
     $$PWD/welcomescreen.ui \
     $$PWD/preferences.ui \
     $$PWD/sceneconfiguration.ui

@@ -722,7 +722,6 @@
     <addaction name="actionSave_to_Blinky"/>
     <addaction name="separator"/>
     <addaction name="actionRestore_firmware"/>
-    <addaction name="actionAddress_programmer"/>
     <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuInstruments">

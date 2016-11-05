@@ -736,13 +736,6 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
     progressDialog.show();
 }
 
-void MainWindow::on_actionAddress_programmer_triggered()
-{
-    AddressProgrammer programmer(this);
-    programmer.setWindowModality(Qt::WindowModal);
-    programmer.exec();
-}
-
 void MainWindow::closeEvent(QCloseEvent *event)
 {
 #if defined(Q_OS_MACX)    // Workaround for issue #114, multile close events are sent when closing from the dock
