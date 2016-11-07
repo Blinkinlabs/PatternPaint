@@ -158,13 +158,7 @@ bool BlinkyTape::open()
 
     qDebug() << "Connecting to device on " << serialInfo.portName();
 
-#if defined(Q_OS_OSX)
-    // Note: This should be info.portName(). Changed here as a workaround for:
-    // https://bugreports.qt.io/browse/QTBUG-45127
-    serial->setPortName(serialInfo.systemLocation());
-#else
     serial->setPortName(serialInfo.portName());
-#endif
     serial->setBaudRate(QSerialPort::Baud115200);
 
     if (!serial->open(QIODevice::ReadWrite)) {

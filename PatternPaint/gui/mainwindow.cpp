@@ -46,8 +46,7 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    colorChooser(this),
-    progressDialog(this)
+    colorChooser(this)
 {
     setupUi(this);
 
