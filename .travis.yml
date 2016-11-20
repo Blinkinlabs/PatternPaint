@@ -17,5 +17,15 @@ script:
 #  - source /opt/qt55/bin/qt55-env.sh
   - source /opt/qt57/bin/qt57-env.sh
   - cd PatternPaint
-  - qmake -config release
-  - make
+  - qmake -config release PREFIX=/app
+  - make -j7
+
+  - wget -c https://gist.github.com/probonopd/759fa980147c689a9cf8983f6d45f096/raw/83eed1769fb09deb44c54c27667752ab7b5d6b2e/easy-linuxdeployqt.sh
+  - bash easy-linuxdeployqt.sh
+  - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+  - bash ./upload.sh ./*.AppImage
+
+branches:
+  except:
+    - # Do not build tags that we create when we upload to GitHub Releases
+- /^(?i:continuous)$/
