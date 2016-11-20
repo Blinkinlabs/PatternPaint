@@ -11,21 +11,21 @@ before_install:
 
 install:
 #  - sudo apt-get -y install qt55[QTPACKAGE] libqt5serialport5-dev
-  - sudo apt-get -y install qt57[QTPACKAGE] qt57serialport libusb-1.0-0-dev
+  - sudo apt-get -y install qt57[QTPACKAGE] qt57serialport libusb-1.0-0-dev icnsutils
 
 script:
 #  - source /opt/qt55/bin/qt55-env.sh
   - source /opt/qt57/bin/qt57-env.sh
   - cd PatternPaint
-  - qmake -config release PREFIX=/app
+  - qmake -config release
   - make -j7
-
-  - wget -c https://gist.github.com/probonopd/759fa980147c689a9cf8983f6d45f096/raw/83eed1769fb09deb44c54c27667752ab7b5d6b2e/easy-linuxdeployqt.sh
-  - bash easy-linuxdeployqt.sh
-  - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
-  - bash ./upload.sh ./*.AppImage
-
-branches:
-  except:
-    - # Do not build tags that we create when we upload to GitHub Releases
-- /^(?i:continuous)$/
+  - icns2png images/patternpaint.icns -x
+  - cp patternpaint_256x256x32.png patternpaint.png
+  - cd ..
+  - find PatternPaint/
+  - wget -c https://github.com/probonopd/linuxdeployqt/releases/download/1/linuxdeployqt-1-x86_64.AppImage -O linuxdeployqt
+  - chmod a+x linuxdeployqt
+  - unset LD_LIBRARY_PATH # Remove too old Qt from the search path; TODO: Move inside the linuxdeployqt AppImage
+  - ./linuxdeployqt PatternPaint/PatternPaint -qmldir=PatternPaint/ -bundle-non-qt-libs || true # Bug that exits with 1
+  - ./linuxdeployqt PatternPaint/PatternPaint -qmldir=PatternPaint/ -appimage || true # Bug that exits with 1
+  - curl --upload-file ./*.AppImage https://transfer.sh/PatternPaint-git$(git describe --tags --always)-x86_64.AppImage
