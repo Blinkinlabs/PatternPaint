@@ -16,7 +16,7 @@ SerialCommand checkDeviceSignature()
 
 SerialCommand reset()
 {
-    return SerialCommand("reset", QByteArray('E'), QByteArray('\r'));
+    return SerialCommand("reset", QByteArray("E"), QByteArray("\r"));
 }
 
 SerialCommand setAddress(int address)
