@@ -50,6 +50,8 @@ private:
     QImage frameData;     ///< Frame image
     int frameIndex;                 ///< Frame index
 
+    QPoint lastMousePoint;
+
     QPointer<AbstractInstrument> instrument;
 
     QImage gridPattern;    ///< Holds the pre-rendered grid overlay
@@ -63,6 +65,9 @@ private:
 
     QPointer<Fixture> fixture;
 
+    /// Convert a coordinte from frame coordinate to image coordinate
+    QPoint frameToImage(const QPoint& framePoint) const;
+
     /// Redraw the gridPattern to fit the current widget size.
     void updateGridSize();
 
@@ -70,7 +75,7 @@ private:
     void lazyUpdate();
 
     /// True if the editor has an image to edit
-    bool hasImage();
+    bool hasImage() const;
 
     void paintEvent(QPaintEvent *event);
 

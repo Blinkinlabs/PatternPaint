@@ -19,6 +19,14 @@
 
 #define GRID_MIN_Y_SCALE        6   // Minimum scale that the image needs to scale to before the grid is displayed
 
+
+QPoint FrameEditor::frameToImage(const QPoint &framePoint) const {
+    //    int x = event->x()/pixelScale;
+    //    int y = event->y()/pixelScale;
+    return (QPoint(framePoint.x()/pixelScale, framePoint.y()/pixelScale));
+}
+
+
 FrameEditor::FrameEditor(QWidget *parent) :
     QWidget(parent),
     frameIndex(0),
@@ -31,7 +39,7 @@ FrameEditor::FrameEditor(QWidget *parent) :
     setMouseTracking(true);
 }
 
-bool FrameEditor::hasImage()
+bool FrameEditor::hasImage() const
 {
     return !frameData.isNull();
 }
@@ -138,7 +146,7 @@ void FrameEditor::mousePressEvent(QMouseEvent *event)
         return;
 
     setCursor(instrument->cursor());
-    instrument->mousePressEvent(event, *this, QPoint(event->x()/pixelScale, event->y()/pixelScale));
+    instrument->mousePressEvent(event, *this, frameToImage(event->pos()));
     lazyUpdate();
 }
 
@@ -147,30 +155,21 @@ void FrameEditor::mouseMoveEvent(QMouseEvent *event)
     if (!hasImage() || instrument.isNull())
         return;
 
-    // Ignore the update request if it came too quickly
+    // Filter the move event if it came too quickly
     static intervalFilter rateLimiter(MIN_MOUSE_INTERVAL);
 
     if(!rateLimiter.check())
         return;
 
-    static int oldX = -1;
-    static int oldY = -1;
+    QPoint mousePoint = frameToImage(event->pos());
 
-    Q_UNUSED(oldX);
-    Q_UNUSED(oldY);
-
-    int x = event->x()/pixelScale;
-    int y = event->y()/pixelScale;
-
-    // If the position hasn't changed, don't do anything.
-    // This is to avoid expensive reprocessing of the tool preview window.
-    if (x == oldX && y == oldY)
+    // Filter the move event if it didn't result in a move to a new image pixel
+    if (mousePoint == lastMousePoint)
         return;
 
-    oldX = x;
-    oldY = y;
+    lastMousePoint = mousePoint;
 
-    instrument->mouseMoveEvent(event, *this, QPoint(x, y));
+    instrument->mouseMoveEvent(event, *this, mousePoint);
 
     lazyUpdate();
 }
@@ -182,7 +181,7 @@ void FrameEditor::mouseReleaseEvent(QMouseEvent *event)
     if (!hasImage() || instrument.isNull())
         return;
 
-    instrument->mouseReleaseEvent(event, *this, QPoint(event->x()/pixelScale, event->y()/pixelScale));
+    instrument->mouseReleaseEvent(event, *this, frameToImage(event->pos()));
     lazyUpdate();
 }
 
