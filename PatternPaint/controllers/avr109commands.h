@@ -6,21 +6,21 @@
 #include <QList>
 
 /// Subset of AVR109 commands supported by the Caterina bootloader
-/// -Start block flash read 'g'
-/// -Start block flash write 'g'
+/// See Caterina.c in the Arduino sources, and the 'AVR109: Self Programming'
+/// guide by Atmel for further information.
 
 namespace Avr109Commands {
-///// Read the contents of the flash
-///// @param startAddress Word-aligned address to begin reading from, in bytes
-///// @param lengthBytes Length of data to read, in bytes
-// void readFlash(int startAddress, int lengthBytes);
-
 /// Write the contents of the flash
 /// Note that if length is not a multiple of the page size, some pre-existing
 /// data at the end may be erased.
 /// @param data QByteArray containing the data to write to the flash
 /// @param startAddress Page-aligned address to begin writing to, in bytes
 QList<SerialCommand> writeFlash(QByteArray &data, int startAddress);
+
+/// Verify the contents of the flash
+/// @param data QByteArray containing the expected flash data
+/// @param startAddress Page-aligned address to verify from, in bytes
+QList<SerialCommand> verifyFlash(QByteArray &data, int startAddress);
 
 /// Write a page of flash data
 /// Note that the address must be set by running setAddress() before this

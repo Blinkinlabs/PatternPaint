@@ -296,15 +296,15 @@ void BlinkyTapeUploader::doWork()
         // Queue an EEPROM clear
         QByteArray eepromBytes(EEPROM_TABLE_SIZE_BYTES, char(255));
         commandQueue.enqueue(Avr109Commands::writeEeprom(eepromBytes,0));
+        // TODO: Verify EEPROM?
 
         // Queue all of the flash sections to memory
         while (!flashData.empty()) {
             FlashSection f = flashData.front();
             commandQueue.enqueue(Avr109Commands::writeFlash(f.data, f.address));
+            commandQueue.enqueue(Avr109Commands::verifyFlash(f.data, f.address));
             flashData.pop_front();
         }
-
-        // TODO: Add verify stage?
 
         commandQueue.enqueue(Avr109Commands::reset());
 
