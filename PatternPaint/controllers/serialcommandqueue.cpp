@@ -98,7 +98,7 @@ void SerialCommandQueue::processQueue()
         return;
     }
 
-// qDebug() << "Starting Command:" << queue.front().name;
+    //qDebug() << "Starting Command:" << queue.front().name;
     responseData.clear();
 
     if (serial->write(queue.front().data)

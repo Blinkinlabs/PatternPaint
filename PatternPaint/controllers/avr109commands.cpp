@@ -3,7 +3,9 @@
 
 #include <QDebug>
 
-#define PAGE_SIZE_BYTES 128
+#define FLASH_PAGE_SIZE_BYTES 128 // This could be polled using the 'b' command
+
+#define EEPROM_CHUNK_SIZE_BYTES 32 // EEPROM writes are slow, so chunk them into smaller commands
 
 namespace Avr109Commands {
 // Send the command to probe for the device signature, and register the expected response
@@ -14,25 +16,19 @@ SerialCommand checkDeviceSignature()
 
 SerialCommand reset()
 {
-    return SerialCommand("reset", QByteArray("E"), QByteArray("\r"));
+    return SerialCommand("reset", QByteArray('E'), QByteArray('\r'));
 }
 
 SerialCommand setAddress(int address)
 {
-    // TODO: Test if address > supported
-    if (address & 0x01) {
-        // TODO: report error
-        qCritical() << "Address out of bounds";
-    }
-
-    // Note that the address her is word aligned.
+    // Note that the address is word defined for flash, but byte defined for EEPROM.
     QByteArray command;
     command.append('A');
-    command.append((address >> 9) & 0xFF);
-    command.append((address >> 1) & 0xFF);
+    command.append((address >> 8) & 0xFF);
+    command.append((address >> 0) & 0xFF);
 
     QByteArray response;
-    response.append("\r");
+    response.append('\r');
 
     return SerialCommand("setAddress", command, response);
 }
@@ -57,7 +53,7 @@ SerialCommand setAddress(int address)
 // response.append((char)0x00);
 // responseMask.append((char)0x00);
 // }
-// response.append("\r");
+// response.append('\r');
 // responseMask.append((char)0xFF);
 
 //// Note: only the length matters for the response, the response data
@@ -65,26 +61,41 @@ SerialCommand setAddress(int address)
 // return SerialCommand("readFlash", command, response, responseMask);
 // }
 
-SerialCommand writeFlashPage(QByteArray data)
+SerialCommand writeFlashBlock(QByteArray data)
 {
     QByteArray command;
     command.append('B'); // command: write memory
-    command.append((data.count() >> 8) & 0xFF); // read size (high)
-    command.append((data.count())      & 0xFF); // read size (low)
+    command.append((data.count() >> 8) & 0xFF); // write size (high)
+    command.append((data.count())      & 0xFF); // write size (low)
     command.append('F'); // memory type: flash
     command += data;
 
     QByteArray response;
-    response.append("\r");
+    response.append('\r');
 
-    return SerialCommand("writeFlashPage", command, response);
+    return SerialCommand("writeFlashBlock", command, response);
+}
+
+SerialCommand writeEepromBlock(QByteArray data)
+{
+    QByteArray command;
+    command.append('B'); // command: write memory
+    command.append((data.count() >> 8) & 0xFF); // write size (high)
+    command.append((data.count())      & 0xFF); // write size (low)
+    command.append('E'); // memory type: eeprom
+    command += data;
+
+    QByteArray response;
+    response.append('\r');
+
+    return SerialCommand("writeEepromBlock", command, response);
 }
 
 QList<SerialCommand> writeFlash(QByteArray &data, int startAddress)
 {
     QList<SerialCommand> commands;
 
-    if (startAddress%PAGE_SIZE_BYTES) {
+    if (startAddress%FLASH_PAGE_SIZE_BYTES) {
         qCritical() << "Bad start address, must align with page boundary";
         return commands;
     }
@@ -101,27 +112,43 @@ QList<SerialCommand> writeFlash(QByteArray &data, int startAddress)
     }
 
     // TODO: Check that we fit into available memory.
-    commands.append(setAddress(startAddress));
+
+    // Write the word address for Flash writes
+    commands.append(setAddress(startAddress >> 1));
 
     // Write the data in page-sized chunks
     for (int currentChunkPosition = 0;
          currentChunkPosition < data.length();
-         currentChunkPosition += PAGE_SIZE_BYTES) {
-        int currentChunkSize = std::min(PAGE_SIZE_BYTES, data.length() - currentChunkPosition);
+         currentChunkPosition += FLASH_PAGE_SIZE_BYTES) {
+        int currentChunkSize = std::min(FLASH_PAGE_SIZE_BYTES, data.length() - currentChunkPosition);
 
-// QByteArray command;
-// command.append('B'); // command: write memory
-// command.append((currentChunkSize >> 8) & 0xFF); // read size (high)
-// command.append((currentChunkSize)      & 0xFF); // read size (low)
-// command.append('F'); // memory type: flash
-// command.append(data.mid(currentChunkPosition, currentChunkSize));
+        commands.append(writeFlashBlock(data.mid(currentChunkPosition, currentChunkSize)));
+    }
 
-// QByteArray response;
-// response.append("\r");
+    return commands;
+}
 
-// queueCommand(SerialCommand("writeFlash", command, response));
+QList<SerialCommand> writeEeprom(QByteArray &data, int startAddress)
+{
+    QList<SerialCommand> commands;
 
-        commands.append(writeFlashPage(data.mid(currentChunkPosition, currentChunkSize)));
+    if (data.length() == 0) {
+        qCritical() << "No data to write";
+        return commands;
+    }
+
+    // TODO: Check that we fit into available eprom.
+
+    // Write the byte address for EEPROM writes
+    commands.append(setAddress(startAddress));
+
+    // Write the data in small chunks, so that the write doesn't time out.
+    for (int currentChunkPosition = 0;
+         currentChunkPosition < data.length();
+         currentChunkPosition += EEPROM_CHUNK_SIZE_BYTES) {
+        int currentChunkSize = std::min(EEPROM_CHUNK_SIZE_BYTES, data.length() - currentChunkPosition);
+
+        commands.append(writeEepromBlock(data.mid(currentChunkPosition, currentChunkSize)));
     }
 
     return commands;

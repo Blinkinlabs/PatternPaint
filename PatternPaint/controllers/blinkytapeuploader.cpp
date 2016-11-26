@@ -8,7 +8,9 @@
 #include <QDebug>
 
 // TODO: Combine this with the definitions in avruploaddata.cpp
-#define FLASH_MEMORY_AVAILABLE          0x7000  // Amount of application space in the flash
+#define FLASH_BYTES_AVAILABLE           0x7000  // Amount of application space in the flash
+
+#define EEPROM_TABLE_SIZE_BYTES         0x0010  // Amount of space available in the EEPROM
 
 #define PAGE_SIZE_BYTES 128
 
@@ -102,12 +104,12 @@ bool BlinkyTapeUploader::startUpload(BlinkyController &tape, QList<PatternWriter
     // TODO: Verify this by looking at each section individually instead, making sure
     // none of them overlap or extend outside of available memory?
     if (data.sketch.length() + data.patternData.length() + data.patternTable.length()
-        > FLASH_MEMORY_AVAILABLE) {
+        > FLASH_BYTES_AVAILABLE) {
         qCritical() << "sketch can't fit into memory!";
 
         errorString = QString(
             "Sorry! The Pattern is a bit too big to fit in BlinkyTape memory! Avaiable space=%1, Pattern size=%2")
-                      .arg(FLASH_MEMORY_AVAILABLE)
+                      .arg(FLASH_BYTES_AVAILABLE)
                       .arg(
             data.sketch.length() + data.patternData.length() + data.patternTable.length());
         return false;
@@ -143,12 +145,12 @@ bool BlinkyTapeUploader::upgradeFirmware(int timeout)
     // at the end of flash for the configuration header
     // TODO: Could save ~100 bytes if we let the sketch spill into the unused portion
     // of the header.
-    if (sketch.length() > FLASH_MEMORY_AVAILABLE) {
+    if (sketch.length() > FLASH_BYTES_AVAILABLE) {
         qDebug() << "sketch can't fit into memory!";
 
         errorString = QString(
             "Sorry! The Pattern is a bit too big to fit in BlinkyTape memory right now. We're working on improving this! Avaiable space=%1, Pattern size=%2")
-                      .arg(FLASH_MEMORY_AVAILABLE)
+                      .arg(FLASH_BYTES_AVAILABLE)
                       .arg(sketch.length());
         return false;
     }
@@ -181,12 +183,12 @@ bool BlinkyTapeUploader::upgradeFirmware(BlinkyController &blinky)
 
     // The entire sketch must fit into the available memory, minus a single page
     // at the end of flash for the configuration header
-    if (sketch.length() > FLASH_MEMORY_AVAILABLE) {
+    if (sketch.length() > FLASH_BYTES_AVAILABLE) {
         qDebug() << "sketch can't fit into memory!";
 
         errorString = QString(
             "Sorry! The Pattern is a bit too big to fit in BlinkyTape memory right now. We're working on improving this! Avaiable space=%1, Pattern size=%2")
-                      .arg(FLASH_MEMORY_AVAILABLE)
+                      .arg(FLASH_BYTES_AVAILABLE)
                       .arg(sketch.length());
         return false;
     }
@@ -290,6 +292,10 @@ void BlinkyTapeUploader::doWork()
 
         // Send Check Device Signature command
         commandQueue.enqueue(Avr109Commands::checkDeviceSignature());
+
+        // Queue an EEPROM clear
+        QByteArray eepromBytes(EEPROM_TABLE_SIZE_BYTES, char(255));
+        commandQueue.enqueue(Avr109Commands::writeEeprom(eepromBytes,0));
 
         // Queue all of the flash sections to memory
         while (!flashData.empty()) {
