@@ -23,9 +23,12 @@
 QPoint FrameEditor::frameToImage(const QPoint &framePoint) const {
     //    int x = event->x()/pixelScale;
     //    int y = event->y()/pixelScale;
-    return (QPoint(framePoint.x()/pixelScale, framePoint.y()/pixelScale));
+    return framePoint/pixelScale;
 }
 
+QPoint FrameEditor::imageToFrame(const QPoint &imagePoint) const {
+    return imagePoint*pixelScale;
+}
 
 FrameEditor::FrameEditor(QWidget *parent) :
     QWidget(parent),
@@ -106,14 +109,12 @@ void FrameEditor::updateGridSize()
     // cast float to int to save rounded scale
     QSize frameSize = frameData.size();
 
-    // TODO Why?
-    pixelScale = static_cast<int>(float(size().height() - 1)/frameSize.height()*10);
-    pixelScale /= 10;
+    pixelScale = float(size().height())/frameSize.height();
 
     // If the drawing space is large enough, make a grid pattern to superimpose over the image
     if (pixelScale >= GRID_MIN_Y_SCALE) {
-        gridPattern = QImage(frameSize.width()*pixelScale  +.5 + 1,
-                             frameSize.height()*pixelScale +.5 + 1,
+        gridPattern = QImage(frameSize.width()*pixelScale,
+                             frameSize.height()*pixelScale,
                              QImage::Format_ARGB32_Premultiplied);
         gridPattern.fill(COLOR_CLEAR);
 
@@ -124,18 +125,18 @@ void FrameEditor::updateGridSize()
         // Draw vertical lines
         painter.setPen(COLOR_GRID_LINES);
         for (int x = 0; x <= frameSize.width(); x++) {
-            painter.drawLine(x*pixelScale+.5,
+            painter.drawLine(std::round(x*pixelScale),
                              0,
-                             x*pixelScale+.5,
+                             std::round(x*pixelScale),
                              gridPattern.height());
         }
 
         // Draw horizontal lines
         for (int y = 0; y <= frameSize.height(); y++) {
             painter.drawLine(0,
-                             y*pixelScale+.5,
+                             std::round(y*pixelScale),
                              gridPattern.width(),
-                             y*pixelScale+.5);
+                             std::round(y*pixelScale));
         }
     }
 }
@@ -265,51 +266,43 @@ void FrameEditor::paintEvent(QPaintEvent *)
     }
 
     // Draw the image and tool preview
+    // TODO: Why +1 here?
     painter.drawImage(QRect(0, 0,
-                            frameData.width()*pixelScale+.5,
-                            frameData.height()*pixelScale),
+                            frameData.width()*pixelScale + 1,
+                            frameData.height()*pixelScale + 1),
                       frameData);
 
     if (!instrument.isNull() && instrument->hasPreview())
-        painter.drawImage(QRect(0, 0, frameData.width()*pixelScale+.5, frameData.height()*pixelScale),
+        painter.drawImage(QRect(0, 0,
+                                frameData.width()*pixelScale + 1,
+                                frameData.height()*pixelScale + 1),
                           (instrument->getPreview()));
 
     if (pixelScale >= GRID_MIN_Y_SCALE)
         painter.drawImage(0, 0, gridPattern);
 
     // TODO: How to do this more generically?
-// if(deviceModel->showPlaybackIndicator()) {
     if (!fixture.isNull() && showPlaybackIndicator) {
-// int playbackRow = deviceModel->getFrameIndex();
-// const float outputScale = deviceModel->getDisplaySize().width()*xScale;
 
         int playbackRow = frameIndex;
         int fixtureWidth = fixture->getSize().width();
         int fixtureHeight = fixture->getSize().height();
 
         // Draw the playback indicator
-        // Note that we need to compute the correct width based on the rounding error of
-        // the current cell, otherwise it won't line up correctly with the actual image.
         painter.setPen(COLOR_PLAYBACK_EDGE);
-        painter.drawRect(playbackRow*pixelScale +.5,
-                         0,
-                         int((playbackRow+fixtureWidth)*pixelScale +.5) - int(playbackRow*pixelScale +.5),
-                         fixtureHeight*pixelScale);
-        painter.fillRect(playbackRow*pixelScale +.5,
-                         0,
-                         int((playbackRow+fixtureWidth)*pixelScale +.5) - int(playbackRow*pixelScale +.5),
-                         fixtureHeight*pixelScale,
-                         COLOR_PLAYBACK_TOP);
 
-        painter.drawRect((playbackRow-frameData.width())*pixelScale +.5,
-                         0,
-                         int((playbackRow+fixtureWidth)*pixelScale +.5) - int(playbackRow*pixelScale +.5),
-                         fixtureHeight*pixelScale);
-        painter.fillRect((playbackRow-frameData.width())*pixelScale +.5,
-                         0,
-                         int((playbackRow+fixtureWidth)*pixelScale +.5) - int(playbackRow*pixelScale +.5),
-                         fixtureHeight*pixelScale,
-                         COLOR_PLAYBACK_TOP);
+        QPoint topLeft = imageToFrame(QPoint(playbackRow, 0));
+        QPoint bottomRight = imageToFrame(QPoint(playbackRow + fixtureWidth, fixtureHeight));
+
+        painter.drawRect(QRect(topLeft, bottomRight));
+        painter.fillRect(QRect(topLeft, bottomRight), COLOR_PLAYBACK_TOP);
+
+        // In the case that the indicator is split, draw the other half
+        topLeft = imageToFrame(QPoint(playbackRow-frameData.width(),0));
+        bottomRight = imageToFrame(QPoint(playbackRow - frameData.width() + fixtureWidth,fixtureHeight));
+
+        painter.drawRect(QRect(topLeft, bottomRight));
+        painter.fillRect(QRect(topLeft, bottomRight), COLOR_PLAYBACK_TOP);
     }
 }
 

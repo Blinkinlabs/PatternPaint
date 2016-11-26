@@ -67,6 +67,7 @@ private:
 
     /// Convert a coordinte from frame coordinate to image coordinate
     QPoint frameToImage(const QPoint& framePoint) const;
+    QPoint imageToFrame(const QPoint& imagePoint) const;
 
     /// Redraw the gridPattern to fit the current widget size.
     void updateGridSize();
