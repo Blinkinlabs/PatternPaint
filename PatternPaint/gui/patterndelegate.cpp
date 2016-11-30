@@ -66,5 +66,5 @@ QSize PatternDelegate::sizeHint(const QStyleOptionViewItem &option,
                                 const QModelIndex &modelIndex) const
 {
     return getScaledWidgetSize(option.rect.height()+option.decorationSize.height(),
-                               modelIndex.data(PatternFrameModel::FrameImage).value<QImage>().size());
+                               modelIndex.data(PatternModel::FrameImage).value<QImage>().size());
 }
