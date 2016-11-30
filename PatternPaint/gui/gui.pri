@@ -9,7 +9,6 @@ HEADERS += \
     $$PWD/patternframemodel.h \
     $$PWD/pattern.h \
     $$PWD/patterncollectionmodel.h \
-    $$PWD/patterncollectionlistview.h \
     $$PWD/patterncollectiondelegate.h \
     $$PWD/patterncollection.h \
     $$PWD/frameeditor.h \
@@ -38,7 +37,6 @@ SOURCES += \
     $$PWD/patternframemodel.cpp \
     $$PWD/pattern.cpp \
     $$PWD/patterncollectionmodel.cpp \
-    $$PWD/patterncollectionlistview.cpp \
     $$PWD/patterncollectiondelegate.cpp \
     $$PWD/patterncollection.cpp \
     $$PWD/frameeditor.cpp \
