@@ -82,9 +82,12 @@ void BlinkyTapeUploader::handleCommandFinished(QString command, QByteArray retur
 
 void BlinkyTapeUploader::setProgress(int newProgress)
 {
+    qDebug() << "Progress: " << newProgress
+             << "maxProgress: " << maxProgress;
+
     progress = newProgress;
     // TODO: Precalculate the max progress
-    emit(progressChanged(static_cast<float>(progress)/maxProgress));
+    emit(progressChanged((progress*100)/maxProgress));
 }
 
 bool BlinkyTapeUploader::startUpload(BlinkyController &tape, QList<PatternWriter> &patternWriters)
@@ -161,7 +164,7 @@ bool BlinkyTapeUploader::upgradeFirmware(int timeout)
     // TODO: This is duplicated in startUpload...
     maxProgress = 1;    // checkDeviceSignature
     foreach (FlashSection flashSection, flashData)
-        maxProgress += flashSection.data.count()/PAGE_SIZE_BYTES;
+        maxProgress += 2*flashSection.data.count()/PAGE_SIZE_BYTES;
     setProgress(0);
 
     stateStartTime = QDateTime::currentDateTime();
@@ -203,7 +206,7 @@ bool BlinkyTapeUploader::startUpload(BlinkyController &blinky)
 {
     maxProgress = 1;    // checkDeviceSignature
     foreach (FlashSection flashSection, flashData)
-        maxProgress += flashSection.data.count()/PAGE_SIZE_BYTES;
+        maxProgress += 2*flashSection.data.count()/PAGE_SIZE_BYTES;
 
     setProgress(0);
 

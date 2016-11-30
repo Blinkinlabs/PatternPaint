@@ -72,8 +72,6 @@ private slots:
 
     void on_blinkyConnectionStatusChanged(bool connected);
 
-    void on_uploaderProgressChanged(float progressDialog);
-
     void on_uploaderFinished(bool result);
 
     void on_actionExport_pattern_for_Arduino_triggered();

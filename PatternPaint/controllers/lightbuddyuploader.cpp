@@ -228,5 +228,5 @@ void LightBuddyUploader::handleCommandFinished(QString command, QByteArray retur
 void LightBuddyUploader::setProgress(int newProgress)
 {
     progress = newProgress;
-    emit(progressChanged(static_cast<float>(newProgress)/maxProgress));
+    emit(progressChanged((newProgress*100)/maxProgress));
 }

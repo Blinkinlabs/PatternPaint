@@ -198,6 +198,9 @@ void BlinkyPendantUploader::handleCommandFinished(QString command, QByteArray re
 
 void BlinkyPendantUploader::setProgress(int newProgress)
 {
+    // TODO: Calculate max progress
+    int maxProgress = 10;
+
     progress = newProgress;
-    emit(progressChanged(static_cast<float>(progress)/10));
+    emit(progressChanged((progress*100)/maxProgress));
 }

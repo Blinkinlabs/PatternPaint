@@ -172,7 +172,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Pre-set the upload progress dialog
     progressDialog.setMinimum(0);
-    progressDialog.setMaximum(1000);
+    progressDialog.setMaximum(100);
     progressDialog.setWindowModality(Qt::WindowModal);
     progressDialog.setAutoClose(false);
     progressDialog.setAutoReset(false);
@@ -560,19 +560,6 @@ void MainWindow::on_actionSystem_Information_triggered()
     info->show();
 }
 
-void MainWindow::on_uploaderProgressChanged(float progressValue)
-{
-    if (progressDialog.isHidden()) {
-        qDebug()
-            << "Got a progress event while the progress dialog is hidden, event order problem?";
-        return;
-    }
-
-    int newValue = progressDialog.maximum()*progressValue;
-
-    progressDialog.setValue(newValue);
-}
-
 void MainWindow::on_uploaderFinished(bool result)
 {
     mode = Disconnected;
@@ -917,10 +904,12 @@ void MainWindow::applyScene(SceneTemplate sceneTemplate)
 
 void MainWindow::connectUploader()
 {
-    connect(uploader, SIGNAL(progressChanged(float)),
-            this, SLOT(on_uploaderProgressChanged(float)));
     connect(uploader, SIGNAL(finished(bool)),
             this, SLOT(on_uploaderFinished(bool)));
+
+    connect(uploader, SIGNAL(progressChanged(int)),
+            &progressDialog, SLOT(setValue(int)));
+
     connect(&progressDialog, SIGNAL(canceled()),
             uploader, SLOT(cancel()));
 }
