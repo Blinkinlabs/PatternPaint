@@ -114,6 +114,10 @@ When installing, only the 'Windoes Software Development Kit' feature is required
 
 ### Qt, libusb
 
+First, get the essential build tools:
+
+	sudo apt-get install build-essential mesa-common-dev libglu-mesa
+
 There's a PPA with the latest version of Qt, Hooray!
 
 	sudo add-apt-repository --yes ppa:beineri/opt-qt57-trusty
