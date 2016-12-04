@@ -10,7 +10,7 @@ before_install:
 
 install:
 #  - sudo apt-get -y install qt57[QTPACKAGE] qt57serialport libusb-1.0-0-dev icnsutils
-  - sudo apt-get -y install qt57qbs qt57serialport libusb-1.0-0-dev icnsutils
+  - sudo apt-get -y install qt57base qt57declarative qt57serialport libusb-1.0-0-dev icnsutils
 
 script:
 #  - source /opt/qt55/bin/qt55-env.sh
