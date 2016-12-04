@@ -23,9 +23,9 @@ script:
   - cp patternpaint_256x256x32.png patternpaint.png
   - cd ..
   - find PatternPaint/
-  - wget -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage -O linuxdeployqt
+  - wget -c https://github.com/probonopd/linuxdeployqt/releases/download/2/linuxdeployqt-2-x86_64.AppImage -O linuxdeployqt
   - chmod a+x linuxdeployqt
   - unset LD_LIBRARY_PATH # Remove too old Qt from the search path; TODO: Move inside the linuxdeployqt AppImage
-  - ./linuxdeployqt PatternPaint/PatternPaint -qmldir=PatternPaint/ -bundle-non-qt-libs || true # Bug that exits with 1
-  - ./linuxdeployqt PatternPaint/PatternPaint -qmldir=PatternPaint/ -appimage || true # Bug that exits with 1
+  - ./linuxdeployqt PatternPaint/PatternPaint -qmldir=PatternPaint/ -bundle-non-qt-libs
+  - ./linuxdeployqt PatternPaint/PatternPaint -qmldir=PatternPaint/ -appimage
   - curl --upload-file ./*.AppImage https://transfer.sh/PatternPaint-git$(git describe --tags --always)-x86_64.AppImage
