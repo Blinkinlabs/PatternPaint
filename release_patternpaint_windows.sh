@@ -44,7 +44,7 @@ BLINKYPENDANT='Blinkypendant/'
 EIGHTBYEIGHT='EightByEight/'
 
 # Winsparkle library release
-WINSPARKLE=${PATTERNPAINT}'thirdparty/WinSparkle-0.4/'
+WINSPARKLE=${PATTERNPAINT}'thirdparty/WinSparkle-0.5.2/'
 
 # libusb library release
 LIBUSB=${PATTERNPAINT}'thirdparty/libusb-1.0.20-win/'
