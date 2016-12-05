@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
     <title>PatternPaint Changelog</title>
-    <link>http://software.blinkinlabs.com/patternpaint/patternpaint-osx.xml</link>
+    <link>https://software.blinkinlabs.com/patternpaint/patternpaint-osx.xml</link>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
       <item>
@@ -51,6 +51,7 @@
           type="application/octet-stream"
         />
       </item>
+      <item>
         <title>PatternPaint 1.8.0</title>
         <pubDate>Mon, 27 Jul 2015 8:32:00 +0000</pubDate>
         <description>
@@ -71,7 +72,6 @@
           length="13321443"
           type="application/octet-stream"
         />
-
       </item>
   </channel>
 </rss>

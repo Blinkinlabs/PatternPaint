@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
     <title>PatternPaint Changelog</title>
-    <link>http://software.blinkinlabs.com/patternpaint/patternpaint-windows.xml</link>
+    <link>https://software.blinkinlabs.com/patternpaint/patternpaint-windows.xml</link>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
     <item>
@@ -72,7 +72,6 @@
           length="25551480"
           type="application/octet-stream"
         />
-
       </item>
   </channel>
 </rss>
