@@ -129,8 +129,7 @@ cd ${PATTERNPAINT}PatternPaint
 PATH=${QT_TOOLS}:${QT_MINGW}bin/:${PATH}
 
 qmake.exe -config release OBJECTS_DIR=build MOC_DIR=build/moc RCC_DIR=build/rcc UI_DIR=build/uic DESTDIR=bin
-#TODO
-#mingw32-make.exe clean
+mingw32-make.exe clean
 mingw32-make.exe 
 
 cd ../../
