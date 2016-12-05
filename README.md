@@ -229,7 +229,7 @@ Please contact us if you have experience releasing packages for Linux. We're par
 
 The PatternPaint page at blinkinlabs.com contains links to the latest releases. Update those! The page is:
 
-http://blinkinlabs.com/patternpaint
+https://blinkinlabs.com/patternpaint
 
 ## Update the appcast files
 

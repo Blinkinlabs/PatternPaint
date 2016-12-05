@@ -6,6 +6,28 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
       <item>
+        <title>PatternPaint 2.1.0</title>
+        <pubDate>Tue, 06 Dec 2016 12:00:00 +0000</pubDate>
+        <description>
+          <![CDATA[
+<b>Introducing PatternPaint 2.1<b>
+<br>Changelog:<br>
+<ul>
+<li>Control up to 512 LEDs with the BlinkyTape controller</li>
+<li>Allow high brightness setting with the BlinkyTape controller</li>
+<li>Enable manual update checks through the preferences window</li>
+<li>Appimage release for Linux systems</li>
+<li>Lots of bugfixes</li>
+</ul>
+          ]]>
+        </description>
+        <enclosure url="https://github.com/Blinkinlabs/PatternPaint/releases/download/2.1.0/PatternPaint_2.1.0.dmg"
+          sparkle:version="2.1.0"
+          length="19822166"
+          type="application/octet-stream"
+        />
+      </item>
+      <item>
         <title>PatternPaint 2.0.3</title>
         <pubDate>Tue, 22 Dec 2015 12:00:00 +0000</pubDate>
         <description>
