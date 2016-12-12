@@ -82,8 +82,8 @@ void BlinkyTapeUploader::handleCommandFinished(QString command, QByteArray retur
 
 void BlinkyTapeUploader::setProgress(int newProgress)
 {
-    qDebug() << "Progress: " << newProgress
-             << "maxProgress: " << maxProgress;
+    qDebug() << "Progress:" << newProgress
+             << "maxProgress:" << maxProgress;
 
     progress = newProgress;
     // TODO: Precalculate the max progress

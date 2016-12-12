@@ -22,7 +22,7 @@ bool SerialCommandQueue::open(QSerialPortInfo info)
         return false;
     }
 
-    qDebug() << "connecting to " << info.portName();
+    qDebug() << "connecting to" << info.portName();
 
 #if defined(Q_OS_OSX)
     // Note: This should be info.portName(). Changed here as a workaround for:
@@ -55,7 +55,7 @@ void SerialCommandQueue::close()
 
 bool SerialCommandQueue::isConnected()
 {
-    return serial->isOpen();
+    return (serial != NULL && serial->isOpen());
 }
 
 void SerialCommandQueue::enqueue(QList<SerialCommand> commands)
@@ -98,7 +98,7 @@ void SerialCommandQueue::processQueue()
         return;
     }
 
-    //qDebug() << "Starting Command:" << queue.front().name;
+    qDebug() << "Starting Command:" << queue.front().name;
     responseData.clear();
 
     if (serial->write(queue.front().data)
@@ -115,53 +115,65 @@ void SerialCommandQueue::processQueue()
 
 void SerialCommandQueue::handleReadData()
 {
+    if (!isConnected())
+        return;
+
+    responseData.append(serial->readAll());
+
+    qDebug() << "Got data: length:" << responseData.length()
+             << "data: " << responseData.toHex();
+
     if (queue.length() == 0) {
         // TODO: error, we got unexpected data.
         qCritical() << "Got data when we didn't expect it!";
         return;
     }
 
-    if (isConnected())
-        responseData.append(serial->readAll());
-
-// for(int i = 0; i < responseData.count(); i++)
-// qDebug() << "Data at " << i << ": "
-// << (int)responseData.at(i)
-// << "(" << responseData.at(i) << ")";
-
     if (responseData.length() > queue.front().expectedResponse.length()) {
         // TODO: error, we got unexpected data.
-        qCritical() << "Got more data than we expected";
+        qCritical() << "Got more data than we expected"
+                    << "expected:" << queue.front().expectedResponse.length()
+                    << "received:" << responseData.length();
         return;
     }
 
     if (responseData.length() < queue.front().expectedResponse.length()) {
         qDebug() << "Didn't get enough data yet. Expecting:"
                  << queue.front().expectedResponse.length()
-                 << " received: " << responseData.length();
+                 << "received:" << responseData.length();
         return;
     }
 
     // If the expected data should be masked, do a chracter by character match
+    // TODO: Dump both streams here
     if (queue.front().expectedResponseMask.length() > 0) {
         for (int i = 0; i < responseData.length(); i++) {
             if (queue.front().expectedResponseMask.at(i) != 0
                 && responseData[i] != queue.front().expectedResponse.at(i)) {
                 qCritical() << "Got unexpected data back"
-                            << " position=" << i
-                            << " expected=" << (int)queue.front().expectedResponse.at(i)
-                            << " received=" << (int)responseData[i]
-                            << " mask=" << (int)queue.front().expectedResponseMask.at(i);
+                            << "position:" << i
+                            << "expected:" << (int)queue.front().expectedResponse.at(i)
+                            << "received:" << (int)responseData[i]
+                            << "mask:" << (int)queue.front().expectedResponseMask.at(i);
                 emit(error("Got unexpected data back"));
                 return;
             }
         }
     }
     // Otherwise just check if the strings match
-    else if (responseData != queue.front().expectedResponse) {
-        qCritical() << "Got unexpected data back";
-        emit(error("Got unexpected data back"));
-        return;
+    // TODO: Dump both streams here
+    else {
+        for (int i = 0; i < responseData.length(); i++) {
+            if (responseData[i] != queue.front().expectedResponse.at(i)) {
+                qCritical() << "Got unexpected data back"
+                            << "position:" << i
+                            << "expected:" << (int)queue.front().expectedResponse.at(i)
+                            << "received:" << (int)responseData[i]
+                            << "mask:" << (int)queue.front().expectedResponseMask.at(i);
+                emit(error("Got unexpected data back"));
+                return;
+            }
+        }
     }
 
 // qDebug() << "Command completed successfully: " << commandQueue.front().name;
@@ -197,8 +209,8 @@ void SerialCommandQueue::handleSerialError(QSerialPort::SerialPortError serialEr
 
 void SerialCommandQueue::handleCommandTimeout()
 {
-    qCritical() << "Command " << queue.front().name
-                << " timed out, disconnecting from programmer";
+    qCritical() << "Command" << queue.front().name
+                << "timed out, disconnecting from programmer";
 
     emit(error("Command timed out, disconnecting from programmer"));
 

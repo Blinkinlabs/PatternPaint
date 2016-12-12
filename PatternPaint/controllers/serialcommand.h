@@ -4,7 +4,7 @@
 #include <QString>
 #include <QByteArray>
 
-#define DEFAULT_COMMAND_TIMEOUT 200 // Default command timeout, in ms
+#define DEFAULT_COMMAND_TIMEOUT 1000 // Default command timeout, in ms
 
 class SerialCommand
 {
