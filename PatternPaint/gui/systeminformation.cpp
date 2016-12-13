@@ -82,7 +82,7 @@ void SystemInformation::on_copyToClipboard_clicked()
 void SystemInformation::on_sendToSupport_clicked()
 {
     QString body = "Thanks for helping make Pattern Paint a better program!\n"
-                   "Please fill out this brief questionaire to help us better understand your issue.\n\n"
+                   "Please fill out this brief questionnaire to help us better understand your issue.\n\n"
                    "1. Please describe the issue you are having:\n\n\n\n"
                    "2. How can we reproduce it? Be as detailed as possible. If there is a specific pattern that causes the problem, please attach it:\n\n\n\n"
                    "3. Has this worked for you before?\n\n\n\n"
