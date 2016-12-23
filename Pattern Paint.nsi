@@ -16,7 +16,7 @@ RequestExecutionLevel admin
 !define COMP_NAME "Blinkinlabs"
 !define WEB_SITE "http://blinkinlabs.com"
 !define VERSION "VERSION_STRING"
-!define COPYRIGHT "Blinkinlabs © 2015"
+!define COPYRIGHT "Blinkinlabs © 2016"
 !define DESCRIPTION "Application"
 !define INSTALLER_NAME "PatternPaint Windows Installer.exe"
 !define MAIN_APP_EXE "PatternPaint.exe"
