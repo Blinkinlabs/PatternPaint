@@ -59,6 +59,7 @@ int PatternWriter::colorCount() const
     QImage image;
 
     // Brute force method for counting the number of unique colors in the image
+    // TODO: Convert colors to compressed space (RGB565, etc) first?
     QList<QRgb> colors;
 
     for (int frame = 0; frame < image.width(); frame++) {
@@ -74,19 +75,12 @@ int PatternWriter::colorCount() const
 
 int PatternWriter::QRgbTo565(QColor color)
 {
-    switch (fixture->getColorMode()) {
-    case GRB:
-        return (((color.green()   >> 3) & 0x1F) << 11)
-               | (((color.red()   >> 2) & 0x3F) <<  5)
-               | (((color.blue()  >> 3) & 0x1F));
-        break;
-    case RGB:
-    default:
-        return (((color.red()     >> 3) & 0x1F) << 11)
-               | (((color.green() >> 2) & 0x3F) <<  5)
-               | (((color.blue()  >> 3) & 0x1F));
-        break;
-    }
+    QByteArray bytes = colorToBytes(fixture->getColorMode(), color);
+
+    // TODO: is the cast necessicary here?
+    return   (((static_cast<unsigned int>(bytes.at(0)) >> 3) & 0x1F) << 11)
+           | (((static_cast<unsigned int>(bytes.at(1)) >> 2) & 0x3F) <<  5)
+           | (((static_cast<unsigned int>(bytes.at(2)) >> 3) & 0x1F));
 }
 
 void PatternWriter::encodeImageRGB565_RLE(const Pattern *pattern)
@@ -167,19 +161,7 @@ void PatternWriter::encodeImageRGB24(const Pattern *pattern)
         for (int pixel = 0; pixel < colorStream.count(); pixel++) {
             QColor color = colorStream.at(pixel);
 
-            switch (fixture->getColorMode()) {
-            case GRB:
-                data.append(color.green());
-                data.append(color.red());
-                data.append(color.blue());
-                break;
-            case RGB:
-            default:
-                data.append(color.red());
-                data.append(color.green());
-                data.append(color.blue());
-                break;
-            }
+            data.append(colorToBytes(fixture->getColorMode(), color));
         }
     }
 
@@ -191,25 +173,12 @@ void PatternWriter::encodeImageRGB24(const Pattern *pattern)
         QList<QColor> colorStream = fixture->getColorStreamForFrame(pattern->getFrameImage(frame));
 
         for (int pixel = 0; pixel < colorStream.count(); pixel++) {
-            QColor color = colorStream.at(pixel);
-
-            switch (fixture->getColorMode()) {
-            case GRB:
-                header.append(QString("    %1, %2, %3, // %4\n")
-                              .arg(color.green(), 3)
-                              .arg(color.red(), 3)
-                              .arg(color.blue(), 3)
-                              .arg(pixel));
-                break;
-            case RGB:
-            default:
-                header.append(QString("    %1, %2, %3, // %4\n")
-                              .arg(color.red(), 3)
-                              .arg(color.green(), 3)
-                              .arg(color.blue(), 3)
-                              .arg(pixel));
-                break;
-            }
+            QByteArray bytes = colorToBytes(fixture->getColorMode(), colorStream.at(pixel));
+            header.append(QString("    %1, %2, %3, // %4\n")
+                          .arg(static_cast<unsigned int>(bytes.at(0)), 3)
+                          .arg(static_cast<unsigned int>(bytes.at(1)), 3)
+                          .arg(static_cast<unsigned int>(bytes.at(2)), 3)
+                          .arg(pixel));
         }
     }
 

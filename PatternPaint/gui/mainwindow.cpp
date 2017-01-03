@@ -500,7 +500,7 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered()
 
     // Attempt to open the specified file
     QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
         showError(tr("Error, cannot write file %1.")
                   .arg(fileName));
         return;
@@ -978,21 +978,7 @@ void MainWindow::updateBlinky()
     // TODO:
     QByteArray ledData;
     for (int i = 0; i < pixels.size(); i++) {
-        switch (fixture->getColorMode()) {
-        case RGB:
-            ledData.append(pixels[i].red());
-            ledData.append(pixels[i].green());
-            ledData.append(pixels[i].blue());
-            break;
-        case GRB:
-            ledData.append(pixels[i].green());
-            ledData.append(pixels[i].red());
-            ledData.append(pixels[i].blue());
-            break;
-        case COLOR_MODE_COUNT:
-        default:
-            break;
-        }
+        ledData.append(colorToBytes(fixture->getColorMode(), pixels[i]));
     }
 
     controller->sendUpdate(ledData);
