@@ -14,6 +14,9 @@ win32 {
 # Need to call git with manually specified paths to repository
 BASE_GIT_COMMAND = git -C $$PWD
 
+# Need to call git with manually specified paths to repository
+GIT_VERSION = $$system($$BASE_GIT_COMMAND describe --always --tags)
+
 # Trying to get version from git tag / revision
 GIT_VERSION = $$system($$BASE_GIT_COMMAND describe --always --tags 2> $$NULL_DEVICE)
 
@@ -21,6 +24,7 @@ GIT_VERSION = $$system($$BASE_GIT_COMMAND describe --always --tags 2> $$NULL_DEV
 !contains(GIT_VERSION,\d+\.\d+\.\d+) {
     # If there is nothing we simply use version defined manually
     isEmpty(GIT_VERSION) {
+        message("Could not determine version from git, using placeholder")
         GIT_VERSION = $$VERSION
     } else { # otherwise construct proper git describe string
         GIT_VERSION = $$GIT_VERSION
