@@ -42,13 +42,14 @@ SOURCES += \
         $$PWD/avruploaddata.cpp \
         $$PWD/blinkytape.cpp \
         $$PWD/lightbuddyuploader.cpp \
-        $$PWD/usbutils.cpp \
+        $$PWD/usbutils.cpp
+
 #}
 
 
 # For libusb on OS X
 macx {
-    LIBUSB_PATH = $$PWD/../../thirdparty/libusb-1.0.20/osx-install
+    LIBUSB_PATH = $$PWD/../../../thirdparty/libusb-1.0.20/osx-install
 
     INCLUDEPATH += $$LIBUSB_PATH/include
     QMAKE_LFLAGS += -L $$LIBUSB_PATH/lib
@@ -65,10 +66,10 @@ macx {
 
 # For libusb on Windows
 win32 {
-    LIBUSB_DLL = $$PWD/../../thirdparty/libusb-1.0.20-win/MinGW32/dll/libusb-1.0.dll
+    LIBUSB_DLL = $$PWD/../../../thirdparty/libusb-1.0.20-win/MinGW32/dll/libusb-1.0.dll
 
-    INCLUDEPATH += $$PWD/../../thirdparty/libusb-1.0.20-win/include/
-    LIBS += $$PWD/../../thirdparty/libusb-1.0.20-win/MinGW32/dll/libusb-1.0.dll
+    INCLUDEPATH += $$PWD/../../../thirdparty/libusb-1.0.20-win/include/
+    LIBS += $$PWD/../../../thirdparty/libusb-1.0.20-win/MinGW32/dll/libusb-1.0.dll
 
     # Copy the Sparkle DLL into the build directory so that it can be used
     QMAKE_PRE_LINK += copy $$shell_path($$LIBUSB_DLL)  $$shell_path($$OUT_PWD) &

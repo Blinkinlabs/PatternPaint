@@ -1,5 +1,4 @@
 #include "pattern.h"
-#include "patternframeundocommand.h"
 #include "patternframemodel.h"
 #include "patternscrollmodel.h"
 

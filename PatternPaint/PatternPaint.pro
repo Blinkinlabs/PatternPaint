@@ -18,6 +18,13 @@ UI_DIR = $$OBJECTS_DIR/uic
 TARGET = PatternPaint
 TEMPLATE = app
 
+
+SUBDIRS = libblinky
+depends = libblinky
+
+LIBS += -L libblinky/ -llibblinky
+
+
 #Target version and application information
 #VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
 
@@ -57,12 +64,6 @@ equals(QT_MAJOR_VERSION, 5){
     }
 }
 
-SOURCES += \
-    main.cpp
-
-HEADERS  += 
-
-FORMS    += 
 
 RESOURCES += \
     images.qrc \
@@ -70,9 +71,10 @@ RESOURCES += \
 
 include(gui/gui.pri)
 include(instruments/instruments.pri)
-include(controllers/controllers.pri)
-include(fixtures/fixtures.pri)
 include(updater/updater.pri)
+
+#include(libblinky/controllers/controllers.pri)
+#include(libblinky/fixtures/fixtures.pri)
 
 macx {
     # OS X: Specify icon resource to use
