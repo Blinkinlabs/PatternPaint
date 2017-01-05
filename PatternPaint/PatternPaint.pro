@@ -22,7 +22,12 @@ TEMPLATE = app
 SUBDIRS = libblinky
 depends = libblinky
 
-LIBS += -L libblinky/ -llibblinky
+LIBS += -L libblinky -llibblinky
+INCLUDEPATH += libblinky/
+
+# TODO: Push this entirely into libblinky, and don't refer
+# serial directly in the GUI
+    QT += serialport
 
 
 #Target version and application information

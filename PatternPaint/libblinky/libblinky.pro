@@ -3,8 +3,9 @@ QT += core widgets
 TARGET = libblinky
 TEMPLATE = lib
 
-include(controllers/controllers.pri)
-include(patterns/patterns.pri)
+OBJECTS_DIR = .tmplib
+MOC_DIR = .tmplib
+RCC_DIR = .tmplib
 
 
 HEADERS += \
@@ -77,7 +78,7 @@ SOURCES +=  \
 
 # For libusb on OS X
 macx {
-    LIBUSB_PATH = ../../../thirdparty/libusb-1.0.20/osx-install
+    LIBUSB_PATH = ../../thirdparty/libusb-1.0.20/osx-install
 
     INCLUDEPATH += $$LIBUSB_PATH/include
     QMAKE_LFLAGS += -L $$LIBUSB_PATH/lib
@@ -94,10 +95,10 @@ macx {
 
 # For libusb on Windows
 win32 {
-    LIBUSB_DLL = ../../../thirdparty/libusb-1.0.20-win/MinGW32/dll/libusb-1.0.dll
+    LIBUSB_DLL = ../../thirdparty/libusb-1.0.20-win/MinGW32/dll/libusb-1.0.dll
 
-    INCLUDEPATH += ../../../thirdparty/libusb-1.0.20-win/include/
-    LIBS += ../../../thirdparty/libusb-1.0.20-win/MinGW32/dll/libusb-1.0.dll
+    INCLUDEPATH += ../../thirdparty/libusb-1.0.20-win/include/
+    LIBS += ../../thirdparty/libusb-1.0.20-win/MinGW32/dll/libusb-1.0.dll
 
     # Copy the Sparkle DLL into the build directory so that it can be used
     QMAKE_PRE_LINK += copy $$shell_path($$LIBUSB_DLL)  $$shell_path($$OUT_PWD) &
