@@ -12,15 +12,14 @@ QT += widgets gui core
 TARGET = PatternPaint
 TEMPLATE = app
 
-# Specificy where to place the object files so they don't clutter the source tree
-OBJECTS_DIR = .tmpapp
-MOC_DIR = .tmpapp
-RCC_DIR = .tmpapp
-UI_DIR = .tmpapp
+OBJECTS_DIR = .tmp
+MOC_DIR = .tmp
+RCC_DIR = .tmp
+UI_DIR = .tmp
 
-# TODO: How to coerce qmake to do this automatically?
-LIBS += -L../libblinky/release/ -llibblinky
-INCLUDEPATH += ../libblinky/
+include(../libusb.pri)
+include(../libblinky.pri)
+
 
 # TODO: Push this entirely into libblinky, and don't refer
 # serial directly in the GUI
@@ -30,8 +29,7 @@ INCLUDEPATH += ../libblinky/
 #Target version and application information
 #VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
 include(../gitversion.pri)
-message("Version: $${VERSION}")
-message("Git version: $${GIT_VERSION}")
+
 
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 DEFINES += APPLICATION_NAME=\\\"$${TARGET}\\\"
@@ -91,4 +89,3 @@ win32 {
     # Windows: Specify the icon to use
     RC_ICONS += images/patternpaint.ico
 }
-

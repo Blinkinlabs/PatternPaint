@@ -1,9 +1,15 @@
 # myclock/myclock.pro
 TEMPLATE = subdirs
-SUBDIRS = libblinky app
+SUBDIRS = \
+    libblinky \
+    libblinky-test \
+    app
 
+libblinky-test.depends = libblinky
 app.depends = libblinky
 
 
 DISTFILES += \
-    gitversion.pri
+    gitversion.pri \
+    libusb.pri \
+    libblinky.pri
