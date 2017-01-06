@@ -109,6 +109,20 @@ void Avr109CommandsTests::resetTest()
     QVERIFY(command.expectedResponseMask == expectedResponseMask);
 }
 
+void Avr109CommandsTests::chipEraseTest()
+{
+    QByteArray expectedData = "e";
+    QByteArray expectedResponse = "\r";
+    QByteArray expectedResponseMask;
+
+    SerialCommand command = Avr109Commands::chipErase();
+    QVERIFY(command.name == "chipErase");
+    QVERIFY(command.data == expectedData);
+    QVERIFY(command.expectedResponse == expectedResponse);
+    QVERIFY(command.expectedResponseMask == expectedResponseMask);
+    QVERIFY(command.timeout == 10000);
+}
+
 void Avr109CommandsTests::setAddressTest()
 {
     int address = 0;
@@ -270,31 +284,32 @@ void Avr109CommandsTests::writeFlashTest()
 
     QList<SerialCommand> commands = Avr109Commands::writeFlash(data, address);
 
-
-    // The set address command should come first
-    // Note: The address should also be page-aligned, rather than word aligned
-    SerialCommand expectedAddressCommand = Avr109Commands::setAddress(address >> 1);
-
-    QVERIFY(commands.at(0).name == expectedAddressCommand.name);
-    QVERIFY(commands.at(0).data == expectedAddressCommand.data);
-    QVERIFY(commands.at(0).expectedResponse == expectedAddressCommand.expectedResponse);
-    QVERIFY(commands.at(0).expectedResponseMask == expectedAddressCommand.expectedResponseMask);
-
-
-    // Next, there should be 1 or more writeFlashPage commands
+    // Build a list of expected output commands
     QList<QByteArray> chunks = Avr109Commands::chunkData(data, FLASH_PAGE_SIZE_BYTES);
 
-    // Verify that there are the correct number of commands
-    QVERIFY(commands.length() == (1 + chunks.length()));
+    // There should be 1 setaddress and 1 writeflashpage instruction per chunk
+    QVERIFY(commands.length() == 2*chunks.length());
 
     // Verify each chunk is correct
     for(int chunkIndex = 0; chunkIndex < chunks.length(); chunkIndex++) {
-        SerialCommand expectedCommand = Avr109Commands::writeFlashPage(chunks.at(chunkIndex));
 
-        QVERIFY(commands.at(1+chunkIndex).name == expectedCommand.name);
-        QVERIFY(commands.at(1+chunkIndex).data == expectedCommand.data);
-        QVERIFY(commands.at(1+chunkIndex).expectedResponse == expectedCommand.expectedResponse);
-        QVERIFY(commands.at(1+chunkIndex).expectedResponseMask == expectedCommand.expectedResponseMask);
+        // The set address command should come first
+        // Note: The address should also be page-aligned, rather than word aligned
+        int expectedAddress = address + chunkIndex*FLASH_PAGE_SIZE_BYTES;
+        SerialCommand expectedAddressCommand = Avr109Commands::setAddress(expectedAddress >> 1);
+
+        QVERIFY(commands.at(chunkIndex*2).name == expectedAddressCommand.name);
+        QVERIFY(commands.at(chunkIndex*2).data == expectedAddressCommand.data);
+        QVERIFY(commands.at(chunkIndex*2).expectedResponse == expectedAddressCommand.expectedResponse);
+        QVERIFY(commands.at(chunkIndex*2).expectedResponseMask == expectedAddressCommand.expectedResponseMask);
+
+
+        SerialCommand expectedWriteFlashPageCommand = Avr109Commands::writeFlashPage(chunks.at(chunkIndex));
+
+        QVERIFY(commands.at(chunkIndex*2 + 1).name == expectedWriteFlashPageCommand.name);
+        QVERIFY(commands.at(chunkIndex*2 + 1).data == expectedWriteFlashPageCommand.data);
+        QVERIFY(commands.at(chunkIndex*2 + 1).expectedResponse == expectedWriteFlashPageCommand.expectedResponse);
+        QVERIFY(commands.at(chunkIndex*2 + 1).expectedResponseMask == expectedWriteFlashPageCommand.expectedResponseMask);
     }
 }
 
@@ -328,36 +343,38 @@ void Avr109CommandsTests::verifyFlashTest_data()
 
 void Avr109CommandsTests::verifyFlashTest()
 {
+
     QFETCH(QByteArray, data);
     QFETCH(int, address);
 
     QList<SerialCommand> commands = Avr109Commands::verifyFlash(data, address);
 
-
-    // The set address command should come first
-    // Note: The address should be word aligned
-    SerialCommand expectedAddressCommand = Avr109Commands::setAddress(address >> 1);
-
-    QVERIFY(commands.at(0).name == expectedAddressCommand.name);
-    QVERIFY(commands.at(0).data == expectedAddressCommand.data);
-    QVERIFY(commands.at(0).expectedResponse == expectedAddressCommand.expectedResponse);
-    QVERIFY(commands.at(0).expectedResponseMask == expectedAddressCommand.expectedResponseMask);
-
-
-    // Next, there should be 1 or more writeFlashPage commands
+    // Build a list of expected output commands
     QList<QByteArray> chunks = Avr109Commands::chunkData(data, FLASH_PAGE_SIZE_BYTES);
 
-    // Verify that there are the correct number of commands
-    QVERIFY(commands.length() == (1 + chunks.length()));
+    // There should be 1 setaddress and 1 verifyflashpage instruction per chunk
+    QVERIFY(commands.length() == 2*chunks.length());
 
     // Verify each chunk is correct
     for(int chunkIndex = 0; chunkIndex < chunks.length(); chunkIndex++) {
-        SerialCommand expectedCommand = Avr109Commands::verifyFlashPage(chunks.at(chunkIndex));
 
-        QVERIFY(commands.at(1+chunkIndex).name == expectedCommand.name);
-        QVERIFY(commands.at(1+chunkIndex).data == expectedCommand.data);
-        QVERIFY(commands.at(1+chunkIndex).expectedResponse == expectedCommand.expectedResponse);
-        QVERIFY(commands.at(1+chunkIndex).expectedResponseMask == expectedCommand.expectedResponseMask);
+        // The set address command should come first
+        // Note: The address should also be page-aligned, rather than word aligned
+        int expectedAddress = address + chunkIndex*FLASH_PAGE_SIZE_BYTES;
+        SerialCommand expectedAddressCommand = Avr109Commands::setAddress(expectedAddress >> 1);
+
+        QVERIFY(commands.at(chunkIndex*2).name == expectedAddressCommand.name);
+        QVERIFY(commands.at(chunkIndex*2).data == expectedAddressCommand.data);
+        QVERIFY(commands.at(chunkIndex*2).expectedResponse == expectedAddressCommand.expectedResponse);
+        QVERIFY(commands.at(chunkIndex*2).expectedResponseMask == expectedAddressCommand.expectedResponseMask);
+
+
+        SerialCommand expectedVerifyFlashPageCommand = Avr109Commands::verifyFlashPage(chunks.at(chunkIndex));
+
+        QVERIFY(commands.at(chunkIndex*2 + 1).name == expectedVerifyFlashPageCommand.name);
+        QVERIFY(commands.at(chunkIndex*2 + 1).data == expectedVerifyFlashPageCommand.data);
+        QVERIFY(commands.at(chunkIndex*2 + 1).expectedResponse == expectedVerifyFlashPageCommand.expectedResponse);
+        QVERIFY(commands.at(chunkIndex*2 + 1).expectedResponseMask == expectedVerifyFlashPageCommand.expectedResponseMask);
     }
 }
 

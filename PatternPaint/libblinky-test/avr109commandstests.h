@@ -15,6 +15,7 @@ private slots:
 
     void checkDeviceSignatureTest();
     void resetTest();
+    void chipEraseTest();
     void setAddressTest();
 
     void writeFlashPageTest_data();

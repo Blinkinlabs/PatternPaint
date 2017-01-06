@@ -23,6 +23,9 @@ SerialCommand checkDeviceSignature();
 /// Instruct the programmer to reset.
 SerialCommand reset();
 
+/// Erase the entire flash memory
+SerialCommand chipErase();
+
 /// Set the current read/write address for flash/EEPROM reading/writing
 /// @param address Offset in the device flash space to use for the next read
 /// or write operation

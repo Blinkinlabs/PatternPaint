@@ -62,6 +62,14 @@ SerialCommand reset()
     return SerialCommand("reset", QByteArray("E"), QByteArray("\r"));
 }
 
+SerialCommand chipErase()
+{
+    SerialCommand command("chipErase", QByteArray("e"), QByteArray("\r"));
+    command.timeout = 10000;
+
+    return command;
+}
+
 SerialCommand setAddress(unsigned int address)
 {
     // Note that the address is word defined for flash, but byte defined for EEPROM.
@@ -137,12 +145,15 @@ QList<SerialCommand> writeFlash(const QByteArray &data, unsigned int startAddres
         return commands;
     }
 
-    // Write the word address for Flash writes
-    commands.append(setAddress(startAddress >> 1));
+    QList<QByteArray> chunks = chunkData(data, FLASH_PAGE_SIZE_BYTES);
 
-    // Write the data in page-sized chunks
-    for(QByteArray chunk : chunkData(data, FLASH_PAGE_SIZE_BYTES)) {
-        commands.append(writeFlashPage(chunk));
+    for(int chunkIndex = 0; chunkIndex < chunks.length(); chunkIndex++) {
+        // Write the word address for Flash writes
+        int currentAddress = startAddress + chunkIndex*FLASH_PAGE_SIZE_BYTES;
+        commands.append(setAddress(currentAddress >> 1));
+
+        // Then write the chunk
+        commands.append(writeFlashPage(chunks.at(chunkIndex)));
     }
 
     return commands;
@@ -157,12 +168,15 @@ QList<SerialCommand> verifyFlash(const QByteArray &data, unsigned int startAddre
         return commands;
     }
 
-    // Write the word address for Flash read
-    commands.append(setAddress(startAddress >> 1));
+    QList<QByteArray> chunks = chunkData(data, FLASH_PAGE_SIZE_BYTES);
 
-    // Write the data in page-sized chunks
-    for(QByteArray chunk : chunkData(data, FLASH_PAGE_SIZE_BYTES)) {
-        commands.append(verifyFlashPage(chunk));
+    for(int chunkIndex = 0; chunkIndex < chunks.length(); chunkIndex++) {
+        // Write the word address for Flash writes
+        int currentAddress = startAddress + chunkIndex*FLASH_PAGE_SIZE_BYTES;
+        commands.append(setAddress(currentAddress >> 1));
+
+        // Then write the chunk
+        commands.append(verifyFlashPage(chunks.at(chunkIndex)));
     }
 
     return commands;

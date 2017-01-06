@@ -164,7 +164,7 @@ bool BlinkyTapeUploader::upgradeFirmware(int timeout)
     // TODO: This is duplicated in startUpload...
     maxProgress = 1;    // checkDeviceSignature
     foreach (FlashSection flashSection, flashData)
-        maxProgress += 2*flashSection.data.count()/PAGE_SIZE_BYTES;
+        maxProgress += 4*flashSection.data.count()/PAGE_SIZE_BYTES;
     setProgress(0);
 
     stateStartTime = QDateTime::currentDateTime();
@@ -205,8 +205,11 @@ bool BlinkyTapeUploader::upgradeFirmware(BlinkyController &blinky)
 bool BlinkyTapeUploader::startUpload(BlinkyController &blinky)
 {
     maxProgress = 1;    // checkDeviceSignature
+
+    // There are 4 commands for each page-
+    // setaddress, writeflashpage, setaddress, verifyflashpage
     foreach (FlashSection flashSection, flashData)
-        maxProgress += 2*flashSection.data.count()/PAGE_SIZE_BYTES;
+        maxProgress += 4*flashSection.data.count()/PAGE_SIZE_BYTES;
 
     setProgress(0);
 
@@ -300,6 +303,9 @@ void BlinkyTapeUploader::doWork()
         QByteArray eepromBytes(EEPROM_TABLE_SIZE_BYTES, char(255));
         commandQueue.enqueue(Avr109Commands::writeEeprom(eepromBytes,0));
         // TODO: Verify EEPROM?
+
+        // TODO: Disable this eventually
+        commandQueue.enqueue(Avr109Commands::chipErase());
 
         // Queue all of the flash sections to memory
         while (!flashData.empty()) {
