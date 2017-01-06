@@ -1,5 +1,5 @@
-#ifndef AVR109COMMANDS_H
-#define AVR109COMMANDS_H
+#ifndef AVR109COMMANDSTESTS_H
+#define AVR109COMMANDSTESTS_H
 
 #include <QObject>
 
@@ -38,4 +38,4 @@ private slots:
     void writeEepromTest();
 };
 
-#endif // AVR109COMMANDS_H
+#endif // AVR109COMMANDSTESTS_H

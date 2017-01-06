@@ -46,7 +46,6 @@ QByteArray colorToBytes(ColorMode colorMode, const QColor &color)
         bytes.append(color.red());
         break;
 
-    case COLOR_MODE_COUNT:
     default:
         break;
     }

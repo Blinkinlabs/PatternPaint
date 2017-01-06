@@ -20,8 +20,10 @@ include(../libusb.pri)
 include(../libblinky.pri)
 
 HEADERS += \
-    avr109commandstests.h
+    avr109commandstests.h \
+    colormodetests.h
 
 SOURCES += \
     avr109commandstests.cpp \
-    main.cpp
+    main.cpp \
+    colormodetests.cpp
