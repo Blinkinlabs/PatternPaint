@@ -70,8 +70,8 @@ cd ${TEMPDIR}
 
 ################## Get PatternPaint ###################
 if [ ! -d "${PATTERNPAINT}" ]; then
-#	git clone https://github.com/Blinkinlabs/PatternPaint.git ${PATTERNPAINT}
-	git clone `pwd`/.. ${PATTERNPAINT} -b test
+	git clone https://github.com/Blinkinlabs/PatternPaint.git ${PATTERNPAINT}
+#	git clone `pwd`/.. ${PATTERNPAINT} -b test
 else
 	cd ${PATTERNPAINT}
 	git pull
@@ -131,7 +131,7 @@ cd ${PATTERNPAINT}PatternPaint
 PATH=${QT_TOOLS}:${QT_MINGW}bin/:${PATH}
 
 qmake.exe -config release OBJECTS_DIR=build MOC_DIR=build/moc RCC_DIR=build/rcc UI_DIR=build/uic DESTDIR=bin
-#mingw32-make.exe clean
+mingw32-make.exe clean
 mingw32-make.exe 
 
 cd ../../
