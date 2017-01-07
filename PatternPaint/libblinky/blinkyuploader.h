@@ -41,9 +41,9 @@ public:
     virtual bool updateFirmware(BlinkyController &controller) = 0;
 
     /// Scan for a device bootloader, then attempt to restore the firmware to it.
-    /// @param timeout Number of seconds to wait for a bootloader, or -1 to wait
+    /// @param timeout Number of milliseconds to wait for a bootloader, or -1 to wait
     /// indefinetly
-    virtual bool restoreFirmware(int timeout) = 0;
+    virtual bool restoreFirmware(qint64 timeout) = 0;
 
     /// Get a string describing the last error, if any.
     virtual QString getErrorString() const = 0;

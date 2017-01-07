@@ -29,9 +29,12 @@ public:
 
     void enqueue(QList<SerialCommand> commands);
 
+    void flushQueue();
+
 signals:
     void error(QString error);
     void commandFinished(QString command, QByteArray returnData);
+    void lastCommandFinished();
 
 public slots:
     // Handle receiving data from the serial port

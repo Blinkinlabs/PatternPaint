@@ -176,7 +176,7 @@ bool LightBuddyUploader::updateFirmware(BlinkyController &controller)
     return false;
 }
 
-bool LightBuddyUploader::restoreFirmware(int)
+bool LightBuddyUploader::restoreFirmware(qint64)
 {
     // TODO: Support firmware upload for the lightbuddy
     errorString = "Firmware update not currently supported for Lightbuddy!";

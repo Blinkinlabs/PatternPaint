@@ -30,7 +30,7 @@ public:
 
     bool storePatterns(BlinkyController &blinky, QList<PatternWriter> &patternWriters);
     bool updateFirmware(BlinkyController &blinky);
-    bool restoreFirmware(int timeout);
+    bool restoreFirmware(qint64 timeout);
     QString getErrorString() const;
 
     QList<PatternWriter::Encoding> getSupportedEncodings() const;
@@ -45,11 +45,15 @@ private slots:
 
     void handleCommandFinished(QString command, QByteArray returnData);
 
+    void handleLastCommandFinished();
+
 private:
     enum State {
-        State_Ready,                    ///< Ready for a command.
-        State_WaitForBootloaderPort,    ///< We are waiting for the bootloader device to show up.
-        State_WaitAfterBootloaderPort,  ///< Short delay after the device shows up
+        State_ProbeBootloaders,         ///< Waiting for the bootloader device to become available
+        State_InitializeBootloader,     ///< Sending initialization commands to bootloader
+        State_WriteFlashData,           ///< Writing flash data sections
+        State_ResetBootloader,          ///< Resetting bootloader
+        State_SendingCommands,          ///< Ready for a command. TODO: Delete me
     };
 
     /// Start an upload, using the passed blinkytape as a launching point
@@ -57,26 +61,34 @@ private:
     /// and will need to be reconnected manually afterwards.
     bool startUpload(BlinkyController &tape);
 
-    qint64 bootloaderPollTimeout;
-
-    /// Current upload progress, in command counts
-    int progress;
-    int maxProgress;
-
-    QString errorString;
-
-    /// Time that we transitioned into the current state
-    QDateTime stateStartTime;
-
-    /// Current command state
-    State state;
+    bool startUpload(qint64 timeout);
 
     /// Update any listeners with the latest progress
     void setProgress(int newProgress);
 
-    SerialCommandQueue commandQueue;
+    /// True if a bootloader device is available to connect to
+    bool bootloaderAvailable();
 
-    QQueue<FlashSection> flashData; ///< Queue of memory sections to write
+    bool ProbeBootloaderTimeout();
+
+
+    /// Variables used in all states
+
+    int progress;           ///< Current upload progress, in command counts
+    int maxProgress;        ///< Total expected progress states
+
+    QString errorString;    ///< Error string for asyncronous debugging
+
+    State state;            ///< Current command state
+
+
+    qint64 probeBootloaderTimeout;       ///< Amount of time to wait for a bootloader device to appear
+    QDateTime probeBootloaderStartTime;  ///< Time that we transitioned into the current state
+
+    int flashWriteRetriesRemaining;      ///< Number of times we can re-try writing the flash before giving up
+
+    SerialCommandQueue commandQueue;
+    QQueue<FlashSection> flashData;     ///< Queue of memory sections to write
 };
 
 #endif // AVRPATTERNUPLOADER_H

@@ -64,6 +64,17 @@ void SerialCommandQueue::enqueue(QList<SerialCommand> commands)
         enqueue(command);
 }
 
+void SerialCommandQueue::flushQueue()
+{
+    // TODO: this is dangerous, if a command is already running it could
+    // put the device in a bad state. Switch to some version that only takes
+    // effect between command executions
+    queue.clear();
+    responseData.clear();
+
+    commandTimeoutTimer.stop();
+}
+
 void SerialCommandQueue::enqueue(SerialCommand command)
 {
 // qDebug() << "queuing command:" << command.name
@@ -98,7 +109,7 @@ void SerialCommandQueue::processQueue()
         return;
     }
 
-    qDebug() << "Starting Command:" << queue.front().name;
+//    qDebug() << "Starting Command:" << queue.front().name;
     responseData.clear();
 
     if (serial->write(queue.front().data)
@@ -120,8 +131,8 @@ void SerialCommandQueue::handleReadData()
 
     responseData.append(serial->readAll());
 
-    qDebug() << "Got data: length:" << responseData.length()
-             << "data: " << responseData.toHex();
+//    qDebug() << "Got data: length:" << responseData.length()
+//             << "data: " << responseData.toHex();
 
     if (queue.length() == 0) {
         // TODO: error, we got unexpected data.
@@ -185,6 +196,11 @@ void SerialCommandQueue::handleReadData()
     commandTimeoutTimer.stop();
 
     queue.pop_front();
+
+    // If that was the last command, signal it
+    if(queue.empty()) {
+        QMetaObject::invokeMethod(this, "lastCommandFinished", Qt::QueuedConnection);
+    }
 
     // Start another command, if there is one.
     processQueue();

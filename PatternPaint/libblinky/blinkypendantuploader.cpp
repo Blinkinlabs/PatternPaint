@@ -149,7 +149,7 @@ bool BlinkyPendantUploader::updateFirmware(BlinkyController &controller)
     return false;
 }
 
-bool BlinkyPendantUploader::restoreFirmware(int)
+bool BlinkyPendantUploader::restoreFirmware(qint64)
 {
     errorString = "Firmware update not currently supported for BlinkyPendant!";
     return false;

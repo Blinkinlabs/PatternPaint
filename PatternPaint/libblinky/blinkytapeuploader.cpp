@@ -14,27 +14,32 @@
 
 #define PAGE_SIZE_BYTES 128
 
-/// Interval between polling the serial port list for new devices
+/// Interval between polling the serial port list for new devices (milliseconds)
 #define BOOTLOADER_POLL_INTERVAL 200
 
-/// Maximum time to wait before giving up on finding a bootloader
+/// Maximum time to wait before giving up on finding a bootloader (milliseconds)
 #define BOOTLOADER_POLL_TIMEOUT 10000
 
 /// How long to wait between receiving notification that the programmer has been
-/// reset, and notifying the caller that we are finished
+/// reset, and notifying the caller that we are finished (milliseconds)
 #define BOOTLOADER_SETTLING_DELAY 500
 
 /// Length of character buffer for debug messages
 #define BUFF_LENGTH 100
 
+/// Maximum number of times to try writing the flash memory
+#define FLASH_WRITE_MAX_RETRIES 10
+
 BlinkyTapeUploader::BlinkyTapeUploader(QObject *parent) :
     BlinkyUploader(parent),
-    state(State_Ready)
+    state(State_SendingCommands)
 {
     connect(&commandQueue, SIGNAL(error(QString)),
             this, SLOT(handleError(QString)));
     connect(&commandQueue, SIGNAL(commandFinished(QString, QByteArray)),
             this, SLOT(handleCommandFinished(QString, QByteArray)));
+    connect(&commandQueue, SIGNAL(lastCommandFinished()),
+            this, SLOT(handleLastCommandFinished()));
 }
 
 QList<PatternWriter::Encoding> BlinkyTapeUploader::getSupportedEncodings() const
@@ -47,77 +52,33 @@ QList<PatternWriter::Encoding> BlinkyTapeUploader::getSupportedEncodings() const
 
 void BlinkyTapeUploader::cancel()
 {
-    if (state != State_WaitForBootloaderPort) {
+    if (state != State_ProbeBootloaders) {
         qDebug() << "Can't cancel during upload";
         return;
     }
 
-    state = State_Ready;
-}
-
-void BlinkyTapeUploader::handleError(QString error)
-{
-    qCritical() << error;
-
-    commandQueue.close();
-
-    emit(finished(false));
-}
-
-void BlinkyTapeUploader::handleCommandFinished(QString command, QByteArray returnData)
-{
-    Q_UNUSED(returnData);
-
-// qDebug() << "Command finished:" << command;
-    setProgress(progress + 1);
-
-    // we know reset is the last command, so the BlinkyTape should be ready soon.
-    // Schedule a timer to emit the message shortly.
-    // TODO: Let the receiver handle this instead.
-    if (command == "reset") {
-        commandQueue.close();
-        emit(finished(true));
-    }
+    state = State_SendingCommands;
 }
 
 void BlinkyTapeUploader::setProgress(int newProgress)
 {
-    qDebug() << "Progress:" << newProgress
-             << "maxProgress:" << maxProgress;
+//    qDebug() << "Progress:" << newProgress
+//             << "maxProgress:" << maxProgress;
 
     progress = newProgress;
     // TODO: Precalculate the max progress
     emit(progressChanged((progress*100)/maxProgress));
 }
 
-bool BlinkyTapeUploader::restoreFirmware(int timeout)
+bool BlinkyTapeUploader::restoreFirmware(qint64 timeout)
 {
     QByteArray sketch = QByteArray(reinterpret_cast<const char *>(PRODUCTION_DATA),
                                    PRODUCTION_LENGTH);
 
-    bootloaderPollTimeout = timeout;
-
     // Put the sketch, pattern, and metadata into the programming queue.
     flashData.push_back(FlashSection("Sketch", PRODUCTION_ADDRESS, sketch));
 
-    for(FlashSection& section : flashData) {
-        qDebug() << "Flash Section:" << section.name
-                 << "address: " << section.address
-                 << "size: " << section.data.length();
-    }
-
-
-    // TODO: This is duplicated in startUpload...
-    maxProgress = 1;    // checkDeviceSignature
-    foreach (FlashSection flashSection, flashData)
-        maxProgress += 4*flashSection.data.count()/PAGE_SIZE_BYTES;
-    setProgress(0);
-
-    stateStartTime = QDateTime::currentDateTime();
-    state = State_WaitForBootloaderPort;
-
-    QTimer::singleShot(0, this, SLOT(doWork()));
-    return true;
+    return startUpload(timeout);
 }
 
 bool BlinkyTapeUploader::updateFirmware(BlinkyController &blinky)
@@ -127,12 +88,6 @@ bool BlinkyTapeUploader::updateFirmware(BlinkyController &blinky)
 
     // Put the sketch, pattern, and metadata into the programming queue.
     flashData.push_back(FlashSection("Sketch", PRODUCTION_ADDRESS, sketch));
-
-    for(FlashSection& section : flashData) {
-        qDebug() << "Flash Section:" << section.name
-                 << "address: " << section.address
-                 << "size: " << section.data.length();
-    }
 
     return startUpload(blinky);
 }
@@ -152,29 +107,82 @@ bool BlinkyTapeUploader::storePatterns(BlinkyController &blinky, QList<PatternWr
     flashData.push_back(data.patternDataSection);
     flashData.push_back(data.patternTableSection);
 
-    for(FlashSection& section : flashData) {
-        qDebug() << "Flash Section:" << section.name
-                 << "address: " << section.address
-                 << "size: " << section.data.length();
-    }
-
     return startUpload(blinky);
 }
+
+void BlinkyTapeUploader::handleError(QString error)
+{
+    qCritical() << error;
+
+    // If we're in writeflashdata and the error was, try re-starting the upload process
+    if(state == State_WriteFlashData) {
+        if((error == "Got unexpected data back")
+                && (flashWriteRetriesRemaining > 0)) {
+            qCritical() << "Unexpected data error- re-starting firmware upload process";
+
+            flashWriteRetriesRemaining--;
+
+            commandQueue.flushQueue();
+            doWork();
+
+            return;
+        }
+    }
+
+
+    // Otherwise we can't recover
+    commandQueue.close();
+    emit(finished(false));
+}
+
+void BlinkyTapeUploader::handleCommandFinished(QString command, QByteArray returnData)
+{
+    Q_UNUSED(returnData);
+
+// qDebug() << "Command finished:" << command;
+    setProgress(progress + 1);
+
+//    // we know reset is the last command, so the BlinkyTape should be ready soon.
+//    // Schedule a timer to emit the message shortly.
+//    // TODO: Let the receiver handle this instead.
+//    if (command == "reset") {
+//        commandQueue.close();
+//        emit(finished(true));
+//    }
+}
+
+void BlinkyTapeUploader::handleLastCommandFinished()
+{
+    qDebug() << "All commands finished! Transitioning to next state";
+
+    // TODO: Moveme to doWork() ?
+    switch (state) {
+    case State_InitializeBootloader:
+        state = State_WriteFlashData;
+        doWork();
+        break;
+
+    case State_WriteFlashData:
+        state = State_ResetBootloader;
+        doWork();
+        break;
+
+    case State_ResetBootloader:
+        commandQueue.close();
+        emit(finished(true));
+        break;
+
+    default:
+        qCritical() << "Got a last command finished signal when not expected";
+        break;
+    }
+}
+
+
 
 
 bool BlinkyTapeUploader::startUpload(BlinkyController &blinky)
 {
-    maxProgress = 1;    // checkDeviceSignature
-
-    // There are 4 commands for each page-
-    // setaddress, writeflashpage, setaddress, verifyflashpage
-    foreach (FlashSection flashSection, flashData)
-        maxProgress += 4*flashSection.data.count()/PAGE_SIZE_BYTES;
-
-    setProgress(0);
-
-    bootloaderPollTimeout = BOOTLOADER_POLL_TIMEOUT;
-
     // Now, start the polling processes to detect a new bootloader
     // We can't reset if we weren't already connected...
     if (!blinky.isConnected()) {
@@ -185,8 +193,32 @@ bool BlinkyTapeUploader::startUpload(BlinkyController &blinky)
     // Next, tell the tape to reset.
     blinky.reset();
 
-    stateStartTime = QDateTime::currentDateTime();
-    state = State_WaitForBootloaderPort;
+    return startUpload(BOOTLOADER_POLL_TIMEOUT);
+}
+
+bool BlinkyTapeUploader::startUpload(qint64 timeout)
+{
+    for(FlashSection& section : flashData) {
+        qDebug() << "Flash Section:" << section.name
+                 << "address: " << section.address
+                 << "size: " << section.data.length();
+    }
+
+    maxProgress = 1;    // checkDeviceSignature
+
+    // There are 4 commands for each page-
+    // setaddress, writeflashpage, setaddress, verifyflashpage
+    foreach (FlashSection flashSection, flashData)
+        maxProgress += 4*flashSection.data.count()/PAGE_SIZE_BYTES;
+
+    setProgress(0);
+
+    probeBootloaderTimeout = timeout;
+    probeBootloaderStartTime = QDateTime::currentDateTime();
+
+    flashWriteRetriesRemaining = FLASH_WRITE_MAX_RETRIES;
+
+    state = State_ProbeBootloaders;
 
     QTimer::singleShot(0, this, SLOT(doWork()));
 
@@ -198,6 +230,19 @@ QString BlinkyTapeUploader::getErrorString() const
     return errorString;
 }
 
+bool BlinkyTapeUploader::bootloaderAvailable() {
+    return !BlinkyController::probeBootloaders().empty();
+}
+
+bool BlinkyTapeUploader::ProbeBootloaderTimeout() {
+    // -1 is a special case to never time out.
+    if(probeBootloaderTimeout == -1) {
+        return false;
+    }
+
+    return (probeBootloaderStartTime.msecsTo(QDateTime::currentDateTime()) > probeBootloaderTimeout);
+}
+
 void BlinkyTapeUploader::doWork()
 {
     // TODO: This flow is really ungainly
@@ -206,55 +251,51 @@ void BlinkyTapeUploader::doWork()
 
     // Continue the current state
     switch (state) {
-    case State_WaitForBootloaderPort:
+    case State_ProbeBootloaders:
     {
         // TODO: Only search BlinkyTapes bootloaders!
-        QList<QSerialPortInfo> postResetTapes
-            = BlinkyController::probeBootloaders();
 
-        // If we didn't detect a bootloader and still have time, then queue the timer and
-        // wait. Otherwise, we timed out, so fail.
-        if (postResetTapes.count() == 0) {
-            if ((bootloaderPollTimeout > 0)
-                && (stateStartTime.msecsTo(QDateTime::currentDateTime())
-                    > bootloaderPollTimeout)) {
-                handleError("Timeout waiting for a bootloader device");
-                return;
-            }
+        // If we ran out of time, error
+        if(ProbeBootloaderTimeout()) {
+            handleError("Timeout waiting for a bootloader device");
+            return;
+        }
 
+        // If we're still waiting for a bootloader, set a timer to look again
+        // after a small interval
+        if(!bootloaderAvailable()) {
             QTimer::singleShot(BOOTLOADER_POLL_INTERVAL, this, SLOT(doWork()));
             return;
         }
 
-        qDebug() << "Bootloader waiting on: " << postResetTapes.at(0).portName();
-
+        // Otherwise we found a bootloader.
         // Don't connect immediately, the device might need a short time to settle down
         QTimer::singleShot(BOOTLOADER_SETTLING_DELAY, this, SLOT(doWork()));
-        state = State_WaitAfterBootloaderPort;
+        state = State_InitializeBootloader;
 
         break;
     }
 
-    case State_WaitAfterBootloaderPort:
+    case State_InitializeBootloader:
     {
         // TODO: Only search BlinkyTapes bootloaders!
-        QList<QSerialPortInfo> postResetTapes
+        QList<QSerialPortInfo> bootloaders
             = BlinkyController::probeBootloaders();
 
         // If we didn't detect a bootloader and still have time, then queue the timer and
         // wait. Otherwise, we timed out, so fail.
-        if (postResetTapes.count() == 0) {
+        if (bootloaders.count() == 0) {
             handleError("Bootloader dissappeared!");
             return;
         }
 
         // Try to create a new programmer by connecting to the port
-        if (!commandQueue.open(postResetTapes.at(0))) {
+        if (!commandQueue.open(bootloaders.front())) {
             handleError("could not connect to programmer!");
             return;
         }
 
-        qDebug() << "Connected to programmer!";
+        qDebug() << "Connected to bootloader!";
 
         // Send Check Device Signature command
         commandQueue.enqueue(Avr109Commands::checkDeviceSignature());
@@ -262,25 +303,34 @@ void BlinkyTapeUploader::doWork()
         // Queue an EEPROM clear
         QByteArray eepromBytes(EEPROM_TABLE_SIZE_BYTES, char(255));
         commandQueue.enqueue(Avr109Commands::writeEeprom(eepromBytes,0));
+
         // TODO: Verify EEPROM?
 
-        // TODO: Disable this eventually
-        commandQueue.enqueue(Avr109Commands::chipErase());
+//        // TODO: Disable this eventually
+//        commandQueue.enqueue(Avr109Commands::chipErase());
 
-        // Queue all of the flash sections to memory
-        while (!flashData.empty()) {
-            FlashSection f = flashData.front();
-            commandQueue.enqueue(Avr109Commands::writeFlash(f.data, f.address));
-            commandQueue.enqueue(Avr109Commands::verifyFlash(f.data, f.address));
-            flashData.pop_front();
-        }
-
-        commandQueue.enqueue(Avr109Commands::reset());
-
-        state = State_Ready;
         break;
     }
 
+    case State_WriteFlashData:
+    {
+        // Queue all of the flash sections to memory
+        for(FlashSection& section : flashData) {
+            commandQueue.enqueue(Avr109Commands::writeFlash(section.data, section.address));
+            commandQueue.enqueue(Avr109Commands::verifyFlash(section.data, section.address));
+        }
+
+        break;
+    }
+
+    case State_ResetBootloader:
+    {
+        commandQueue.enqueue(Avr109Commands::reset());
+
+        break;
+    }
+
+    case State_SendingCommands:
     default:
         break;
     }
