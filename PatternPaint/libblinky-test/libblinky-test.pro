@@ -16,6 +16,10 @@ MOC_DIR = .tmp
 RCC_DIR = .tmp
 UI_DIR = .tmp
 
+warning("outside pri:")
+warning($$PWD)
+warning($$OUT_PWD)
+
 include(../libusb.pri)
 include(../libblinky.pri)
 

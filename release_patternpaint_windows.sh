@@ -3,6 +3,7 @@
 #Stop on any error
 set -e
 
+
 ################# Signature #####################################
 
 ROOT_CERTIFICATE='../GlobalSign_Root_CA.crt'
@@ -69,7 +70,8 @@ cd ${TEMPDIR}
 
 ################## Get PatternPaint ###################
 if [ ! -d "${PATTERNPAINT}" ]; then
-	git clone https://github.com/Blinkinlabs/PatternPaint.git ${PATTERNPAINT}
+#	git clone https://github.com/Blinkinlabs/PatternPaint.git ${PATTERNPAINT}
+	git clone `pwd`/.. ${PATTERNPAINT} -b test
 else
 	cd ${PATTERNPAINT}
 	git pull
@@ -129,7 +131,7 @@ cd ${PATTERNPAINT}PatternPaint
 PATH=${QT_TOOLS}:${QT_MINGW}bin/:${PATH}
 
 qmake.exe -config release OBJECTS_DIR=build MOC_DIR=build/moc RCC_DIR=build/rcc UI_DIR=build/uic DESTDIR=bin
-mingw32-make.exe clean
+#mingw32-make.exe clean
 mingw32-make.exe 
 
 cd ../../
@@ -152,7 +154,10 @@ mkdir -p ${OUTDIR}driver/eightbyeight/x86
 mkdir -p ${OUTDIR}driver/eightbyeight/amd64
 
 # Main executable
-cp ${PATTERNPAINT}PatternPaint/bin/PatternPaint.exe ${OUTDIR}
+cp ${PATTERNPAINT}PatternPaint/app/bin/PatternPaint.exe ${OUTDIR}
+
+# And the libblinky library
+cp ${PATTERNPAINT}PatternPaint/libblinky/bin/libblinky.dll ${OUTDIR}
 
 # Note: This list of DLLs must be determined by hand, using Dependency Walker
 # Also, the .nsi file should be synchronized with this list, otherwise the file

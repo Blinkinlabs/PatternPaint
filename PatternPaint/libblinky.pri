@@ -1,20 +1,9 @@
-# TODO: How to coerce qmake to do this automatically?
-INCLUDEPATH += ../libblinky
+#Automatically generated in Qt creator (right click on project and choose 'add library'
+#Then modified to fit in a .pri file.
 
-#CONFIG(debug, debug|release) {
-#    LIBBLINKYDIR = ../libblinky/debug/
-#}
-#else {
-#    LIBBLINKYDIR = ../libblinky/release/
-#}
-#LIBS += -L$$LIBBLINKYDIR -llibblinky
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libblinky/release/ -llibblinky
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libblinky/debug/ -llibblinky
+else:unix: LIBS += -L$$OUT_PWD/../libblinky/ -llibblinky
 
-# On console buils, the 'release' and 'debug' folders don't seem to be generated
-# So let's just include all the different options to be safe?
-# TODO: Determine this automatically
-
-LIBS += -llibblinky
-
-LIBS += -L../libblinky/
-LIBS += -L../libblinky/debug
-LIBS += -L../libblinky/release
+INCLUDEPATH += $$PWD/libblinky
+DEPENDPATH += $$PWD/libblinky
