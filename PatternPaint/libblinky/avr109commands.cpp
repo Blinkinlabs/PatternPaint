@@ -1,4 +1,5 @@
 #include "avr109commands.h"
+#include "bytearrayhelpers.h"
 #include "serialcommandqueue.h"
 
 #include <QDebug>
@@ -12,43 +13,6 @@
 
 
 namespace Avr109Commands {
-
-// Utility function to transmit a uint16_t value
-QByteArray int16ToByteArray(int value)
-{
-    QByteArray data;
-
-    // If the value is out of bounds, return a zero-length byte array
-    if((value < 0) || (value > 65535)) {
-        return data;
-    }
-
-    data.append((value >> 8) & 0xFF);
-    data.append((value >> 0) & 0xFF);
-
-    return data;
-}
-
-//
-QList<QByteArray> chunkData(const QByteArray &data, int chunkSize)
-{
-    QList<QByteArray> chunks;
-
-    // If the chunk size is invalid, return an empty set
-    if(chunkSize <=  0) {
-        return chunks;
-    }
-
-    for (int position = 0;
-         position < data.length();
-         position += chunkSize) {
-        // Note: if chunkSize is larger than the data available,
-        // mid() only returns available data.
-        chunks.append(data.mid(position, chunkSize));
-    }
-
-    return chunks;
-}
 
 // Send the command to probe for the device signature, and register the expected response
 SerialCommand checkDeviceSignature()
@@ -75,7 +39,7 @@ SerialCommand setAddress(unsigned int address)
     // Note that the address is word defined for flash, but byte defined for EEPROM.
     QByteArray command;
     command.append('A');
-    command += int16ToByteArray(address);
+    command += uint16ToByteArray(address);
 
     QByteArray response;
     response.append('\r');
@@ -93,7 +57,7 @@ SerialCommand writeFlashPage(const QByteArray &data)
 
     QByteArray command;
     command.append('B'); // command: write memory
-    command += int16ToByteArray(paddedData.count());  // write size (bytes)
+    command += uint16ToByteArray(paddedData.count());  // write size (bytes)
     command.append('F'); // memory type: flash
     command += paddedData;
 
@@ -113,7 +77,7 @@ SerialCommand verifyFlashPage(const QByteArray &data)
 
     QByteArray command;
     command.append('g'); // command: verify memory
-    command += int16ToByteArray(paddedData.count()); // read size (bytes)
+    command += uint16ToByteArray(paddedData.count()); // read size (bytes)
     command.append('F'); // memory type: flash
 
     QByteArray response;
@@ -126,7 +90,7 @@ SerialCommand writeEepromBlock(const QByteArray &data)
 {
     QByteArray command;
     command.append('B'); // command: write memory
-    command += int16ToByteArray(data.count());  // write size (bytes)
+    command += uint16ToByteArray(data.count());  // write size (bytes)
     command.append('E'); // memory type: eeprom
     command += data;
 
@@ -198,4 +162,5 @@ QList<SerialCommand> writeEeprom(const QByteArray &data, unsigned int startAddre
 
     return commands;
 }
-}
+
+} // namespace

@@ -29,7 +29,9 @@ HEADERS += \
     avr109commands.h \
     serialcommand.h \
     lightbuddycommands.h \
-    blinkypendantcommands.h
+    blinkypendantcommands.h \
+    bytearrayhelpers.h \
+    blinkytapeuploaddata.h
 
 SOURCES +=  \
     fixture.cpp \
@@ -48,7 +50,9 @@ SOURCES +=  \
     avr109commands.cpp \
     serialcommand.cpp \
     lightbuddycommands.cpp \
-    blinkypendantcommands.cpp
+    blinkypendantcommands.cpp \
+    bytearrayhelpers.cpp \
+    blinkytapeuploaddata.cpp
 
 # For platforms that have serial ports
 # TODO: Pull hard-coded references to BlinkyTape from the gui, allowing this section to be switchable
@@ -59,7 +63,6 @@ SOURCES +=  \
         blinkypendantuploader.h \
         blinkytapeuploader.h \
         serialcommandqueue.h \
-        avruploaddata.h \
         blinkytape.h \
         lightbuddyuploader.h \
         PatternPlayer_Sketch.h \
@@ -70,7 +73,6 @@ SOURCES +=  \
         blinkypendantuploader.cpp \
         blinkytapeuploader.cpp \
         serialcommandqueue.cpp \
-        avruploaddata.cpp \
         blinkytape.cpp \
         lightbuddyuploader.cpp \
         usbutils.cpp

@@ -7,12 +7,6 @@ class Avr109CommandsTests: public QObject
 {
     Q_OBJECT
 private slots:
-    void int16ToByteArrayTest_data();
-    void int16ToByteArrayTest();
-
-    void chunkDataTest_data();
-    void chunkDataTest();
-
     void checkDeviceSignatureTest();
     void resetTest();
     void chipEraseTest();

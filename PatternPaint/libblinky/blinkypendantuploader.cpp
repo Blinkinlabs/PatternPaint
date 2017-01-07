@@ -39,7 +39,7 @@ BlinkyPendantUploader::BlinkyPendantUploader(QObject *parent) :
             this, SLOT(handleCommandFinished(QString, QByteArray)));
 }
 
-bool BlinkyPendantUploader::startUpload(BlinkyController &controller,
+bool BlinkyPendantUploader::storePatterns(BlinkyController &controller,
                                         QList<PatternWriter> &patternWriters)
 {
     // TODO: push the image conversions into here so they are less awkward.
@@ -141,7 +141,7 @@ bool BlinkyPendantUploader::startUpload(BlinkyController &controller,
     return true;
 }
 
-bool BlinkyPendantUploader::upgradeFirmware(BlinkyController &controller)
+bool BlinkyPendantUploader::updateFirmware(BlinkyController &controller)
 {
     Q_UNUSED(controller);
 
@@ -149,7 +149,7 @@ bool BlinkyPendantUploader::upgradeFirmware(BlinkyController &controller)
     return false;
 }
 
-bool BlinkyPendantUploader::upgradeFirmware(int)
+bool BlinkyPendantUploader::restoreFirmware(int)
 {
     errorString = "Firmware update not currently supported for BlinkyPendant!";
     return false;

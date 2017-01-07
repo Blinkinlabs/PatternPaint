@@ -1,87 +1,14 @@
-#include <QtTest>
 #include "avr109commandstests.h"
+
+#include <QtTest>
 
 #include "serialcommand.h"
 #include "avr109commands.h"
+#include "bytearrayhelpers.h"
 
 // For atmega32u4. TODO: poll this from the library?
 #define FLASH_PAGE_SIZE_BYTES 128
 #define EEPROM_CHUNK_SIZE_BYTES 32
-
-void Avr109CommandsTests::int16ToByteArrayTest_data()
-{
-    QTest::addColumn<int>("value");
-    QTest::addColumn<QByteArray>("result");
-
-    QTest::newRow("negative")   << -1          << QByteArray();
-    QTest::newRow("too big")    << (1 << 16)   << QByteArray();
-    QTest::newRow("zero")       << 0           << QByteArray().append('\x00').append('\x00');
-    QTest::newRow("one")        << 1           << QByteArray().append('\x00').append('\x01');
-    QTest::newRow("small")      << 300          << QByteArray().append('\x01').append('\x2C');
-    QTest::newRow("max")        << ((1 << 16) - 1) << QByteArray().append('\xFF').append('\xFF');
-}
-
-void Avr109CommandsTests::int16ToByteArrayTest()
-{
-    QFETCH(int, value);
-    QFETCH(QByteArray, result);
-
-    QVERIFY(Avr109Commands::int16ToByteArray(value) == result);
-}
-
-void Avr109CommandsTests::chunkDataTest_data()
-{
-    QTest::addColumn<QByteArray>("data");
-    QTest::addColumn<int>("chunkSize");
-    QTest::addColumn<QList<QByteArray> >("expectedChunks");
-
-    QTest::newRow("negative chunk size")   << QByteArray() << -1 << QList<QByteArray> ();
-    QTest::newRow("zero chunk size")   << QByteArray() << 0 << QList<QByteArray> ();
-
-    // Create a dataset that is not divisible by the chunk size
-    QByteArray oddSizeData;
-    int oddSizeDataLength = FLASH_PAGE_SIZE_BYTES*1.5;
-    int oddSizeDataChunkSize = FLASH_PAGE_SIZE_BYTES;
-    for(int i = 0; i < oddSizeDataLength; i++) {
-        oddSizeData.append(static_cast<unsigned char>(i & 0xFF));
-    }
-    QList<QByteArray> oddSizeChunks;
-    oddSizeChunks.append(oddSizeData.mid(0, oddSizeDataChunkSize));
-    oddSizeChunks.append(oddSizeData.mid(oddSizeDataChunkSize, (oddSizeDataLength-oddSizeDataChunkSize)));
-    QTest::newRow("odd chunk size")   << oddSizeData << oddSizeDataChunkSize << oddSizeChunks;
-
-
-    // Create a largeish dataset with a length divisible by 1 and FLASH_PAGE_SIZE_BYTES
-    QByteArray largeData;
-    for(int i = 0; i < (2^14); i++) {
-        largeData.append(static_cast<unsigned char>(i & 0xFF));
-    }
-
-    // Test that a chunk size of 1 works correctly
-    QList<QByteArray> chunkSize1;
-    for(int i = 0; i < largeData.length(); i += 1) {
-        chunkSize1.append(largeData.mid(i, 1));
-    }
-    QTest::newRow("1 byte chunk size")   << largeData << 1 << chunkSize1;
-
-    // Test that a chunk size of 1 page works correctly
-    QList<QByteArray> chunkSizePage;
-    for(int i = 0; i < largeData.length(); i += FLASH_PAGE_SIZE_BYTES) {
-        chunkSizePage.append(largeData.mid(i, FLASH_PAGE_SIZE_BYTES));
-    }
-    QTest::newRow("1 page chunk size")   << largeData << FLASH_PAGE_SIZE_BYTES << chunkSizePage;
-}
-
-void Avr109CommandsTests::chunkDataTest()
-{
-    QFETCH(QByteArray, data);
-    QFETCH(int, chunkSize);
-    QFETCH(QList<QByteArray>, expectedChunks);
-
-    QList<QByteArray> chunks = Avr109Commands::chunkData(data, chunkSize);
-
-    QVERIFY(chunks == expectedChunks);
-}
 
 void Avr109CommandsTests::checkDeviceSignatureTest()
 {
@@ -129,7 +56,7 @@ void Avr109CommandsTests::setAddressTest()
 
     QByteArray expectedData;
     expectedData.append('A');
-    expectedData += Avr109Commands::int16ToByteArray(address);
+    expectedData += uint16ToByteArray(address);
 
     QByteArray expectedResponse = "\r";
     QByteArray expectedResponseMask;
@@ -169,7 +96,7 @@ void Avr109CommandsTests::writeFlashPageTest()
 
     QByteArray expectedData;
     expectedData.append('B');
-    expectedData.append(Avr109Commands::int16ToByteArray(data.length()));
+    expectedData.append(uint16ToByteArray(data.length()));
     expectedData.append('F');
     expectedData.append(data);
 
@@ -213,7 +140,7 @@ void Avr109CommandsTests::verifyFlashPageTest()
 
     QByteArray expectedData;
     expectedData.append('g');
-    expectedData.append(Avr109Commands::int16ToByteArray(data.length()));
+    expectedData.append(uint16ToByteArray(data.length()));
     expectedData.append('F');
 
     QByteArray expectedResponse;
@@ -235,7 +162,7 @@ void Avr109CommandsTests::writeEepromBlockTest()
 
     QByteArray expectedData;
     expectedData.append('B');
-    expectedData.append(Avr109Commands::int16ToByteArray(data.length()));
+    expectedData.append(uint16ToByteArray(data.length()));
     expectedData.append('E');
     expectedData.append(data);
 
@@ -285,7 +212,7 @@ void Avr109CommandsTests::writeFlashTest()
     QList<SerialCommand> commands = Avr109Commands::writeFlash(data, address);
 
     // Build a list of expected output commands
-    QList<QByteArray> chunks = Avr109Commands::chunkData(data, FLASH_PAGE_SIZE_BYTES);
+    QList<QByteArray> chunks = chunkData(data, FLASH_PAGE_SIZE_BYTES);
 
     // There should be 1 setaddress and 1 writeflashpage instruction per chunk
     QVERIFY(commands.length() == 2*chunks.length());
@@ -350,7 +277,7 @@ void Avr109CommandsTests::verifyFlashTest()
     QList<SerialCommand> commands = Avr109Commands::verifyFlash(data, address);
 
     // Build a list of expected output commands
-    QList<QByteArray> chunks = Avr109Commands::chunkData(data, FLASH_PAGE_SIZE_BYTES);
+    QList<QByteArray> chunks = chunkData(data, FLASH_PAGE_SIZE_BYTES);
 
     // There should be 1 setaddress and 1 verifyflashpage instruction per chunk
     QVERIFY(commands.length() == 2*chunks.length());
@@ -416,7 +343,7 @@ void Avr109CommandsTests::writeEepromTest()
 
 
     // Next, there should be 1 or more writeFlashPage commands
-    QList<QByteArray> chunks = Avr109Commands::chunkData(data, EEPROM_CHUNK_SIZE_BYTES);
+    QList<QByteArray> chunks = chunkData(data, EEPROM_CHUNK_SIZE_BYTES);
 
     // Verify that there are the correct number of commands
     QVERIFY(commands.length() == (1 + chunks.length()));

@@ -50,7 +50,7 @@ void LightBuddyUploader::cancel()
     qDebug() << "Cancel signalled, but not supported";
 }
 
-bool LightBuddyUploader::startUpload(BlinkyController &controller,
+bool LightBuddyUploader::storePatterns(BlinkyController &controller,
                                      QList<PatternWriter> &patternWriters)
 {
     // 1. Make the patterns into data and store them in a vector
@@ -167,7 +167,7 @@ void LightBuddyUploader::doWork()
     }
 }
 
-bool LightBuddyUploader::upgradeFirmware(BlinkyController &controller)
+bool LightBuddyUploader::updateFirmware(BlinkyController &controller)
 {
     Q_UNUSED(controller);
 
@@ -176,7 +176,7 @@ bool LightBuddyUploader::upgradeFirmware(BlinkyController &controller)
     return false;
 }
 
-bool LightBuddyUploader::upgradeFirmware(int)
+bool LightBuddyUploader::restoreFirmware(int)
 {
     // TODO: Support firmware upload for the lightbuddy
     errorString = "Firmware update not currently supported for Lightbuddy!";

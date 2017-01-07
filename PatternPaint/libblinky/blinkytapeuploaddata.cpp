@@ -1,4 +1,4 @@
-#include "avruploaddata.h"
+#include "blinkytapeuploaddata.h"
 
 #include "PatternPlayer_Sketch.h"
 #include "blinkytape.h"
@@ -27,23 +27,32 @@ QByteArray encodeWordLSB(int data)
     return output;
 }
 
-bool avrUploadData::init(QList<PatternWriter> &patterns)
+bool BlinkyTapeUploadData::init(QList<PatternWriter> &patterns)
 {
     char buff[BUFF_LENGTH];
     QString errorString;
 
-    // We need to build two things- a memory image containing the sketch and pattern data,
-    // and a memory image containing the pattern data information table.
+    // First, build the flash section for the sketch. This is the same for
+    // all uploads
 
-    sketch = QByteArray();          // Program data
-    patternData = QByteArray();     // Pattern Data
-    patternTable = QByteArray();    // Pattern data header
-
+    QByteArray sketch;          // Program data
     sketch.append(reinterpret_cast<const char *>(PATTERNPLAYER_DATA), sizeof(PATTERNPLAYER_DATA));
 
     // Expand sketch size to FLASH_MEMORY_PAGE_SIZE boundary
     while (sketch.length() % FLASH_MEMORY_PAGE_SIZE != 0)
         sketch.append(static_cast<char>(0xFF));
+
+    sketchSection = FlashSection("Sketch",
+                                 FLASH_MEMORY_SKETCH_ADDRESS,
+                                 sketch);
+
+
+
+    // Next, build the pattern data section and pattern header table
+
+
+    QByteArray patternData;     // Pattern Data
+    QByteArray patternTable;    // Pattern data header
 
     // Test for the minimum/maximum patterns count
     if (patterns.count() == 0) {
@@ -109,9 +118,13 @@ bool avrUploadData::init(QList<PatternWriter> &patterns)
              patternTable.count());
     qDebug() << buff;
 
-    sketchAddress = FLASH_MEMORY_SKETCH_ADDRESS;
-    patternDataAddress = FLASH_MEMORY_SKETCH_ADDRESS + sketch.count();
-    patternTableAddress = FLASH_MEMORY_PATTERN_TABLE_ADDRESS;
 
+    patternDataSection = FlashSection("PatternData",
+                                      FLASH_MEMORY_SKETCH_ADDRESS + sketch.count(),
+                                      patternData);
+
+    patternTableSection = FlashSection("PatternTable",
+                                       FLASH_MEMORY_PATTERN_TABLE_ADDRESS,
+                                       patternTable);
     return true;
 }

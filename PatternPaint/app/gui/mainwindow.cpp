@@ -642,7 +642,7 @@ void MainWindow::on_actionRestore_firmware_triggered()
 
         connectUploader();
 
-        if (!uploader->upgradeFirmware(-1)) {
+        if (!uploader->restoreFirmware(-1)) {
             showError(uploader->getErrorString());
             return;
         }
@@ -666,7 +666,7 @@ void MainWindow::on_actionRestore_firmware_triggered()
 
         connectUploader();
 
-        if (!uploader->upgradeFirmware(*controller)) {
+        if (!uploader->updateFirmware(*controller)) {
             showError(uploader->getErrorString());
             return;
         }
@@ -709,7 +709,7 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
 
     connectUploader();
 
-    if (!uploader->startUpload(*controller, patternWriters)) {
+    if (!uploader->storePatterns(*controller, patternWriters)) {
         showError(uploader->getErrorString());
         return;
     }

@@ -1,7 +1,7 @@
 #include "blinkytapeuploader.h"
 
 #include "avr109commands.h"
-#include "avruploaddata.h"
+#include "blinkytapeuploaddata.h"
 #include "ProductionSketch.h"
 #include "blinkycontroller.h"
 
@@ -90,76 +90,22 @@ void BlinkyTapeUploader::setProgress(int newProgress)
     emit(progressChanged((progress*100)/maxProgress));
 }
 
-bool BlinkyTapeUploader::startUpload(BlinkyController &tape, QList<PatternWriter> &patternWriters)
-{
-    /// Create the compressed image and check if it will fit into the device memory
-    avrUploadData data;
-    if (!data.init(patternWriters)) {
-        errorString = data.errorString;
-        return false;
-    }
-
-    // TODO: Only write the sketch portion if we absolutely have to, to lower the risk
-    // that we trash the firmware if there is a problem later
-
-    // The entire sketch must fit into the available memory, minus a single page
-    // at the end of flash for the configuration header
-    // TODO: Verify this by looking at each section individually instead, making sure
-    // none of them overlap or extend outside of available memory?
-    if (data.sketch.length() + data.patternData.length() + data.patternTable.length()
-        > FLASH_BYTES_AVAILABLE) {
-        qCritical() << "sketch can't fit into memory!";
-
-        errorString = QString(
-            "Sorry! The Pattern is a bit too big to fit in BlinkyTape memory! Avaiable space=%1, Pattern size=%2")
-                      .arg(FLASH_BYTES_AVAILABLE)
-                      .arg(
-            data.sketch.length() + data.patternData.length() + data.patternTable.length());
-        return false;
-    }
-
-    // Put the sketch, pattern, and metadata into the programming queue.
-    qDebug() << "Sketch address: " << data.sketchAddress << ", size: " << data.sketch.length();
-    qDebug() << "pattern data address: " << data.patternDataAddress << ", size: "
-             << data.patternData.length();
-    qDebug() << "pattern table address: " << data.patternTableAddress << ", size: "
-             << data.patternTable.length();
-
-    flashData.push_back(FlashSection(data.sketchAddress, data.sketch));
-    flashData.push_back(FlashSection(data.patternDataAddress, data.patternData));
-    flashData.push_back(FlashSection(data.patternTableAddress, data.patternTable));
-
-    return startUpload(tape);
-}
-
-bool BlinkyTapeUploader::upgradeFirmware(int timeout)
+bool BlinkyTapeUploader::restoreFirmware(int timeout)
 {
     QByteArray sketch = QByteArray(reinterpret_cast<const char *>(PRODUCTION_DATA),
                                    PRODUCTION_LENGTH);
 
     bootloaderPollTimeout = timeout;
 
-    char buff[BUFF_LENGTH];
-    snprintf(buff, BUFF_LENGTH, "Sketch size: %iB",
-             sketch.length()),
-    qDebug() << buff;
+    // Put the sketch, pattern, and metadata into the programming queue.
+    flashData.push_back(FlashSection("Sketch", PRODUCTION_ADDRESS, sketch));
 
-    // The entire sketch must fit into the available memory, minus a single page
-    // at the end of flash for the configuration header
-    // TODO: Could save ~100 bytes if we let the sketch spill into the unused portion
-    // of the header.
-    if (sketch.length() > FLASH_BYTES_AVAILABLE) {
-        qDebug() << "sketch can't fit into memory!";
-
-        errorString = QString(
-            "Sorry! The Pattern is a bit too big to fit in BlinkyTape memory right now. We're working on improving this! Avaiable space=%1, Pattern size=%2")
-                      .arg(FLASH_BYTES_AVAILABLE)
-                      .arg(sketch.length());
-        return false;
+    for(FlashSection& section : flashData) {
+        qDebug() << "Flash Section:" << section.name
+                 << "address: " << section.address
+                 << "size: " << section.data.length();
     }
 
-    // Put the sketch, pattern, and metadata into the programming queue.
-    flashData.push_back(FlashSection(PRODUCTION_ADDRESS, sketch));
 
     // TODO: This is duplicated in startUpload...
     maxProgress = 1;    // checkDeviceSignature
@@ -174,33 +120,47 @@ bool BlinkyTapeUploader::upgradeFirmware(int timeout)
     return true;
 }
 
-bool BlinkyTapeUploader::upgradeFirmware(BlinkyController &blinky)
+bool BlinkyTapeUploader::updateFirmware(BlinkyController &blinky)
 {
     QByteArray sketch = QByteArray(reinterpret_cast<const char *>(PRODUCTION_DATA),
                                    PRODUCTION_LENGTH);
 
-    char buff[BUFF_LENGTH];
-    snprintf(buff, BUFF_LENGTH, "Sketch size: %iB",
-             sketch.length()),
-    qDebug() << buff;
-
-    // The entire sketch must fit into the available memory, minus a single page
-    // at the end of flash for the configuration header
-    if (sketch.length() > FLASH_BYTES_AVAILABLE) {
-        qDebug() << "sketch can't fit into memory!";
-
-        errorString = QString(
-            "Sorry! The Pattern is a bit too big to fit in BlinkyTape memory right now. We're working on improving this! Avaiable space=%1, Pattern size=%2")
-                      .arg(FLASH_BYTES_AVAILABLE)
-                      .arg(sketch.length());
-        return false;
-    }
-
     // Put the sketch, pattern, and metadata into the programming queue.
-    flashData.push_back(FlashSection(PRODUCTION_ADDRESS, sketch));
+    flashData.push_back(FlashSection("Sketch", PRODUCTION_ADDRESS, sketch));
+
+    for(FlashSection& section : flashData) {
+        qDebug() << "Flash Section:" << section.name
+                 << "address: " << section.address
+                 << "size: " << section.data.length();
+    }
 
     return startUpload(blinky);
 }
+
+bool BlinkyTapeUploader::storePatterns(BlinkyController &blinky, QList<PatternWriter> &patternWriters)
+{
+    /// Create the compressed image and check if it will fit into the device memory
+    BlinkyTapeUploadData data;
+
+    if (!data.init(patternWriters)) {
+        errorString = data.errorString;
+        return false;
+    }
+
+    // TODO: re-enable size check
+    flashData.push_back(data.sketchSection);
+    flashData.push_back(data.patternDataSection);
+    flashData.push_back(data.patternTableSection);
+
+    for(FlashSection& section : flashData) {
+        qDebug() << "Flash Section:" << section.name
+                 << "address: " << section.address
+                 << "size: " << section.data.length();
+    }
+
+    return startUpload(blinky);
+}
+
 
 bool BlinkyTapeUploader::startUpload(BlinkyController &blinky)
 {

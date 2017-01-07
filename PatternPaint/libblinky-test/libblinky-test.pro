@@ -21,9 +21,13 @@ include(../libblinky.pri)
 
 HEADERS += \
     avr109commandstests.h \
-    colormodetests.h
+    colormodetests.h \
+    serialcommandtests.h \
+    bytearrayhelperstests.h
 
 SOURCES += \
     avr109commandstests.cpp \
     main.cpp \
-    colormodetests.cpp
+    colormodetests.cpp \
+    serialcommandtests.cpp \
+    bytearrayhelperstests.cpp

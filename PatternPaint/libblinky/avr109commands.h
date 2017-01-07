@@ -11,12 +11,6 @@
 
 namespace Avr109Commands {
 
-// Utility function to transmit a uint16_t value
-QByteArray int16ToByteArray(int value);
-
-// Utility function to split a qbytearray into regularly-sized pieces
-QList<QByteArray> chunkData(const QByteArray &data, int chunkSize);
-
 /// Check that we are talking to the correct device
 SerialCommand checkDeviceSignature();
 

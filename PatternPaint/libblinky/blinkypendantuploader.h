@@ -13,9 +13,9 @@ class BlinkyPendantUploader : public BlinkyUploader
 public:
     BlinkyPendantUploader(QObject *parent = 0);
 
-    bool startUpload(BlinkyController &controller, QList<PatternWriter> &patternWriters);
-    bool upgradeFirmware(BlinkyController &controller);
-    bool upgradeFirmware(int timeout);
+    bool storePatterns(BlinkyController &controller, QList<PatternWriter> &patternWriters);
+    bool updateFirmware(BlinkyController &controller);
+    bool restoreFirmware(int timeout);
     QString getErrorString() const;
 
     QList<PatternWriter::Encoding> getSupportedEncodings() const;

@@ -4,27 +4,11 @@
 #include "patternwriter.h"
 #include "blinkyuploader.h"
 #include "serialcommandqueue.h"
+#include "blinkytapeuploaddata.h"
 
 #include <QObject>
 #include <QTimer>
 #include <iostream>
-
-struct FlashSection {
-    /// Create a new flash section
-    /// @param address Address in the flash memory where the data should be stored
-    /// @param data Data to store
-    FlashSection(int address, QByteArray data) :
-        address(address),
-        data(data)
-    {
-    }
-
-    /// Address to store the data
-    int address;
-
-    /// Data to store
-    QByteArray data;
-};
 
 /// This is an re-entreant version of an pattern uploader.
 /// Each task in the upload process is broken into a single state, and the state
@@ -44,9 +28,9 @@ class BlinkyTapeUploader : public BlinkyUploader
 public:
     BlinkyTapeUploader(QObject *parent = 0);
 
-    bool startUpload(BlinkyController &blinky, QList<PatternWriter> &patternWriters);
-    bool upgradeFirmware(BlinkyController &blinky);
-    bool upgradeFirmware(int timeout);
+    bool storePatterns(BlinkyController &blinky, QList<PatternWriter> &patternWriters);
+    bool updateFirmware(BlinkyController &blinky);
+    bool restoreFirmware(int timeout);
     QString getErrorString() const;
 
     QList<PatternWriter::Encoding> getSupportedEncodings() const;
