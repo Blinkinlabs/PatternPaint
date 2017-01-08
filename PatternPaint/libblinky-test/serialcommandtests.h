@@ -9,6 +9,12 @@ class SerialCommandTests : public QObject
 private slots:
     void initTest();
     void initMaskedTest();
+
+    void compareNoMaskTest_data();
+    void compareNoMaskTest();
+
+    void compareMaskTest_data();
+    void compareMaskTest();
 };
 
 #endif // SERIALCOMMANDTESTS_H

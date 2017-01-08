@@ -140,70 +140,53 @@ void SerialCommandQueue::handleReadData()
         return;
     }
 
-    if (responseData.length() > queue.front().expectedResponse.length()) {
+    switch(queue.front().testResponse(responseData)) {
+    case RESPONSE_NOT_ENOUGH_DATA:
+        qDebug() << "Didn't get enough data yet. Expecting:"
+                 << queue.front().expectedResponse.length()
+                 << "received:" << responseData.length();
+        break;
+
+    case RESPONSE_TOO_MUCH_DATA:
         // TODO: error, we got unexpected data.
         qCritical() << "Got more data than we expected"
                     << "expected:" << queue.front().expectedResponse.length()
                     << "received:" << responseData.length();
-        return;
-    }
+        break ;
 
-    if (responseData.length() < queue.front().expectedResponse.length()) {
-        qDebug() << "Didn't get enough data yet. Expecting:"
-                 << queue.front().expectedResponse.length()
-                 << "received:" << responseData.length();
-        return;
-    }
+    case RESPONSE_INVALID_MASK:
+        // TODO: error, we got unexpected data.
+        qCritical() << "Invalid mask length- command formatted incorrectly."
+                    << "expectedResponse:" << queue.front().expectedResponse.length()
+                    << "expectedResponseMask:" << queue.front().expectedResponseMask.length();
+        break;
 
-    // If the expected data should be masked, do a chracter by character match
-    // TODO: Dump both streams here
-    if (queue.front().expectedResponseMask.length() > 0) {
-        for (int i = 0; i < responseData.length(); i++) {
-            if (queue.front().expectedResponseMask.at(i) != 0
-                && responseData[i] != queue.front().expectedResponse.at(i)) {
-                qCritical() << "Got unexpected data back"
-                            << "position:" << i
-                            << "expected:" << (int)queue.front().expectedResponse.at(i)
-                            << "received:" << (int)responseData[i]
-                            << "mask:" << (int)queue.front().expectedResponseMask.at(i);
-                emit(error("Got unexpected data back"));
-                return;
-            }
+    case RESPONSE_MISMATCH:
+        emit(error("Got unexpected data back"));
+        break;
+
+    case RESPONSE_MATCH:
+
+        // qDebug() << "Command completed successfully: " << commandQueue.front().name;
+
+        QMetaObject::invokeMethod(this, "commandFinished", Qt::QueuedConnection,
+                                  Q_ARG(QString, queue.front().name), Q_ARG(QByteArray, responseData));
+
+        // At this point, we've gotten all of the data that we expected.
+        commandTimeoutTimer.stop();
+
+        queue.pop_front();
+
+        // If that was the last command, signal it
+        if(queue.empty()) {
+            QMetaObject::invokeMethod(this, "lastCommandFinished", Qt::QueuedConnection);
         }
+
+        // Start another command, if there is one.
+        processQueue();
+
+        break;
     }
-    // Otherwise just check if the strings match
-    // TODO: Dump both streams here
-    else {
-        for (int i = 0; i < responseData.length(); i++) {
-            if (responseData[i] != queue.front().expectedResponse.at(i)) {
-                qCritical() << "Got unexpected data back"
-                            << "position:" << i
-                            << "expected:" << (int)queue.front().expectedResponse.at(i)
-                            << "received:" << (int)responseData[i]
-                            << "mask:" << (int)queue.front().expectedResponseMask.at(i);
-                emit(error("Got unexpected data back"));
-                return;
-            }
-        }
-    }
-
-// qDebug() << "Command completed successfully: " << commandQueue.front().name;
-
-    QMetaObject::invokeMethod(this, "commandFinished", Qt::QueuedConnection,
-                              Q_ARG(QString, queue.front().name), Q_ARG(QByteArray, responseData));
-
-    // At this point, we've gotten all of the data that we expected.
-    commandTimeoutTimer.stop();
-
-    queue.pop_front();
-
-    // If that was the last command, signal it
-    if(queue.empty()) {
-        QMetaObject::invokeMethod(this, "lastCommandFinished", Qt::QueuedConnection);
-    }
-
-    // Start another command, if there is one.
-    processQueue();
 }
 
 void SerialCommandQueue::handleSerialError(QSerialPort::SerialPortError serialError)

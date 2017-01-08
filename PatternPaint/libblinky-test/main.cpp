@@ -16,11 +16,11 @@ int main(int argc, char *argv[])
     ColorModeTests colorModeTests;
     QTest::qExec(&colorModeTests);
 
-    SerialCommandTests serialCommandTests;
-    QTest::qExec(&serialCommandTests);
-
     ByteArrayHelpersTests byteArrayHelpersTests;
     QTest::qExec(&byteArrayHelpersTests);
+
+    SerialCommandTests serialCommandTests;
+    QTest::qExec(&serialCommandTests);
 
     return 0;
 }
