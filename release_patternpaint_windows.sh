@@ -115,7 +115,7 @@ else
 fi
 
 ################### Extract the version info ###################
-cd ${PATTERNPAINT}PatternPaint
+cd ${PATTERNPAINT}
 
 GIT_COMMAND="git -C ${PWD}"
 GIT_VERSION=`${GIT_COMMAND} describe --always --tags 2> /dev/null`
@@ -123,10 +123,10 @@ VERSION=`echo ${GIT_VERSION} | sed 's/-/\./g' | sed 's/g//g'`
 
 echo "PatternPaint version: " ${VERSION}
 
-cd ../../
+cd ../
 
 ################## Build PatternPaint ###################
-cd ${PATTERNPAINT}PatternPaint
+cd ${PATTERNPAINT}src
 
 PATH=${QT_TOOLS}:${QT_MINGW}bin/:${PATH}
 
@@ -154,10 +154,10 @@ mkdir -p ${OUTDIR}driver/eightbyeight/x86
 mkdir -p ${OUTDIR}driver/eightbyeight/amd64
 
 # Main executable
-cp ${PATTERNPAINT}PatternPaint/app/bin/PatternPaint.exe ${OUTDIR}
+cp ${PATTERNPAINT}src/app/bin/PatternPaint.exe ${OUTDIR}
 
 # And the libblinky library
-cp ${PATTERNPAINT}PatternPaint/libblinky/bin/libblinky.dll ${OUTDIR}
+cp ${PATTERNPAINT}src/libblinky/bin/libblinky.dll ${OUTDIR}
 
 # Note: This list of DLLs must be determined by hand, using Dependency Walker
 # Also, the .nsi file should be synchronized with this list, otherwise the file

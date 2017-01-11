@@ -13,7 +13,7 @@ install:
 script:
   # Build
   - source /opt/qt57/bin/qt57-env.sh
-  - cd PatternPaint
+  - cd src
   - qmake -config release
   - make -j7
 
@@ -24,10 +24,10 @@ script:
   - icns2png app/images/patternpaint.icns -x
   - cp patternpaint_256x256x32.png patternpaint.png
   - cd ..
-  - find PatternPaint/
+  - find src/
   - wget -c https://github.com/probonopd/linuxdeployqt/releases/download/2/linuxdeployqt-2-x86_64.AppImage -O linuxdeployqt
   - chmod a+x linuxdeployqt
   - unset LD_LIBRARY_PATH # Remove too old Qt from the search path; TODO: Move inside the linuxdeployqt AppImage
-  - ./linuxdeployqt PatternPaint/app/PatternPaint -qmldir=app/PatternPaint -bundle-non-qt-libs
-  - ./linuxdeployqt PatternPaint/app/PatternPaint -qmldir=app/PatternPaint -appimage
+  - ./linuxdeployqt src/app/PatternPaint -qmldir=app/PatternPaint -bundle-non-qt-libs
+  - ./linuxdeployqt src/app/PatternPaint -qmldir=app/PatternPaint -appimage
   - curl --upload-file ./*.AppImage https://transfer.sh/PatternPaint-git$(git describe --tags --always)-x86_64.AppImage
