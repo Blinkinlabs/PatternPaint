@@ -1,5 +1,4 @@
 # Linux instructions from: https://forum.qt.io/topic/50340/installing-qt-5-4-dev-packages-in-travis-ci/16
-# TODO: Add support for macOS builds
 
 sudo: required
 dist: trusty
@@ -9,15 +8,19 @@ before_install:
   - sudo apt-get update -qq
 
 install:
-#  - sudo apt-get -y install qt57[QTPACKAGE] qt57serialport libusb-1.0-0-dev icnsutils
   - sudo apt-get -y install qt57base qt57declarative qt57serialport libusb-1.0-0-dev icnsutils
 
 script:
-#  - source /opt/qt55/bin/qt55-env.sh
+  # Build
   - source /opt/qt57/bin/qt57-env.sh
   - cd PatternPaint
   - qmake -config release
   - make -j7
+
+  # Run unit tests
+  - PatternPaint/libblinky-test/libblinky-test
+
+  # Package
   - icns2png images/patternpaint.icns -x
   - cp patternpaint_256x256x32.png patternpaint.png
   - cd ..
@@ -25,6 +28,6 @@ script:
   - wget -c https://github.com/probonopd/linuxdeployqt/releases/download/2/linuxdeployqt-2-x86_64.AppImage -O linuxdeployqt
   - chmod a+x linuxdeployqt
   - unset LD_LIBRARY_PATH # Remove too old Qt from the search path; TODO: Move inside the linuxdeployqt AppImage
-  - ./linuxdeployqt PatternPaint/PatternPaint -qmldir=PatternPaint/ -bundle-non-qt-libs
-  - ./linuxdeployqt PatternPaint/PatternPaint -qmldir=PatternPaint/ -appimage
+  - ./linuxdeployqt PatternPaint/PatternPaint/app -qmldir=PatternPaint/app -bundle-non-qt-libs
+  - ./linuxdeployqt PatternPaint/PatternPaint/app -qmldir=PatternPaint/app -appimage
   - curl --upload-file ./*.AppImage https://transfer.sh/PatternPaint-git$(git describe --tags --always)-x86_64.AppImage
