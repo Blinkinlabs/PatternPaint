@@ -70,8 +70,8 @@ cd ${TEMPDIR}
 
 ################## Get PatternPaint ###################
 if [ ! -d "${PATTERNPAINT}" ]; then
-	git clone https://github.com/Blinkinlabs/PatternPaint.git ${PATTERNPAINT}
-#	git clone `pwd`/.. ${PATTERNPAINT} -b test
+#	git clone https://github.com/Blinkinlabs/PatternPaint.git ${PATTERNPAINT}
+	git clone `pwd`/.. ${PATTERNPAINT}
 else
 	cd ${PATTERNPAINT}
 	git pull
@@ -115,7 +115,7 @@ else
 fi
 
 ################### Extract the version info ###################
-cd ${PATTERNPAINT}
+pushd ${PATTERNPAINT}
 
 GIT_COMMAND="git -C ${PWD}"
 GIT_VERSION=`${GIT_COMMAND} describe --always --tags 2> /dev/null`
@@ -123,19 +123,18 @@ VERSION=`echo ${GIT_VERSION} | sed 's/-/\./g' | sed 's/g//g'`
 
 echo "PatternPaint version: " ${VERSION}
 
-cd ../
+popd
 
 ################## Build PatternPaint ###################
-cd ${PATTERNPAINT}src
+pushd ${PATTERNPAINT}src
 
 PATH=${QT_TOOLS}:${QT_MINGW}bin/:${PATH}
 
 qmake.exe -config release OBJECTS_DIR=build MOC_DIR=build/moc RCC_DIR=build/rcc UI_DIR=build/uic DESTDIR=bin
 mingw32-make.exe clean
-mingw32-make.exe 
+mingw32-make.exe -j6
 
-cd ../../
-
+popd
 
 ################## Package Everything ############################
 mkdir -p ${OUTDIR}
