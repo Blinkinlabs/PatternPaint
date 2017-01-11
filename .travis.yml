@@ -18,6 +18,7 @@ script:
   - make -j7
 
   # Run unit tests
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/libblinky
   - ./libblinky-test/libblinky-test
 
   # Package
