@@ -10,17 +10,19 @@ int main(int argc, char *argv[])
     Q_UNUSED(argc);
     Q_UNUSED(argv);
 
+    int result = 0;
+
     Avr109CommandsTests avr109CommandsTests;
-    QTest::qExec(&avr109CommandsTests);
+    result |= QTest::qExec(&avr109CommandsTests);
 
     ColorModeTests colorModeTests;
-    QTest::qExec(&colorModeTests);
+    result |= QTest::qExec(&colorModeTests);
 
     ByteArrayHelpersTests byteArrayHelpersTests;
-    QTest::qExec(&byteArrayHelpersTests);
+    result |= QTest::qExec(&byteArrayHelpersTests);
 
     SerialCommandTests serialCommandTests;
-    QTest::qExec(&serialCommandTests);
+    result |= QTest::qExec(&serialCommandTests);
 
-    return 0;
+    return result;
 }
