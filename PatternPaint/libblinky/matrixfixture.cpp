@@ -14,7 +14,7 @@ MatrixFixture::MatrixFixture(
 MatrixFixture::~MatrixFixture()
 {
     if(brightnessModel != NULL)
-        free(brightnessModel);
+        delete brightnessModel;
 }
 
 QString MatrixFixture::getName() const

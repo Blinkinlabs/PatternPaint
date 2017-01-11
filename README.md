@@ -116,13 +116,13 @@ When installing, only the 'Windoes Software Development Kit' feature is required
 
 First, get the essential build tools:
 
-	sudo apt-get install build-essential mesa-common-dev libglu-mesa
+	sudo apt-get install build-essential mesa-common-dev libglu-mesa1-dev libusb-1.0-0-dev
 
 There's a PPA with the latest version of Qt, Hooray!
 
 	sudo add-apt-repository --yes ppa:beineri/opt-qt57-trusty
 	sudo apt-get update -qq
-	sudo apt-get install qt57[QTPACKAGE] qt57serialport libusb-1.0-0-dev
+	sudo apt-get install qt57[QTPACKAGE] qt57serialport
 
 Note: You'll probably need to update the qt serial version, similar to the macOS instructions above.
 
