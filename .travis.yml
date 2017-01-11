@@ -18,7 +18,7 @@ script:
   - make -j7
 
   # Run unit tests
-  - ./PatternPaint/libblinky-test/libblinky-test
+  - ./libblinky-test/libblinky-test
 
   # Package
   - icns2png app/images/patternpaint.icns -x
