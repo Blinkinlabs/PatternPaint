@@ -18,16 +18,16 @@ script:
   - make -j7
 
   # Run unit tests
-  - PatternPaint/libblinky-test/libblinky-test
+  - ./PatternPaint/libblinky-test/libblinky-test
 
   # Package
-  - icns2png images/patternpaint.icns -x
+  - icns2png app/images/patternpaint.icns -x
   - cp patternpaint_256x256x32.png patternpaint.png
   - cd ..
   - find PatternPaint/
   - wget -c https://github.com/probonopd/linuxdeployqt/releases/download/2/linuxdeployqt-2-x86_64.AppImage -O linuxdeployqt
   - chmod a+x linuxdeployqt
   - unset LD_LIBRARY_PATH # Remove too old Qt from the search path; TODO: Move inside the linuxdeployqt AppImage
-  - ./linuxdeployqt PatternPaint/PatternPaint/app -qmldir=PatternPaint/app -bundle-non-qt-libs
-  - ./linuxdeployqt PatternPaint/PatternPaint/app -qmldir=PatternPaint/app -appimage
+  - ./linuxdeployqt PatternPaint/app/PatternPaint -qmldir=app/PatternPaint -bundle-non-qt-libs
+  - ./linuxdeployqt PatternPaint/app/PatternPaint -qmldir=app/PatternPaint -appimage
   - curl --upload-file ./*.AppImage https://transfer.sh/PatternPaint-git$(git describe --tags --always)-x86_64.AppImage
