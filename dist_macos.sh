@@ -28,55 +28,70 @@ VERSION=`echo ${GIT_VERSION} | sed 's/-/\./g' | sed 's/g//g'`
 echo "PatternPaint version: " ${VERSION}
 
 # Build PatternPaint
-${QTDIR}/bin/qmake -config release OBJECTS_DIR=build MOC_DIR=build/moc RCC_DIR=build/rcc UI_DIR=build/uic
+#${QTDIR}/bin/qmake -config release OBJECTS_DIR=build MOC_DIR=build/moc RCC_DIR=build/rcc UI_DIR=build/uic
+
+${QTDIR}/bin/qmake PatternPaint.pro \
+    -r \
+    -spec macx-clang \
+    CONFIG+=x86_64 \
+    DESTDIR=release
+
+make clean
 make -j
 
 cd ..
 
-APP=src/app/PatternPaint.app
+APP=src/app/release/PatternPaint.app
 
 # Integrate the system frameworks
 ${QTDIR}/bin/macdeployqt ${APP} -verbose=1
 
 # TODO: automate this instead of listing each plugin separately?
 
-SIGNING_ID='Developer ID Application: BLINKINLABS, LLC'
-CODESIGN_FLAGS="--verbose --force"
+#SIGNING_ID='Developer ID Application: BLINKINLABS, LLC'
 
-# Sign the frameworks
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/Sparkle.framework/Versions/A
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/libusb-1.0.0.dylib
+if [ -z "$SIGNING_ID" ]; then
+    echo "WARNING: Signing id not found, skipping code signature phase. Resulting binary will not be signed."
+else
 
-# And the system frameworks 
-# TODO: This is a workaround for toolchain changes in 5.5.1
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/QtCore.framework/Versions/5
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/QtDBus.framework/Versions/5
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/QtGui.framework/Versions/5
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/QtPrintSupport.framework/Versions/5
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/QtSerialPort.framework/Versions/5
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/QtWidgets.framework/Versions/5
+    CODESIGN_FLAGS="--verbose --force"
 
-# And the plugins
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqdds.dylib
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqgif.dylib
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqicns.dylib
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqico.dylib
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqjpeg.dylib
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqmacjp2.dylib
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqtga.dylib
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqtiff.dylib
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqwbmp.dylib
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqwebp.dylib
+    # Sign the frameworks
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/Sparkle.framework/Versions/A
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/libusb-1.0.0.dylib
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/libblinky-1.0.0.dylib
 
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/printsupport/libcocoaprintersupport.dylib
+    # And the system frameworks 
+    # TODO: This is a workaround for toolchain changes in 5.5.1
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/QtCore.framework/Versions/5
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/QtDBus.framework/Versions/5
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/QtGui.framework/Versions/5
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/QtPrintSupport.framework/Versions/5
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/QtSerialPort.framework/Versions/5
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/QtWidgets.framework/Versions/5
 
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/platforms/libqcocoa.dylib
+    # And the plugins
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqdds.dylib
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqgif.dylib
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqicns.dylib
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqico.dylib
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqjpeg.dylib
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqmacjp2.dylib
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqtga.dylib
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqtiff.dylib
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqwbmp.dylib
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/imageformats/libqwebp.dylib
 
-# Finally the app
-codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/printsupport/libcocoaprintersupport.dylib
 
-# Perform a quick verification of the application signature
-codesign --verify --verbose=4 ${APP}
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/PlugIns/platforms/libqcocoa.dylib
+
+    # Finally the app
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/
+
+    # Perform a quick verification of the application signature
+    codesign --verify --verbose=4 ${APP}
+fi
 
 
 DMG_NAME=PatternPaint_${VERSION}
