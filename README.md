@@ -165,8 +165,8 @@ These are the steps required to build a release version (installer) for PatternP
 
 Once the prerequsites have been installed, the deployment script can be run:
 
-	curl -O https://raw.githubusercontent.com/Blinkinlabs/PatternPaint/master/release_patternpaint_macos.sh
-	sh ./release_patternpaint_macos.sh
+	curl -O https://raw.githubusercontent.com/Blinkinlabs/PatternPaint/master/dist_macos.sh
+	sh ./dist_macos.sh
 	
 If everything works, it will generate a redistributable disk image 'PatternPaint_X.Y.Z.dmg', where X.Y.Z is the current version of PatternPaint.
 
@@ -193,8 +193,8 @@ NOTE: Obtain the GlobalSign file and install the Blinkinlabs Cert before continu
 
 Start Git bash (start->run->git bash)
 
-	curl -O https://raw.githubusercontent.com/Blinkinlabs/PatternPaint/master/release_patternpaint_windows.sh
-	sh release_patternpaint_windows.sh
+	curl -O https://raw.githubusercontent.com/Blinkinlabs/PatternPaint/master/dist_windows.sh
+	sh dist_windows.sh
 
 
 If everything works, it will generate an installer executable 'PatternPaint_Installer_X.Y.Z.exe', where X.Y.Y is the current version of PatternPaint.
