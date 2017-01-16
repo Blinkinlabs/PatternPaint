@@ -8,6 +8,7 @@
 #include "sceneconfiguration.h"
 #include "colorchooser.h"
 #include "patternwriter.h"
+#include "debuglog.h"
 
 #include "blinkytape.h"
 #include "blinkytapeuploader.h"
@@ -1276,4 +1277,10 @@ void MainWindow::on_actionClose_All_triggered()
         return;
 
     patternCollection.clear();
+}
+
+void MainWindow::on_actionDebug_Log_triggered()
+{
+    DebugLog* logDialog = new DebugLog(this);
+    logDialog->show();
 }

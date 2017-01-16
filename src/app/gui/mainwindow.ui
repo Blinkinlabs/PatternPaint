@@ -189,7 +189,7 @@
           <x>0</x>
           <y>0</y>
           <width>500</width>
-          <height>267</height>
+          <height>280</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -645,7 +645,7 @@
      <x>0</x>
      <y>0</y>
      <width>880</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -698,6 +698,7 @@
     <addaction name="actionTroubleshooting_tips"/>
     <addaction name="separator"/>
     <addaction name="actionSystem_Information"/>
+    <addaction name="actionDebug_Log"/>
     <addaction name="actionWelcome"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
@@ -1137,6 +1138,11 @@
   <action name="actionSave_All">
    <property name="text">
     <string>Save All</string>
+   </property>
+  </action>
+  <action name="actionDebug_Log">
+   <property name="text">
+    <string>Debug Log...</string>
    </property>
   </action>
  </widget>

@@ -18,7 +18,8 @@ HEADERS += \
     $$PWD/scenetemplate.h \
     $$PWD/patternframelistview.h \
     $$PWD/eventratelimiter.h \
-    $$PWD/outputpreview.h
+    $$PWD/outputpreview.h \
+    $$PWD/debuglog.h
 
 
 SOURCES += \
@@ -39,7 +40,8 @@ SOURCES += \
     $$PWD/patternframelistview.cpp \
     $$PWD/eventratelimiter.cpp \
     $$PWD/outputpreview.cpp \
-    $$PWD/main.cpp
+    $$PWD/main.cpp \
+    $$PWD/debuglog.cpp
 
 FORMS += \
     $$PWD/mainwindow.ui \
@@ -47,7 +49,8 @@ FORMS += \
     $$PWD/aboutpatternpaint.ui \
     $$PWD/welcomescreen.ui \
     $$PWD/preferences.ui \
-    $$PWD/sceneconfiguration.ui
+    $$PWD/sceneconfiguration.ui \
+    $$PWD/debuglog.ui
 
 macx {
     # App nap, to prevent macOS from sleeping PatternPaint
