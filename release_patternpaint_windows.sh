@@ -133,11 +133,7 @@ PATH=${QT_TOOLS}:${QT_MINGW}bin/:${PATH}
 qmake.exe PatternPaint.pro \
 	-r \
 	-spec win32-g++ \
-	DESTDIR=release \
-	OBJECTS_DIR=.tmp \
-	MOC_DIR=.tmp \
-	RCC_DIR=.tmp \
-	UI_DIR=.tmp
+	DESTDIR=release
 	
 mingw32-make.exe clean
 mingw32-make.exe -j6
