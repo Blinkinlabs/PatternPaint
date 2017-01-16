@@ -8,6 +8,7 @@ set -e
 
 ROOT_CERTIFICATE='../GlobalSign_Root_CA.crt'
 TIMESTAMP_SERVER='http://timestamp.globalsign.com/scripts/timstamp.dll'
+#TIMESTAMP_SERVER='http://rfc3161timestamp.globalsign.com/advanced'
 SIGNING_ID='Blinkinlabs, LLC'
 
 
@@ -243,7 +244,11 @@ grep -q ${VERSION} "Pattern Paint.nsi"
 
 rm "Pattern Paint.nsi"
 
-# Sign the installer
-"${WIN_KIT_SIGNTOOL}bin/x86/signtool.exe" sign //v //ac ${ROOT_CERTIFICATE} //n "${SIGNING_ID}" //fd sha256 //tr ${TIMESTAMP_SERVER} //td sha256 //a PatternPaint\ Windows\ Installer.exe
+if [ -z "$SIGNING_ID" ]; then
+    echo "WARNING: Signing ID not found, skipping code signature phase. Resulting binary will not be signed."
+else
+    # Sign the installer
+    "${WIN_KIT_SIGNTOOL}bin/x86/signtool.exe" sign //v //ac ${ROOT_CERTIFICATE} //n "${SIGNING_ID}" //fd sha256 //tr ${TIMESTAMP_SERVER} //td sha256 //a PatternPaint\ Windows\ Installer.exe
+fi
 
 mv "PatternPaint Windows Installer.exe" "../PatternPaint_Installer_"${VERSION}".exe"
