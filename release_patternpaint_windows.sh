@@ -130,7 +130,15 @@ pushd ${PATTERNPAINT}src
 
 PATH=${QT_TOOLS}:${QT_MINGW}bin/:${PATH}
 
-qmake.exe -config release OBJECTS_DIR=build MOC_DIR=build/moc RCC_DIR=build/rcc UI_DIR=build/uic DESTDIR=bin
+qmake.exe PatternPaint.pro \
+	-r \
+	-spec win32-g++ \
+	DESTDIR=release \
+	OBJECTS_DIR=.tmp \
+	MOC_DIR=.tmp \
+	RCC_DIR=.tmp \
+	UI_DIR=.tmp
+	
 mingw32-make.exe clean
 mingw32-make.exe -j6
 
@@ -153,10 +161,10 @@ mkdir -p ${OUTDIR}driver/eightbyeight/x86
 mkdir -p ${OUTDIR}driver/eightbyeight/amd64
 
 # Main executable
-cp ${PATTERNPAINT}src/app/bin/PatternPaint.exe ${OUTDIR}
+cp ${PATTERNPAINT}src/app/release/PatternPaint.exe ${OUTDIR}
 
 # And the libblinky library
-cp ${PATTERNPAINT}src/libblinky/bin/libblinky.dll ${OUTDIR}
+cp ${PATTERNPAINT}src/libblinky/release/libblinky.dll ${OUTDIR}
 
 # Note: This list of DLLs must be determined by hand, using Dependency Walker
 # Also, the .nsi file should be synchronized with this list, otherwise the file
