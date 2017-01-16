@@ -6,6 +6,8 @@
 class BrightnessModel
 {
 public:
+    virtual ~BrightnessModel();
+
     /// Perform a rough brightness correction (from screen space to LED space)
     /// on a given color value. Note that it drops the alpha channel.
     /// @param uncorrected 32-bit RGB color value in screen space

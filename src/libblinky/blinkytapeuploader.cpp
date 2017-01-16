@@ -137,6 +137,7 @@ void BlinkyTapeUploader::handleError(QString error)
 
 void BlinkyTapeUploader::handleCommandFinished(QString command, QByteArray returnData)
 {
+    Q_UNUSED(command);
     Q_UNUSED(returnData);
 
 // qDebug() << "Command finished:" << command;
