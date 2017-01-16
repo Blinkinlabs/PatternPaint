@@ -6,9 +6,7 @@ src/*/Makefile
 src/*/release
 src/*/debug
 src/*.user
-Blinkinlabs32u4_boards/*
-Blinkytile/*
-Blinkypendant/*
-PatternPaintWindows/*
 build-*
-TempWindowsBuild/*
+PatternPaint/*.user
+dist-windows/*
+windows-drivers/*
