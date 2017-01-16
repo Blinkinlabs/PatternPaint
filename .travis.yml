@@ -14,7 +14,7 @@ script:
   # Build
   - source /opt/qt57/bin/qt57-env.sh
   - cd src
-  - qmake -config release
+  - qmake -r -spec linux-g++
   - make -j7
 
   # Run unit tests
