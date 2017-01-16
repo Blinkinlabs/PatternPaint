@@ -21,8 +21,8 @@
 
 #define MIN_UPDATE_INTERVAL 3
 
-#define WRITE_BUSY_DELAY 2
-#define WRITE_CHUNK_DELAY 4
+#define WRITE_BUSY_DELAY 10      // Delay before continuing after getting a write busy, in ms
+#define WRITE_CHUNK_DELAY 10     // Delay after writing a chunk, in ms
 #define CHUNK_SIZE 300
 
 BlinkyTape::BlinkyTape(QSerialPortInfo info, QObject *parent) :
