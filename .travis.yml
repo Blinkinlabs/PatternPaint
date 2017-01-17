@@ -11,6 +11,7 @@ install:
   - sudo apt-get -y install qt57base qt57declarative qt57serialport libusb-1.0-0-dev icnsutils
 
   - wget -c https://github.com/probonopd/linuxdeployqt/releases/download/2/linuxdeployqt-2-x86_64.AppImage -O linuxdeployqt
+  - chmod a+x linuxdeployqt
 
 
   - export QTDIR=/opt/qt57/
@@ -35,7 +36,6 @@ script:
 #  - ./linuxdeployqt src/app/PatternPaint -qmldir=src/app/PatternPaint -bundle-non-qt-libs -libpath=src/libblinky
 #  - ./linuxdeployqt src/app/PatternPaint -qmldir=src/app/PatternPaint -appimage -libpath=src/libblinky
 
-  - source dist_linux.sh
-
   - find src/
+  - source dist_linux.sh
   - curl --upload-file ./*.AppImage https://transfer.sh/PatternPaint-git$(git describe --tags --always)-x86_64.AppImage
