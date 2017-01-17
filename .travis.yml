@@ -10,25 +10,32 @@ before_install:
 install:
   - sudo apt-get -y install qt57base qt57declarative qt57serialport libusb-1.0-0-dev icnsutils
 
-script:
-  # Build
-  - source /opt/qt57/bin/qt57-env.sh
-  - cd src
-  - qmake -r -spec linux-g++
-  - make -j7
-
-  # Run unit tests
-  - LD_LIBRARY_PATH=./libblinky libblinky-test/libblinky-test
-
-  # Package
-  - icns2png app/images/patternpaint.icns -x
-  - cp patternpaint_256x256x32.png patternpaint.png
-  - cd ..
-  #- find src/
   - wget -c https://github.com/probonopd/linuxdeployqt/releases/download/2/linuxdeployqt-2-x86_64.AppImage -O linuxdeployqt
-  - chmod a+x linuxdeployqt
-  - unset LD_LIBRARY_PATH # Remove too old Qt from the search path; TODO: Move inside the linuxdeployqt AppImage
-  - ./linuxdeployqt src/app/PatternPaint -qmldir=src/app/PatternPaint -bundle-non-qt-libs -libpath=src/libblinky
-  - ./linuxdeployqt src/app/PatternPaint -qmldir=src/app/PatternPaint -appimage -libpath=src/libblinky
+
+
+  - export QTDIR=/opt/qt57/
+
+script:
+#  # Build
+#  - source /opt/qt57/bin/qt57-env.sh
+#  - cd src
+#  - qmake -r -spec linux-g++
+#  - make -j7
+#
+#  # Run unit tests
+#  - LD_LIBRARY_PATH=./libblinky libblinky-test/libblinky-test
+#
+#  # Package
+#  - icns2png app/images/patternpaint.icns -x
+#  - cp patternpaint_256x256x32.png patternpaint.png
+#  - cd ..
+#  #- find src/
+#  - chmod a+x linuxdeployqt
+#  - unset LD_LIBRARY_PATH # Remove too old Qt from the search path; TODO: Move inside the linuxdeployqt AppImage
+#  - ./linuxdeployqt src/app/PatternPaint -qmldir=src/app/PatternPaint -bundle-non-qt-libs -libpath=src/libblinky
+#  - ./linuxdeployqt src/app/PatternPaint -qmldir=src/app/PatternPaint -appimage -libpath=src/libblinky
+
+  - source dist_linux.sh
+
   - find src/
   - curl --upload-file ./*.AppImage https://transfer.sh/PatternPaint-git$(git describe --tags --always)-x86_64.AppImage

@@ -4,7 +4,10 @@
 set -e
 
 # Location of the QT tools
-QTDIR=~/Qt5.7.1/5.7/gcc_64
+if [ -z ${QTDIR+x} ]; then
+	echo "QTDIR not defined, using default"
+	QTDIR=~/Qt5.7.1/5.7/gcc_64
+fi
 
 QMAKE=${QTDIR}/bin/qmake
 MAKE=make
@@ -38,6 +41,7 @@ ${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
     -spec linux-g++ \
     DESTDIR=release
 
+#${MAKE} clean
 ${MAKE} -j6
 
 
@@ -65,14 +69,10 @@ fi
 
 cp libblinky/release/libblinky.so.1 app/release/lib
 
-
-#unset LD_LIBRARY_PATH # Remove too old Qt from the search path; TODO: Move inside the linuxdeployqt AppImage
+unset LD_LIBRARY_PATH # Remove too old Qt from the search path; TODO: Move inside the linuxdeployqt AppImage
 
 ${LINUXDEPLOYQT} app/release/PatternPaint -qmldir=${SOURCEDIR}/app/PatternPaint -bundle-non-qt-libs
 ${LINUXDEPLOYQT} app/release/PatternPaint -qmldir=${SOURCEDIR}/app/PatternPaint -appimage
 
-# find  ./
-
-#curl --upload-file ./*.AppImage https://transfer.sh/PatternPaint-git$(git describe --tags --always)-x86_64.AppImage
 
 popd
