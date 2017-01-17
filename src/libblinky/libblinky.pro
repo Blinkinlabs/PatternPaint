@@ -1,6 +1,6 @@
 QT += core widgets
 
-TARGET = libblinky
+TARGET = blinky
 TEMPLATE = lib
 
 OBJECTS_DIR = .tmp
