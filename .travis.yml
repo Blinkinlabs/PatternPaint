@@ -16,7 +16,7 @@ install:
 
   - export QTDIR=/opt/qt57/
 
-script:
+script: dist_linux.sh
 #  # Build
 #  - source /opt/qt57/bin/qt57-env.sh
 #  - cd src
@@ -36,6 +36,5 @@ script:
 #  - ./linuxdeployqt src/app/PatternPaint -qmldir=src/app/PatternPaint -bundle-non-qt-libs -libpath=src/libblinky
 #  - ./linuxdeployqt src/app/PatternPaint -qmldir=src/app/PatternPaint -appimage -libpath=src/libblinky
 
-  - find src/
-  - source dist_linux.sh
-  - curl --upload-file ./*.AppImage https://transfer.sh/PatternPaint-git$(git describe --tags --always)-x86_64.AppImage
+after_success:
+  - curl --upload-file build-dist-linux/*.AppImage https://transfer.sh/PatternPaint-git$(git describe --tags --always)-x86_64.AppImage
