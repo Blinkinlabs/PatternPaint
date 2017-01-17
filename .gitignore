@@ -8,5 +8,4 @@ src/*/debug
 src/*.user
 build-*
 PatternPaint/*.user
-dist-windows/*
 windows-drivers/*

@@ -1,4 +1,4 @@
-# Linux instructions from: https://forum.qt.io/topic/50340/installing-qt-5-4-dev-packages-in-travis-ci/16
+
 
 sudo: required
 dist: trusty
@@ -28,7 +28,7 @@ script:
   - wget -c https://github.com/probonopd/linuxdeployqt/releases/download/2/linuxdeployqt-2-x86_64.AppImage -O linuxdeployqt
   - chmod a+x linuxdeployqt
   - unset LD_LIBRARY_PATH # Remove too old Qt from the search path; TODO: Move inside the linuxdeployqt AppImage
-  - ./linuxdeployqt src/app/PatternPaint -qmldir=app/PatternPaint -bundle-non-qt-libs -libpath=src/libblinky
-  - ./linuxdeployqt src/app/PatternPaint -qmldir=app/PatternPaint -appimage -libpath=src/libblinky
+  - ./linuxdeployqt src/app/PatternPaint -qmldir=src/app/PatternPaint -bundle-non-qt-libs -libpath=src/libblinky
+  - ./linuxdeployqt src/app/PatternPaint -qmldir=src/app/PatternPaint -appimage -libpath=src/libblinky
   - find src/
   - curl --upload-file ./*.AppImage https://transfer.sh/PatternPaint-git$(git describe --tags --always)-x86_64.AppImage

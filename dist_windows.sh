@@ -8,6 +8,7 @@ set -e
 
 ROOT_CERTIFICATE='../GlobalSign_Root_CA.crt'
 TIMESTAMP_SERVER='http://timestamp.globalsign.com/scripts/timstamp.dll'
+#TODO
 #TIMESTAMP_SERVER='http://rfc3161timestamp.globalsign.com/advanced'
 SIGNING_ID='Blinkinlabs, LLC'
 
@@ -30,7 +31,7 @@ WIN_KIT_DPINST=${PROGRAMFILES}'Windows Kits/8.1/'
 NSIS=${PROGRAMFILES}'NSIS/'
 
 # Location to build PatternPaint
-SHADOWBUILD='dist-windows/'
+SHADOWBUILD='build-dist-windows/'
 
 # Staging directory for assembling the installer
 OUTDIR=${SHADOWBUILD}'bin/'
@@ -57,16 +58,8 @@ LIBUSB='thirdparty/libusb-1.0.20-win/'
 
 
 
-VERSION='0.1.0'
-
-
 ################### Extract the version info ###################
-GIT_COMMAND="git -C ${PWD}"
-GIT_VERSION=`${GIT_COMMAND} describe --always --tags 2> /dev/null`
-VERSION=`echo ${GIT_VERSION} | sed 's/-/\./g' | sed 's/g//g'`
-
-echo "PatternPaint version: " ${VERSION}
-
+source ./gitversion.sh
 
 
 

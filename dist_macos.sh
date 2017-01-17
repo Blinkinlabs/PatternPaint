@@ -6,29 +6,12 @@ set -e
 # Pull in the QT tools
 export QTDIR=~/Qt5.7.0/5.7/clang_64/
 
-OUTPUTDIR=`pwd`
-echo "Output to: " ${OUTPUTDIR}
+################### Extract the version info ###################
+source ./gitversion.sh
 
-## Move to a temporary directory
-#pushd $(mktemp -d -t com.blinkinlabs.PatternPaint)
-#echo "Building in: " `pwd`
-#
-## Get the repository
-##git clone https://github.com/Blinkinlabs/PatternPaint.git
-#git clone ${OUTPUTDIR}/.git
-#cd PatternPaint
 
+################## Build PatternPaint ###################
 cd src
-
-# Extract the version
-GIT_COMMAND="git -C ${PWD}"
-GIT_VERSION=`${GIT_COMMAND} describe --always --tags 2> /dev/null`
-VERSION=`echo ${GIT_VERSION} | sed 's/-/\./g' | sed 's/g//g'`
-
-echo "PatternPaint version: " ${VERSION}
-
-# Build PatternPaint
-#${QTDIR}/bin/qmake -config release OBJECTS_DIR=build MOC_DIR=build/moc RCC_DIR=build/rcc UI_DIR=build/uic
 
 ${QTDIR}/bin/qmake PatternPaint.pro \
     -r \
