@@ -16,7 +16,7 @@ install:
 
   - export QTDIR=/opt/qt57/
 
-script: dist_linux.sh
+script: ./dist_linux.sh
 #  # Build
 #  - source /opt/qt57/bin/qt57-env.sh
 #  - cd src

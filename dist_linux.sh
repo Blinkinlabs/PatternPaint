@@ -29,10 +29,7 @@ BUILDDIR='build-dist-linux'
 source ./gitversion.sh
 
 ################## Build PatternPaint ##########################
-if [ ! -d "${BUILDDIR}" ]; then
-	mkdir ${BUILDDIR}
-fi
-
+mkdir -p ${BUILDDIR}
 pushd ${BUILDDIR}
 
 ${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
@@ -60,14 +57,10 @@ cp ${SOURCEDIR}/app/patternpaint.desktop ./
 popd
 
 
-# TODO: this should be done automagically though the qt build tools?
-if [ ! -d "app/release/lib" ]; then
-	mkdir app/release/lib
-fi
-
-cp libblinky/release/libblinky.so.1 app/release/lib
-
 unset LD_LIBRARY_PATH # Remove too old Qt from the search path; TODO: Move inside the linuxdeployqt AppImage
+
+# TODO: this should be done automatically through the qt build tools?
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:libblinky/release
 
 ${LINUXDEPLOYQT} app/release/PatternPaint -verbose=2 -bundle-non-qt-libs
 ${LINUXDEPLOYQT} app/release/PatternPaint -verbose=2 -appimage
