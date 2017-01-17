@@ -20,6 +20,9 @@ QT_MINGW=${QT_DIR}'5.7/mingw53_32/'
 QT_TOOLS=${QT_DIR}'Tools/mingw530_32/bin/'
 QT_REDIST=${QT_DIR}'Tools/QtCreator/bin/'
 
+QMAKE=${QT_MINGW}'/bin/qmake.exe'
+MAKE=${QT_TOOLS}'/mingw32-make.exe'
+
 # TODO: Adjust for Win32/64?
 PROGRAMFILES='/c/Program Files (x86)/'
 
@@ -31,10 +34,13 @@ WIN_KIT_DPINST=${PROGRAMFILES}'Windows Kits/8.1/'
 NSIS=${PROGRAMFILES}'NSIS/'
 
 # Location to build PatternPaint
-SHADOWBUILD='build-dist-windows/'
+BUILDDIR=`pwd`'/build-dist-windows/'
+
+# location of the source tree
+SOURCEDIR=`pwd`'/src'
 
 # Staging directory for assembling the installer
-OUTDIR=${SHADOWBUILD}'bin/'
+OUTDIR=${BUILDDIR}'bin/'
 
 DRIVERREPOS='windows-drivers/'
 
@@ -64,10 +70,7 @@ source ./gitversion.sh
 
 
 ################## Make driver repo directory ####################
-if [ ! -d "${DRIVERREPOS}" ]; then
-	mkdir ${DRIVERREPOS}
-fi
-
+mkdir -p ${DRIVERREPOS}
 pushd ${DRIVERREPOS}
 
 
@@ -110,21 +113,18 @@ fi
 popd
 
 ################## Build PatternPaint ###################
-if [ ! -d "${SHADOWBUILD}" ]; then
-	mkdir ${SHADOWBUILD}
-fi
+mkdir -p ${BUILDDIR}
+pushd ${BUILDDIR}
 
-pushd ${SHADOWBUILD}
+#PATH=${QT_TOOLS}:${QT_MINGW}bin/:${PATH}
 
-PATH=${QT_TOOLS}:${QT_MINGW}bin/:${PATH}
-
-qmake.exe ../src/PatternPaint.pro \
+${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
 	-r \
 	-spec win32-g++ \
 	DESTDIR=release
 	
-#mingw32-make.exe clean
-mingw32-make.exe -j6
+#{MAKE} clean
+${MAKE} -j6
 
 popd
 
@@ -145,10 +145,10 @@ mkdir -p ${OUTDIR}driver/eightbyeight/x86
 mkdir -p ${OUTDIR}driver/eightbyeight/amd64
 
 # Main executable
-cp ${SHADOWBUILD}app/release/PatternPaint.exe ${OUTDIR}
+cp ${BUILDDIR}app/release/PatternPaint.exe ${OUTDIR}
 
 # And the libblinky library
-cp ${SHADOWBUILD}libblinky/release/libblinky.dll ${OUTDIR}
+cp ${BUILDDIR}libblinky/release/blinky.dll ${OUTDIR}
 
 # Note: This list of DLLs must be determined by hand, using Dependency Walker
 # Also, the .nsi file should be synchronized with this list, otherwise the file
@@ -222,16 +222,16 @@ cp "${WIN_KIT_DPINST}redist/DIFx/dpinst/MultiLin/x64/dpinst.exe" ${OUTDIR}driver
 
 # Run NSIS to make an executablels
 # For some reason the NSIS file is run from the directory it's located in?
-pushd ${SHADOWBUILD}
+pushd ${BUILDDIR}
 
 cp ../"patternpaint.nsi" "patternpaint.nsi"
 
+
 # Update the version info in the NSI, fail if it didn't change
-sed -i 's/VERSION_STRING/'${VERSION}'.0/g' "patternpaint.nsi"
-grep -q ${VERSION} "patternpaint.nsi"
-
+sed -i 's/VERSION_STRING/'${VERSION}'/g' "patternpaint.nsi"
+# TODO: This grep isn't working.
+#grep -q "${VERSION}" "patternpaint.nsi"
 "${NSIS}makensis.exe" "patternpaint.nsi"
-
 rm "patternpaint.nsi"
 
 if [ -z "$SIGNING_ID" ]; then
@@ -243,4 +243,3 @@ fi
 
 mv "PatternPaint Windows Installer.exe" "../PatternPaint_Installer_"${VERSION}".exe"
 
-popd
