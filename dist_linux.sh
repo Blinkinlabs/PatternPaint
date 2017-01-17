@@ -28,7 +28,6 @@ BUILDDIR='build-dist-linux'
 ################### Extract the version info ###################
 source ./gitversion.sh
 
-
 ################## Build PatternPaint ##########################
 if [ ! -d "${BUILDDIR}" ]; then
 	mkdir ${BUILDDIR}
@@ -48,7 +47,6 @@ ${MAKE} -j6
 ################## Run Unit Tests ##############################
 
 LD_LIBRARY_PATH=libblinky/release libblinky-test/release/libblinky-test
-
 
 
 ################## Package using linuxdeployqt #################
@@ -71,8 +69,7 @@ cp libblinky/release/libblinky.so.1 app/release/lib
 
 unset LD_LIBRARY_PATH # Remove too old Qt from the search path; TODO: Move inside the linuxdeployqt AppImage
 
-${LINUXDEPLOYQT} app/release/PatternPaint -qmldir=${SOURCEDIR}/app/PatternPaint -bundle-non-qt-libs
-${LINUXDEPLOYQT} app/release/PatternPaint -qmldir=${SOURCEDIR}/app/PatternPaint -appimage
-
+${LINUXDEPLOYQT} app/release/PatternPaint -verbose=2 -bundle-non-qt-libs
+${LINUXDEPLOYQT} app/release/PatternPaint -verbose=2 -appimage
 
 popd
