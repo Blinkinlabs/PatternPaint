@@ -68,8 +68,7 @@ cp libblinky/release/libblinky.so.1 app/release/lib
 
 #unset LD_LIBRARY_PATH # Remove too old Qt from the search path; TODO: Move inside the linuxdeployqt AppImage
 
-
-${LINUXDEPLOYQT} app/release/PatternPaint -qmldir=${SOURCEDIR}/app/PatternPaint -bundle-non-qt-libs -libpath=libblinky/release
+${LINUXDEPLOYQT} app/release/PatternPaint -qmldir=${SOURCEDIR}/app/PatternPaint -bundle-non-qt-libs
 ${LINUXDEPLOYQT} app/release/PatternPaint -qmldir=${SOURCEDIR}/app/PatternPaint -appimage
 
 # find  ./
