@@ -165,16 +165,13 @@ These are the steps required to build a release version (installer) for PatternP
 
 Once the prerequsites have been installed, the deployment script can be run:
 
-	curl -O https://raw.githubusercontent.com/Blinkinlabs/PatternPaint/master/dist_macos.sh
-	sh ./dist_macos.sh
-	
+	git clone --depth 1 https://github.com/Blinkinlabs/PatternPaint.git
+	cd PatternPaint
+	sh dist_macos.sh
+
 If everything works, it will generate a redistributable disk image 'PatternPaint_X.Y.Z.dmg', where X.Y.Z is the current version of PatternPaint.
 
 Test this file manually on a clean macOS host.
-
-
-Note: See the script for the details of making a distributable Qt app image for macOS!
-Note: There might be some temporary file carnage left over after running this. Sorry about that.
 
 ## Windows
 
@@ -193,9 +190,9 @@ NOTE: Obtain the GlobalSign file and install the Blinkinlabs Cert before continu
 
 Start Git bash (start->run->git bash)
 
-	curl -O https://raw.githubusercontent.com/Blinkinlabs/PatternPaint/master/dist_windows.sh
+	git clone --depth 1 https://github.com/Blinkinlabs/PatternPaint.git
+	cd PatternPaint
 	sh dist_windows.sh
-
 
 If everything works, it will generate an installer executable 'PatternPaint_Installer_X.Y.Z.exe', where X.Y.Y is the current version of PatternPaint.
 
@@ -203,7 +200,18 @@ Test this file manually on clean Windows 7 and 8 hosts.
 
 ## Linux
 
-Please contact us if you have experience releasing packages for Linux. We're particularly interested in making a release for Debian-based systems. The main requirement is that a fairly recent version of Qt (5.2.1+) is available. There appear to be random bugs with each Qt release on each platform, so some attention needs to be paid to the specific version targeted.
+### Building a Pattern Paint Release
+
+Once the prerequsites have been installed, the deployment script can be run:
+
+	git clone --depth 1 https://github.com/Blinkinlabs/PatternPaint.git
+	cd PatternPaint
+	sh dist_linux.sh
+
+If everything works, it will generate a distributable AppImage 'PatternPaint_X.Y.Z.Appimage', where X.Y.Z is the current version of PatternPaint.
+
+Test this file manually on a clean Linux host.
+
 
 ## Create a release page on Github
 
