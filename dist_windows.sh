@@ -29,34 +29,30 @@ SOURCEDIR=`pwd`'/src'
 BUILDDIR=`pwd`'/build-dist-windows/'
 
 
-
-# TODO: Adjust for Win32/64?
-PROGRAMFILES='/c/Program Files (x86)/'
-
 # Location of the Windows SDK and WDK
-WIN_KIT_SIGNTOOL=${PROGRAMFILES}'Windows Kits/10/'
-WIN_KIT_DPINST=${PROGRAMFILES}'Windows Kits/8.1/'
+WIN_KIT_SIGNTOOL='/c/Program Files (x86)/Windows Kits/10/'
+WIN_KIT_DPINST='/c/Program Files (x86)/Windows Kits/8.1/'
 
 # Location of NSIS
-NSIS=${PROGRAMFILES}'NSIS/'
+NSIS='/c/Program Files (x86)/NSIS/'
 
 
 # Staging directory for assembling the installer
 OUTDIR=${BUILDDIR}'bin/'
 
-DRIVERREPOS='windows-drivers/'
+DRIVERS='windows-drivers'
 
 # Blinkinlabs32u4_boards repository (for the BlinkyTape driver)
-BLINKYTAPE='Blinkinlabs32u4_boards/'
+BLINKYTAPE=${DRIVERS}'/Blinkinlabs32u4_boards/'
 
 # BlinkyTile repository (for the LightBuddy driver)
-BLINKYTILE='Blinkytile/'
+BLINKYTILE=${DRIVERS}'/Blinkytile/'
 
 # BlinkyPendant repository (for the BlinkyPendant driver)
-BLINKYPENDANT='Blinkypendant/'
+BLINKYPENDANT=${DRIVERS}'/Blinkypendant/'
 
 # EightByEight repository (for the EightByEight driver)
-EIGHTBYEIGHT='EightByEight/'
+EIGHTBYEIGHT=${DRIVERS}'/EightByEight/'
 
 # Winsparkle library release
 WINSPARKLE='thirdparty/WinSparkle-0.5.2/'
@@ -71,48 +67,26 @@ source ./gitversion.sh
 
 
 
-################## Make driver repo directory ####################
-mkdir -p ${DRIVERREPOS}
-pushd ${DRIVERREPOS}
+################## Get device driver repositories ##############
+function getRepo {
+	# $1 is output directory
+	# $2 is repo location
 
+	if [ ! -d "$1" ]; then
+		git clone --depth 1 $2 $1
+	else
+		pushd $1
+		git pull
+		popd
+	fi
 
-################## Get BlinkyTape driver #########################
-if [ ! -d "${BLINKYTAPE}" ]; then
-	git clone --depth 1 https://github.com/Blinkinlabs/Blinkinlabs32u4_boards.git ${BLINKYTAPE}
-else
-	cd ${BLINKYTAPE}
-	git pull
-	cd ..
-fi
+}
 
-################## Get BlinkyTile driver #########################
-if [ ! -d "${BLINKYTILE}" ]; then
-	git clone --depth 1 https://github.com/Blinkinlabs/BlinkyTile.git ${BLINKYTILE}
-else
-	cd ${BLINKYTILE}
-	git pull
-	cd ..
-fi
+getRepo ${BLINKYTAPE} https://github.com/Blinkinlabs/Blinkinlabs32u4_boards.git
+getRepo ${BLINKYTILE} https://github.com/Blinkinlabs/BlinkyTile.git
+getRepo ${BLINKYPENDANT} https://github.com/Blinkinlabs/BlinkyPendant.git
+getRepo ${EIGHTBYEIGHT} https://github.com/Blinkinlabs/EightByEight.git
 
-################## Get BlinkyPendat driver #########################
-if [ ! -d "${BLINKYPENDANT}" ]; then
-	git clone --depth 1 https://github.com/Blinkinlabs/BlinkyPendant.git ${BLINKYPENDANT}
-else
-	cd ${BLINKYPENDANT}
-	git pull
-	cd ..
-fi
-
-################## Get EightByEight driver #########################
-if [ ! -d "${EIGHTBYEIGHT}" ]; then
-	git clone --depth 1 https://github.com/Blinkinlabs/EightByEight.git ${EIGHTBYEIGHT}
-else
-	cd ${EIGHTBYEIGHT}
-	git pull
-	cd ..
-fi
-
-popd
 
 ################## Build PatternPaint ###################
 mkdir -p ${BUILDDIR}
@@ -180,41 +154,41 @@ cp ${WINSPARKLE}/release/WinSparkle.dll ${OUTDIR}
 cp ${LIBUSB}/MinGW32/dll/libusb-1.0.dll ${OUTDIR}
 
 # BlinkyTape Driver files
-cp ${DRIVERREPOS}${BLINKYTAPE}avr/driver/blinkinlabs.inf ${OUTDIR}driver/blinkytape/
-cp ${DRIVERREPOS}${BLINKYTAPE}avr/driver/blinkinlabs.cat ${OUTDIR}driver/blinkytape/
+cp ${BLINKYTAPE}avr/driver/blinkinlabs.inf ${OUTDIR}driver/blinkytape/
+cp ${BLINKYTAPE}avr/driver/blinkinlabs.cat ${OUTDIR}driver/blinkytape/
 
 # BlinkyTile Driver files
-cp ${DRIVERREPOS}${BLINKYTILE}driver/lightbuddy_serial.inf ${OUTDIR}driver/lightbuddy/
-cp ${DRIVERREPOS}${BLINKYTILE}driver/lightbuddy_DFU_runtime.inf ${OUTDIR}driver/lightbuddy/
-cp ${DRIVERREPOS}${BLINKYTILE}driver/lightbuddy_DFU.inf ${OUTDIR}driver/lightbuddy/
-cp ${DRIVERREPOS}${BLINKYTILE}driver/libusb_device.cat ${OUTDIR}driver/lightbuddy/
-cp ${DRIVERREPOS}${BLINKYTILE}driver/blinkinlabs.cat ${OUTDIR}driver/lightbuddy/
-cp ${DRIVERREPOS}${BLINKYTILE}driver/x86/winusbcoinstaller2.dll ${OUTDIR}driver/lightbuddy/x86/
-cp ${DRIVERREPOS}${BLINKYTILE}driver/x86/WdfCoInstaller01009.dll ${OUTDIR}driver/lightbuddy/x86/
-cp ${DRIVERREPOS}${BLINKYTILE}driver/amd64/winusbcoinstaller2.dll ${OUTDIR}driver/lightbuddy/amd64/
-cp ${DRIVERREPOS}${BLINKYTILE}driver/amd64/WdfCoInstaller01009.dll ${OUTDIR}driver/lightbuddy/amd64/
+cp ${BLINKYTILE}driver/lightbuddy_serial.inf ${OUTDIR}driver/lightbuddy/
+cp ${BLINKYTILE}driver/lightbuddy_DFU_runtime.inf ${OUTDIR}driver/lightbuddy/
+cp ${BLINKYTILE}driver/lightbuddy_DFU.inf ${OUTDIR}driver/lightbuddy/
+cp ${BLINKYTILE}driver/libusb_device.cat ${OUTDIR}driver/lightbuddy/
+cp ${BLINKYTILE}driver/blinkinlabs.cat ${OUTDIR}driver/lightbuddy/
+cp ${BLINKYTILE}driver/x86/winusbcoinstaller2.dll ${OUTDIR}driver/lightbuddy/x86/
+cp ${BLINKYTILE}driver/x86/WdfCoInstaller01009.dll ${OUTDIR}driver/lightbuddy/x86/
+cp ${BLINKYTILE}driver/amd64/winusbcoinstaller2.dll ${OUTDIR}driver/lightbuddy/amd64/
+cp ${BLINKYTILE}driver/amd64/WdfCoInstaller01009.dll ${OUTDIR}driver/lightbuddy/amd64/
 
 # BlinkyPendant Driver files
-cp ${DRIVERREPOS}${BLINKYPENDANT}driver/blinkypendant_serial.inf ${OUTDIR}driver/blinkypendant/
-cp ${DRIVERREPOS}${BLINKYPENDANT}driver/blinkypendant_DFU_runtime.inf ${OUTDIR}driver/blinkypendant/
-cp ${DRIVERREPOS}${BLINKYPENDANT}driver/blinkypendant_DFU.inf ${OUTDIR}driver/blinkypendant/
-cp ${DRIVERREPOS}${BLINKYPENDANT}driver/libusb_device.cat ${OUTDIR}driver/blinkypendant/
-cp ${DRIVERREPOS}${BLINKYPENDANT}driver/blinkinlabs.cat ${OUTDIR}driver/blinkypendant/
-cp ${DRIVERREPOS}${BLINKYPENDANT}driver/x86/winusbcoinstaller2.dll ${OUTDIR}driver/blinkypendant/x86/
-cp ${DRIVERREPOS}${BLINKYPENDANT}driver/x86/WdfCoInstaller01009.dll ${OUTDIR}driver/blinkypendant/x86/
-cp ${DRIVERREPOS}${BLINKYPENDANT}driver/amd64/winusbcoinstaller2.dll ${OUTDIR}driver/blinkypendant/amd64/
-cp ${DRIVERREPOS}${BLINKYPENDANT}driver/amd64/WdfCoInstaller01009.dll ${OUTDIR}driver/blinkypendant/amd64/
+cp ${BLINKYPENDANT}driver/blinkypendant_serial.inf ${OUTDIR}driver/blinkypendant/
+cp ${BLINKYPENDANT}driver/blinkypendant_DFU_runtime.inf ${OUTDIR}driver/blinkypendant/
+cp ${BLINKYPENDANT}driver/blinkypendant_DFU.inf ${OUTDIR}driver/blinkypendant/
+cp ${BLINKYPENDANT}driver/libusb_device.cat ${OUTDIR}driver/blinkypendant/
+cp ${BLINKYPENDANT}driver/blinkinlabs.cat ${OUTDIR}driver/blinkypendant/
+cp ${BLINKYPENDANT}driver/x86/winusbcoinstaller2.dll ${OUTDIR}driver/blinkypendant/x86/
+cp ${BLINKYPENDANT}driver/x86/WdfCoInstaller01009.dll ${OUTDIR}driver/blinkypendant/x86/
+cp ${BLINKYPENDANT}driver/amd64/winusbcoinstaller2.dll ${OUTDIR}driver/blinkypendant/amd64/
+cp ${BLINKYPENDANT}driver/amd64/WdfCoInstaller01009.dll ${OUTDIR}driver/blinkypendant/amd64/
 
 # EightByEight Driver files
-cp ${DRIVERREPOS}${EIGHTBYEIGHT}driver/eightbyeight_serial.inf ${OUTDIR}driver/eightbyeight/
-cp ${DRIVERREPOS}${EIGHTBYEIGHT}driver/eightbyeight_DFU_runtime.inf ${OUTDIR}driver/eightbyeight/
-cp ${DRIVERREPOS}${EIGHTBYEIGHT}driver/eightbyeight_DFU.inf ${OUTDIR}driver/eightbyeight/
-cp ${DRIVERREPOS}${EIGHTBYEIGHT}driver/libusb_device.cat ${OUTDIR}driver/eightbyeight/
-cp ${DRIVERREPOS}${EIGHTBYEIGHT}driver/blinkinlabs.cat ${OUTDIR}driver/eightbyeight/
-cp ${DRIVERREPOS}${EIGHTBYEIGHT}driver/x86/winusbcoinstaller2.dll ${OUTDIR}driver/eightbyeight/x86/
-cp ${DRIVERREPOS}${EIGHTBYEIGHT}driver/x86/WdfCoInstaller01009.dll ${OUTDIR}driver/eightbyeight/x86/
-cp ${DRIVERREPOS}${EIGHTBYEIGHT}driver/amd64/winusbcoinstaller2.dll ${OUTDIR}driver/eightbyeight/amd64/
-cp ${DRIVERREPOS}${EIGHTBYEIGHT}driver/amd64/WdfCoInstaller01009.dll ${OUTDIR}driver/eightbyeight/amd64/
+cp ${EIGHTBYEIGHT}driver/eightbyeight_serial.inf ${OUTDIR}driver/eightbyeight/
+cp ${EIGHTBYEIGHT}driver/eightbyeight_DFU_runtime.inf ${OUTDIR}driver/eightbyeight/
+cp ${EIGHTBYEIGHT}driver/eightbyeight_DFU.inf ${OUTDIR}driver/eightbyeight/
+cp ${EIGHTBYEIGHT}driver/libusb_device.cat ${OUTDIR}driver/eightbyeight/
+cp ${EIGHTBYEIGHT}driver/blinkinlabs.cat ${OUTDIR}driver/eightbyeight/
+cp ${EIGHTBYEIGHT}driver/x86/winusbcoinstaller2.dll ${OUTDIR}driver/eightbyeight/x86/
+cp ${EIGHTBYEIGHT}driver/x86/WdfCoInstaller01009.dll ${OUTDIR}driver/eightbyeight/x86/
+cp ${EIGHTBYEIGHT}driver/amd64/winusbcoinstaller2.dll ${OUTDIR}driver/eightbyeight/amd64/
+cp ${EIGHTBYEIGHT}driver/amd64/WdfCoInstaller01009.dll ${OUTDIR}driver/eightbyeight/amd64/
 
 # Driver installer
 cp "${WIN_KIT_DPINST}redist/DIFx/dpinst/MultiLin/x86/dpinst.exe" ${OUTDIR}driver/dpinst32.exe
