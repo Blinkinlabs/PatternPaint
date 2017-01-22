@@ -69,5 +69,3 @@ PATH=${QTDIR}/bin:${PATH} ${LINUXDEPLOYQT} app/release/PatternPaint -appimage
 tar -cjf PatternPaint-x86_64_${VERSION}.tar.bz2 PatternPaint-x86_64.AppImage
 
 popd
-
-mv ${BUILDDIR}/PatternPaint-x86_64_${VERSION}.tar.bz2 ./
