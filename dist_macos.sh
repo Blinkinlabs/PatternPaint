@@ -56,20 +56,27 @@ install_name_tool ${APP}/Contents/MacOS/PatternPaint -change libblinky.1.dylib @
 # Integrate the system frameworks
 ${QTDIR}/bin/macdeployqt ${APP} -verbose=1
 
-# TODO: automate this instead of listing each plugin separately?
 
-#SIGNING_ID='Developer ID Application: BLINKINLABS, LLC'
 
 if [ -z "$SIGNING_ID" ]; then
-    echo "WARNING: Signing id not found, skipping code signature phase. Resulting binary will not be signed."
+    echo "**************************************************************"
+    echo "WARNING: Signing id not found, skipping code signature phase."
+    echo "Resulting binary will not be signed."
+    echo ""
+    echo "To activate the code signature, define a SIGNING_ID envirnment"
+    echo "variable before running the script. Example:"
+    echo "export SIGNING_ID='Developer ID Application: BLINKINLABS, LLC'"
+    echo "**************************************************************"
+
 else
 
+    # TODO: automate this instead of listing each plugin separately?
     CODESIGN_FLAGS="--verbose --force"
 
     # Sign the frameworks
     codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/Sparkle.framework/Versions/A
     codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/libusb-1.0.0.dylib
-    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/libblinky-1.0.0.dylib
+    codesign ${CODESIGN_FLAGS} --sign "${SIGNING_ID}" ${APP}/Contents/Frameworks/libblinky.1.0.0.dylib
 
     # And the system frameworks 
     # TODO: This is a workaround for toolchain changes in 5.5.1
