@@ -1,5 +1,3 @@
-# For libusb on OS X
-# TODO: Dupe in app project, put in .pri?
 macx {
     LIBUSB_PATH = ../../thirdparty/libusb-1.0.20/osx-install
 
@@ -16,7 +14,6 @@ macx {
     QMAKE_RPATHDIR += @executable_path/../Frameworks
 }
 
-# For libusb on Windows
 win32 {
     LIBUSB_DLL = ../../thirdparty/libusb-1.0.20-win/MinGW32/dll/libusb-1.0.dll
 

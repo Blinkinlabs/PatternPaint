@@ -35,10 +35,12 @@ ${MAKE} -j6
 popd
 
 ################## Run Unit Tests ##############################
-# TODO?
 pushd ${BUILDDIR}
 
-DYLD_LIBRARY_PATH=libblinky/release libblinky-test/release/libblinky-test.app/Contents/MacOS/libblinky-test
+# TODO: this dylib path is being pulled in incorrectly, find a way for the build to load it correctly?
+install_name_tool libblinky-test/release/libblinky-test.app/Contents/MacOS/libblinky-test -change libblinky.1.dylib @rpath/libblinky.1.0.0.dylib
+
+libblinky-test/release/libblinky-test.app/Contents/MacOS/libblinky-test
 
 popd
 
@@ -48,7 +50,8 @@ pushd ${BUILDDIR}
 
 APP=app/release/PatternPaint.app
 
-cp libblinky/release/libblinky.1.0.0.dylib ${APP}/Contents/Frameworks
+# TODO: this dylib path is being pulled in incorrectly, find a way for the build to load it correctly?
+install_name_tool ${APP}/Contents/MacOS/PatternPaint -change libblinky.1.dylib @rpath/libblinky.1.0.0.dylib
 
 # Integrate the system frameworks
 ${QTDIR}/bin/macdeployqt ${APP} -verbose=1
@@ -99,7 +102,6 @@ else
     # Perform a quick verification of the application signature
     codesign --verify --verbose=4 ${APP}
 fi
-
 
 DMG_NAME=PatternPaint_${VERSION}
 
