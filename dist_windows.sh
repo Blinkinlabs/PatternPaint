@@ -23,6 +23,14 @@ QT_REDIST=${QT_DIR}'Tools/QtCreator/bin/'
 QMAKE=${QT_MINGW}'/bin/qmake.exe'
 MAKE=${QT_TOOLS}'/mingw32-make.exe'
 
+# location of the source tree
+SOURCEDIR=`pwd`'/src'
+
+# Location to build PatternPaint
+BUILDDIR=`pwd`'/build-dist-windows/'
+
+
+
 # TODO: Adjust for Win32/64?
 PROGRAMFILES='/c/Program Files (x86)/'
 
@@ -33,11 +41,6 @@ WIN_KIT_DPINST=${PROGRAMFILES}'Windows Kits/8.1/'
 # Location of NSIS
 NSIS=${PROGRAMFILES}'NSIS/'
 
-# Location to build PatternPaint
-BUILDDIR=`pwd`'/build-dist-windows/'
-
-# location of the source tree
-SOURCEDIR=`pwd`'/src'
 
 # Staging directory for assembling the installer
 OUTDIR=${BUILDDIR}'bin/'
@@ -116,14 +119,12 @@ popd
 mkdir -p ${BUILDDIR}
 pushd ${BUILDDIR}
 
-#PATH=${QT_TOOLS}:${QT_MINGW}bin/:${PATH}
-
 ${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
 	-r \
 	-spec win32-g++ \
 	DESTDIR=release
 	
-#{MAKE} clean
+#${MAKE} clean
 ${MAKE} -j6
 
 popd

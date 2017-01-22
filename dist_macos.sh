@@ -6,25 +6,46 @@ set -e
 # Pull in the QT tools
 export QTDIR=~/Qt5.7.0/5.7/clang_64/
 
+QMAKE=${QTDIR}/bin/qmake
+MAKE=make
+
+# location of the source tree
+SOURCEDIR=`pwd`'/src'
+
+# Location to build PatternPaint
+BUILDDIR=`pwd`'/build-dist-macos/'
+
 ################### Extract the version info ###################
 source ./gitversion.sh
 
 
 ################## Build PatternPaint ###################
-cd src
+mkdir -p ${BUILDDIR}
+pushd {$BUILDDIR}
 
-${QTDIR}/bin/qmake PatternPaint.pro \
+${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
     -r \
     -spec macx-clang \
     CONFIG+=x86_64 \
     DESTDIR=release
 
-make clean
-make -j
+${MAKE} clean
+${MAKE} -j6
 
-cd ..
+popd
 
-APP=src/app/release/PatternPaint.app
+################## Run Unit Tests ##############################
+# TODO?
+pushd ${BUILDDIR}
+
+LD_LIBRARY_PATH=libblinky/release libblinky-test/release/libblinky-test
+
+popd
+
+
+################## Package using macdeployqt #################
+
+APP=${BUILDDIR}/app/release/PatternPaint.app
 
 # Integrate the system frameworks
 ${QTDIR}/bin/macdeployqt ${APP} -verbose=1

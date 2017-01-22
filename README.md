@@ -126,6 +126,12 @@ There's a PPA with the latest version of Qt, Hooray!
 
 Note: You'll probably need to update the qt serial version, similar to the macOS instructions above.
 
+### linuxdeployqt, for generating a portable AppImage executable
+
+	wget -c https://github.com/probonopd/linuxdeployqt/releases/download/2/linuxdeployqt-2-x86_64.AppImage -O linuxdeployqt
+	chmod a+x linuxdeployqt
+
+
 ### Serial permissions
 
 You'll need to add yourself to the dialout group in order to access the serial ports:
