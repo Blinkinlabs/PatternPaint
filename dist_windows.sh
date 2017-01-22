@@ -6,6 +6,8 @@ set -e
 
 ################# Signature #####################################
 
+# Note that these are GlobalSign specific- if you want to use a
+# different certificate provider, you'll need to modify these.
 ROOT_CERTIFICATE='../GlobalSign_Root_CA.crt'
 TIMESTAMP_SERVER='http://timestamp.globalsign.com/scripts/timstamp.dll'
 #TODO
