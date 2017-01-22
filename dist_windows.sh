@@ -10,7 +10,6 @@ ROOT_CERTIFICATE='../GlobalSign_Root_CA.crt'
 TIMESTAMP_SERVER='http://timestamp.globalsign.com/scripts/timstamp.dll'
 #TODO
 #TIMESTAMP_SERVER='http://rfc3161timestamp.globalsign.com/advanced'
-SIGNING_ID='Blinkinlabs, LLC'
 
 
 ################# Library Locations #############################
@@ -211,11 +210,20 @@ sed -i 's/VERSION_STRING/'${VERSION}'/g' patternpaint.nsi
 rm patternpaint.nsi
 
 if [ -z "$SIGNING_ID" ]; then
-    echo "WARNING: Signing ID not found, skipping code signature phase. Resulting binary will not be signed."
+    echo "**************************************************************"
+    echo "WARNING: Signing id not found, skipping code signature phase."
+    echo "Resulting binary will not be signed."
+    echo ""
+    echo "To activate the code signature, define a SIGNING_ID envirnment"
+    echo "variable before running the script. Example:"
+    echo "export SIGNING_ID='Blinkinlabs, LLC'"
+    echo "**************************************************************"
 else
     # Sign the installer
     "${WIN_KIT_SIGNTOOL}/bin/x86/signtool.exe" sign //v //ac ${ROOT_CERTIFICATE} //n "${SIGNING_ID}" //fd sha256 //tr ${TIMESTAMP_SERVER} //td sha256 //a PatternPaint\ Windows\ Installer.exe
 fi
 
-mv "PatternPaint Windows Installer.exe" "../PatternPaint_Installer_"${VERSION}".exe"
+mv "PatternPaint Windows Installer.exe" "PatternPaint_Installer_"${VERSION}".exe"
+
+popd
 
