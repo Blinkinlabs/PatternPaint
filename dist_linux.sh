@@ -30,8 +30,7 @@ pushd ${BUILDDIR}
 
 ${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
     -r \
-    -spec linux-g++ \
-    DESTDIR=release
+    -spec linux-g++
 
 #${MAKE} clean
 ${MAKE} -j6
@@ -41,13 +40,13 @@ popd
 ################## Run Unit Tests ##############################
 pushd ${BUILDDIR}
 
-LD_LIBRARY_PATH=libblinky/release libblinky-test/release/libblinky-test
+LD_LIBRARY_PATH=libblinky libblinky-test/libblinky-test
 
 popd
 
 ################## Package using linuxdeployqt #################
 pushd ${BUILDDIR}
-pushd app/release
+pushd app
 
 icns2png ${SOURCEDIR}/app/images/patternpaint.icns -x
 cp patternpaint_256x256x32.png patternpaint.png
@@ -58,13 +57,13 @@ popd
 
 
 # TODO: this should be done automagically though the qt build tools?
-mkdir -p app/release/lib
-cp libblinky/release/libblinky.so.1 app/release/lib
+mkdir -p app/lib
+cp libblinky/libblinky.so.1 app/lib
 
 unset LD_LIBRARY_PATH # Remove too old Qt from the search path; TODO: Move inside the linuxdeployqt AppImage
 
-PATH=${QTDIR}/bin:${PATH} ${LINUXDEPLOYQT} app/release/PatternPaint -bundle-non-qt-libs
-PATH=${QTDIR}/bin:${PATH} ${LINUXDEPLOYQT} app/release/PatternPaint -appimage
+PATH=${QTDIR}/bin:${PATH} ${LINUXDEPLOYQT} app/PatternPaint -bundle-non-qt-libs
+PATH=${QTDIR}/bin:${PATH} ${LINUXDEPLOYQT} app/PatternPaint -appimage
 
 tar -cjf PatternPaint-x86_64_${VERSION}.tar.bz2 PatternPaint-x86_64.AppImage
 
