@@ -13,7 +13,7 @@ install:
   - wget -c https://github.com/probonopd/linuxdeployqt/releases/download/2/linuxdeployqt-2-x86_64.AppImage -O linuxdeployqt
   - chmod a+x linuxdeployqt
 
-  - export QTDIR=/opt/qt57/
+  - export QTDIR=/opt/qt57
 
 script: ./dist_linux.sh
 
