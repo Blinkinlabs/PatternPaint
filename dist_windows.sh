@@ -15,13 +15,12 @@ SIGNING_ID='Blinkinlabs, LLC'
 
 ################# Library Locations #############################
 # Location of the MINGW libraries (Installed as part of Qt)
-QT_DIR='/c/Qt/Qt5.7.0/'
-QT_MINGW=${QT_DIR}'5.7/mingw53_32/'
-QT_TOOLS=${QT_DIR}'Tools/mingw530_32/bin/'
-QT_REDIST=${QT_DIR}'Tools/QtCreator/bin/'
+QTDIR='/c/Qt/Qt5.7.0/'
+QT_DIST=${QTDIR}'5.7/mingw53_32/'
+MINGW_BIN=${QTDIR}'Tools/mingw530_32/bin/'
 
-QMAKE=${QT_MINGW}'/bin/qmake.exe'
-MAKE=${QT_TOOLS}'/mingw32-make.exe'
+QMAKE=${QT_DIST}'/bin/qmake.exe'
+MAKE=${MINGW_BIN}'/mingw32-make.exe'
 
 # location of the source tree
 SOURCEDIR=`pwd`'/src'
@@ -119,13 +118,14 @@ popd
 mkdir -p ${BUILDDIR}
 pushd ${BUILDDIR}
 
+
 ${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
 	-r \
 	-spec win32-g++ \
 	DESTDIR=release
 	
-#${MAKE} clean
-${MAKE} -j6
+${MAKE} clean
+PATH=${MINGW_BIN}:${PATH} ${MAKE} -j6
 
 popd
 
@@ -154,24 +154,24 @@ cp ${BUILDDIR}libblinky/release/blinky.dll ${OUTDIR}
 # Note: This list of DLLs must be determined by hand, using Dependency Walker
 # Also, the .nsi file should be synchronized with this list, otherwise the file
 # will not actually be included by the installer.
-cp ${QT_MINGW}bin/libgcc_s_dw2-1.dll ${OUTDIR}
-cp ${QT_MINGW}bin/libstdc++-6.dll ${OUTDIR}
-cp ${QT_MINGW}bin/libgcc_s_dw2-1.dll ${OUTDIR}
-cp ${QT_MINGW}bin/libwinpthread-1.dll ${OUTDIR}
+cp ${QT_DIST}bin/libgcc_s_dw2-1.dll ${OUTDIR}
+cp ${QT_DIST}bin/libstdc++-6.dll ${OUTDIR}
+cp ${QT_DIST}bin/libgcc_s_dw2-1.dll ${OUTDIR}
+cp ${QT_DIST}bin/libwinpthread-1.dll ${OUTDIR}
 
-cp ${QT_MINGW}bin/Qt5Core.dll ${OUTDIR}
-cp ${QT_MINGW}bin/Qt5Core.dll ${OUTDIR}
-cp ${QT_MINGW}bin/Qt5Gui.dll ${OUTDIR}
-cp ${QT_MINGW}bin/Qt5Widgets.dll ${OUTDIR}
-cp ${QT_MINGW}bin/Qt5Gui.dll ${OUTDIR}
-cp ${QT_MINGW}bin/Qt5SerialPort.dll ${OUTDIR}
+cp ${QT_DIST}bin/Qt5Core.dll ${OUTDIR}
+cp ${QT_DIST}bin/Qt5Core.dll ${OUTDIR}
+cp ${QT_DIST}bin/Qt5Gui.dll ${OUTDIR}
+cp ${QT_DIST}bin/Qt5Widgets.dll ${OUTDIR}
+cp ${QT_DIST}bin/Qt5Gui.dll ${OUTDIR}
+cp ${QT_DIST}bin/Qt5SerialPort.dll ${OUTDIR}
 
-cp ${QT_MINGW}plugins/platforms/qwindows.dll ${OUTDIR}platforms/
+cp ${QT_DIST}plugins/platforms/qwindows.dll ${OUTDIR}platforms/
 
-cp ${QT_MINGW}plugins/imageformats/qgif.dll ${OUTDIR}imageformats/
-cp ${QT_MINGW}plugins/imageformats/qjpeg.dll ${OUTDIR}imageformats/
-cp ${QT_MINGW}plugins/imageformats/qsvg.dll ${OUTDIR}imageformats/
-cp ${QT_MINGW}plugins/imageformats/qtiff.dll ${OUTDIR}imageformats/
+cp ${QT_DIST}plugins/imageformats/qgif.dll ${OUTDIR}imageformats/
+cp ${QT_DIST}plugins/imageformats/qjpeg.dll ${OUTDIR}imageformats/
+cp ${QT_DIST}plugins/imageformats/qsvg.dll ${OUTDIR}imageformats/
+cp ${QT_DIST}plugins/imageformats/qtiff.dll ${OUTDIR}imageformats/
 
 # Winsparkle Files
 cp ${WINSPARKLE}/release/WinSparkle.dll ${OUTDIR}
