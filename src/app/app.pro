@@ -12,11 +12,6 @@ QT += widgets gui core
 TARGET = PatternPaint
 TEMPLATE = app
 
-OBJECTS_DIR = .tmp
-MOC_DIR = .tmp
-RCC_DIR = .tmp
-UI_DIR = .tmp
-
 include(../libusb.pri)
 include(../libblinky.pri)
 
