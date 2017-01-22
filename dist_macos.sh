@@ -4,7 +4,7 @@
 set -e
 
 # Pull in the QT tools
-export QTDIR=~/Qt5.7.0/5.7/clang_64/
+export QTDIR=~/Qt5.7.0/5.7/clang_64
 
 QMAKE=${QTDIR}/bin/qmake
 MAKE=make
@@ -13,7 +13,7 @@ MAKE=make
 SOURCEDIR=`pwd`'/src'
 
 # Location to build PatternPaint
-BUILDDIR=`pwd`'/build-dist-macos/'
+BUILDDIR=`pwd`'/build-dist-macos'
 
 ################### Extract the version info ###################
 source ./gitversion.sh
@@ -21,7 +21,7 @@ source ./gitversion.sh
 
 ################## Build PatternPaint ###################
 mkdir -p ${BUILDDIR}
-pushd {$BUILDDIR}
+pushd ${BUILDDIR}
 
 ${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
     -r \
@@ -29,7 +29,7 @@ ${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
     CONFIG+=x86_64 \
     DESTDIR=release
 
-${MAKE} clean
+#${MAKE} clean
 ${MAKE} -j6
 
 popd
@@ -38,14 +38,17 @@ popd
 # TODO?
 pushd ${BUILDDIR}
 
-LD_LIBRARY_PATH=libblinky/release libblinky-test/release/libblinky-test
+DYLD_LIBRARY_PATH=libblinky/release libblinky-test/release/libblinky-test.app/Contents/MacOS/libblinky-test
 
 popd
 
 
 ################## Package using macdeployqt #################
+pushd ${BUILDDIR}
 
-APP=${BUILDDIR}/app/release/PatternPaint.app
+APP=app/release/PatternPaint.app
+
+cp libblinky/release/libblinky.1.0.0.dylib ${APP}/Contents/Frameworks
 
 # Integrate the system frameworks
 ${QTDIR}/bin/macdeployqt ${APP} -verbose=1
@@ -102,6 +105,8 @@ DMG_NAME=PatternPaint_${VERSION}
 
 mkdir ${DMG_NAME}
 mv ${APP}/ ${DMG_NAME}/
-hdiutil create -volname ${DMG_NAME} -srcfolder ${DMG_NAME} -ov -format UDZO ${OUTPUTDIR}/${DMG_NAME}.dmg
+hdiutil create -volname ${DMG_NAME} -srcfolder ${DMG_NAME} -ov -format UDZO ${DMG_NAME}.dmg
 
 rm -R ${DMG_NAME}
+
+popd
