@@ -60,13 +60,10 @@ popd
 mkdir -p app/release/lib
 cp libblinky/release/libblinky.so.1 app/release/lib
 
-# linuxdeployqt requres qmake to be in the path
-PATH=${QTDIR}/bin:${PATH}
-
 unset LD_LIBRARY_PATH # Remove too old Qt from the search path; TODO: Move inside the linuxdeployqt AppImage
 
-${LINUXDEPLOYQT} app/release/PatternPaint -verbose=2 -bundle-non-qt-libs
-${LINUXDEPLOYQT} app/release/PatternPaint -verbose=2 -appimage
+PATH=${QTDIR}/bin:${PATH} ${LINUXDEPLOYQT} app/release/PatternPaint -bundle-non-qt-libs
+PATH=${QTDIR}/bin:${PATH} ${LINUXDEPLOYQT} app/release/PatternPaint -appimage
 
 tar -cjf PatternPaint-x86_64_${VERSION}.tar.bz2 PatternPaint-x86_64.AppImage
 
