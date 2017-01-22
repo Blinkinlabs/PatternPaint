@@ -96,8 +96,7 @@ pushd ${BUILDDIR}
 
 ${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
 	-r \
-	-spec win32-g++ \
-	DESTDIR=release
+	-spec win32-g++
 	
 ${MAKE} clean
 PATH=${MINGW_BIN}:${PATH} ${MAKE} -j6
