@@ -26,8 +26,7 @@ pushd ${BUILDDIR}
 ${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
     -r \
     -spec macx-clang \
-    CONFIG+=x86_64 \
-    DESTDIR=release
+    CONFIG+=x86_64
 
 #${MAKE} clean
 ${MAKE} -j6
@@ -38,9 +37,9 @@ popd
 pushd ${BUILDDIR}
 
 # TODO: this dylib path is being pulled in incorrectly, find a way for the build to load it correctly?
-install_name_tool libblinky-test/release/libblinky-test.app/Contents/MacOS/libblinky-test -change libblinky.1.dylib @rpath/libblinky.1.0.0.dylib
+install_name_tool libblinky-test/libblinky-test.app/Contents/MacOS/libblinky-test -change libblinky.1.dylib @rpath/libblinky.1.0.0.dylib
 
-libblinky-test/release/libblinky-test.app/Contents/MacOS/libblinky-test
+libblinky-test/libblinky-test.app/Contents/MacOS/libblinky-test
 
 popd
 
@@ -48,7 +47,7 @@ popd
 ################## Package using macdeployqt #################
 pushd ${BUILDDIR}
 
-APP=app/release/PatternPaint.app
+APP=app/PatternPaint.app
 
 # TODO: this dylib path is being pulled in incorrectly, find a way for the build to load it correctly?
 install_name_tool ${APP}/Contents/MacOS/PatternPaint -change libblinky.1.dylib @rpath/libblinky.1.0.0.dylib

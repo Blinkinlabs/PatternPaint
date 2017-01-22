@@ -1,5 +1,7 @@
-CONFIG(release, debug|release): LIBBLINKYDIR=$$OUT_PWD/../libblinky/release
-else:CONFIG(debug, debug|release): LIBBLINKYDIR=$$OUT_PWD/../libblinky/debug
+# TODO: Why does qmake on windows make release and debug dirs, but on macOS it doesn't?
+win32:CONFIG(release, debug|release): LIBBLINKYDIR=$$OUT_PWD/../libblinky/release
+else:win32:CONFIG(debug, debug|release): LIBBLINKYDIR=$$OUT_PWD/../libblinky/debug
+else:unix: LIBBLINKYDIR=$$OUT_PWD/../libblinky
 
 INCLUDEPATH += $$PWD/libblinky
 DEPENDPATH += $$PWD/libblinky
