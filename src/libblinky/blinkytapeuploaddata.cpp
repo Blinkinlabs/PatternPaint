@@ -11,10 +11,8 @@
 #define PATTERN_TABLE_HEADER_LENGTH     3
 #define PATTERN_TABLE_ENTRY_LENGTH      7
 
-#define FLASH_MEMORY_AVAILABLE          0x7000  // Amount of application space in the flash
-#define FLASH_MEMORY_PAGE_SIZE          0x80    // Size of a page of memory in our flash
 #define FLASH_MEMORY_SKETCH_ADDRESS     0x0000  // Location of sketch
-#define FLASH_MEMORY_PATTERN_TABLE_ADDRESS (FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE) // Location of pattern table
+#define FLASH_MEMORY_PATTERN_TABLE_ADDRESS (FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE_BYTES) // Location of pattern table
 
 
 #define BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT 36
@@ -38,11 +36,11 @@ bool BlinkyTapeUploadData::init(QList<PatternWriter> &patterns)
     QByteArray sketch;          // Program data
     sketch.append(reinterpret_cast<const char *>(PATTERNPLAYER_DATA), sizeof(PATTERNPLAYER_DATA));
 
-    // Expand sketch size to FLASH_MEMORY_PAGE_SIZE boundary
-    while (sketch.length() % FLASH_MEMORY_PAGE_SIZE != 0)
+    // Expand sketch size to FLASH_MEMORY_PAGE_SIZE_BYTES boundary
+    while (sketch.length() % FLASH_MEMORY_PAGE_SIZE_BYTES != 0)
         sketch.append(static_cast<char>(0xFF));
 
-    sketchSection = FlashSection("Sketch",
+    sketchSection = MemorySection("Sketch",
                                  FLASH_MEMORY_SKETCH_ADDRESS,
                                  sketch);
 
@@ -60,7 +58,7 @@ bool BlinkyTapeUploadData::init(QList<PatternWriter> &patterns)
         return false;
     }
     if (patterns.count()
-        >= ((FLASH_MEMORY_PAGE_SIZE - PATTERN_TABLE_HEADER_LENGTH) / PATTERN_TABLE_ENTRY_LENGTH)) {
+        >= ((FLASH_MEMORY_PAGE_SIZE_BYTES - PATTERN_TABLE_HEADER_LENGTH) / PATTERN_TABLE_ENTRY_LENGTH)) {
         errorString = QString("Too many patterns, cannot fit in pattern table.");
         return false;
     }
@@ -108,8 +106,8 @@ bool BlinkyTapeUploadData::init(QList<PatternWriter> &patterns)
         dataOffset += pattern.getData().count();
     }
 
-    // Pad pattern table to FLASH_MEMORY_PAGE_SIZE bytes.
-    while (patternTable.count() < FLASH_MEMORY_PAGE_SIZE)
+    // Pad pattern table to FLASH_MEMORY_PAGE_SIZE_BYTES.
+    while (patternTable.count() < FLASH_MEMORY_PAGE_SIZE_BYTES)
         patternTable.append(static_cast<char>(0xFF));
 
     snprintf(buff, BUFF_LENGTH, "Sketch size: %iB, pattern data size: %iB, pattern table size: %iB",
@@ -119,11 +117,11 @@ bool BlinkyTapeUploadData::init(QList<PatternWriter> &patterns)
     qDebug() << buff;
 
 
-    patternDataSection = FlashSection("PatternData",
+    patternDataSection = MemorySection("PatternData",
                                       FLASH_MEMORY_SKETCH_ADDRESS + sketch.count(),
                                       patternData);
 
-    patternTableSection = FlashSection("PatternTable",
+    patternTableSection = MemorySection("PatternTable",
                                        FLASH_MEMORY_PATTERN_TABLE_ADDRESS,
                                        patternTable);
     return true;

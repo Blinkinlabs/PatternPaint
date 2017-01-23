@@ -4,25 +4,10 @@
 #include <QByteArray>
 #include <vector>
 #include "patternwriter.h"
+#include "memorysection.h"
 
-struct FlashSection {
-    FlashSection() {}
-
-    /// Create a new flash section
-    /// @param address Address in the flash memory where the data should be stored
-    /// @param data Data to store
-    FlashSection(QString name, int address, const QByteArray& data) :
-        name(name),
-        address(address),
-        data(data)
-    {
-    }
-
-    QString name;       /// Section name, for debugging
-    int address;        /// Address to store the data
-    QByteArray data;    /// Data to store
-};
-
+#define FLASH_MEMORY_AVAILABLE          0x7000  // Amount of application space in the flash
+#define FLASH_MEMORY_PAGE_SIZE_BYTES    0x80    // Size of a page of memory in our flash
 
 /// Utility class for assembling flash sections for the BlinkyTape
 class BlinkyTapeUploadData
@@ -30,9 +15,9 @@ class BlinkyTapeUploadData
 public:
     bool init(QList<PatternWriter> &patterns);
 
-    FlashSection sketchSection;
-    FlashSection patternDataSection;
-    FlashSection patternTableSection;
+    MemorySection sketchSection;
+    MemorySection patternDataSection;
+    MemorySection patternTableSection;
 
     QString errorString;
 };

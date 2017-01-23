@@ -4,6 +4,8 @@
 #include "colormodetests.h"
 #include "serialcommandtests.h"
 #include "bytearrayhelperstests.h"
+#include "memorysectiontests.h"
+#include "memorymaptests.h"
 
 int main(int argc, char *argv[])
 {
@@ -23,6 +25,12 @@ int main(int argc, char *argv[])
 
     SerialCommandTests serialCommandTests;
     result |= QTest::qExec(&serialCommandTests);
+
+    MemorySectionTests flashSectionTests;
+    result |= QTest::qExec(&flashSectionTests);
+
+    MemoryMapTests memoryMapTests;
+    result |= QTest::qExec(&memoryMapTests);
 
     return result;
 }

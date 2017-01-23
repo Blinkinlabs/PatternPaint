@@ -1,18 +1,14 @@
 #include "blinkytapeuploader.h"
 
 #include "avr109commands.h"
-#include "blinkytapeuploaddata.h"
 #include "ProductionSketch.h"
 #include "blinkycontroller.h"
+#include "blinkytapeuploaddata.h"
 
 #include <QDebug>
 
 // TODO: Combine this with the definitions in avruploaddata.cpp
-#define FLASH_BYTES_AVAILABLE           0x7000  // Amount of application space in the flash
-
 #define EEPROM_TABLE_SIZE_BYTES         0x0010  // Amount of space available in the EEPROM
-
-#define PAGE_SIZE_BYTES 128
 
 /// Interval between polling the serial port list for new devices (milliseconds)
 #define BOOTLOADER_POLL_INTERVAL 200
@@ -24,11 +20,9 @@
 /// reset, and notifying the caller that we are finished (milliseconds)
 #define BOOTLOADER_SETTLING_DELAY 500
 
-/// Length of character buffer for debug messages
-#define BUFF_LENGTH 100
-
 /// Maximum number of times to try writing the flash memory
 #define FLASH_WRITE_MAX_RETRIES 10
+
 
 BlinkyTapeUploader::BlinkyTapeUploader(QObject *parent) :
     BlinkyUploader(parent),
@@ -76,7 +70,7 @@ bool BlinkyTapeUploader::restoreFirmware(qint64 timeout)
                                    PRODUCTION_LENGTH);
 
     // Put the sketch, pattern, and metadata into the programming queue.
-    flashData.push_back(FlashSection("Sketch", PRODUCTION_ADDRESS, sketch));
+    flashData.append(MemorySection("Sketch", PRODUCTION_ADDRESS, sketch));
 
     return startUpload(timeout);
 }
@@ -87,7 +81,7 @@ bool BlinkyTapeUploader::updateFirmware(BlinkyController &blinky)
                                    PRODUCTION_LENGTH);
 
     // Put the sketch, pattern, and metadata into the programming queue.
-    flashData.push_back(FlashSection("Sketch", PRODUCTION_ADDRESS, sketch));
+    flashData.append(MemorySection("Sketch", PRODUCTION_ADDRESS, sketch));
 
     return startUpload(blinky);
 }
@@ -102,10 +96,9 @@ bool BlinkyTapeUploader::storePatterns(BlinkyController &blinky, QList<PatternWr
         return false;
     }
 
-    // TODO: re-enable size check
-    flashData.push_back(data.sketchSection);
-    flashData.push_back(data.patternDataSection);
-    flashData.push_back(data.patternTableSection);
+    flashData.append(data.sketchSection);
+    flashData.append(data.patternDataSection);
+    flashData.append(data.patternTableSection);
 
     return startUpload(blinky);
 }
@@ -184,6 +177,19 @@ void BlinkyTapeUploader::handleLastCommandFinished()
 
 bool BlinkyTapeUploader::startUpload(BlinkyController &blinky)
 {
+    // TODO: Check if all flash sections fit in memory
+    // TODO: Check that all sections are not overlapping
+    for(MemorySection& section : flashData) {
+        if(section.address + section.data.length() > FLASH_MEMORY_AVAILABLE) {
+            errorString = "Pattern data too large, cannot fit on device!";
+            return false;
+        }
+
+        qDebug() << "Flash Section:" << section.name
+                 << "address: " << section.address
+                 << "size: " << section.data.length();
+    }
+
     // Now, start the polling processes to detect a new bootloader
     // We can't reset if we weren't already connected...
     if (!blinky.isConnected()) {
@@ -199,7 +205,14 @@ bool BlinkyTapeUploader::startUpload(BlinkyController &blinky)
 
 bool BlinkyTapeUploader::startUpload(qint64 timeout)
 {
-    for(FlashSection& section : flashData) {
+    // TODO: Check if all flash sections fit in memory
+    // TODO: Check that all sections are not overlapping
+    for(MemorySection& section : flashData) {
+        if(section.address + section.data.length() > FLASH_MEMORY_AVAILABLE) {
+            errorString = "Pattern data too large, cannot fit on device!";
+            return false;
+        }
+
         qDebug() << "Flash Section:" << section.name
                  << "address: " << section.address
                  << "size: " << section.data.length();
@@ -209,8 +222,8 @@ bool BlinkyTapeUploader::startUpload(qint64 timeout)
 
     // There are 4 commands for each page-
     // setaddress, writeflashpage, setaddress, verifyflashpage
-    foreach (FlashSection flashSection, flashData)
-        maxProgress += 4*flashSection.data.count()/PAGE_SIZE_BYTES;
+    foreach (MemorySection flashSection, flashData)
+        maxProgress += 4*flashSection.data.count()/FLASH_MEMORY_PAGE_SIZE_BYTES;
 
     setProgress(0);
 
@@ -316,7 +329,7 @@ void BlinkyTapeUploader::doWork()
     case State_WriteFlashData:
     {
         // Queue all of the flash sections to memory
-        for(FlashSection& section : flashData) {
+        for(MemorySection& section : flashData) {
             commandQueue.enqueue(Avr109Commands::writeFlash(section.data, section.address));
             commandQueue.enqueue(Avr109Commands::verifyFlash(section.data, section.address));
         }

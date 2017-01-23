@@ -18,11 +18,15 @@ HEADERS += \
     avr109commandstests.h \
     colormodetests.h \
     serialcommandtests.h \
-    bytearrayhelperstests.h
+    bytearrayhelperstests.h \
+    memorysectiontests.h \
+    memorymaptests.h
 
 SOURCES += \
     avr109commandstests.cpp \
     main.cpp \
     colormodetests.cpp \
     serialcommandtests.cpp \
-    bytearrayhelperstests.cpp
+    bytearrayhelperstests.cpp \
+    memorysectiontests.cpp \
+    memorymaptests.cpp

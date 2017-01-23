@@ -4,7 +4,7 @@
 #include "patternwriter.h"
 #include "blinkyuploader.h"
 #include "serialcommandqueue.h"
-#include "blinkytapeuploaddata.h"
+#include "memorysection.h"
 
 #include <QObject>
 #include <QTimer>
@@ -88,7 +88,7 @@ private:
     int flashWriteRetriesRemaining;      ///< Number of times we can re-try writing the flash before giving up
 
     SerialCommandQueue commandQueue;
-    QQueue<FlashSection> flashData;     ///< Queue of memory sections to write
+    QList<MemorySection> flashData;     ///< Queue of memory sections to write
 };
 
 #endif // AVRPATTERNUPLOADER_H
