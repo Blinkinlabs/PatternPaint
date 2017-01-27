@@ -5,10 +5,13 @@
 #include "patternwriter.h"
 
 #include <QDialog>
+#include <QString>
 
 namespace Ui {
 class SceneConfiguration;
 }
+
+
 
 /// Dialog to allow the user to specify a new width/height for the animation
 class SceneConfiguration : public QDialog
@@ -35,6 +38,8 @@ private slots:
     void on_ColorType_currentIndexChanged(int index);
 
     void on_controllerType_currentIndexChanged(int index);
+
+    void on_firmwareType_currentIndexChanged(const QString &indexName);
 
 private:
     Ui::SceneConfiguration *ui;

@@ -1,8 +1,12 @@
 #include "sceneconfiguration.h"
 #include "ui_sceneconfiguration.h"
+#include "firmwareimport.h"
 
 #include <limits>
 #include <QDebug>
+#include <QStandardPaths>
+#include <QFileDialog>
+
 
 SceneConfiguration::SceneConfiguration(QWidget *parent) :
     QDialog(parent),
@@ -25,6 +29,19 @@ SceneConfiguration::SceneConfiguration(QWidget *parent) :
 
     // Disable controller selection for now since it doesn't really matter.
 // ui->controllerBox->setVisible(false);
+
+    // Add the Firmware types
+    ui->firmwareType->addItem(DEFAULT_FIRMWARE_NAME);
+    // search for third party Firmware
+    QString documents = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    documents.append(FIRMWARE_FOLDER);
+    QDir firmwareDir(documents);
+    if (firmwareDir.exists()){
+        QStringList firmwarelist = firmwareDir.entryList(QDir::Dirs);
+        firmwarelist.removeFirst();
+        firmwarelist.removeFirst();
+        ui->firmwareType->addItems(firmwarelist);
+    }
 
     // Add the fixture types
     // TODO: Auto configuration for this?
@@ -151,4 +168,11 @@ void SceneConfiguration::on_controllerType_currentIndexChanged(int index)
     Q_UNUSED(index);
 
     sceneCustomized();
+}
+
+void SceneConfiguration::on_firmwareType_currentIndexChanged(const QString &indexName)
+{
+
+    FIRMWARE_NAME = indexName;
+
 }
