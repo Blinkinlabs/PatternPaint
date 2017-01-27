@@ -32,7 +32,9 @@ class MemoryMap {
 public:
     MemoryMap(unsigned int start, unsigned int size);
 
-//    bool addSection(const memorySection& section);
+    // Add a new memory section to the map. Fails if the new section
+    // overlaps an existing section
+    bool addSection(const MemorySection& section);
 
     QList<MemorySection> memorySections;     ///< List of memory sections
 

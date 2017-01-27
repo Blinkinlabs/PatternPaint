@@ -7,7 +7,10 @@ class MemoryMapTests : public QObject
 {
     Q_OBJECT
 private slots:
-    void nameSetTest();
+    void constructorTest();
+
+    void addSectionTest_data();
+    void addSectionTest();
 };
 
 #endif // MEMORYMAPTESTS_H
