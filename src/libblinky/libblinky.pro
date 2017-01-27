@@ -26,7 +26,8 @@ HEADERS += \
     lightbuddycommands.h \
     blinkypendantcommands.h \
     bytearrayhelpers.h \
-    blinkytapeuploaddata.h
+    blinkytapeuploaddata.h \
+    firmwareimport.h
 
 SOURCES +=  \
     fixture.cpp \
@@ -47,7 +48,8 @@ SOURCES +=  \
     lightbuddycommands.cpp \
     blinkypendantcommands.cpp \
     bytearrayhelpers.cpp \
-    blinkytapeuploaddata.cpp
+    blinkytapeuploaddata.cpp \
+    firmwareimport.cpp
 
 # For platforms that have serial ports
 # TODO: Pull hard-coded references to BlinkyTape from the gui, allowing this section to be switchable
