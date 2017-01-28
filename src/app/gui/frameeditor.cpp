@@ -20,10 +20,10 @@
 #define GRID_MIN_Y_SCALE        6   // Minimum scale that the image needs to scale to before the grid is displayed
 
 
-QPoint FrameEditor::frameToImage(const QPoint &framePoint) const {
-    //    int x = event->x()/pixelScale;
-    //    int y = event->y()/pixelScale;
-    return framePoint/pixelScale;
+QPoint FrameEditor::frameToImage(const int &framePointX, const int &framePointY ) const {
+        int x = framePointX/pixelScale;
+        int y = framePointY/pixelScale;
+        return QPoint(x,y);
 }
 
 QPoint FrameEditor::imageToFrame(const QPoint &imagePoint) const {
@@ -147,7 +147,7 @@ void FrameEditor::mousePressEvent(QMouseEvent *event)
         return;
 
     setCursor(instrument->cursor());
-    instrument->mousePressEvent(event, *this, frameToImage(event->pos()));
+    instrument->mousePressEvent(event, *this, frameToImage(event->x(),event->y()));
     lazyUpdate();
 }
 
@@ -162,7 +162,7 @@ void FrameEditor::mouseMoveEvent(QMouseEvent *event)
     if(!rateLimiter.check())
         return;
 
-    QPoint mousePoint = frameToImage(event->pos());
+    QPoint mousePoint = frameToImage(event->x(),event->y());
 
     // Filter the move event if it didn't result in a move to a new image pixel
     if (mousePoint == lastMousePoint)
@@ -182,7 +182,7 @@ void FrameEditor::mouseReleaseEvent(QMouseEvent *event)
     if (!hasImage() || instrument.isNull())
         return;
 
-    instrument->mouseReleaseEvent(event, *this, frameToImage(event->pos()));
+    instrument->mouseReleaseEvent(event, *this, frameToImage(event->x(),event->y()));
     lazyUpdate();
 }
 
@@ -278,7 +278,7 @@ void FrameEditor::paintEvent(QPaintEvent *)
                                 frameData.height()*pixelScale + 1),
                           (instrument->getPreview()));
 
-    if (pixelScale >= GRID_MIN_Y_SCALE)
+    if (pixelScale > GRID_MIN_Y_SCALE)
         painter.drawImage(0, 0, gridPattern);
 
     // TODO: How to do this more generically?
@@ -292,14 +292,17 @@ void FrameEditor::paintEvent(QPaintEvent *)
         painter.setPen(COLOR_PLAYBACK_EDGE);
 
         QPoint topLeft = imageToFrame(QPoint(playbackRow, 0));
-        QPoint bottomRight = imageToFrame(QPoint(playbackRow + fixtureWidth, fixtureHeight)) - QPoint(1,0);
+        //QPoint bottomRight = imageToFrame(QPoint(playbackRow + fixtureWidth, fixtureHeight)) - QPoint(1,0);
+        QPoint bottomRight = imageToFrame(QPoint(playbackRow + fixtureWidth, fixtureHeight));
+
 
         painter.drawRect(QRect(topLeft, bottomRight));
         painter.fillRect(QRect(topLeft, bottomRight), COLOR_PLAYBACK_TOP);
 
         // In the case that the indicator is split, draw the other half
         topLeft = imageToFrame(QPoint(playbackRow-frameData.width(),0));
-        bottomRight = imageToFrame(QPoint(playbackRow - frameData.width() + fixtureWidth, fixtureHeight)) - QPoint(1,0);
+        //bottomRight = imageToFrame(QPoint(playbackRow - frameData.width() + fixtureWidth, fixtureHeight)) - QPoint(1,0);
+        bottomRight = imageToFrame(QPoint(playbackRow - frameData.width() + fixtureWidth, fixtureHeight));
 
         painter.drawRect(QRect(topLeft, bottomRight));
         painter.fillRect(QRect(topLeft, bottomRight), COLOR_PLAYBACK_TOP);
