@@ -18,6 +18,7 @@ bool firmwareimport::firmwareRead(const QString filename)
     QFile inputFile(filename);
     if (inputFile.open(QIODevice::ReadOnly))
     {
+       FIRMWARE_DATA.clear();
        QTextStream in(&inputFile);
        while (!in.atEnd())
        {
@@ -32,7 +33,7 @@ bool firmwareimport::firmwareRead(const QString filename)
                       //read data
                       uint8_t dataByte = line.mid(i+9,2).toUInt(&bStatus,16);
                       if(bStatus==true){
-                          FIRMWARE_DATA.append(dataByte);
+                          FIRMWARE_DATA.append(static_cast<char>(dataByte));
                       }else{
                           qDebug("Format error in hex file, data can not be read");
                           return false;
