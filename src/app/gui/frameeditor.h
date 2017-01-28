@@ -66,7 +66,7 @@ private:
     QPointer<Fixture> fixture;
 
     /// Convert a coordinte from frame coordinate to image coordinate
-    QPoint frameToImage(const QPoint& framePoint) const;
+    QPoint frameToImage(const int &framePointX, const int &framePointY) const;
     QPoint imageToFrame(const QPoint& imagePoint) const;
 
     /// Redraw the gridPattern to fit the current widget size.
