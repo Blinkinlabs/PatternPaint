@@ -57,8 +57,8 @@ bool BlinkyTapeUploadData::init(QList<PatternWriter> &patterns)
                 qDebug() << "Firmware successfully read";
                 sketch.append(FIRMWARE_DATA);
             }else{
-                qDebug() << "Firmware read failed";
                 errorString = QString("Firmware read failed");
+                qDebug() << errorString;
                 return false;
             }
         }
@@ -144,6 +144,12 @@ bool BlinkyTapeUploadData::init(QList<PatternWriter> &patterns)
              patternData.count(),
              patternTable.count());
     qDebug() << buff;
+
+    if(sketch.count()+patternData.count()+patternTable.count()>FLASH_MEMORY_AVAILABLE){
+        errorString = QString("No more space in Blinky Flash memory !");
+        qDebug() << errorString;
+        return false;
+    }
 
 
     patternDataSection = FlashSection("PatternData",
