@@ -278,7 +278,7 @@ void FrameEditor::paintEvent(QPaintEvent *)
                                 frameData.height()*pixelScale + 1),
                           (instrument->getPreview()));
 
-    if (pixelScale > GRID_MIN_Y_SCALE)
+    if (pixelScale >= GRID_MIN_Y_SCALE)
         painter.drawImage(0, 0, gridPattern);
 
     // TODO: How to do this more generically?
@@ -292,17 +292,14 @@ void FrameEditor::paintEvent(QPaintEvent *)
         painter.setPen(COLOR_PLAYBACK_EDGE);
 
         QPoint topLeft = imageToFrame(QPoint(playbackRow, 0));
-        //QPoint bottomRight = imageToFrame(QPoint(playbackRow + fixtureWidth, fixtureHeight)) - QPoint(1,0);
-        QPoint bottomRight = imageToFrame(QPoint(playbackRow + fixtureWidth, fixtureHeight));
-
+        QPoint bottomRight = imageToFrame(QPoint(playbackRow + fixtureWidth, fixtureHeight)) - QPoint(1,0);
 
         painter.drawRect(QRect(topLeft, bottomRight));
         painter.fillRect(QRect(topLeft, bottomRight), COLOR_PLAYBACK_TOP);
 
         // In the case that the indicator is split, draw the other half
         topLeft = imageToFrame(QPoint(playbackRow-frameData.width(),0));
-        //bottomRight = imageToFrame(QPoint(playbackRow - frameData.width() + fixtureWidth, fixtureHeight)) - QPoint(1,0);
-        bottomRight = imageToFrame(QPoint(playbackRow - frameData.width() + fixtureWidth, fixtureHeight));
+        bottomRight = imageToFrame(QPoint(playbackRow - frameData.width() + fixtureWidth, fixtureHeight)) - QPoint(1,0);
 
         painter.drawRect(QRect(topLeft, bottomRight));
         painter.fillRect(QRect(topLeft, bottomRight), COLOR_PLAYBACK_TOP);
