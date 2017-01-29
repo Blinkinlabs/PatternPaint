@@ -296,6 +296,9 @@ bool BlinkyTape::getUploader(QPointer<BlinkyUploader> &uploader)
     else if (serialInfo.vendorIdentifier() == LEONARDO_SKETCH_VID
              && serialInfo.productIdentifier() == LEONARDO_SKETCH_PID)
         uploader = new BlinkyTapeUploader(parent());
+    else if (serialInfo.vendorIdentifier() == ARDUINOMICRO_SKETCH_VID
+             && serialInfo.productIdentifier() == ARDUINOMICRO_SKETCH_PID)
+        uploader = new BlinkyTapeUploader(parent());
     else if (serialInfo.vendorIdentifier() == BLINKYPENDANT_SKETCH_VID
              && serialInfo.productIdentifier() == BLINKYPENDANT_SKETCH_PID)
         uploader = new BlinkyPendantUploader(parent());
@@ -305,5 +308,7 @@ bool BlinkyTape::getUploader(QPointer<BlinkyUploader> &uploader)
     else
         return false;
 
-    return true;
+
+   return true;
+
 }
