@@ -5,6 +5,8 @@
 #include <vector>
 #include "patternwriter.h"
 
+extern float FLASH_USED;
+
 struct FlashSection {
     FlashSection() {}
 

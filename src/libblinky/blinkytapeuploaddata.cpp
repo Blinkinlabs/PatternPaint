@@ -22,6 +22,8 @@
 
 #define BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT 36
 
+float FLASH_USED = 0;
+
 QByteArray encodeWordLSB(int data)
 {
     QByteArray output;
@@ -151,6 +153,7 @@ bool BlinkyTapeUploadData::init(QList<PatternWriter> &patterns)
         return false;
     }
 
+    FLASH_USED = float(sketch.count()+patternData.count()+patternTable.count())*100/FLASH_MEMORY_AVAILABLE;
 
     patternDataSection = FlashSection("PatternData",
                                       FLASH_MEMORY_SKETCH_ADDRESS + sketch.count(),
