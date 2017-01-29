@@ -731,7 +731,10 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
     mode = Uploading;
 
     progressDialog.setWindowTitle(tr("Blinky exporter"));
-    progressDialog.setLabelText(tr("Saving to Blinky..."));
+    progressDialog.setLabelText(QString("Saving to Blinky...\n"
+                                "\n"
+                                "Firmware: " + FIRMWARE_NAME + "\n"
+                                "Flash used: %1%").arg(QString::number(FLASH_USED,'f', 1)));
 
     progressDialog.setValue(progressDialog.minimum());
     progressDialog.show();
