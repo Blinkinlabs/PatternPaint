@@ -84,6 +84,8 @@ private slots:
 
     void on_actionFlip_Vertical_triggered();
 
+    void on_actionFirmware_Manager_triggered();
+
     void on_actionRestore_firmware_triggered();
 
     void on_actionSave_to_Blinky_triggered();

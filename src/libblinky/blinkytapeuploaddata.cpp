@@ -2,9 +2,12 @@
 
 #include "PatternPlayer_Sketch.h"
 #include "blinkytape.h"
+#include "firmwareimport.h"
 
 #include <QDebug>
 #include <QSettings>
+#include <QStandardPaths>
+#include <QFileDialog>
 
 #define BUFF_LENGTH 100
 
@@ -19,6 +22,8 @@
 
 #define BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT 36
 
+float FLASH_USED = 0;
+
 QByteArray encodeWordLSB(int data)
 {
     QByteArray output;
@@ -30,13 +35,37 @@ QByteArray encodeWordLSB(int data)
 bool BlinkyTapeUploadData::init(QList<PatternWriter> &patterns)
 {
     char buff[BUFF_LENGTH];
-    QString errorString;
 
     // First, build the flash section for the sketch. This is the same for
     // all uploads
 
     QByteArray sketch;          // Program data
-    sketch.append(reinterpret_cast<const char *>(PATTERNPLAYER_DATA), sizeof(PATTERNPLAYER_DATA));
+
+    qDebug() << "Selected firmware: " << FIRMWARE_NAME;
+    if(FIRMWARE_NAME==DEFAULT_FIRMWARE_NAME){
+        sketch.append(reinterpret_cast<const char *>(PATTERNPLAYER_DATA), sizeof(PATTERNPLAYER_DATA));
+    }else{
+        // search for third party Firmware
+        QString documents = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+        documents.append(FIRMWARE_FOLDER);
+        documents.append(FIRMWARE_NAME);
+        QDir firmwareDir(documents);
+        if (firmwareDir.exists()){
+            documents.append("/");
+            documents.append(FIRMWARE_NAME);
+            documents.append(".hex");
+            firmwareimport newFirmware;
+            if(newFirmware.firmwareRead(documents)){
+                qDebug() << "Firmware successfully read";
+                sketch.append(FIRMWARE_DATA);
+            }else{
+                errorString = QString("Firmware read failed");
+                qDebug() << errorString;
+                return false;
+            }
+        }
+    }
+
 
     // Expand sketch size to FLASH_MEMORY_PAGE_SIZE boundary
     while (sketch.length() % FLASH_MEMORY_PAGE_SIZE != 0)
@@ -118,6 +147,13 @@ bool BlinkyTapeUploadData::init(QList<PatternWriter> &patterns)
              patternTable.count());
     qDebug() << buff;
 
+    if(sketch.count()+patternData.count()+patternTable.count()>FLASH_MEMORY_AVAILABLE){
+        errorString = QString("No more space in Blinky Flash memory !");
+        qDebug() << errorString;
+        return false;
+    }
+
+    FLASH_USED = float(sketch.count()+patternData.count()+patternTable.count())*100/FLASH_MEMORY_AVAILABLE;
 
     patternDataSection = FlashSection("PatternData",
                                       FLASH_MEMORY_SKETCH_ADDRESS + sketch.count(),

@@ -20,10 +20,10 @@
 #define GRID_MIN_Y_SCALE        6   // Minimum scale that the image needs to scale to before the grid is displayed
 
 
-QPoint FrameEditor::frameToImage(const QPoint &framePoint) const {
-    //    int x = event->x()/pixelScale;
-    //    int y = event->y()/pixelScale;
-    return framePoint/pixelScale;
+QPoint FrameEditor::frameToImage(const int &framePointX, const int &framePointY ) const {
+        int x = framePointX/pixelScale;
+        int y = framePointY/pixelScale;
+        return QPoint(x,y);
 }
 
 QPoint FrameEditor::imageToFrame(const QPoint &imagePoint) const {
@@ -147,7 +147,7 @@ void FrameEditor::mousePressEvent(QMouseEvent *event)
         return;
 
     setCursor(instrument->cursor());
-    instrument->mousePressEvent(event, *this, frameToImage(event->pos()));
+    instrument->mousePressEvent(event, *this, frameToImage(event->x(),event->y()));
     lazyUpdate();
 }
 
@@ -162,7 +162,7 @@ void FrameEditor::mouseMoveEvent(QMouseEvent *event)
     if(!rateLimiter.check())
         return;
 
-    QPoint mousePoint = frameToImage(event->pos());
+    QPoint mousePoint = frameToImage(event->x(),event->y());
 
     // Filter the move event if it didn't result in a move to a new image pixel
     if (mousePoint == lastMousePoint)
@@ -182,7 +182,7 @@ void FrameEditor::mouseReleaseEvent(QMouseEvent *event)
     if (!hasImage() || instrument.isNull())
         return;
 
-    instrument->mouseReleaseEvent(event, *this, frameToImage(event->pos()));
+    instrument->mouseReleaseEvent(event, *this, frameToImage(event->x(),event->y()));
     lazyUpdate();
 }
 

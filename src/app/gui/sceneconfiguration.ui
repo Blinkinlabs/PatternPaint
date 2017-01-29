@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>278</width>
-    <height>366</height>
+    <height>445</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -42,6 +42,18 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="firmwareBox">
+     <property name="title">
+      <string>Firmware</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="0" column="0">
+       <widget class="QComboBox" name="firmwareType"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="fixtureBox">
      <property name="title">
       <string>Fixture</string>
@@ -50,24 +62,27 @@
       <property name="bottomMargin">
        <number>12</number>
       </property>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label">
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="fixtureWidth">
         <property name="text">
-         <string>Colors:</string>
+         <string>0</string>
+        </property>
+        <property name="maxLength">
+         <number>10</number>
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Height:</string>
+         <string>Type:</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="2">
-       <widget class="QLabel" name="label_4">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>LEDs</string>
+         <string>Width:</string>
         </property>
        </widget>
       </item>
@@ -84,37 +99,34 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
+      <item row="1" column="2">
+       <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>Type:</string>
+         <string>LEDs</string>
         </property>
        </widget>
       </item>
       <item row="4" column="1">
        <widget class="QComboBox" name="ColorType"/>
       </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="fixtureWidth">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>0</string>
-        </property>
-        <property name="maxLength">
-         <number>10</number>
+         <string>Height:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>Width:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QLabel" name="label_5">
+      <item row="2" column="2">
+       <widget class="QLabel" name="label_4">
         <property name="text">
          <string>LEDs</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Colors:</string>
         </property>
        </widget>
       </item>
