@@ -147,7 +147,7 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
     qDebug() << buff;
 
     if(sketch.count()+patternData.count()+patternTable.count()>FLASH_MEMORY_AVAILABLE){
-        errorString = QString("No more space in Blinky Flash memory !");
+        errorString = QString("Not enough space in Blinky Flash memory !");
         qDebug() << errorString;
         return false;
     }
