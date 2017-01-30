@@ -28,7 +28,7 @@ QByteArray encodeWordLSB(int data)
     return output;
 }
 
-bool BlinkyTapeUploadData::init(QList<PatternWriter> &patterns)
+bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter> &patterns)
 {
     char buff[BUFF_LENGTH];
 
@@ -37,23 +37,26 @@ bool BlinkyTapeUploadData::init(QList<PatternWriter> &patterns)
 
     QByteArray sketch;          // Program data
 
-    qDebug() << "Selected firmware: " << FIRMWARE_NAME;
-    if(FIRMWARE_NAME==DEFAULT_FIRMWARE_NAME){
+    qDebug() << "Selected firmware: " << firmwareName;
+    if(firmwareName == DEFAULT_FIRMWARE_NAME){
         sketch.append(reinterpret_cast<const char *>(PATTERNPLAYER_DATA), sizeof(PATTERNPLAYER_DATA));
     }else{
         // search for third party Firmware
         QString documents = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
         documents.append(FIRMWARE_FOLDER);
-        documents.append(FIRMWARE_NAME);
+        documents.append(firmwareName);
         QDir firmwareDir(documents);
+
         if (firmwareDir.exists()){
             documents.append("/");
-            documents.append(FIRMWARE_NAME);
+            documents.append(firmwareName);
             documents.append(".hex");
+
             firmwareimport newFirmware;
+
             if(newFirmware.firmwareRead(documents)){
                 qDebug() << "Firmware successfully read";
-                sketch.append(FIRMWARE_DATA);
+                sketch.append(newFirmware.getData());
             }else{
                 qDebug() << "Firmware read failed";
                 errorString = QString("Firmware read failed");

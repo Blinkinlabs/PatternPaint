@@ -4,7 +4,6 @@
 
 #include <limits>
 #include <QDebug>
-#include <QStandardPaths>
 #include <QFileDialog>
 
 
@@ -31,17 +30,7 @@ SceneConfiguration::SceneConfiguration(QWidget *parent) :
 // ui->controllerBox->setVisible(false);
 
     // Add the Firmware types
-    ui->firmwareType->addItem(DEFAULT_FIRMWARE_NAME);
-    // search for third party Firmware
-    QString documents = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-    documents.append(FIRMWARE_FOLDER);
-    QDir firmwareDir(documents);
-    if (firmwareDir.exists()){
-        QStringList firmwarelist = firmwareDir.entryList(QDir::Dirs);
-        firmwarelist.removeFirst();
-        firmwarelist.removeFirst();
-        ui->firmwareType->addItems(firmwarelist);
-    }
+    ui->firmwareType->addItems(firmwareimport::listAvailableFirmware());
 
     // Add the fixture types
     // TODO: Auto configuration for this?
@@ -114,6 +103,7 @@ SceneTemplate SceneConfiguration::getSceneTemplate()
     sceneTemplate.examples = "";
     sceneTemplate.controllerType = "";
     sceneTemplate.fixtureType = "";
+    sceneTemplate.firmwareName = ui->firmwareType->currentText();
     sceneTemplate.colorMode = (ColorMode)ui->ColorType->currentData().toInt();
     sceneTemplate.height = ui->fixtureHeight->text().toInt();
     sceneTemplate.width = ui->fixtureWidth->text().toInt();
@@ -170,9 +160,9 @@ void SceneConfiguration::on_controllerType_currentIndexChanged(int index)
     sceneCustomized();
 }
 
-void SceneConfiguration::on_firmwareType_currentIndexChanged(const QString &indexName)
+void SceneConfiguration::on_firmwareType_currentIndexChanged(int index)
 {
 
-    FIRMWARE_NAME = indexName;
+    sceneCustomized();
 
 }

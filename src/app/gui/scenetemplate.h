@@ -11,6 +11,7 @@ struct SceneTemplate {
     QString photo;
     QString examples;
     QString controllerType;
+    QString firmwareName;
     QString fixtureType;
     ColorMode colorMode;
     int height;

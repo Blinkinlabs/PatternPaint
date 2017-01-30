@@ -92,7 +92,8 @@ bool BlinkyTapeUploader::storePatterns(BlinkyController &blinky, QList<PatternWr
     /// Create the compressed image and check if it will fit into the device memory
     BlinkyTapeUploadData data;
 
-    if (!data.init(patternWriters)) {
+    // TODO: Pull in firmware
+    if (!data.init("test", patternWriters)) {
         errorString = data.errorString;
         return false;
     }

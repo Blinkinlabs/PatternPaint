@@ -21,7 +21,7 @@ private slots:
 
     void on_removeFirmware_clicked();
 
-    void on_FirmwareList_clicked(const QModelIndex &index);
+    void on_FirmwareList_itemSelectionChanged();
 
 private:
     Ui::FirmwareManager *ui;

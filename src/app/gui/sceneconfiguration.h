@@ -39,7 +39,7 @@ private slots:
 
     void on_controllerType_currentIndexChanged(int index);
 
-    void on_firmwareType_currentIndexChanged(const QString &indexName);
+    void on_firmwareType_currentIndexChanged(int index);
 
 private:
     Ui::SceneConfiguration *ui;
