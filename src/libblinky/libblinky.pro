@@ -27,7 +27,8 @@ HEADERS += \
     blinkypendantcommands.h \
     bytearrayhelpers.h \
     blinkytapeuploaddata.h \
-    memorysection.h
+    memorysection.h \
+    firmwareimport.h
 
 SOURCES +=  \
     fixture.cpp \
@@ -49,7 +50,8 @@ SOURCES +=  \
     blinkypendantcommands.cpp \
     bytearrayhelpers.cpp \
     blinkytapeuploaddata.cpp \
-    memorysection.cpp
+    memorysection.cpp \
+    firmwareimport.cpp
 
 # For platforms that have serial ports
 # TODO: Pull hard-coded references to BlinkyTape from the gui, allowing this section to be switchable

@@ -189,7 +189,7 @@
           <x>0</x>
           <y>0</y>
           <width>500</width>
-          <height>280</height>
+          <height>267</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -645,7 +645,7 @@
      <x>0</x>
      <y>0</y>
      <width>880</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -722,6 +722,7 @@
     <addaction name="separator"/>
     <addaction name="actionSave_to_Blinky"/>
     <addaction name="separator"/>
+    <addaction name="actionFirmware_Manager"/>
     <addaction name="actionRestore_firmware"/>
     <addaction name="separator"/>
    </widget>
@@ -1143,6 +1144,11 @@
   <action name="actionDebug_Log">
    <property name="text">
     <string>Debug Log...</string>
+   </property>
+  </action>
+  <action name="actionFirmware_Manager">
+   <property name="text">
+    <string>Firmware manager</string>
    </property>
   </action>
  </widget>

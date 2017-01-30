@@ -9,6 +9,8 @@
 #include "colorchooser.h"
 #include "patternwriter.h"
 #include "debuglog.h"
+#include "firmwaremanager.h"
+#include "firmwareimport.h"
 
 #include "blinkytape.h"
 #include "blinkytapeuploader.h"
@@ -37,13 +39,14 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QtWidgets>
-#include <QDebug>
+#include <QStandardPaths>
 
 
 #define OSX_RELEASE_APPCAST_URL \
     "https://software.blinkinlabs.com/patternpaint/patternpaint-osx.xml"
 #define WINDOWS_RELEASE_APPCAST_URL \
     "https://software.blinkinlabs.com/patternpaint/patternpaint-windows.xml"
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -635,6 +638,16 @@ void MainWindow::showError(QString errorMessage)
     box.exec();
 }
 
+
+void MainWindow::on_actionFirmware_Manager_triggered()
+{
+
+    FirmwareManager *firmwareManager = new FirmwareManager(this);
+    firmwareManager->show();
+
+}
+
+
 void MainWindow::on_actionRestore_firmware_triggered()
 {
     // If the controller doesn't exist, create a new uploader based on the blinkytape
@@ -684,6 +697,7 @@ void MainWindow::on_actionRestore_firmware_triggered()
 
 void MainWindow::on_actionSave_to_Blinky_triggered()
 {
+
     if (patternCollection.isEmpty())
         return;
 
