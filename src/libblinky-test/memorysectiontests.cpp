@@ -7,7 +7,7 @@
 void MemorySectionTests::nameSetTest()
 {
     QString name("name");
-    int address = 32;
+    unsigned int address = 32;
     QByteArray data('x', 32);
 
     MemorySection testSection(name, address, data);

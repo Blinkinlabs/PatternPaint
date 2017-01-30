@@ -16,19 +16,21 @@ TIMESTAMP_SERVER='http://timestamp.globalsign.com/scripts/timstamp.dll'
 
 ################# Library Locations #############################
 # Location of the MINGW libraries (Installed as part of Qt)
-QTDIR='/c/Qt/Qt5.7.0'
-QT_DIST=${QTDIR}'/5.7/mingw53_32'
-MINGW_BIN=${QTDIR}'/Tools/mingw530_32/bin'
+QTDIR=/c/Qt/Qt5.7.0
+QT_DIST=${QTDIR}/5.7/mingw53_32
+MINGW_BIN=${QTDIR}/Tools/mingw530_32/bin
 
-QMAKE=${QT_DIST}'/bin/qmake.exe'
-MAKE=${MINGW_BIN}'/mingw32-make.exe'
+QMAKE=${QT_DIST}/bin/qmake
+MAKE=${MINGW_BIN}/mingw32-make
+
+# Project root
+BASEDIR=`pwd`
 
 # location of the source tree
-SOURCEDIR=`pwd`'/src'
+SOURCEDIR=${BASEDIR}/src
 
 # Location to build PatternPaint
-BUILDDIR=`pwd`'/build-dist-windows'
-
+BUILDDIR=${BASEDIR}/build-dist-windows
 
 # Location of the Windows SDK and WDK
 WIN_KIT_SIGNTOOL='/c/Program Files (x86)/Windows Kits/10'
@@ -37,29 +39,28 @@ WIN_KIT_DPINST='/c/Program Files (x86)/Windows Kits/8.1'
 # Location of NSIS
 NSIS='/c/Program Files (x86)/NSIS'
 
-
 # Staging directory for assembling the installer
-OUTDIR=${BUILDDIR}'/bin'
+OUTDIR=${BUILDDIR}/bin
 
-DRIVERS='windows-drivers'
+DRIVERS=${BASEDIR}/windows-drivers
 
 # Blinkinlabs32u4_boards repository (for the BlinkyTape driver)
-BLINKYTAPE=${DRIVERS}'/Blinkinlabs32u4_boards'
+BLINKYTAPE=${DRIVERS}/Blinkinlabs32u4_boards
 
 # BlinkyTile repository (for the LightBuddy driver)
-BLINKYTILE=${DRIVERS}'/Blinkytile'
+BLINKYTILE=${DRIVERS}/Blinkytile
 
 # BlinkyPendant repository (for the BlinkyPendant driver)
-BLINKYPENDANT=${DRIVERS}'/Blinkypendant'
+BLINKYPENDANT=${DRIVERS}/Blinkypendant
 
 # EightByEight repository (for the EightByEight driver)
-EIGHTBYEIGHT=${DRIVERS}'/EightByEight'
+EIGHTBYEIGHT=${DRIVERS}/EightByEight
 
 # Winsparkle library release
-WINSPARKLE='thirdparty/WinSparkle-0.5.2'
+WINSPARKLE=${BASEDIR}/thirdparty/WinSparkle-0.5.2
 
 # libusb library release
-LIBUSB='thirdparty/libusb-1.0.20-win'
+LIBUSB=${BASEDIR}/thirdparty/libusb-1.0.20-win
 
 
 
@@ -67,6 +68,25 @@ LIBUSB='thirdparty/libusb-1.0.20-win'
 source ./gitversion.sh
 
 
+################## Build PatternPaint ###################
+mkdir -p ${BUILDDIR}
+pushd ${BUILDDIR}
+
+${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
+	-r \
+	-spec win32-g++
+	
+#${MAKE} clean
+PATH=${MINGW_BIN}:${PATH} ${MAKE} -j6
+
+popd
+
+################## Run Unit Tests ##############################
+pushd ${BUILDDIR}
+
+PATH=${PATH}:libblinky/release:${QT_DIST}/bin:${QT_DIST}/plugins/platforms:${WINSPARKLE}/release:${LIBUSB}/MinGW32/dll libblinky-test/release/libblinky-test
+
+popd
 
 ################## Get device driver repositories ##############
 function getRepo {
@@ -87,21 +107,6 @@ getRepo ${BLINKYTAPE} https://github.com/Blinkinlabs/Blinkinlabs32u4_boards.git
 getRepo ${BLINKYTILE} https://github.com/Blinkinlabs/BlinkyTile.git
 getRepo ${BLINKYPENDANT} https://github.com/Blinkinlabs/BlinkyPendant.git
 getRepo ${EIGHTBYEIGHT} https://github.com/Blinkinlabs/EightByEight.git
-
-
-################## Build PatternPaint ###################
-mkdir -p ${BUILDDIR}
-pushd ${BUILDDIR}
-
-
-${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
-	-r \
-	-spec win32-g++
-	
-${MAKE} clean
-PATH=${MINGW_BIN}:${PATH} ${MAKE} -j6
-
-popd
 
 ################## Package Everything ############################
 mkdir -p ${OUTDIR}
@@ -207,7 +212,7 @@ sed -i 's/VERSION_STRING/'${VERSION}'/g' patternpaint.nsi
 # TODO: This grep isn't working.
 #grep -q "${VERSION}" patternpaint.nsi
 
-"${NSIS}/makensis.exe" patternpaint.nsi
+"${NSIS}/makensis" patternpaint.nsi
 rm patternpaint.nsi
 
 if [ -z "$SIGNING_ID" ]; then
@@ -221,7 +226,7 @@ if [ -z "$SIGNING_ID" ]; then
     echo "**************************************************************"
 else
     # Sign the installer
-    "${WIN_KIT_SIGNTOOL}/bin/x86/signtool.exe" sign //v //ac ${ROOT_CERTIFICATE} //n "${SIGNING_ID}" //fd sha256 //tr ${TIMESTAMP_SERVER} //td sha256 //a PatternPaint\ Windows\ Installer.exe
+    "${WIN_KIT_SIGNTOOL}/bin/x86/signtool" sign //v //ac ${ROOT_CERTIFICATE} //n "${SIGNING_ID}" //fd sha256 //tr ${TIMESTAMP_SERVER} //td sha256 //a PatternPaint\ Windows\ Installer.exe
 fi
 
 mv "PatternPaint Windows Installer.exe" "PatternPaint_Installer_"${VERSION}".exe"
