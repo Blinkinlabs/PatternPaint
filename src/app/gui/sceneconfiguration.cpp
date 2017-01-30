@@ -30,7 +30,7 @@ SceneConfiguration::SceneConfiguration(QWidget *parent) :
 // ui->controllerBox->setVisible(false);
 
     // Add the Firmware types
-    ui->firmwareType->addItems(firmwareimport::listAvailableFirmware());
+    ui->firmwareName->addItems(firmwareimport::listAvailableFirmware());
 
     // Add the fixture types
     // TODO: Auto configuration for this?
@@ -54,7 +54,7 @@ void SceneConfiguration::setSceneTemplate(SceneTemplate sceneTemplate)
 {
     setControllerType(sceneTemplate.controllerType);
     setFixtureType(sceneTemplate.fixtureType);
-
+    setFirmwareName(sceneTemplate.firmwareName);
     setColorMode(sceneTemplate.colorMode);
     setFixtureSize(QSize(sceneTemplate.width, sceneTemplate.height));
 }
@@ -95,6 +95,13 @@ void SceneConfiguration::setFixtureType(QString type)
     ui->FixtureType->blockSignals(false);
 }
 
+void SceneConfiguration::setFirmwareName(QString type)
+{
+    ui->firmwareName->blockSignals(true);
+    ui->firmwareName->setCurrentText(type);
+    ui->firmwareName->blockSignals(false);
+}
+
 SceneTemplate SceneConfiguration::getSceneTemplate()
 {
     SceneTemplate sceneTemplate;
@@ -103,7 +110,7 @@ SceneTemplate SceneConfiguration::getSceneTemplate()
     sceneTemplate.examples = "";
     sceneTemplate.controllerType = "";
     sceneTemplate.fixtureType = "";
-    sceneTemplate.firmwareName = ui->firmwareType->currentText();
+    sceneTemplate.firmwareName = ui->firmwareName->currentText();
     sceneTemplate.colorMode = (ColorMode)ui->ColorType->currentData().toInt();
     sceneTemplate.height = ui->fixtureHeight->text().toInt();
     sceneTemplate.width = ui->fixtureWidth->text().toInt();
@@ -160,9 +167,7 @@ void SceneConfiguration::on_controllerType_currentIndexChanged(int index)
     sceneCustomized();
 }
 
-void SceneConfiguration::on_firmwareType_currentIndexChanged(int index)
+void SceneConfiguration::on_firmwareName_currentIndexChanged(int index)
 {
-
     sceneCustomized();
-
 }

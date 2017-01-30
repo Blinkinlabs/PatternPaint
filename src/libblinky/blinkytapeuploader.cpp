@@ -4,6 +4,7 @@
 #include "ProductionSketch.h"
 #include "blinkycontroller.h"
 #include "blinkytapeuploaddata.h"
+#include "firmwareimport.h"
 
 
 #include <QDebug>
@@ -92,8 +93,11 @@ bool BlinkyTapeUploader::storePatterns(BlinkyController &blinky, QList<PatternWr
     /// Create the compressed image and check if it will fit into the device memory
     BlinkyTapeUploadData data;
 
-    // TODO: Pull in firmware
-    if (!data.init("test", patternWriters)) {
+    // TODO: Get this from the current scene rather than from preferences
+    QSettings settings;
+    QString firmwareName = settings.value("BlinkyTape/firmwareName", DEFAULT_FIRMWARE_NAME).toString();
+
+    if (!data.init(firmwareName, patternWriters)) {
         errorString = data.errorString;
         return false;
     }

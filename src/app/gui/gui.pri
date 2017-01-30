@@ -15,7 +15,6 @@ HEADERS += \
     $$PWD/preferences.h \
     $$PWD/sceneconfiguration.h \
     $$PWD/defaults.h \
-    $$PWD/scenetemplate.h \
     $$PWD/patternframelistview.h \
     $$PWD/eventratelimiter.h \
     $$PWD/outputpreview.h \
@@ -37,7 +36,6 @@ SOURCES += \
     $$PWD/welcomescreen.cpp \
     $$PWD/preferences.cpp \
     $$PWD/sceneconfiguration.cpp \
-    $$PWD/scenetemplate.cpp \
     $$PWD/patternframelistview.cpp \
     $$PWD/eventratelimiter.cpp \
     $$PWD/outputpreview.cpp \

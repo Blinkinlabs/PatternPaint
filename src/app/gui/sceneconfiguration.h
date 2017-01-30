@@ -39,12 +39,13 @@ private slots:
 
     void on_controllerType_currentIndexChanged(int index);
 
-    void on_firmwareType_currentIndexChanged(int index);
+    void on_firmwareName_currentIndexChanged(int index);
 
 private:
     Ui::SceneConfiguration *ui;
 
     void setControllerType(QString type);
+    void setFirmwareName(QString type);
     void setFixtureType(QString type);
     void setFixtureSize(QSize size);
     void setColorMode(ColorMode mode);

@@ -33,6 +33,7 @@
 #include "matrixfixture.h"
 #include "preferences.h"
 #include "defaults.h"
+#include "firmwareimport.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -1194,16 +1195,23 @@ void MainWindow::on_actionConfigure_Fixture_triggered()
 {
     SceneConfiguration sceneConfiguration(this);
 
-    // To do: save the controller and fixture types so that we can recall them here.
+    // Keep a persistant scene template around that's loaded/saved with program start
     SceneTemplate sceneTemplate;
-    if (!controller.isNull())
+    if (!controller.isNull()) {
         sceneTemplate.controllerType = controller->getName();
+    }
+
     if (!fixture.isNull()) {
         sceneTemplate.fixtureType = fixture->getName();
         sceneTemplate.colorMode = fixture->getColorMode();
         sceneTemplate.height = fixture->getSize().height();
         sceneTemplate.width = fixture->getSize().width();
     }
+
+    QSettings settings;
+    sceneTemplate.firmwareName = settings.value("BlinkyTape/firmwareName", DEFAULT_FIRMWARE_NAME).toString();
+
+    qDebug() << "FirmwareName: " << sceneTemplate.firmwareName;
 
     sceneConfiguration.setSceneTemplate(sceneTemplate);
     sceneConfiguration.exec();
@@ -1212,6 +1220,10 @@ void MainWindow::on_actionConfigure_Fixture_triggered()
         return;
 
     applyScene(sceneConfiguration.getSceneTemplate());
+
+    // TODO: roll this into the persistant sceneTemplate
+    settings.setValue("BlinkyTape/firmwareName",sceneConfiguration.getSceneTemplate().firmwareName);
+    qDebug() << "FirmwareName: " << sceneConfiguration.getSceneTemplate().firmwareName;
 }
 
 void MainWindow::openPattern(Pattern::PatternType type)
@@ -1233,7 +1245,6 @@ void MainWindow::openPattern(Pattern::PatternType type)
     QFileInfo fileInfo(fileName);
     settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
 
-    // TODO: choose scrolling/frame-based
     if (!loadPattern(type, fileName)) {
         showError(tr("Could not open file %1. Perhaps it has a formatting problem?")
                   .arg(fileName));
