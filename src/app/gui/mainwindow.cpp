@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include "colormode.h"
-#include "brightnessmodel.h"
+#include "exponentialbrightness.h"
 #include "systeminformation.h"
 #include "aboutpatternpaint.h"
 #include "sceneconfiguration.h"

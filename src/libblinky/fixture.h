@@ -8,7 +8,7 @@
 #include <QSize>
 
 #include "colormode.h"
-#include "brightnessmodel.h"
+#include "exponentialbrightness.h"
 
 class Fixture : public QObject
 {

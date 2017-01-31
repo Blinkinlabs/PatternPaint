@@ -9,7 +9,6 @@ HEADERS += \
     fixture.h \
     matrixfixture.h \
     colormode.h \
-    brightnessmodel.h\
     pattern.h \
     patternmodel.h \
     patternwriter.h \
@@ -29,13 +28,14 @@ HEADERS += \
     blinkytapeuploaddata.h \
     memorysection.h \
     firmwareimport.h \
-    scenetemplate.h
+    scenetemplate.h \
+    exponentialbrightness.h \
+    brightnessmodel.h
 
 SOURCES +=  \
     fixture.cpp \
     matrixfixture.cpp \
     colormode.cpp \
-    brightnessmodel.cpp \
     pattern.cpp \
     patternwriter.cpp \
     patternframemodel.cpp \
@@ -53,7 +53,8 @@ SOURCES +=  \
     blinkytapeuploaddata.cpp \
     memorysection.cpp \
     firmwareimport.cpp \
-    scenetemplate.cpp
+    scenetemplate.cpp \
+    exponentialbrightness.cpp
 
 # For platforms that have serial ports
 # TODO: Pull hard-coded references to BlinkyTape from the gui, allowing this section to be switchable

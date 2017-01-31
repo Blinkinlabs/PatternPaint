@@ -28,7 +28,7 @@ A fixture is an arrangement of LEDs. Pattern paint supports the following fixtur
 
 * Linear: Single strip of LEDs spaced evenly along a row (BlinkyTape)
 * Matrix: A grid of LEDs (BlinkyMatrix)
-* Arbitrary: 2d arrangement of LEDs in any arbitrary posisitons (BlinkyTile, BlinkyPixels) (coming soon)
+* Mapped: 2d arrangement of LEDs in any arbitrary posisitons (BlinkyTile, BlinkyPixels)
 
 # Patterns
 

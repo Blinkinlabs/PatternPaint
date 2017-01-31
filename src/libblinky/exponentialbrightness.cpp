@@ -1,4 +1,4 @@
-#include "brightnessmodel.h"
+#include "exponentialbrightness.h"
 
 #include <cmath>
 
