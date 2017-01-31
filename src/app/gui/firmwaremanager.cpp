@@ -41,14 +41,25 @@ void FirmwareManager::on_addFirmware_clicked()
     // TODO: Store the new directory here if successful.
 
     firmwareimport::addFirmware(dirSource);
+    // TODO: Message if not successful
 
     fillFirmwareList();
 }
 
 void FirmwareManager::on_removeFirmware_clicked()
 {
+
     for(QListWidgetItem *item : ui->FirmwareList->selectedItems()) {
-        firmwareimport::removeFirmware(item->text());
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Delete firmware");
+        msgBox.setText(QString("Are you sure if you want to delete the firmware %1 ?").arg(item->text()));
+        msgBox.setStandardButtons(QMessageBox::Yes);
+        msgBox.addButton(QMessageBox::No);
+        msgBox.setDefaultButton(QMessageBox::No);
+        if(msgBox.exec() == QMessageBox::Yes){
+            firmwareimport::removeFirmware(item->text());
+        }
+
     }
 
     fillFirmwareList();
