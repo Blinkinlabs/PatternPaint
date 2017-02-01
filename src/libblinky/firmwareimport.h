@@ -5,6 +5,9 @@
 
 #define FIRMWARE_FOLDER "/Pattern Paint/Firmware/" /// Default folder for Firmware import
 #define DEFAULT_FIRMWARE_NAME "Default"
+#define FIRMWARE_DESCRIPTION_FILE "README.md"
+
+extern QString errorStringFirmware;
 
 class firmwareimport
 {
