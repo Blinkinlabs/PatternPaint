@@ -1211,8 +1211,6 @@ void MainWindow::on_actionConfigure_Fixture_triggered()
     QSettings settings;
     sceneTemplate.firmwareName = settings.value("BlinkyTape/firmwareName", DEFAULT_FIRMWARE_NAME).toString();
 
-    qDebug() << "FirmwareName: " << sceneTemplate.firmwareName;
-
     sceneConfiguration.setSceneTemplate(sceneTemplate);
     sceneConfiguration.exec();
 
@@ -1223,7 +1221,7 @@ void MainWindow::on_actionConfigure_Fixture_triggered()
 
     // TODO: roll this into the persistant sceneTemplate
     settings.setValue("BlinkyTape/firmwareName",sceneConfiguration.getSceneTemplate().firmwareName);
-    qDebug() << "FirmwareName: " << sceneConfiguration.getSceneTemplate().firmwareName;
+
 }
 
 void MainWindow::openPattern(Pattern::PatternType type)

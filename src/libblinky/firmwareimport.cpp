@@ -5,6 +5,9 @@
 #include <QDebug>
 #include <QStandardPaths>
 
+#define BUFF_LENGTH 100
+
+
 QStringList firmwareimport::listAvailableFirmware() {
     QStringList firmwareNames;
 
@@ -83,6 +86,8 @@ bool firmwareimport::addFirmware(const QString &dirSource) {
         return false;
     }
 
+    qDebug() << "add firmware:" << firmwareDirSource.dirName();
+
     // TODO: Test if there is at least a valid .hex file in the directory before doing anything.
 
     // create firmwarefolder
@@ -95,6 +100,7 @@ bool firmwareimport::addFirmware(const QString &dirSource) {
         firmwareDirDestination.mkpath(".");
     }else{
         qDebug() << "Firmware folder already exists";
+        return false;
     }
 
     // TODO: Bail if the destination directory is not created
@@ -150,50 +156,118 @@ const QString& firmwareimport::getName() const {
 
 bool firmwareimport::firmwareRead(const QString& filename)
 {
+
+    char buff[BUFF_LENGTH];
+
+
     // read HEX file
     qDebug() << "read firmware: " << filename;
 
-    //read line
     QFile inputFile(filename);
-    if (inputFile.open(QIODevice::ReadOnly))
+    if (!inputFile.open(QIODevice::ReadOnly))
     {
-       data.clear();
-       QTextStream in(&inputFile);
-       while (!in.atEnd())
-       {
-          //read colon
-          QString line = in.readLine();
-          if(line.at(0)==':'){
-              //read data lenght
-              bool bStatus = false;
-              unsigned int dataLenght = line.mid(1,2).toUInt(&bStatus,16);
-              if(bStatus==true){
-                  for(unsigned int i=0; i<dataLenght<<1; i+=2){
-                      //read data
-                      uint8_t dataByte = line.mid(i+9,2).toUInt(&bStatus,16);
-                      if(bStatus==true){
-                          data.append(static_cast<char>(dataByte));
-                      }else{
-                          qDebug("Format error in hex file, data can not be read");
-                          return false;
-                      }
-                  }
-              }else{
-                  qDebug("Format error in hex file, address can not be read");
-                  return false;
-              }
-          }else{
-              qDebug("Format error in hex file, colon is missing");
-              return false;
-          }
-       }
-       inputFile.close();
-       qDebug() << "Firmware size: " << data.count() << "bytes";
-       //qDebug() << FIRMWARE_DATA;
-       return true;
+        qDebug("hex file can not be read");
+        return false;
+    }
+
+    data.clear();
+    unsigned int dataAddressNext = 0;
+
+    QTextStream in(&inputFile);
+    while (!in.atEnd()){
+
+        //read line
+        QString line = in.readLine();
+        bool bStatus;
+
+        // TODO: Move the part of the test to libblinky-test
+
+        //read colon
+        if(line.at(0)!=':'){
+            qDebug("Format error in hex file, colon is missing");
+            return false;
+        }
+
+        //read data lenght
+        unsigned int dataLenght = line.mid(1,2).toUInt(&bStatus,16);
+        if(!bStatus){
+            qDebug("Format error in hex file, data lenght can not be read");
+            return false;
+        }
+
+        //read data address
+        unsigned int dataAddress = line.mid(3,4).toUInt(&bStatus,16);
+        if(!bStatus){
+            qDebug("Format error in hex file, address can not be read");
+            return false;
+        }
+
+        //read data type
+        unsigned int dataType = line.mid(7,2).toUInt(&bStatus,16);
+        if(!bStatus){
+            qDebug("Format error in hex file, data type can not be read");
+            return false;
+        }
+
+
+        switch(dataType){
+
+        // data
+        case 0x00:
+            if(int(11+dataLenght*2)!=line.length()){
+                qDebug("Format error in hex file, incorrect data length");
+                return false;
+            }else if(dataAddressNext != dataAddress){
+                qDebug("Format error in hex file, address is false");
+                return false;
+            }
+            dataAddressNext = dataAddress + dataLenght;
+
+            for(unsigned int i=0; i<dataLenght<<1; i+=2){
+                //read data
+                uint8_t dataByte = line.mid(i+9,2).toUInt(&bStatus,16);
+                if(bStatus==true){
+                    data.append(static_cast<char>(dataByte));
+                }else{
+                    qDebug("Format error in hex file, data can not be read");
+                    return false;
+                }
+            }
+
+            break;
+
+        // end of file
+        case 0x01:
+            break;
+
+
+        }
+
+
+        //read checksum
+        unsigned int checksum = line.mid(line.length()-2,2).toUInt(&bStatus,16);
+        if(!bStatus){
+            qDebug("Format error in hex file, checksum can not be read");
+            return false;
+        }
+
+        // calculate checksum
+        unsigned int checksumData = 0;
+        for(int i=1;i<line.length(); i+=2){
+            checksumData += line.mid(i,2).toUInt(&bStatus,16);
+        }
+        if(checksumData & 0xFF){
+            qDebug("Format error in hex file, checksum is false");
+            return false;
+        }
 
     }
 
-    return false;
+
+    inputFile.close();
+    snprintf(buff, BUFF_LENGTH,"Firmware size: %iB",data.count());
+    qDebug() << buff;
+
+    return true;
 
 }
