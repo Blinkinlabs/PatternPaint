@@ -38,10 +38,16 @@ void FirmwareManager::on_addFirmware_clicked()
                                                 QFileDialog::ShowDirsOnly
                                                 | QFileDialog::DontResolveSymlinks);
 
-    // TODO: Store the new directory here if successful.
+    if(dirSource=="")return;
 
-    firmwareimport::addFirmware(dirSource);
-    // TODO: Message if not successful
+    if(!firmwareimport::addFirmware(dirSource)){
+        qDebug() << "ERROR:" << errorStringFirmware;
+        QMessageBox msgBox(this);
+        msgBox.setWindowModality(Qt::WindowModal);
+        msgBox.setText(errorStringFirmware);
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+    }
 
     fillFirmwareList();
 }
@@ -50,8 +56,9 @@ void FirmwareManager::on_removeFirmware_clicked()
 {
 
     for(QListWidgetItem *item : ui->FirmwareList->selectedItems()) {
-        QMessageBox msgBox;
-        msgBox.setWindowTitle("Delete firmware");
+
+        QMessageBox msgBox(this);
+        msgBox.setWindowModality(Qt::WindowModal);
         msgBox.setText(QString("Are you sure if you want to delete the firmware %1 ?").arg(item->text()));
         msgBox.setStandardButtons(QMessageBox::Yes);
         msgBox.addButton(QMessageBox::No);

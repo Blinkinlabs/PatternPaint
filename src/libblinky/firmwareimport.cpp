@@ -5,7 +5,12 @@
 #include <QDebug>
 #include <QStandardPaths>
 
+
 #define BUFF_LENGTH 100
+char buff[BUFF_LENGTH];
+
+
+QString errorStringFirmware;
 
 
 QStringList firmwareimport::listAvailableFirmware() {
@@ -39,7 +44,8 @@ QString firmwareimport::getFirmwareDescription(const QString &name) {
     QString documents = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
     documents.append(FIRMWARE_FOLDER);
     documents.append(name);
-    documents.append("/README.md");
+    documents.append("/");
+    documents.append(FIRMWARE_DESCRIPTION_FILE);
 
     QFile inputFile(documents);
     if (!inputFile.open(QIODevice::ReadOnly))
@@ -64,7 +70,8 @@ bool firmwareimport::removeFirmware(const QString &name) {
         return false;
     }
 
-    qDebug() << "remove Firmware:" << name;
+    snprintf(buff, BUFF_LENGTH,"remove Firmware: %s",(const char *)((QByteArray)name.toLatin1()).data());
+    qDebug() << buff;
 
     QString documents = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
     documents.append(FIRMWARE_FOLDER);
@@ -86,9 +93,8 @@ bool firmwareimport::addFirmware(const QString &dirSource) {
         return false;
     }
 
-    qDebug() << "add firmware:" << firmwareDirSource.dirName();
-
-    // TODO: Test if there is at least a valid .hex file in the directory before doing anything.
+    snprintf(buff, BUFF_LENGTH,"add firmware: %s",(const char *)((QByteArray)(firmwareDirSource.dirName().toLatin1()).data()));
+    qDebug() << buff;
 
     // create firmwarefolder
     QString dirDestination = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
@@ -96,14 +102,16 @@ bool firmwareimport::addFirmware(const QString &dirSource) {
     dirDestination.append(firmwareDirSource.dirName());
     QDir firmwareDirDestination(dirDestination);
     if (!firmwareDirDestination.exists()){
-        qDebug() << "Firmware folder is created";
-        firmwareDirDestination.mkpath(".");
+        if(firmwareDirDestination.mkpath(".")){
+            qDebug() << "Firmware folder is created";
+        }else{
+            errorStringFirmware = "can not create firmware folder";
+            return false;
+        }
     }else{
-        qDebug() << "Firmware folder already exists";
+        errorStringFirmware = "Firmware folder already exists, please remove first";
         return false;
     }
-
-    // TODO: Bail if the destination directory is not created
 
     // copy hex file
     QString fileSource = dirSource;
@@ -119,27 +127,40 @@ bool firmwareimport::addFirmware(const QString &dirSource) {
     QFile hexFile(fileSource);
     if (hexFile.open(QIODevice::ReadOnly))
     {
-        qDebug() << "copy hex file" ;
-        QFile::copy(fileSource, fileDestination);
+        if(QFile::copy(fileSource, fileDestination)){
+            snprintf(buff, BUFF_LENGTH,"copy Firmware file: %s.hex",(const char *)((QByteArray)(firmwareDirSource.dirName().toLatin1()).data()));
+            qDebug() << buff;
+        }else{
+            errorStringFirmware = "can not copy Firmware hex file";
+            removeFirmware(firmwareDirSource.dirName());
+            return false;
+        }
     }else{
-        qDebug() << "hex file not found";
+        errorStringFirmware = "Firmware hex file not found";
+        removeFirmware(firmwareDirSource.dirName());
         return false;
     }
 
-    // copy README.md file
+    // copy description file
     fileSource = dirSource;
-    fileSource.append("/README.md");
+    fileSource.append("/");
+    fileSource.append(FIRMWARE_DESCRIPTION_FILE);
 
     fileDestination = dirDestination;
-    fileDestination.append("/README.md");
+    fileDestination.append("/");
+    fileDestination.append(FIRMWARE_DESCRIPTION_FILE);
 
     QFile readmeFile(fileSource);
     if (readmeFile.open(QIODevice::ReadOnly))
     {
-        qDebug() << "copy README.md";
-        QFile::copy(fileSource, fileDestination);
+        if(QFile::copy(fileSource, fileDestination)){
+            snprintf(buff, BUFF_LENGTH,"copy Firmware description: %s",FIRMWARE_DESCRIPTION_FILE);
+            qDebug() << buff;
+        }else{
+            qDebug() << "can not copy Firmware description file";
+        }
     }else{
-        qDebug() << "README.md not found";
+        qDebug() << "no Firmware description file found";
     }
 
     return true;
@@ -156,9 +177,6 @@ const QString& firmwareimport::getName() const {
 
 bool firmwareimport::firmwareRead(const QString& filename)
 {
-
-    char buff[BUFF_LENGTH];
-
 
     // read HEX file
     qDebug() << "read firmware: " << filename;
@@ -179,8 +197,6 @@ bool firmwareimport::firmwareRead(const QString& filename)
         //read line
         QString line = in.readLine();
         bool bStatus;
-
-        // TODO: Move the part of the test to libblinky-test
 
         //read colon
         if(line.at(0)!=':'){
@@ -240,6 +256,9 @@ bool firmwareimport::firmwareRead(const QString& filename)
         case 0x01:
             break;
 
+        default:
+            qDebug("Format error in hex file, data type not recognized");
+            return false;
 
         }
 
