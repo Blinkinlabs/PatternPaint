@@ -7,6 +7,12 @@
 #include <QPointer>
 #include <QDebug>
 
+MemoryInfo memoryInfo {
+    false,
+    0,
+    0
+};
+
 BlinkyController::BlinkyController(QObject *parent) : QObject(parent)
 {
 }
