@@ -22,10 +22,10 @@ private:
     QString errorString;
 };
 
-class firmwareimporter
+class FirmwareReader
 {
 public:
-    bool firmwareRead(const QString &filename);
+    bool load(const QString &filename);
 
     const QByteArray &getData() const;
     const QString &getName() const;

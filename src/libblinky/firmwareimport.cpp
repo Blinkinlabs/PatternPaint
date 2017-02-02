@@ -168,15 +168,15 @@ QString FirmwareStore::getErrorString() const {
 }
 
 
-const QByteArray& firmwareimporter::getData() const {
+const QByteArray& FirmwareReader::getData() const {
     return data;
 }
 
-const QString& firmwareimporter::getName() const {
+const QString& FirmwareReader::getName() const {
     return name;
 }
 
-bool firmwareimporter::firmwareRead(const QString& filename)
+bool FirmwareReader::load(const QString& filename)
 {
 
     // read HEX file
