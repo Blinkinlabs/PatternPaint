@@ -10,10 +10,7 @@
 char buff[BUFF_LENGTH];
 
 
-QString errorStringFirmware;
-
-
-QStringList firmwareimport::listAvailableFirmware() {
+QStringList FirmwareStore::listAvailableFirmware() {
     QStringList firmwareNames;
 
     firmwareNames.push_back(DEFAULT_FIRMWARE_NAME);
@@ -32,7 +29,7 @@ QStringList firmwareimport::listAvailableFirmware() {
     return firmwareNames;
 }
 
-QString firmwareimport::getFirmwareDescription(const QString &name) {
+QString FirmwareStore::getFirmwareDescription(const QString &name) {
 
     if(name==DEFAULT_FIRMWARE_NAME){
         return QString()
@@ -64,29 +61,7 @@ QString firmwareimport::getFirmwareDescription(const QString &name) {
     return description;
 }
 
-bool firmwareimport::removeFirmware(const QString &name) {
-
-    if (name == DEFAULT_FIRMWARE_NAME) {
-        return false;
-    }
-
-    snprintf(buff, BUFF_LENGTH,"remove Firmware: %s",(const char *)((QByteArray)name.toLatin1()).data());
-    qDebug() << buff;
-
-    QString documents = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-    documents.append(FIRMWARE_FOLDER);
-    documents.append(name);
-    QDir firmwareDir(documents);
-
-    if(!firmwareDir.exists()) {
-        return false;
-    }
-
-    firmwareDir.removeRecursively();
-    return true;
-}
-
-bool firmwareimport::addFirmware(const QString &dirSource) {
+bool FirmwareStore::addFirmware(const QString &dirSource) {
 
     QDir firmwareDirSource(dirSource);
     if (!firmwareDirSource.exists()){
@@ -105,11 +80,11 @@ bool firmwareimport::addFirmware(const QString &dirSource) {
         if(firmwareDirDestination.mkpath(".")){
             qDebug() << "Firmware folder is created";
         }else{
-            errorStringFirmware = "can not create firmware folder";
+            errorString = "can not create firmware folder";
             return false;
         }
     }else{
-        errorStringFirmware = "Firmware folder already exists, please remove first";
+        errorString = "Firmware folder already exists, please remove first";
         return false;
     }
 
@@ -131,12 +106,12 @@ bool firmwareimport::addFirmware(const QString &dirSource) {
             snprintf(buff, BUFF_LENGTH,"copy Firmware file: %s.hex",(const char *)((QByteArray)(firmwareDirSource.dirName().toLatin1()).data()));
             qDebug() << buff;
         }else{
-            errorStringFirmware = "can not copy Firmware hex file";
+            errorString = "can not copy Firmware hex file";
             removeFirmware(firmwareDirSource.dirName());
             return false;
         }
     }else{
-        errorStringFirmware = "Firmware hex file not found";
+        errorString = "Firmware hex file not found";
         removeFirmware(firmwareDirSource.dirName());
         return false;
     }
@@ -166,16 +141,42 @@ bool firmwareimport::addFirmware(const QString &dirSource) {
     return true;
 }
 
+bool FirmwareStore::removeFirmware(const QString &name) {
 
-const QByteArray& firmwareimport::getData() const {
+    if (name == DEFAULT_FIRMWARE_NAME) {
+        return false;
+    }
+
+    snprintf(buff, BUFF_LENGTH,"remove Firmware: %s",(const char *)((QByteArray)name.toLatin1()).data());
+    qDebug() << buff;
+
+    QString documents = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    documents.append(FIRMWARE_FOLDER);
+    documents.append(name);
+    QDir firmwareDir(documents);
+
+    if(!firmwareDir.exists()) {
+        return false;
+    }
+
+    firmwareDir.removeRecursively();
+    return true;
+}
+
+QString FirmwareStore::getErrorString() const {
+    return errorString;
+}
+
+
+const QByteArray& firmwareimporter::getData() const {
     return data;
 }
 
-const QString& firmwareimport::getName() const {
+const QString& firmwareimporter::getName() const {
     return name;
 }
 
-bool firmwareimport::firmwareRead(const QString& filename)
+bool firmwareimporter::firmwareRead(const QString& filename)
 {
 
     // read HEX file

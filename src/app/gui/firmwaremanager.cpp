@@ -40,11 +40,13 @@ void FirmwareManager::on_addFirmware_clicked()
 
     if(dirSource=="")return;
 
-    if(!firmwareimport::addFirmware(dirSource)){
-        qDebug() << "ERROR:" << errorStringFirmware;
+    FirmwareStore firmwareStore;
+
+    if(!firmwareStore.addFirmware(dirSource)){
+        qDebug() << "ERROR:" << firmwareStore.getErrorString();
         QMessageBox msgBox(this);
         msgBox.setWindowModality(Qt::WindowModal);
-        msgBox.setText(errorStringFirmware);
+        msgBox.setText(firmwareStore.getErrorString());
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.exec();
     }
@@ -59,12 +61,14 @@ void FirmwareManager::on_removeFirmware_clicked()
 
         QMessageBox msgBox(this);
         msgBox.setWindowModality(Qt::WindowModal);
-        msgBox.setText(QString("Are you sure if you want to delete the firmware %1 ?").arg(item->text()));
+        msgBox.setText(QString("Are you sure you want to delete the firmware %1 ?").arg(item->text()));
         msgBox.setStandardButtons(QMessageBox::Yes);
         msgBox.addButton(QMessageBox::No);
         msgBox.setDefaultButton(QMessageBox::No);
         if(msgBox.exec() == QMessageBox::Yes){
-            firmwareimport::removeFirmware(item->text());
+            // TODO: show error if firmware could not be deleted
+            FirmwareStore firmwareStore;
+            firmwareStore.removeFirmware(item->text());
         }
 
     }
@@ -75,7 +79,7 @@ void FirmwareManager::on_removeFirmware_clicked()
 void FirmwareManager::fillFirmwareList()
 {
     ui->FirmwareList->clear();
-    ui->FirmwareList->addItems(firmwareimport::listAvailableFirmware());
+    ui->FirmwareList->addItems(FirmwareStore::listAvailableFirmware());
 
     on_FirmwareList_itemSelectionChanged();
 }
@@ -93,7 +97,7 @@ void FirmwareManager::on_FirmwareList_itemSelectionChanged()
 
     QString selectedFirmwareName = ui->FirmwareList->selectedItems().at(0)->text();
 
-    ui->FirmwareText->setText(firmwareimport::getFirmwareDescription(selectedFirmwareName));
+    ui->FirmwareText->setText(FirmwareStore::getFirmwareDescription(selectedFirmwareName));
 
     QTextCursor cursor = ui->FirmwareText->textCursor();
     cursor.setPosition(0);

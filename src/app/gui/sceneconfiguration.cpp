@@ -31,7 +31,7 @@ SceneConfiguration::SceneConfiguration(QWidget *parent) :
 // ui->controllerBox->setVisible(false);
 
     // Add the Firmware types
-    ui->firmwareName->addItems(firmwareimport::listAvailableFirmware());
+    ui->firmwareName->addItems(FirmwareStore::listAvailableFirmware());
 
     // Add the fixture types
     // TODO: Auto configuration for this?

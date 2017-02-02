@@ -7,17 +7,23 @@
 #define DEFAULT_FIRMWARE_NAME "Default"
 #define FIRMWARE_DESCRIPTION_FILE "README.md"
 
-extern QString errorStringFirmware;
-
-class firmwareimport
+class FirmwareStore
 {
 public:
     static QStringList listAvailableFirmware();
     static QString getFirmwareDescription(const QString &name);
 
-    static bool removeFirmware(const QString &name);
-    static bool addFirmware(const QString &dirSource);
+    bool addFirmware(const QString &dirSource);
+    bool removeFirmware(const QString &name);
 
+    QString getErrorString() const;
+
+private:
+    QString errorString;
+};
+
+class firmwareimporter
+{
 public:
     bool firmwareRead(const QString &filename);
 

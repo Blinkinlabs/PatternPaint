@@ -3,8 +3,6 @@
 
 #include <QDialog>
 
-extern QString errorStringFirmware;
-
 namespace Ui {
 class FirmwareManager;
 }

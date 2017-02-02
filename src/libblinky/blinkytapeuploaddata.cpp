@@ -52,7 +52,7 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
             documents.append(firmwareName);
             documents.append(".hex");
 
-            firmwareimport newFirmware;
+            firmwareimporter newFirmware;
 
             if(newFirmware.firmwareRead(documents)){
                 qDebug("Firmware successfully read");
