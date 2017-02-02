@@ -45,10 +45,7 @@ public:
     void mouseMoveEvent(QMouseEvent *event, FrameEditor &, const QPoint &);
     void mouseReleaseEvent(QMouseEvent *event, FrameEditor &, const QPoint &);
 
-    QCursor cursor() const
-    {
-        return Qt::CrossCursor;
-    }
+    QCursor cursor() const;
 
 protected:
     void paint(FrameEditor &);

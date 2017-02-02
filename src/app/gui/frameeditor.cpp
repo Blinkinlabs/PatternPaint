@@ -146,7 +146,6 @@ void FrameEditor::mousePressEvent(QMouseEvent *event)
     if (!hasImage() || instrument.isNull())
         return;
 
-    setCursor(instrument->cursor());
     instrument->mousePressEvent(event, *this, frameToImage(event->x(),event->y()));
     lazyUpdate();
 }
@@ -177,8 +176,6 @@ void FrameEditor::mouseMoveEvent(QMouseEvent *event)
 
 void FrameEditor::mouseReleaseEvent(QMouseEvent *event)
 {
-    setCursor(Qt::ArrowCursor);
-
     if (!hasImage() || instrument.isNull())
         return;
 
@@ -199,6 +196,7 @@ void FrameEditor::setToolSize(int size)
 void FrameEditor::setInstrument(AbstractInstrument *pi)
 {
     instrument = pi;
+    setCursor(instrument->cursor());
 }
 
 void FrameEditor::setFixture(Fixture *newFixture)

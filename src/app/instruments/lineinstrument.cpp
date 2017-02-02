@@ -43,6 +43,12 @@ void LineInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const
     drawing = false;
 }
 
+QCursor LineInstrument::cursor() const
+{
+    // TODO: Pull this into the resource file, to keep consistancy across platforms
+    return Qt::CrossCursor;
+}
+
 void LineInstrument::paint(FrameEditor &editor)
 {
     QPainter painter(&toolPreview);

@@ -43,6 +43,12 @@ void PencilInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, con
     drawing = false;
 }
 
+QCursor PencilInstrument::cursor() const
+{
+    // TODO: Pull this into the resource file, to keep consistancy across platforms
+    return Qt::CrossCursor;
+}
+
 void PencilInstrument::paint(FrameEditor &editor)
 {
     QPainter painter(&toolPreview);
