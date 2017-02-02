@@ -41,7 +41,7 @@ class AbstractInstrument : public QObject
     Q_OBJECT
 
 public:
-    explicit AbstractInstrument(QObject *parent = 0);
+    explicit AbstractInstrument(const QString &resource, QObject *parent = 0);
     virtual ~AbstractInstrument()
     {
     }
@@ -66,7 +66,7 @@ public:
 
     /// Get the mouse cursor for this instrument
     /// @return cursor for this tool
-    virtual QCursor cursor() const = 0;
+    virtual QCursor cursor() const;
 
     /// Check if the tool has preview data to display
     /// @return true if the instrument has preview data to display
@@ -78,15 +78,7 @@ protected:
     QPoint mStartPoint, mEndPoint; ///< Point for events.
     QImage toolPreview; ///< Scratch space to draw tool output onto
     bool drawing;       ///< True if we have an unsaved
-};
 
-/// Class for managing the mouse cursor
-class CustomCursorInstrument : public AbstractInstrument
-{
-    Q_OBJECT
-public:
-    CustomCursorInstrument(const QString &resource, QObject *parent = 0);
-    virtual QCursor cursor() const;
 private:
     QPixmap mpm;
     QCursor mcur;

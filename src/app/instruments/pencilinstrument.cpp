@@ -7,7 +7,7 @@
 #include <QDebug>
 
 PencilInstrument::PencilInstrument(QObject *parent) :
-    CustomCursorInstrument(":/instruments/images/instruments-icons/cursor.png", parent)
+    AbstractInstrument(":/instruments/images/instruments-icons/cursor.png", parent)
 {
     drawing = false;
 }

@@ -3,9 +3,11 @@
 #include "frameeditor.h"
 #include "patternframeundocommand.h"
 
-AbstractInstrument::AbstractInstrument(QObject *parent) :
-    QObject(parent)
+AbstractInstrument::AbstractInstrument(const QString &resource, QObject *parent) :
+    QObject(parent),
+    mpm(resource)
 {
+    mcur = QCursor(mpm);
 }
 
 bool AbstractInstrument::hasPreview() const
@@ -18,14 +20,8 @@ const QImage &AbstractInstrument::getPreview() const
     return toolPreview;
 }
 
-CustomCursorInstrument::CustomCursorInstrument(const QString &resource, QObject *parent) :
-    AbstractInstrument(parent),
-    mpm(resource)
-{
-    mcur = QCursor(mpm);
-}
 
-QCursor CustomCursorInstrument::cursor() const
+QCursor AbstractInstrument::cursor() const
 {
     return mcur;
 }

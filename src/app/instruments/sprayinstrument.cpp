@@ -7,7 +7,7 @@
 #include <math.h>
 
 SprayInstrument::SprayInstrument(QObject *parent) :
-    CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_spray.png", parent)
+    AbstractInstrument(":/instruments/images/instruments-icons/cursor_spray.png", parent)
 {
     drawing = false;
 }

@@ -34,7 +34,7 @@
  * @brief Fill instrument class.
  *
  */
-class FillInstrument : public CustomCursorInstrument
+class FillInstrument : public AbstractInstrument
 {
     Q_OBJECT
 public:

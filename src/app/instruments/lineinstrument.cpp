@@ -8,7 +8,7 @@
 #include <QDebug>
 
 LineInstrument::LineInstrument(QObject *parent) :
-    CustomCursorInstrument(":/instruments/images/instruments-icons/cursor.png", parent)
+    AbstractInstrument(":/instruments/images/instruments-icons/cursor.png", parent)
 {
     drawing = false;
 }

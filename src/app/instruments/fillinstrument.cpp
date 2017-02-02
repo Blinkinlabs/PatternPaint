@@ -7,7 +7,7 @@
 #include <QDebug>
 
 FillInstrument::FillInstrument(QObject *parent) :
-    CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_fill.png", parent)
+    AbstractInstrument(":/instruments/images/instruments-icons/cursor_fill.png", parent)
 {
     drawing = false;
 }

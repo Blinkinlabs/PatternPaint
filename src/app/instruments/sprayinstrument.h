@@ -34,7 +34,7 @@
  * @brief Spray instrument class.
  *
  */
-class SprayInstrument : public CustomCursorInstrument
+class SprayInstrument : public AbstractInstrument
 {
     Q_OBJECT
 public:

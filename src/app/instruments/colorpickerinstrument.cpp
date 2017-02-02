@@ -3,7 +3,7 @@
 #include "frameeditor.h"
 
 ColorpickerInstrument::ColorpickerInstrument(QObject *parent) :
-    CustomCursorInstrument(":/instruments/images/instruments-icons/cursor_pipette.png", parent)
+    AbstractInstrument(":/instruments/images/instruments-icons/cursor_pipette.png", parent)
 {
     drawing = false;
 }

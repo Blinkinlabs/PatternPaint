@@ -34,7 +34,7 @@
  * @brief Colorpicker instrument class.
  *
  */
-class ColorpickerInstrument : public CustomCursorInstrument
+class ColorpickerInstrument : public AbstractInstrument
 {
     Q_OBJECT
 
