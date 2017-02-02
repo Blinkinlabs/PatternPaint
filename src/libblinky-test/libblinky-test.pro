@@ -20,7 +20,8 @@ HEADERS += \
     serialcommandtests.h \
     bytearrayhelperstests.h \
     memorysectiontests.h \
-    memorymaptests.h
+    memorymaptests.h \
+    exponentialbrightnesstests.h
 
 SOURCES += \
     avr109commandstests.cpp \
@@ -29,4 +30,5 @@ SOURCES += \
     serialcommandtests.cpp \
     bytearrayhelperstests.cpp \
     memorysectiontests.cpp \
-    memorymaptests.cpp
+    memorymaptests.cpp \
+    exponentialbrightnesstests.cpp

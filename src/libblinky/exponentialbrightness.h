@@ -1,19 +1,25 @@
 #ifndef EXPONENTIALBRIGHTNESS_H
 #define EXPONENTIALBRIGHTNESS_H
 
+#include <QMetaType>
+
 #include "brightnessmodel.h"
 
 class ExponentialBrightness : public BrightnessModel
 {
 public:
-    ExponentialBrightness(float r, float g, float b);
+    ExponentialBrightness(float rFactor, float gFactor, float bFactor);
 
-    QColor correct(QColor uncorrected);
+    QColor correct(const QColor &uncorrected) const;
+
+    float rFactor() const;
+    float gFactor() const;
+    float bFactor() const;
 
 private:
-    float r;
-    float g;
-    float b;
+    float rFactor_;
+    float gFactor_;
+    float bFactor_;
 };
 
 #endif // EXPONENTIALBRIGHTNESS_H

@@ -6,6 +6,7 @@
 #include "bytearrayhelperstests.h"
 #include "memorysectiontests.h"
 #include "memorymaptests.h"
+#include "exponentialbrightnesstests.h"
 
 int main(int argc, char *argv[])
 {
@@ -31,6 +32,9 @@ int main(int argc, char *argv[])
 
     MemoryMapTests memoryMapTests;
     result |= QTest::qExec(&memoryMapTests);
+
+    ExponentialBrightnessTests exponentialBrightnessTests;
+    result |= QTest::qExec(&exponentialBrightnessTests);
 
     return result;
 }

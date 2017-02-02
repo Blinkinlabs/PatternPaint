@@ -12,7 +12,8 @@ public:
     /// on a given color value. Note that it drops the alpha channel.
     /// @param uncorrected 32-bit RGB color value in screen space
     /// @return 32-bit RGB color value converted to LED space
-    virtual QColor correct(QColor uncorrected) = 0;
+    virtual QColor correct(const QColor &uncorrected) const = 0;
 };
+
 
 #endif // BRIGHTNESSMODEL_H
