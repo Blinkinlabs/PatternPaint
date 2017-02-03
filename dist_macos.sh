@@ -3,8 +3,12 @@
 # Stop at any error
 set -e
 
-# Pull in the QT tools
-export QTDIR=~/Qt5.7.0/5.7/clang_64
+# Location of the QT tools
+if [ -z ${QTDIR+x} ]; then
+	echo "QTDIR not defined- please set it to the location containing the Qt version to build against. For example:"
+        echo "  export QTDIR=~/Qt5.8.0/5.8/clang_64"
+	exit 1
+fi
 
 QMAKE=${QTDIR}/bin/qmake
 MAKE=make
