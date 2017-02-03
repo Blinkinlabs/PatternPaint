@@ -15,9 +15,16 @@ TIMESTAMP_SERVER='http://timestamp.globalsign.com/scripts/timstamp.dll'
 
 
 ################# Library Locations #############################
+# Location of the QT tools
+if [ -z ${QTDIR+x} ]; then
+	echo "QTDIR not defined- please set it to the location containing the Qt version to build against. For example:"
+	echo "  export QTDIR=/c/Qt/Qt5.8.0"
+	exit 1
+fi
+
 # Location of the MINGW libraries (Installed as part of Qt)
-QTDIR=/c/Qt/Qt5.7.0
-QT_DIST=${QTDIR}/5.7/mingw53_32
+# TODO: How to determine the correct subdir here?
+QT_DIST=${QTDIR}/5.8/mingw53_32
 MINGW_BIN=${QTDIR}/Tools/mingw530_32/bin
 
 QMAKE=${QT_DIST}/bin/qmake

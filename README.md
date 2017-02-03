@@ -17,17 +17,47 @@ PatternPaint is a cross-platform application, targetting macOS, Windows, and Lin
 
 We use [Github Issues](https://github.com/Blinkinlabs/PatternPaint/issues) for bug tracking and feature implementation.
 
-PatternPaint is written in C++ with QT (5.7.0) libraries. The easiest way to get started is to download QT Creator, and run the project through there.
+PatternPaint is written in C++ with QT (5.8.0) libraries. The easiest way to get started is to download QT Creator, and run the project through there.
 
 PatternPaint is licensed under the GPL version 2
+
+## Notes on older versions of Qt
+
+We recommend using the specified version of Qt, however here are some notes if you do need to backport.
+
+### Qt5.7
+macOS, Linux: The released version has a bug in the QSerial:
+https://github.com/Blinkinlabs/PatternPaint/issues/148
+
+For macOS, download a patched version of qtSerialPort, to fix a critical bug affecting serial disconnects. For more information, see: https://codereview.qt-project.org/#/c/170601/
+
+	git clone git://code.qt.io/qt/qtserialport.git
+	cd qtserialport/
+	git checkout dee818e7
+	~/Qt5.7.0/5.7/clang_64/bin/qmake
+	make
+	rm -R ~/Qt5.7.0/5.7/clang_64/lib/QtSerialPort.framework/
+	mv lib/QtSerialPort.framework/ ~/Qt5.7.0/5.7/clang_64/lib/
+
+macOS: You'll need to modify a qt build script to fix compatibility with Xcode 8. Following these instructions: https://forum.qt.io/topic/71119/project-error-xcode-not-set-up-properly/7
+
+	vi ~/Qt5.7.0/5.7/clang_64/mkspecs/features/mac/default_pre.prf
+	:%s/xcrun\ 2/xcodebuild\ 2/gc
+
+### Qt 5.2-5.4
+
+all platforms: The line drawing function had a bug and needed to be worked around, see:
+https://github.com/Blinkinlabs/PatternPaint/issues/66
+
+
 
 ## macOS Prerequsites
 
 macOS development requires the following software tools:
 
-### OS X/macOS
+### macOS
 
-We're building on El Capitan and Sierra.
+We're building on Sierra.
 
 ### Xcode
 
@@ -45,26 +75,12 @@ Get the command line tools:
 
 ### Qt dev environment
 
-Get Qt 5.7:
+Get Qt 5.8:
 
-    http://download.qt.io/archive/qt/5.7/5.7.0/qt-opensource-mac-x64-clang-5.7.0.dmg
+    https://download.qt.io/archive/qt/5.8/5.8.0/qt-opensource-mac-x64-clang-5.8.0.dmg
 
 Install it using the default options.
 
-Next, you'll also need to modify a qt build script to fix compatibility with Xcode 8. Following these instructions: https://forum.qt.io/topic/71119/project-error-xcode-not-set-up-properly/7
-
-	vi ~/Qt5.7.0/5.7/clang_64/mkspecs/features/mac/default_pre.prf
-	:%s/xcrun\ 2/xcodebuild\ 2/gc
-
-Next, download a patched version of qtSerialPort, to fix a critical bug affecting serial disconnects. For more information, see: https://codereview.qt-project.org/#/c/170601/
-
-	git clone git://code.qt.io/qt/qtserialport.git
-	cd qtserialport/
-	git checkout dee818e7
-	~/Qt5.7.0/5.7/clang_64/bin/qmake
-	make
-	rm -R ~/Qt5.7.0/5.7/clang_64/lib/QtSerialPort.framework/
-	mv lib/QtSerialPort.framework/ ~/Qt5.7.0/5.7/clang_64/lib/
 
 
 ## Windows Prerequisites:
@@ -83,7 +99,7 @@ Note: be sure to check 'Run Git from the Windows Command Prompt', 'Checkout Wind
 
 ### QT dev environment
 
-    http://download.qt.io/archive/qt/5.7/5.7.0/qt-opensource-windows-x86-mingw530-5.7.0.exe
+    https://download.qt.io/archive/qt/5.8/5.8.0/qt-opensource-windows-x86-mingw530-5.8.0.exe
     
 Note: When installing, make sure to select the 'Tools' 'MinGW 5.3.0' option.
 
@@ -120,11 +136,10 @@ First, get the essential build tools:
 
 There's a PPA with the latest version of Qt, Hooray!
 
-	sudo add-apt-repository --yes ppa:beineri/opt-qt57-trusty
+	sudo add-apt-repository --yes ppa:beineri/opt-qt58-trusty
 	sudo apt-get update -qq
-	sudo apt-get install qt57[QTPACKAGE] qt57serialport
+	sudo apt-get install qt58[QTPACKAGE] qt58serialport
 
-Note: You'll probably need to update the qt serial version, similar to the macOS instructions above.
 
 ### linuxdeployqt, for generating a portable AppImage executable
 
@@ -171,8 +186,9 @@ These are the steps required to build a release version (installer) for PatternP
 
 Once the prerequsites have been installed, the deployment script can be run:
 
-	git clone --depth 1 https://github.com/Blinkinlabs/PatternPaint.git
+	git clone https://github.com/Blinkinlabs/PatternPaint.git
 	cd PatternPaint
+	export QTDIR=~/Qt5.8.0/5.8/clang_64
 	sh dist_macos.sh
 
 If everything works, it will generate a redistributable disk image 'PatternPaint_X.Y.Z.dmg', where X.Y.Z is the current version of PatternPaint.
@@ -196,8 +212,9 @@ NOTE: Obtain the GlobalSign file and install the Blinkinlabs Cert before continu
 
 Start Git bash (start->run->git bash)
 
-	git clone --depth 1 https://github.com/Blinkinlabs/PatternPaint.git
+	git clone https://github.com/Blinkinlabs/PatternPaint.git
 	cd PatternPaint
+	export QTDIR=/c/Qt/Qt5.8.0
 	sh dist_windows.sh
 
 If everything works, it will generate an installer executable 'PatternPaint_Installer_X.Y.Z.exe', where X.Y.Y is the current version of PatternPaint.
@@ -210,8 +227,9 @@ Test this file manually on clean Windows 7 and 8 hosts.
 
 Once the prerequsites have been installed, the deployment script can be run:
 
-	git clone --depth 1 https://github.com/Blinkinlabs/PatternPaint.git
+	git clone https://github.com/Blinkinlabs/PatternPaint.git
 	cd PatternPaint
+	export QTDIR=~/Qt5.8.0/5.8/gcc_64
 	sh dist_linux.sh
 
 If everything works, it will generate a distributable AppImage 'PatternPaint_X.Y.Z.Appimage', where X.Y.Z is the current version of PatternPaint.
