@@ -66,6 +66,27 @@ void BlinkyTapeUploader::setProgress(int newProgress)
     emit(progressChanged((progress*100)/maxProgress));
 }
 
+void BlinkyTapeUploader::setDialogText()
+{
+
+    QSettings settings;
+    QString firmwareName = settings.value("BlinkyTape/firmwareName", DEFAULT_FIRMWARE_NAME).toString();
+    int flashUsed = 0;
+
+    textLabel = "Saving to Blinky...\n"
+                "\n"
+                "Firmware: " + firmwareName + "\n";
+
+    for(MemorySection& section : flashData) {
+        flashUsed += section.data.length();
+    }
+
+    float flashUsedPercent = float(flashUsed)*100/FLASH_MEMORY_AVAILABLE;
+    textLabel.append(QString("Flash used: %1%").arg(QString::number(flashUsedPercent,'f', 1)));
+
+    emit(setText(textLabel));
+}
+
 bool BlinkyTapeUploader::restoreFirmware(qint64 timeout)
 {
     QByteArray sketch = QByteArray(reinterpret_cast<const char *>(PRODUCTION_DATA),
@@ -316,6 +337,8 @@ void BlinkyTapeUploader::doWork()
         }
 
         qDebug() << "Connected to bootloader!";
+
+        setDialogText();
 
         // Send Check Device Signature command
         commandQueue.enqueue(Avr109Commands::checkDeviceSignature());

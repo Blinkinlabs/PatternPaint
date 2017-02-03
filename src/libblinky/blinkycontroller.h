@@ -31,14 +31,6 @@
 #define LIGHTBUDDY_BOOTLOADER_VID    0x1d50
 #define LIGHTBUDDY_BOOTLOADER_PID    0x60a9
 
-struct MemoryInfo {
-    bool status;
-    int flashUsed;
-    int flashAvailable;
-};
-
-extern MemoryInfo memoryInfo;
-
 class BlinkyUploader;
 class QSerialPortInfo;
 

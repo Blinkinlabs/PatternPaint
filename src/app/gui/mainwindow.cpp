@@ -732,22 +732,9 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
     mode = Uploading;
 
     progressDialog.setWindowTitle(tr("Blinky exporter"));
-    if(!memoryInfo.status){
-        progressDialog.setLabelText(tr("Saving to Blinky..."));
-    }else{
-        QSettings settings;
-        QString firmwareName = settings.value("BlinkyTape/firmwareName", DEFAULT_FIRMWARE_NAME).toString();
-        float flashUsedPercent = float(memoryInfo.flashUsed)*100/memoryInfo.flashAvailable;
-        progressDialog.setLabelText(QString("Saving to Blinky...\n"
-                                            "\n"
-                                            "Firmware: " + firmwareName + "\n"
-                                            "Flash used: %1%").arg(QString::number(flashUsedPercent,'f', 1)));
-    }
-
+    progressDialog.setLabelText(tr("Saving to Blinky..."));
     progressDialog.setValue(progressDialog.minimum());
     progressDialog.show();
-
-    memoryInfo.status = false;
 
 }
 
@@ -938,6 +925,9 @@ void MainWindow::connectUploader()
 
     connect(uploader, SIGNAL(progressChanged(int)),
             &progressDialog, SLOT(setValue(int)));
+
+    connect(uploader, SIGNAL(setText(QString)),
+            &progressDialog, SLOT(setLabelText(QString)));
 
     connect(&progressDialog, SIGNAL(canceled()),
             uploader, SLOT(cancel()));
