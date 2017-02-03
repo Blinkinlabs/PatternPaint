@@ -147,10 +147,6 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
              patternTable.count());
     qDebug() << buff;
 
-    memoryInfo.flashUsed = sketch.count()+patternData.count()+patternTable.count();
-    memoryInfo.flashAvailable = FLASH_MEMORY_AVAILABLE;
-    memoryInfo.status = true;
-
     patternDataSection = MemorySection("PatternData",
                                       FLASH_MEMORY_SKETCH_ADDRESS + sketch.count(),
                                       patternData);
