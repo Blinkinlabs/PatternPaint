@@ -25,6 +25,9 @@ AboutPatternPaint::AboutPatternPaint(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // Set the dialog to delete itself when closed
+    this->setAttribute(Qt::WA_DeleteOnClose, true);
+
     ui->versionLabel->setText(QString("Version %1").arg(GIT_VERSION));
 
     // Fit all the label text inside the label

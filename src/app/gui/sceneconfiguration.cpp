@@ -13,6 +13,9 @@ SceneConfiguration::SceneConfiguration(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // Set the dialog to delete itself when closed
+    this->setAttribute(Qt::WA_DeleteOnClose, true);
+
     // Add the scene templates
     for (int i = 0; i < SCENE_TEMPLATE_COUNT; i++)
         ui->sceneTemplate->addItem(sceneTemplates[i].name);
@@ -170,5 +173,7 @@ void SceneConfiguration::on_controllerType_currentIndexChanged(int index)
 
 void SceneConfiguration::on_firmwareName_currentIndexChanged(int index)
 {
+    Q_UNUSED(index);
+
     sceneCustomized();
 }

@@ -10,6 +10,9 @@ WelcomeScreen::WelcomeScreen(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // Set the dialog to delete itself when closed
+    this->setAttribute(Qt::WA_DeleteOnClose, true);
+
     QSettings settings;
 
     ui->showWelcomeScreen->setChecked(settings.value("WelcomeScreen/showAtStartup",

@@ -16,6 +16,9 @@ SystemInformation::SystemInformation(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // Set the dialog to delete itself when closed
+    this->setAttribute(Qt::WA_DeleteOnClose, true);
+
     on_refresh_clicked();
 }
 
