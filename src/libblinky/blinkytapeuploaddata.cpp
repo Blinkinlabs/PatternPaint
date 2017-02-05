@@ -9,8 +9,6 @@
 #include <QStandardPaths>
 #include <QFileDialog>
 
-#define BUFF_LENGTH 100
-
 #define PATTERN_TABLE_HEADER_LENGTH     3
 #define PATTERN_TABLE_ENTRY_LENGTH      7
 
@@ -30,7 +28,6 @@ QByteArray encodeWordLSB(int data)
 
 bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter> &patterns)
 {
-    char buff[BUFF_LENGTH];
 
     // First, build the flash section for the sketch. This is the same for
     // all uploads
@@ -58,9 +55,8 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
                 qDebug("Firmware successfully read");
                 sketch.append(newFirmware.getData());
             }else{
-                snprintf(buff, BUFF_LENGTH,"Firmware read failed!");
-                qDebug() << buff;
-                errorString = buff;
+                errorString = "Firmware read failed!";
+                qDebug() << errorString;
                 return false;
             }
         }
@@ -94,10 +90,9 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
         return false;
     }
 
-    snprintf(buff, BUFF_LENGTH, "Building pattern array. Pattern Count: %i, led count: %i",
-             patterns.count(),
-             patterns.first().getLedCount());
-    qDebug() << buff;
+    qDebug() << "Building pattern array"
+             << "Pattern count:" << patterns.count()
+             << "Led count:" << patterns.first().getLedCount();
 
     patternTable.append(static_cast<char>(patterns.count()));       // Offset 0: Pattern count (1 byte)
     // TODO: make the LED count to a separate, explicit parameter?
@@ -117,14 +112,12 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
 
     // Now, for each pattern, append the image data to the sketch
     foreach(PatternWriter pattern, patterns) {
-        snprintf(buff, BUFF_LENGTH,
-                 "Adding pattern. Encoding: %x, framecount: %i, frameDelay: %i, count: %iB, offset: %iB",
-                 pattern.getEncoding(),
-                 pattern.getFrameCount(),
-                 pattern.getFrameDelay(),
-                 pattern.getData().length(),
-                 dataOffset);
-        qDebug() << buff;
+        qDebug() << "Adding pattern "
+                 << "Encoding:" << pattern.getEncoding()
+                 << "Frame count:" << pattern.getFrameCount()
+                 << "Frame delay:" << pattern.getFrameDelay()
+                 << "Count:" << pattern.getData().length()
+                 << "Offset:" << dataOffset;
 
         // Build the table entry for this pattern
         patternTable.append((char)((pattern.getEncoding()) & 0xFF));   // Offset 0: encoding (1 byte)
@@ -141,11 +134,9 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
     while (patternTable.count() < FLASH_MEMORY_PAGE_SIZE_BYTES)
         patternTable.append(static_cast<char>(0xFF));
 
-    snprintf(buff, BUFF_LENGTH, "Sketch size: %iB, pattern data size: %iB, pattern table size: %iB",
-             sketch.count(),
-             patternData.count(),
-             patternTable.count());
-    qDebug() << buff;
+    qDebug() << "Sketch size:" << sketch.count()
+             << "Pattern data size:" << patternData.count()
+             << "Pattern table size" << patternTable.count();
 
     patternDataSection = MemorySection("PatternData",
                                       FLASH_MEMORY_SKETCH_ADDRESS + sketch.count(),

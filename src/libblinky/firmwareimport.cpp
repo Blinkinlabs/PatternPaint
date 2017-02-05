@@ -5,11 +5,6 @@
 #include <QDebug>
 #include <QStandardPaths>
 
-
-#define BUFF_LENGTH 100
-char buff[BUFF_LENGTH];
-
-
 QStringList FirmwareStore::listAvailableFirmware() {
     QStringList firmwareNames;
 
@@ -68,8 +63,7 @@ bool FirmwareStore::addFirmware(const QString &dirSource) {
         return false;
     }
 
-    snprintf(buff, BUFF_LENGTH,"add firmware: %s",(const char *)((QByteArray)(firmwareDirSource.dirName().toLatin1()).data()));
-    qDebug() << buff;
+    qDebug() << "Adding firmware:" << firmwareDirSource.dirName();
 
     // create firmwarefolder
     QString dirDestination = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
@@ -103,8 +97,7 @@ bool FirmwareStore::addFirmware(const QString &dirSource) {
     if (hexFile.open(QIODevice::ReadOnly))
     {
         if(QFile::copy(fileSource, fileDestination)){
-            snprintf(buff, BUFF_LENGTH,"copy Firmware file: %s.hex",(const char *)((QByteArray)(firmwareDirSource.dirName().toLatin1()).data()));
-            qDebug() << buff;
+            qDebug() << "copy Firmware file:" << firmwareDirSource.dirName();
         }else{
             errorString = "can not copy Firmware hex file";
             removeFirmware(firmwareDirSource.dirName());
@@ -129,8 +122,7 @@ bool FirmwareStore::addFirmware(const QString &dirSource) {
     if (readmeFile.open(QIODevice::ReadOnly))
     {
         if(QFile::copy(fileSource, fileDestination)){
-            snprintf(buff, BUFF_LENGTH,"copy Firmware description: %s",FIRMWARE_DESCRIPTION_FILE);
-            qDebug() << buff;
+            qDebug() << "copy Firmware description " << FIRMWARE_DESCRIPTION_FILE;
         }else{
             qDebug() << "can not copy Firmware description file";
         }
@@ -147,8 +139,7 @@ bool FirmwareStore::removeFirmware(const QString &name) {
         return false;
     }
 
-    snprintf(buff, BUFF_LENGTH,"remove Firmware: %s",(const char *)((QByteArray)name.toLatin1()).data());
-    qDebug() << buff;
+    qDebug() << "remove Firmware " << name;
 
     QString documents = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
     documents.append(FIRMWARE_FOLDER);
@@ -285,9 +276,7 @@ bool FirmwareReader::load(const QString& filename)
 
 
     inputFile.close();
-    snprintf(buff, BUFF_LENGTH,"Firmware size: %iB",data.count());
-    qDebug() << buff;
+    qDebug() << "Firmware size:" << data.count();
 
     return true;
-
 }
