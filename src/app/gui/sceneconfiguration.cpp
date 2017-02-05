@@ -13,9 +13,6 @@ SceneConfiguration::SceneConfiguration(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    // Set the dialog to delete itself when closed
-    this->setAttribute(Qt::WA_DeleteOnClose, true);
-
     // Add the scene templates
     for (int i = 0; i < SCENE_TEMPLATE_COUNT; i++)
         ui->sceneTemplate->addItem(sceneTemplates[i].name);
@@ -39,7 +36,7 @@ SceneConfiguration::SceneConfiguration(QWidget *parent) :
     // Add the fixture types
     // TODO: Auto configuration for this?
     ui->FixtureType->addItem("Linear");
-    ui->FixtureType->addItem("Matrix");
+    ui->FixtureType->addItem("Matrix-Zigzag");
 
     ui->fixtureHeight->setValidator(new QIntValidator(1, std::numeric_limits<int>::max(), this));
     ui->fixtureWidth->setValidator(new QIntValidator(1, std::numeric_limits<int>::max(), this));

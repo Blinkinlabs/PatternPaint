@@ -42,7 +42,7 @@ SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT] = {
         ":/examples/matrix",
         "BlinkyTape",
         "Default",
-        "Matrix",
+        "Matrix-Zigzag",
         RGB,
         8,
         8
