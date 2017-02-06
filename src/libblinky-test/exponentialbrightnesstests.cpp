@@ -26,9 +26,9 @@ void ExponentialBrightnessTests::constructorZeroTest()
 
     ExponentialBrightness brightness(rFactor,gFactor,bFactor);
 
-    QVERIFY(brightness.rFactor() == FLT_MIN);
-    QVERIFY(brightness.gFactor() == FLT_MIN);
-    QVERIFY(brightness.bFactor() == FLT_MIN);
+    QVERIFY(brightness.rFactor() == ZERO_VALUE);
+    QVERIFY(brightness.gFactor() == ZERO_VALUE);
+    QVERIFY(brightness.bFactor() == ZERO_VALUE);
 }
 
 
@@ -40,10 +40,22 @@ void ExponentialBrightnessTests::correctTest_data()
     QTest::addColumn<QColor>("inputColor");
     QTest::addColumn<QColor>("resultColor");
 
-    QTest::newRow("zero factor")
-            << float(0.0) << float(0.0) << float(0.0)
+    QTest::newRow("linear, 0")
+            << float(1.0) << float(1.0) << float(1.0)
+            << QColor(0,0,0)
+            << QColor(0,0,0);
+    QTest::newRow("linear, 128")
+            << float(1.0) << float(1.0) << float(1.0)
+            << QColor(128,128,128)
+            << QColor(128,128,128);
+    QTest::newRow("linear, 255")
+            << float(1.0) << float(1.0) << float(1.0)
             << QColor(255,255,255)
-            << QColor(1,1,1);
+            << QColor(255,255,255);
+    QTest::newRow("different:1,2,3, 128")
+            << float(1.0) << float(2.0) << float(3.0)
+            << QColor(128,128,128)
+            << QColor(128,64,32);
 }
 
 void ExponentialBrightnessTests::correctTest()
@@ -55,8 +67,6 @@ void ExponentialBrightnessTests::correctTest()
     QFETCH(QColor, resultColor);
 
     ExponentialBrightness model(rFactor, gFactor, bFactor);
-
-    qDebug() << resultColor << model.correct(inputColor);
 
     QVERIFY(model.correct(inputColor) == resultColor);
 }

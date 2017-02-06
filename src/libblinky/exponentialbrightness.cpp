@@ -1,7 +1,7 @@
 #include "exponentialbrightness.h"
+#include <QDebug>
 
 #include <cmath>
-#include <cfloat>
 
 BrightnessModel::~BrightnessModel()
 {
@@ -15,13 +15,13 @@ ExponentialBrightness::ExponentialBrightness(float r, float g, float b) :
 {
     // Avoid zero-value correction factors
     if(rFactor_ == 0) {
-        rFactor_ = FLT_MIN;
+        rFactor_ = ZERO_VALUE;
     }
     if(gFactor_ == 0) {
-        gFactor_ = FLT_MIN;
+        gFactor_ = ZERO_VALUE;
     }
     if(bFactor_ == 0) {
-        bFactor_ = FLT_MIN;
+        bFactor_ = ZERO_VALUE;
     }
 }
 
@@ -39,9 +39,9 @@ float ExponentialBrightness::bFactor() const {
 
 QColor ExponentialBrightness::correct(const QColor &uncorrected) const
 {
-    return QColor(
-        255*pow(uncorrected.redF()/255, rFactor_),
-        255*pow(uncorrected.greenF()/255, gFactor_),
-        255*pow(uncorrected.blueF()/255, bFactor_)
-        );
+    int r = round(255*pow(uncorrected.redF(), rFactor_));
+    int g = round(255*pow(uncorrected.greenF(), gFactor_));
+    int b = round(255*pow(uncorrected.blueF(), bFactor_));
+
+    return QColor(r,g,b);
 }

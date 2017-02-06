@@ -1,9 +1,12 @@
 #ifndef EXPONENTIALBRIGHTNESS_H
 #define EXPONENTIALBRIGHTNESS_H
 
+#include "brightnessmodel.h"
+
 #include <QMetaType>
 
-#include "brightnessmodel.h"
+// TODO: Use an actual minimum float value
+#define ZERO_VALUE float(.000001)
 
 class ExponentialBrightness : public BrightnessModel
 {
