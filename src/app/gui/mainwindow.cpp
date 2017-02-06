@@ -175,20 +175,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     frameEditor->setToolSize(DRAWING_SIZE_MINIMUM_VALUE);
 
-    // Pre-set the upload progress dialog
-    progressDialog.setMinimum(0);
-    progressDialog.setMaximum(100);
-    progressDialog.setWindowModality(Qt::WindowModal);
-    progressDialog.setAutoClose(false);
-    progressDialog.setAutoReset(false);
-
-    // Workaround for bug in QT 5.5.1
-#if defined(PROGRESS_DIALOG_WORKAROUND)
-#warning Progress dialog workaround enabled
-    progressDialog.reset();
-    progressDialog.hide();
-#endif
-
     // The draw timer tells the pattern to advance
     connect(&drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
 
@@ -560,7 +546,6 @@ void MainWindow::on_actionAbout_triggered()
 
 void MainWindow::on_actionSystem_Information_triggered()
 {
-    // TODO: store this somewhere, for later disposal.
     SystemInformation *info = new SystemInformation(this);
     info->show();
 }
@@ -570,17 +555,9 @@ void MainWindow::on_uploaderFinished(bool result)
     mode = Disconnected;
     uploader.clear();
 
-    progressDialog.hide();
-
     qDebug() << "Uploader finished! Result:" << result;
-    if (!result) {
-        // TODO: allow restarting the upload process if it failed
-        QMessageBox msgBox(this);
-        msgBox.setWindowModality(Qt::WindowModal);
-        msgBox.setText("Error updating blinky- please try again.");
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.exec();
-    }
+    if (!result)
+        showError("Error updating blinky- please try again.");
 }
 
 void MainWindow::on_actionVisit_the_Blinkinlabs_forum_triggered()
@@ -642,10 +619,8 @@ void MainWindow::showError(QString errorMessage)
 
 void MainWindow::on_actionFirmware_Manager_triggered()
 {
-
     FirmwareManager *firmwareManager = new FirmwareManager(this);
     firmwareManager->show();
-
 }
 
 
@@ -655,21 +630,22 @@ void MainWindow::on_actionRestore_firmware_triggered()
     if (controller.isNull()) {
         uploader = QPointer<BlinkyUploader>(new BlinkyTapeUploader(this));
 
-        connectUploader();
+        QProgressDialog* dialog = makeProgressDialog();
 
-        if (!uploader->restoreFirmware(-1)) {
-            showError(uploader->getErrorString());
-            return;
-        }
-
-        progressDialog.setWindowTitle("Firmware reset");
-        progressDialog.setLabelText(
+        dialog->setWindowTitle("Firmware reset");
+        dialog->setLabelText(
             "Searching for a BlinkyTape bootloader...\n"
             "\n"
             "Please connect your blinkytape to the computer via USB,\n"
             "then perform the reset trick. As soon as the device\n"
             "restarts, the progress bar should start moving and the\n"
             "firmware will be restored.");
+        dialog->show();
+
+        if (!uploader->restoreFirmware(-1)) {
+            showError(uploader->getErrorString());
+            return;
+        }
     }
     // Otherwise just grab it
     else {
@@ -679,21 +655,18 @@ void MainWindow::on_actionRestore_firmware_triggered()
         if (uploader.isNull())
             return;
 
-        connectUploader();
+        QProgressDialog* dialog = makeProgressDialog();
+
+        dialog->setWindowTitle("Firmware reset");
+        dialog->setLabelText("Loading new firmware onto Blinky");
+        dialog->show();
 
         if (!uploader->updateFirmware(*controller)) {
             showError(uploader->getErrorString());
             return;
         }
-
-        progressDialog.setWindowTitle("Firmware reset");
-        progressDialog.setLabelText("Loading new firmware onto Blinky");
     }
-
     mode = Uploading;
-
-    progressDialog.setValue(progressDialog.minimum());
-    progressDialog.show();
 }
 
 void MainWindow::on_actionSave_to_Blinky_triggered()
@@ -723,19 +696,17 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
         patternWriters.append(patternWriter);
     }
 
-    connectUploader();
+    QProgressDialog* dialog = makeProgressDialog();
+
+    dialog->setWindowTitle(tr("Blinky exporter"));
+    dialog->setLabelText(tr("Saving to Blinky..."));
+    dialog->show();
 
     if (!uploader->storePatterns(*controller, patternWriters)) {
         showError(uploader->getErrorString());
         return;
     }
     mode = Uploading;
-
-    progressDialog.setWindowTitle(tr("Blinky exporter"));
-    progressDialog.setLabelText(tr("Saving to Blinky..."));
-    progressDialog.setValue(progressDialog.minimum());
-    progressDialog.show();
-
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -918,19 +889,30 @@ void MainWindow::applyScene(SceneTemplate sceneTemplate)
     }
 }
 
-void MainWindow::connectUploader()
-{
+QProgressDialog* MainWindow::makeProgressDialog() {
+    QProgressDialog *dialog = new QProgressDialog(this);
+
+    // Pre-set the upload progress dialog
+    dialog->setMinimum(0);
+    dialog->setMaximum(100);
+    dialog->setWindowModality(Qt::WindowModal);
+
     connect(uploader, SIGNAL(finished(bool)),
             this, SLOT(on_uploaderFinished(bool)));
 
+    connect(dialog, SIGNAL(canceled()),
+            uploader, SLOT(cancel()));
+
     connect(uploader, SIGNAL(progressChanged(int)),
-            &progressDialog, SLOT(setValue(int)));
+            dialog, SLOT(setValue(int)));
 
     connect(uploader, SIGNAL(setText(QString)),
-            &progressDialog, SLOT(setLabelText(QString)));
+            dialog, SLOT(setLabelText(QString)));
 
-    connect(&progressDialog, SIGNAL(canceled()),
-            uploader, SLOT(cancel()));
+    connect(uploader, SIGNAL(finished(bool)),
+            dialog, SLOT(close()));
+
+    return dialog;
 }
 
 bool MainWindow::loadPattern(Pattern::PatternType type, const QString fileName)
@@ -1279,7 +1261,6 @@ void MainWindow::on_actionWelcome_triggered()
     connect(welcomeScreen, SIGNAL(sceneSelected(SceneTemplate)),
             this, SLOT(applyScene(SceneTemplate)));
 
-    welcomeScreen->setAttribute(Qt::WA_DeleteOnClose, true);
     welcomeScreen->show();
 }
 
@@ -1307,6 +1288,6 @@ void MainWindow::on_actionClose_All_triggered()
 
 void MainWindow::on_actionDebug_Log_triggered()
 {
-    DebugLog* logDialog = new DebugLog(this);
-    logDialog->show();
+    DebugLog* debugLog = new DebugLog(this);
+    debugLog->show();
 }
