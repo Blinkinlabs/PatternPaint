@@ -11,8 +11,7 @@ SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT] = {
         "Default",
         "Linear",
         RGB,
-        60,
-        1
+        QSize(1,60)
     },
     {
         "BlinkyTile",
@@ -22,8 +21,7 @@ SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT] = {
         "Default",
         "Linear",
         RGB,
-        56,
-        1
+        QSize(1,56)
     },
     {
         "Blinky Pixels",
@@ -33,8 +31,7 @@ SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT] = {
         "Default",
         "Linear",
         GRB,
-        50,
-        1
+        QSize(1,50)
     },
     {
         "BlinkyMatrix",
@@ -44,8 +41,7 @@ SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT] = {
         "Default",
         "Matrix-Zigzag",
         RGB,
-        8,
-        8
+        QSize(8,8)
     },
     {
         "BlinkyPendant",
@@ -55,8 +51,7 @@ SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT] = {
         "Default",
         "Linear",
         RGB,
-        10,
-        1
+        QSize(1,10)
     },
     {
         "EightByEight",
@@ -66,7 +61,6 @@ SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT] = {
         "Default",
         "Matrix-Rows",
         RGB,
-        8,
-        8
+        QSize(8,8)
     },
 };

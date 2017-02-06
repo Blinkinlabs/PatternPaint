@@ -205,8 +205,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     scene.fixtureType = settings.value("Fixture/Type", DEFAULT_FIXTURE_TYPE).toString();
     scene.colorMode = (ColorMode)settings.value("Fixture/ColorOrder", RGB).toInt();
-    scene.height = fixtureSize.height();
-    scene.width = fixtureSize.width();
+    scene.size = fixtureSize;
 
     applyScene(scene);
 
@@ -835,15 +834,11 @@ bool MainWindow::promptForSave(QList<Pattern *> patterns)
 
 void MainWindow::applyScene(const SceneTemplate &scene)
 {
-    QSize newDisplaySize(scene.width, scene.height);
-
-    qDebug() << newDisplaySize;
-
     // Test if any patterns need to be resized
     QList<Pattern *> needToResize;
 
     foreach(Pattern* pattern, patternCollection.patterns())
-        if (pattern->getFrameSize() != newDisplaySize)
+        if (pattern->getFrameSize() != scene.size)
             needToResize.append(pattern);
 
     if (needToResize.count() > 0) {
@@ -860,7 +855,7 @@ void MainWindow::applyScene(const SceneTemplate &scene)
 
         if (ans == QMessageBox::Yes) {
             foreach(Pattern* pattern, needToResize) {
-                pattern->resize(newDisplaySize, false);
+                pattern->resize(scene.size, false);
             }
         } else if (ans == QMessageBox::Cancel) {
             return;
@@ -868,7 +863,7 @@ void MainWindow::applyScene(const SceneTemplate &scene)
     }
 
     // Apply the new settings
-    fixture = Fixture::makeFixture(scene.fixtureType, newDisplaySize);
+    fixture = Fixture::makeFixture(scene.fixtureType, scene.size);
 
     fixture->setColorMode(scene.colorMode);
     fixture->setBrightnessModel(new ExponentialBrightness(1.8,1.8,2.1));
@@ -901,7 +896,7 @@ void MainWindow::applyScene(const SceneTemplate &scene)
     // Finally, save the settings
     QSettings settings;
     settings.setValue("Fixture/Type", scene.fixtureType);
-    settings.setValue("Fixture/DisplaySize", newDisplaySize);
+    settings.setValue("Fixture/DisplaySize", scene.size);
     settings.setValue("Fixture/ColorOrder", scene.colorMode);
     settings.setValue("BlinkyTape/firmwareName", scene.firmwareName);
 }
@@ -1205,8 +1200,8 @@ void MainWindow::on_actionConfigure_Scene_triggered()
     if (!fixture.isNull()) {
         sceneTemplate.fixtureType = fixture->getName();
         sceneTemplate.colorMode = fixture->getColorMode();
-        sceneTemplate.height = fixture->getExtents().height();
-        sceneTemplate.width = fixture->getExtents().width();
+        sceneTemplate.size = QSize(fixture->getExtents().width(),
+                                   fixture->getExtents().height());
     }
 
     QSettings settings;

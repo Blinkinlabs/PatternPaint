@@ -59,7 +59,7 @@ void SceneConfiguration::setSceneTemplate(const SceneTemplate sceneTemplate)
     setFixtureType(sceneTemplate.fixtureType);
     setFirmwareName(sceneTemplate.firmwareName);
     setColorMode(sceneTemplate.colorMode);
-    setFixtureSize(QSize(sceneTemplate.width, sceneTemplate.height));
+    setFixtureSize(sceneTemplate.size);
 }
 
 SceneTemplate SceneConfiguration::getSceneTemplate() const
@@ -72,8 +72,8 @@ SceneTemplate SceneConfiguration::getSceneTemplate() const
     sceneTemplate.fixtureType = ui->FixtureType->currentText();
     sceneTemplate.firmwareName = ui->firmwareName->currentText();
     sceneTemplate.colorMode = (ColorMode)ui->ColorType->currentData().toInt();
-    sceneTemplate.height = ui->fixtureHeight->text().toInt();
-    sceneTemplate.width = ui->fixtureWidth->text().toInt();
+    sceneTemplate.size = QSize(ui->fixtureHeight->text().toInt(),
+                               ui->fixtureWidth->text().toInt());
 
     return sceneTemplate;
 }

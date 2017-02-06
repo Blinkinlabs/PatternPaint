@@ -44,8 +44,6 @@ QList<QColor> Fixture::getColorStreamForFrame(const QImage frame) const
     if (frame.isNull())
         return colorStream;
 
-    QList<QPoint> locations = getOutputLocations();
-
     foreach(QPoint point, locations) {
         QColor pixel = frame.pixel(point);
         colorStream.append(brightnessModel->correct(pixel));

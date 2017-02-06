@@ -4,6 +4,7 @@
 #include "colormode.h"
 
 #include <QString>
+#include <QSize>
 
 // TODO: Something more flexible
 struct SceneTemplate {
@@ -14,8 +15,7 @@ struct SceneTemplate {
     QString firmwareName;
     QString fixtureType;
     ColorMode colorMode;
-    int height;
-    int width;
+    QSize size;
 };
 
 #define SCENE_TEMPLATE_COUNT 6
