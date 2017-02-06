@@ -18,7 +18,7 @@ struct SceneTemplate {
     int width;
 };
 
-#define SCENE_TEMPLATE_COUNT 5
+#define SCENE_TEMPLATE_COUNT 6
 extern SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT];
 
 #endif // SCENETEMPLATE_H

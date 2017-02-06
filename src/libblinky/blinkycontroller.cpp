@@ -42,6 +42,10 @@ QList<QPointer<ControllerInfo> > BlinkyController::probe()
         else if (info.vendorIdentifier() == LIGHTBUDDY_SKETCH_VID
                  && info.productIdentifier() == LIGHTBUDDY_SKETCH_PID)
             controllerInfos.push_back(new BlinkyTapeControllerInfo(info));
+        // And EightByEights!
+        else if (info.vendorIdentifier() == EIGHTBYEIGHT_SKETCH_VID
+                 && info.productIdentifier() == EIGHTBYEIGHT_SKETCH_PID)
+            controllerInfos.push_back(new BlinkyTapeControllerInfo(info));
     }
 
     return controllerInfos;

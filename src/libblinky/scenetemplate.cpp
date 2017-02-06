@@ -58,4 +58,15 @@ SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT] = {
         10,
         1
     },
+    {
+        "EightByEight",
+        ":/scenetemplates/images/scenetemplates/eightbyeight.jpg",
+        ":/examples/matrix",
+        "EightByEight",
+        "Default",
+        "Matrix-Rows",
+        RGB,
+        8,
+        8
+    },
 };

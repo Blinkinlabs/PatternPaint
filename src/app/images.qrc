@@ -37,5 +37,6 @@
         <file>images/scenetemplates/blinkytape.jpg</file>
         <file>images/scenetemplates/blinkytile.jpg</file>
         <file>images/scenetemplates/pixels.jpg</file>
+        <file>images/scenetemplates/eightbyeight.jpg</file>
     </qresource>
 </RCC>

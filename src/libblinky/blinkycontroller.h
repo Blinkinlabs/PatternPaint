@@ -31,6 +31,12 @@
 #define LIGHTBUDDY_BOOTLOADER_VID    0x1d50
 #define LIGHTBUDDY_BOOTLOADER_PID    0x60a9
 
+
+#define EIGHTBYEIGHT_SKETCH_VID        0x1d50
+#define EIGHTBYEIGHT_SKETCH_PID        0x60f6
+#define EIGHTBYEIGHT_BOOTLOADER_VID    0x1d50
+#define EIGHTBYEIGHT_BOOTLOADER_PID    0x60f5
+
 class BlinkyUploader;
 class QSerialPortInfo;
 
