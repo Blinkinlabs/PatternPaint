@@ -3,7 +3,7 @@
 # Pattern Paint
 # http://blinkinlabs.com/patternpaint
 #
-# Copyright 2013, 2014, 2015, 2016 Blinkinlabs, LLC
+# Copyright 2013, 2014, 2015, 2016, 2017 Blinkinlabs, LLC
 #
 #-------------------------------------------------
 
