@@ -30,7 +30,6 @@
 #include "patterndelegate.h"
 #include "patterncollection.h"
 #include "fixture.h"
-#include "matrixfixture.h"
 #include "preferences.h"
 #include "defaults.h"
 #include "firmwareimport.h"
@@ -869,28 +868,11 @@ void MainWindow::applyScene(const SceneTemplate &scene)
     }
 
     // Apply the new settings
+    fixture = Fixture::makeFixture(scene.fixtureType, newDisplaySize);
 
-    // TODO: Make a factory function for this?
-    qDebug() << "Fixture type:" << scene.fixtureType;
-    if(scene.fixtureType == "Matrix-Zigzag") {
-        fixture = new MatrixFixture(newDisplaySize,
-                                    MatrixFixture::MODE_ZIGZAG,
-                                    scene.colorMode,
-                                    new ExponentialBrightness(1.8, 1.8, 2.1));
-    }
-    else if(scene.fixtureType == "Matrix-Rows") {
-        fixture = new MatrixFixture(newDisplaySize,
-                                    MatrixFixture::MODE_ROWS,
-                                    scene.colorMode,
-                                    new ExponentialBrightness(1.8, 1.8, 2.1));
-    }
-    else {
-        // TODO
-        fixture = new MatrixFixture(newDisplaySize,
-                                    MatrixFixture::MODE_ROWS,
-                                    scene.colorMode,
-                                    new ExponentialBrightness(1.8, 1.8, 2.1));
-    }
+    fixture->setColorMode(scene.colorMode);
+    fixture->setBrightnessModel(new ExponentialBrightness(1.8,1.8,2.1));
+
 
     // Wire in the fixture
     frameEditor->setFixture(fixture);
@@ -955,9 +937,7 @@ bool MainWindow::loadPattern(Pattern::PatternType type, const QString fileName)
     QSettings settings;
     int frameCount = settings.value("Options/FrameCount", DEFAULT_FRAME_COUNT).toUInt();
 
-    QSize displaySize;
-
-    displaySize = fixture->getSize();
+    QSize displaySize(fixture->getExtents().width(), fixture->getExtents().height());
 
     Pattern *pattern = new Pattern(type, displaySize, frameCount);
 
@@ -1225,8 +1205,8 @@ void MainWindow::on_actionConfigure_Scene_triggered()
     if (!fixture.isNull()) {
         sceneTemplate.fixtureType = fixture->getName();
         sceneTemplate.colorMode = fixture->getColorMode();
-        sceneTemplate.height = fixture->getSize().height();
-        sceneTemplate.width = fixture->getSize().width();
+        sceneTemplate.height = fixture->getExtents().height();
+        sceneTemplate.width = fixture->getExtents().width();
     }
 
     QSettings settings;

@@ -8,13 +8,16 @@
 #include <QSize>
 
 #include "colormode.h"
-#include "exponentialbrightness.h"
+#include "brightnessmodel.h"
 
 class Fixture : public QObject
 {
     Q_OBJECT
 
 public:
+    // TODO: The 'size' bit won't make sense for arbitrary fixtures.
+    static Fixture *makeFixture(QString type, QSize size);
+
     Fixture(QObject *parent = 0);
 
     virtual ~Fixture();
@@ -23,23 +26,30 @@ public:
     /// @return
     virtual QString getName() const = 0;
 
-    virtual QList<QColor> getColorStreamForFrame(const QImage frame) const = 0;
+    virtual QList<QColor> getColorStreamForFrame(const QImage frame) const;
 
-    virtual QList<QPoint> getOutputLocations() const = 0;
+    // Get the cooridnates of each LED in this fixture, in order of their address
+    virtual QList<QPoint> getOutputLocations() const;
 
-    virtual QRect getExtents() const = 0;
+    // Get the extents of this fixture in drawing pixel coordinates
+    // TODO: Make float, handle negative coordinates
+    virtual QRect getExtents() const;
 
-    virtual int getLedCount() const = 0;
+    // Get the number of LEDs in this fixture
+    virtual int getLedCount() const;
 
-    // TODO: Push these to individual classes?
-    virtual QSize getSize() const = 0;
-    virtual void setSize(QSize newSize) = 0;
+    virtual ColorMode getColorMode() const;
+    virtual void setColorMode(const ColorMode &newColorMode);
 
-    virtual ColorMode getColorMode() const = 0;
-    virtual void setColorMode(ColorMode newColorMode) = 0;
+    virtual BrightnessModel *getBrightnessModel() const;
+    virtual void setBrightnessModel(BrightnessModel *BrightnessModel);
 
-    virtual BrightnessModel *getBrightnessModel() const = 0;
-    virtual void setBrightnessModel(BrightnessModel *BrightnessModel) = 0;
+protected:
+    ColorMode colorMode;
+    BrightnessModel *brightnessModel;
+
+    QList<QPoint> locations;
+    QRect extents;
 };
 
 #endif // FIXTURE_H

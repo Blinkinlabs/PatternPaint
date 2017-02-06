@@ -2,19 +2,16 @@
 
 #include <limits>
 
-MatrixFixture::MatrixFixture(QSize size, MatrixMode matrixMode, ColorMode colorMode, BrightnessModel *brightnessModel, QObject *parent) :
+MatrixFixture::MatrixFixture(QSize size, MatrixMode matrixMode, QObject *parent) :
     Fixture(parent),
-    matrixMode(matrixMode),
-    colorMode(colorMode),
-    brightnessModel(brightnessModel)
+    matrixMode(matrixMode)
 {
     setSize(size);
 }
 
 MatrixFixture::~MatrixFixture()
 {
-    if(brightnessModel != NULL)
-        delete brightnessModel;
+
 }
 
 QString MatrixFixture::getName() const
@@ -28,38 +25,6 @@ QString MatrixFixture::getName() const
         return QString("Matrix-Rows");
         break;
     }
-}
-
-QList<QColor> MatrixFixture::getColorStreamForFrame(const QImage frame) const
-{
-    QList<QColor> colorStream;
-
-    if (frame.isNull())
-        return colorStream;
-
-    QList<QPoint> locations = getOutputLocations();
-
-    foreach(QPoint point, locations) {
-        QColor pixel = frame.pixel(point);
-        colorStream.append(brightnessModel->correct(pixel));
-    }
-
-    return colorStream;
-}
-
-QList<QPoint> MatrixFixture::getOutputLocations() const
-{
-    return locations;
-}
-
-QRect MatrixFixture::getExtents() const
-{
-    return extents;
-}
-
-int MatrixFixture::getLedCount() const
-{
-    return size.height()*size.width();
 }
 
 QSize MatrixFixture::getSize() const
@@ -110,22 +75,4 @@ MatrixFixture::MatrixMode MatrixFixture::getMode() const
     return matrixMode;
 }
 
-ColorMode MatrixFixture::getColorMode() const
-{
-    return colorMode;
-}
 
-void MatrixFixture::setColorMode(ColorMode newColorMode)
-{
-    colorMode = newColorMode;
-}
-
-BrightnessModel *MatrixFixture::getBrightnessModel() const
-{
-    return brightnessModel;
-}
-
-void MatrixFixture::setBrightnessModel(BrightnessModel *newBrightnessModel)
-{
-    brightnessModel = newBrightnessModel;
-}

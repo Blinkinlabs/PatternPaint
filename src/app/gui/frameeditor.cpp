@@ -283,8 +283,8 @@ void FrameEditor::paintEvent(QPaintEvent *)
     if (!fixture.isNull() && showPlaybackIndicator) {
 
         int playbackRow = frameIndex;
-        int fixtureWidth = fixture->getSize().width();
-        int fixtureHeight = fixture->getSize().height();
+        int fixtureWidth = fixture->getExtents().width();
+        int fixtureHeight = fixture->getExtents().height();
 
         // Draw the playback indicator
         painter.setPen(COLOR_PLAYBACK_EDGE);

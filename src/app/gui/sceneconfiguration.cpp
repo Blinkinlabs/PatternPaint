@@ -26,6 +26,7 @@ SceneConfiguration::SceneConfiguration(QWidget *parent) :
     ui->controllerType->addItem("BlinkyPendant");
     ui->controllerType->addItem("Arduino Leonardo");
     ui->controllerType->addItem("Arduino Micro");
+    ui->controllerType->addItem("EightByEight");
 
     // Disable controller selection for now since it doesn't really matter.
 // ui->controllerBox->setVisible(false);
