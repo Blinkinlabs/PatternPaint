@@ -58,12 +58,17 @@ void BlinkyTapeUploader::cancel()
 
 void BlinkyTapeUploader::setProgress(int newProgress)
 {
-//    qDebug() << "Progress:" << newProgress
-//             << "maxProgress:" << maxProgress;
-
     progress = newProgress;
-    // TODO: Precalculate the max progress
-    emit(progressChanged((progress*100)/maxProgress));
+
+    unsigned progressPercent = (progress*100)/maxProgress;
+    if (progressPercent > 100) {
+        qDebug() << "Progress error: progress % > 100"
+                 << "Progress:" << newProgress
+                 << "maxProgress:" << maxProgress;
+        progressPercent = 100;
+    }
+
+    emit(progressChanged(progressPercent));
 }
 
 void BlinkyTapeUploader::setDialogText()
@@ -142,6 +147,9 @@ void BlinkyTapeUploader::handleError(QString error)
 
             flashWriteRetriesRemaining--;
 
+            // Reset the progress to the beginning of the flash write section
+            progress = 3;
+
             commandQueue.flushQueue();
             doWork();
 
@@ -162,14 +170,6 @@ void BlinkyTapeUploader::handleCommandFinished(QString command, QByteArray retur
 
 // qDebug() << "Command finished:" << command;
     setProgress(progress + 1);
-
-//    // we know reset is the last command, so the BlinkyTape should be ready soon.
-//    // Schedule a timer to emit the message shortly.
-//    // TODO: Let the receiver handle this instead.
-//    if (command == "reset") {
-//        commandQueue.close();
-//        emit(finished(true));
-//    }
 }
 
 void BlinkyTapeUploader::handleLastCommandFinished()
@@ -246,6 +246,8 @@ bool BlinkyTapeUploader::startUpload(qint64 timeout)
     }
 
     maxProgress = 1;    // checkDeviceSignature
+    maxProgress += 2;   // erase EEPROM
+    maxProgress += 1;   // reset
 
     // There are 4 commands for each page-
     // setaddress, writeflashpage, setaddress, verifyflashpage
@@ -348,9 +350,6 @@ void BlinkyTapeUploader::doWork()
         commandQueue.enqueue(Avr109Commands::writeEeprom(eepromBytes,0));
 
         // TODO: Verify EEPROM?
-
-//        // TODO: Disable this eventually
-//        commandQueue.enqueue(Avr109Commands::chipErase());
 
         break;
     }
