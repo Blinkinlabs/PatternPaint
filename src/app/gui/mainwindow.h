@@ -43,7 +43,7 @@ public slots:
 
     void on_frameDataEdited(int index, QImage update);
 
-    void applyScene(SceneTemplate sceneTemplate);
+    void applyScene(const SceneTemplate &scene);
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -119,7 +119,7 @@ private slots:
 
     void on_actionNew_FramePattern_triggered();
 
-    void on_actionConfigure_Fixture_triggered();
+    void on_actionConfigure_Scene_triggered();
 
     void on_actionOpen_Scrolling_Pattern_triggered();
 

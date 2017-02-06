@@ -2,10 +2,10 @@
 
 #include <limits>
 
-MatrixFixture::MatrixFixture(
-    QSize size, ColorMode colorMode, BrightnessModel *brightnessModel, QObject *parent) :
+MatrixFixture::MatrixFixture(QSize size, MatrixMode matrixMode, ColorMode colorMode, BrightnessModel *brightnessModel, QObject *parent) :
     Fixture(parent),
-    colormode(colorMode),
+    matrixMode(matrixMode),
+    colorMode(colorMode),
     brightnessModel(brightnessModel)
 {
     setSize(size);
@@ -19,7 +19,15 @@ MatrixFixture::~MatrixFixture()
 
 QString MatrixFixture::getName() const
 {
-    return QString("Matrix");
+    switch(matrixMode) {
+    case MODE_ZIGZAG:
+        return QString("Matrix-Zigzag");
+        break;
+    case MODE_ROWS:
+    default:
+        return QString("Matrix-Rows");
+        break;
+    }
 }
 
 QList<QColor> MatrixFixture::getColorStreamForFrame(const QImage frame) const
@@ -72,7 +80,17 @@ void MatrixFixture::setSize(QSize newSize)
 
     for (int x = 0; x < size.width(); x++) {
         for (int y = 0; y < size.height(); y++) {
-            QPoint point (x, x%2 ? size.height()-1-y : y);
+            QPoint point;
+
+            switch(matrixMode) {
+            case MODE_ZIGZAG:
+                point = QPoint(x, x%2 ? size.height()-1-y : y);
+                break;
+            case MODE_ROWS:
+                point = QPoint(x, y);
+                break;
+            }
+
             locations.append(point);
 
             if(extents.left() > point.x())
@@ -87,14 +105,19 @@ void MatrixFixture::setSize(QSize newSize)
     }
 }
 
+MatrixFixture::MatrixMode MatrixFixture::getMode() const
+{
+    return matrixMode;
+}
+
 ColorMode MatrixFixture::getColorMode() const
 {
-    return colormode;
+    return colorMode;
 }
 
 void MatrixFixture::setColorMode(ColorMode newColorMode)
 {
-    colormode = newColorMode;
+    colorMode = newColorMode;
 }
 
 BrightnessModel *MatrixFixture::getBrightnessModel() const

@@ -189,7 +189,7 @@
           <x>0</x>
           <y>0</y>
           <width>500</width>
-          <height>267</height>
+          <height>268</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -645,7 +645,7 @@
      <x>0</x>
      <y>0</y>
      <width>880</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -718,7 +718,7 @@
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionConfigure_Fixture"/>
+    <addaction name="actionConfigure_Scene"/>
     <addaction name="separator"/>
     <addaction name="actionSave_to_Blinky"/>
     <addaction name="separator"/>
@@ -1098,7 +1098,7 @@
     <string>Frame-based Pattern</string>
    </property>
   </action>
-  <action name="actionConfigure_Fixture">
+  <action name="actionConfigure_Scene">
    <property name="text">
     <string>Scene configuration...</string>
    </property>

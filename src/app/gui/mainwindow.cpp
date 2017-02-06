@@ -195,14 +195,21 @@ MainWindow::MainWindow(QWidget *parent) :
     // Fill the examples menu using the examples resource
     populateExamplesMenu(":/examples", menuExamples);
 
-    fixture
-        = new MatrixFixture(settings.value("Fixture/DisplaySize",
-                                           QSize(DEFAULT_FIXTURE_WIDTH,
-                                                 DEFAULT_FIXTURE_HEIGHT)).toSize(),
-                            (ColorMode)settings.value("Fixture/ColorOrder", RGB).toInt(),
-                            new ExponentialBrightness(1.8, 1.8, 2.1));
-    frameEditor->setFixture(fixture);
-    outputPreview->setFixture(fixture);
+    // Buld the scene
+    SceneTemplate scene;
+
+    QSize fixtureSize = settings.value("Fixture/DisplaySize",
+                                        QSize(DEFAULT_FIXTURE_WIDTH,
+                                              DEFAULT_FIXTURE_HEIGHT)).toSize();
+
+    scene.firmwareName = settings.value("BlinkyTape/firmwareName", DEFAULT_FIRMWARE_NAME).toString();
+
+    scene.fixtureType = settings.value("Fixture/Type", DEFAULT_FIXTURE_TYPE).toString();
+    scene.colorMode = (ColorMode)settings.value("Fixture/ColorOrder", RGB).toInt();
+    scene.height = fixtureSize.height();
+    scene.width = fixtureSize.width();
+
+    applyScene(scene);
 
     patternCollectionListView->setItemDelegate(new PatternCollectionDelegate(this));
     patternCollectionListView->setModel(patternCollection.getModel());
@@ -827,10 +834,11 @@ bool MainWindow::promptForSave(QList<Pattern *> patterns)
     return false;
 }
 
-void MainWindow::applyScene(SceneTemplate sceneTemplate)
+void MainWindow::applyScene(const SceneTemplate &scene)
 {
-    QSize newDisplaySize(sceneTemplate.width, sceneTemplate.height);
-    ColorMode newColorMode = sceneTemplate.colorMode;
+    QSize newDisplaySize(scene.width, scene.height);
+
+    qDebug() << newDisplaySize;
 
     // Test if any patterns need to be resized
     QList<Pattern *> needToResize;
@@ -860,18 +868,38 @@ void MainWindow::applyScene(SceneTemplate sceneTemplate)
         }
     }
 
-    // Finally, apply the new settings
-    QSettings settings;
-    settings.setValue("Fixture/DisplaySize", newDisplaySize);
-    settings.setValue("Fixture/ColorOrder", newColorMode);
+    // Apply the new settings
 
-    fixture->setSize(newDisplaySize);
-    fixture->setColorMode(newColorMode);
+    // TODO: Make a factory function for this?
+    qDebug() << "Fixture type:" << scene.fixtureType;
+    if(scene.fixtureType == "Matrix-Zigzag") {
+        fixture = new MatrixFixture(newDisplaySize,
+                                    MatrixFixture::MODE_ZIGZAG,
+                                    scene.colorMode,
+                                    new ExponentialBrightness(1.8, 1.8, 2.1));
+    }
+    else if(scene.fixtureType == "Matrix-Rows") {
+        fixture = new MatrixFixture(newDisplaySize,
+                                    MatrixFixture::MODE_ROWS,
+                                    scene.colorMode,
+                                    new ExponentialBrightness(1.8, 1.8, 2.1));
+    }
+    else {
+        // TODO
+        fixture = new MatrixFixture(newDisplaySize,
+                                    MatrixFixture::MODE_ROWS,
+                                    scene.colorMode,
+                                    new ExponentialBrightness(1.8, 1.8, 2.1));
+    }
+
+    // Wire in the fixture
+    frameEditor->setFixture(fixture);
+    outputPreview->setFixture(fixture);
 
     // If the new scene includes examples, load them as well
     // TODO: Separate this out into a different process?
-    if (!sceneTemplate.examples.isEmpty()) {
-        QDir examplesDir(sceneTemplate.examples);
+    if (!scene.examples.isEmpty()) {
+        QDir examplesDir(scene.examples);
         QFileInfoList examplesList = examplesDir.entryInfoList();
 
         foreach(QFileInfo fileinfo, examplesList) {
@@ -881,12 +909,19 @@ void MainWindow::applyScene(SceneTemplate sceneTemplate)
                     type = Pattern::FrameBased;
 
                 loadPattern(type,
-                            sceneTemplate.examples + "/" + fileinfo.fileName());
+                            scene.examples + "/" + fileinfo.fileName());
             }
         }
 
         patternCollectionListView->setCurrentIndex(patternCollectionListView->model()->index(0, 0));
     }
+
+    // Finally, save the settings
+    QSettings settings;
+    settings.setValue("Fixture/Type", scene.fixtureType);
+    settings.setValue("Fixture/DisplaySize", newDisplaySize);
+    settings.setValue("Fixture/ColorOrder", scene.colorMode);
+    settings.setValue("BlinkyTape/firmwareName", scene.firmwareName);
 }
 
 QProgressDialog* MainWindow::makeProgressDialog() {
@@ -1176,12 +1211,13 @@ void MainWindow::on_actionNew_FramePattern_triggered()
     loadPattern(Pattern::FrameBased, QString());
 }
 
-void MainWindow::on_actionConfigure_Fixture_triggered()
+void MainWindow::on_actionConfigure_Scene_triggered()
 {
     SceneConfiguration sceneConfiguration(this);
 
-    // Keep a persistant scene template around that's loaded/saved with program start
+    // TODO: Keep a persistant scene around that's loaded/saved with program start
     SceneTemplate sceneTemplate;
+
     if (!controller.isNull()) {
         sceneTemplate.controllerType = controller->getName();
     }
@@ -1194,7 +1230,10 @@ void MainWindow::on_actionConfigure_Fixture_triggered()
     }
 
     QSettings settings;
+
+    // TODO: roll this into the persistant sceneTemplate
     sceneTemplate.firmwareName = settings.value("BlinkyTape/firmwareName", DEFAULT_FIRMWARE_NAME).toString();
+
 
     sceneConfiguration.setSceneTemplate(sceneTemplate);
     sceneConfiguration.exec();
@@ -1203,10 +1242,6 @@ void MainWindow::on_actionConfigure_Fixture_triggered()
         return;
 
     applyScene(sceneConfiguration.getSceneTemplate());
-
-    // TODO: roll this into the persistant sceneTemplate
-    settings.setValue("BlinkyTape/firmwareName",sceneConfiguration.getSceneTemplate().firmwareName);
-
 }
 
 void MainWindow::openPattern(Pattern::PatternType type)

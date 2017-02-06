@@ -10,7 +10,13 @@ class MatrixFixture : public Fixture
     Q_OBJECT
 
 public:
-    MatrixFixture(QSize size, ColorMode colorMode, BrightnessModel *brightnessModel,
+    enum MatrixMode {
+        MODE_ZIGZAG,
+        MODE_ROWS
+    };
+
+    MatrixFixture(QSize size, MatrixMode matrixMode,
+                  ColorMode colorMode, BrightnessModel *brightnessModel,
                   QObject *parent = 0);
 
     ~MatrixFixture();
@@ -28,6 +34,8 @@ public:
     QSize getSize() const;
     void setSize(QSize newSize);
 
+    MatrixFixture::MatrixMode getMode() const;
+
     ColorMode getColorMode() const;
     void setColorMode(ColorMode newColorMode);
 
@@ -36,7 +44,8 @@ public:
 
 private:
     QSize size;
-    ColorMode colormode;
+    MatrixMode matrixMode;
+    ColorMode colorMode;
     BrightnessModel *brightnessModel;
 
     QList<QPoint> locations;

@@ -22,9 +22,9 @@ public:
     explicit SceneConfiguration(QWidget *parent = 0);
     ~SceneConfiguration();
 
-    void setSceneTemplate(SceneTemplate sceneTemplate);
+    void setSceneTemplate(const SceneTemplate sceneTemplate);
 
-    SceneTemplate getSceneTemplate();
+    SceneTemplate getSceneTemplate() const;
 
 private slots:
     void on_sceneTemplate_activated(const QString &arg1);

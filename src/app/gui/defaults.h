@@ -16,6 +16,7 @@
 #define COLOR_CANVAS_DEFAULT    QColor(0, 0, 0, 255)           /// Default tool color
 #define COLOR_TOOL_DEFAULT    QColor(255, 255, 255, 255)       /// Default pattern backgroud color
 
+#define DEFAULT_FIXTURE_TYPE "Linear"   /// Default fixture type
 #define DEFAULT_FIXTURE_WIDTH 1         /// Default fixture width for new fixtures
 #define DEFAULT_FIXTURE_HEIGHT 60       /// Default fixture height for new fixtures
 #define DEFAULT_FRAME_COUNT 8           /// Default frame count for new patterns

@@ -37,6 +37,7 @@ SceneConfiguration::SceneConfiguration(QWidget *parent) :
     // TODO: Auto configuration for this?
     ui->FixtureType->addItem("Linear");
     ui->FixtureType->addItem("Matrix-Zigzag");
+    ui->FixtureType->addItem("Matrix-Rows");
 
     ui->fixtureHeight->setValidator(new QIntValidator(1, std::numeric_limits<int>::max(), this));
     ui->fixtureWidth->setValidator(new QIntValidator(1, std::numeric_limits<int>::max(), this));
@@ -51,13 +52,29 @@ SceneConfiguration::~SceneConfiguration()
     delete ui;
 }
 
-void SceneConfiguration::setSceneTemplate(SceneTemplate sceneTemplate)
+void SceneConfiguration::setSceneTemplate(const SceneTemplate sceneTemplate)
 {
     setControllerType(sceneTemplate.controllerType);
     setFixtureType(sceneTemplate.fixtureType);
     setFirmwareName(sceneTemplate.firmwareName);
     setColorMode(sceneTemplate.colorMode);
     setFixtureSize(QSize(sceneTemplate.width, sceneTemplate.height));
+}
+
+SceneTemplate SceneConfiguration::getSceneTemplate() const
+{
+    SceneTemplate sceneTemplate;
+    sceneTemplate.name = "???";
+    sceneTemplate.photo = "";
+    sceneTemplate.examples = "";
+    sceneTemplate.controllerType = ui->controllerType->currentText();
+    sceneTemplate.fixtureType = ui->FixtureType->currentText();
+    sceneTemplate.firmwareName = ui->firmwareName->currentText();
+    sceneTemplate.colorMode = (ColorMode)ui->ColorType->currentData().toInt();
+    sceneTemplate.height = ui->fixtureHeight->text().toInt();
+    sceneTemplate.width = ui->fixtureWidth->text().toInt();
+
+    return sceneTemplate;
 }
 
 void SceneConfiguration::setColorMode(ColorMode mode)
@@ -101,22 +118,6 @@ void SceneConfiguration::setFirmwareName(QString type)
     ui->firmwareName->blockSignals(true);
     ui->firmwareName->setCurrentText(type);
     ui->firmwareName->blockSignals(false);
-}
-
-SceneTemplate SceneConfiguration::getSceneTemplate()
-{
-    SceneTemplate sceneTemplate;
-    sceneTemplate.name = "???";
-    sceneTemplate.photo = "";
-    sceneTemplate.examples = "";
-    sceneTemplate.controllerType = "";
-    sceneTemplate.fixtureType = "";
-    sceneTemplate.firmwareName = ui->firmwareName->currentText();
-    sceneTemplate.colorMode = (ColorMode)ui->ColorType->currentData().toInt();
-    sceneTemplate.height = ui->fixtureHeight->text().toInt();
-    sceneTemplate.width = ui->fixtureWidth->text().toInt();
-
-    return sceneTemplate;
 }
 
 void SceneConfiguration::on_sceneTemplate_activated(const QString &arg1)
