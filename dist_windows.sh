@@ -62,7 +62,7 @@ BLINKYPENDANT=${DRIVERS}/Blinkypendant
 EIGHTBYEIGHT=${DRIVERS}/EightByEight
 
 # Winsparkle library release
-WINSPARKLE=${BASEDIR}/thirdparty/WinSparkle-0.5.2
+WINSPARKLE=${BASEDIR}/thirdparty/WinSparkle-0.5.3
 
 # libusb library release
 LIBUSB=${BASEDIR}/thirdparty/libusb-1.0.20-win
