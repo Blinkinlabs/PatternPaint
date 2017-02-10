@@ -189,7 +189,7 @@
           <x>0</x>
           <y>0</y>
           <width>500</width>
-          <height>268</height>
+          <height>280</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -645,7 +645,7 @@
      <x>0</x>
      <y>0</y>
      <width>880</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -860,6 +860,9 @@
    <property name="text">
     <string>Export pattern for Arduino</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
   </action>
   <action name="actionVisit_the_Blinkinlabs_forum">
    <property name="text">
@@ -903,6 +906,9 @@
    <property name="text">
     <string>Save to Blinky</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+U</string>
+   </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
    </property>
@@ -930,6 +936,9 @@
    </property>
    <property name="text">
     <string>Play</string>
+   </property>
+   <property name="shortcut">
+    <string>Space</string>
    </property>
   </action>
   <action name="actionPen">
@@ -1024,9 +1033,6 @@
    <property name="text">
     <string>Save As...</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+S</string>
-   </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
    </property>
@@ -1038,6 +1044,9 @@
    </property>
    <property name="text">
     <string>Close</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
@@ -1051,6 +1060,9 @@
    <property name="text">
     <string>Step backward</string>
    </property>
+   <property name="shortcut">
+    <string>Left</string>
+   </property>
   </action>
   <action name="actionStepForward">
    <property name="icon">
@@ -1063,6 +1075,9 @@
    <property name="toolTip">
     <string>Step forward</string>
    </property>
+   <property name="shortcut">
+    <string>Right</string>
+   </property>
   </action>
   <action name="actionAddFrame">
    <property name="icon">
@@ -1071,6 +1086,9 @@
    </property>
    <property name="text">
     <string>Add frame</string>
+   </property>
+   <property name="shortcut">
+    <string>+</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
@@ -1083,6 +1101,9 @@
    </property>
    <property name="text">
     <string>Delete frame</string>
+   </property>
+   <property name="shortcut">
+    <string>-</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
@@ -1135,10 +1156,16 @@
    <property name="text">
     <string>Close All</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+W</string>
+   </property>
   </action>
   <action name="actionSave_All">
    <property name="text">
     <string>Save All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
   <action name="actionDebug_Log">
