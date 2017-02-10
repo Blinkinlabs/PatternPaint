@@ -1,7 +1,7 @@
 # Third party libraries used in Pattern Paint
 This directory contains third-party libraries that are distributed along with the Pattern Paint exectuable. They are organized by platform
 
-# Mac OS X
+# macOS
 
 ## Sparkle
 Pattern Paint integrates [Sparkle](http://sparkle-project.org/) for automatic app updates on OS X.
@@ -28,19 +28,17 @@ For simplicity, the compiled binaries are included in the github repo. These wer
 	make install
 	install_name_tool -id @rpath/libusb-1.0.0.dylib osx-install/lib/libusb-1.0.0.dylib
 
-
-
 # Windows
 
 ## WinSparkle
 [WinSparkle](http://winsparkle.org) is used for automatic app updates on the Windows platform.
 
 ### Obtaining
-Grab WinSparkle 1.4:
-[https://github.com/vslavik/winsparkle/releases/tag/v0.4](https://github.com/vslavik/winsparkle/releases/tag/v0.4)
+Grab WinSparkle:
+[https://github.com/vslavik/winsparkle/releases](https://github.com/vslavik/winsparkle/releases/)
 
 ### Building
-No special steps need to be performed to use WinSparkle. The download contains a .dll that can be used directly.
+No special steps need to be performed to use WinSparkle. The download contains a .dll that can be used directly. The file '../src/app/updater/updater.pri' will need to be updated if the version number changes.
 
 
 ## Libusb
