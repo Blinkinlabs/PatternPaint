@@ -47,6 +47,9 @@ public:
 
 private:
 
+    QSize scaledSize;       ///< Full size of the image being edited
+    float scale;            ///< User-controlled scale factor
+
     QImage frameData;     ///< Frame image
     int frameIndex;                 ///< Frame index
 
@@ -66,8 +69,8 @@ private:
     QPointer<Fixture> fixture;
 
     /// Convert a coordinte from frame coordinate to image coordinate
-    QPoint frameToImage(const int &framePointX, const int &framePointY) const;
-    QPoint imageToFrame(const QPoint& imagePoint) const;
+    QPoint frameToImage(const int framePointX, const int framePointY) const;
+    QPoint imageToFrame(const QPoint &imagePoint) const;
 
     /// Redraw the gridPattern to fit the current widget size.
     void updateGridSize();
@@ -78,10 +81,12 @@ private:
     /// True if the editor has an image to edit
     bool hasImage() const;
 
+    void updateSize();
+
     void paintEvent(QPaintEvent *event);
 
 signals:
-    void dataEdited(int index, const QImage data);
+    void dataEdited(int index, const QImage &data);
 
 public slots:
     void setToolColor(QColor color);
@@ -90,7 +95,7 @@ public slots:
     void setFixture(Fixture *);
     void setShowPlaybakIndicator(bool);
 
-    void setFrameData(int index, const QImage data);
+    void setFrameData(int index, const QImage &data);
 };
 
 #endif // PATTERNDITOR_H

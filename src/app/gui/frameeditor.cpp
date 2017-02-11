@@ -20,7 +20,7 @@
 #define GRID_MIN_Y_SCALE        6   // Minimum scale that the image needs to scale to before the grid is displayed
 
 
-QPoint FrameEditor::frameToImage(const int &framePointX, const int &framePointY ) const {
+QPoint FrameEditor::frameToImage(const int framePointX, const int framePointY ) const {
         int x = framePointX/pixelScale;
         int y = framePointY/pixelScale;
         return QPoint(x,y);
@@ -90,9 +90,27 @@ const QImage &FrameEditor::getPatternAsImage() const
     return frameData;
 }
 
+void FrameEditor::updateSize()
+{
+    scale = 200;
+
+    if(hasImage()) {
+        // Calculate the display size based on the scaled frameData
+        scaledSize = frameData.size()*scale;
+    }
+    else {
+        scaledSize = QSize(1,1);
+    }
+
+    // Update the widget geometry so that it can be resized correctly
+    setBaseSize(scaledSize);
+    setMinimumSize(scaledSize);
+    updateGridSize();
+}
+
 void FrameEditor::resizeEvent(QResizeEvent *resizeEvent)
 {
-    updateGridSize();
+    updateSize();
 
     QWidget::resizeEvent(resizeEvent);
 }
@@ -102,14 +120,11 @@ void FrameEditor::updateGridSize()
     if (!hasImage())
         return;
 
-    // Update the widget geometry so that it can be resized correctly
-    this->setBaseSize(frameData.size());
-
     // Base the widget size on the window height
     // cast float to int to save rounded scale
     QSize frameSize = frameData.size();
 
-    pixelScale = float(size().height())/frameSize.height();
+    pixelScale = float(scaledSize.height())/frameSize.height();
 
     // If the drawing space is large enough, make a grid pattern to superimpose over the image
     if (pixelScale >= GRID_MIN_Y_SCALE) {
@@ -209,12 +224,13 @@ void FrameEditor::setShowPlaybakIndicator(bool newShowPlaybackIndicator)
     showPlaybackIndicator = newShowPlaybackIndicator;
 }
 
-void FrameEditor::setFrameData(int index, const QImage data)
+void FrameEditor::setFrameData(int index, const QImage &data)
 {
     // Don't update if we are currently in a draw operation
     if(!instrument.isNull() && instrument->hasPreview())
         return;
 
+    // TODO: Unclear logic
     if (data.isNull()) {
         frameData = data;
         frameIndex = index;
@@ -223,17 +239,13 @@ void FrameEditor::setFrameData(int index, const QImage data)
         return;
     }
 
-    // TODO: Unclear logic
-    bool updateSize = (!hasImage() || (data.size() != frameData.size()));
+    bool sizeChanged = (!hasImage() || (data.size() != frameData.size()));
 
     frameData = data;
     frameIndex = index;
 
-    if (updateSize) {
-        updateGridSize();
-        // Compute a new viewport size, based on the current viewport height
-        float scale = float(size().height())/data.size().height();
-        this->setMinimumWidth(data.size().width()*scale);
+    if (sizeChanged) {
+        updateSize();
     }
 
     // and force a screen update
