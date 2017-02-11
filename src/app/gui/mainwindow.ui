@@ -748,6 +748,10 @@
     <addaction name="menuToolbars"/>
     <addaction name="separator"/>
     <addaction name="actionOutput_Preview"/>
+    <addaction name="separator"/>
+    <addaction name="actionZoomToFit"/>
+    <addaction name="actionZoomIn"/>
+    <addaction name="actionZoomOut"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -819,6 +823,23 @@
    <addaction name="actionSpray"/>
    <addaction name="actionPipette"/>
    <addaction name="actionFill"/>
+  </widget>
+  <widget class="QToolBar" name="zoomToolbar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="windowTitle">
+    <string>Zoom Controls</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionZoomIn"/>
+   <addaction name="actionZoomOut"/>
+   <addaction name="actionZoomToFit"/>
   </widget>
   <action name="actionSave">
    <property name="enabled">
@@ -1176,6 +1197,60 @@
   <action name="actionFirmware_Manager">
    <property name="text">
     <string>Firmware manager</string>
+   </property>
+  </action>
+  <action name="actionZoomIn">
+   <property name="icon">
+    <iconset resource="../images.qrc">
+     <normaloff>:/icons/images/icons/Zoom In-100.png</normaloff>:/icons/images/icons/Zoom In-100.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom in</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom in</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+=</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionZoomOut">
+   <property name="icon">
+    <iconset resource="../images.qrc">
+     <normaloff>:/icons/images/icons/Zoom Out-100.png</normaloff>:/icons/images/icons/Zoom Out-100.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom out</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom out</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+-</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionZoomToFit">
+   <property name="icon">
+    <iconset resource="../images.qrc">
+     <normaloff>:/icons/images/icons/Zoom To Extents-100.png</normaloff>:/icons/images/icons/Zoom To Extents-100.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom to fit</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom to fit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+9</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
    </property>
   </action>
  </widget>

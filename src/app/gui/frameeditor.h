@@ -96,6 +96,10 @@ public slots:
     void setShowPlaybakIndicator(bool);
 
     void setFrameData(int index, const QImage &data);
+
+    void zoomIn();
+    void zoomOut();
+    void zoomToFit();
 };
 
 #endif // PATTERNDITOR_H

@@ -72,8 +72,8 @@ SceneTemplate SceneConfiguration::getSceneTemplate() const
     sceneTemplate.fixtureType = ui->FixtureType->currentText();
     sceneTemplate.firmwareName = ui->firmwareName->currentText();
     sceneTemplate.colorMode = (ColorMode)ui->ColorType->currentData().toInt();
-    sceneTemplate.size = QSize(ui->fixtureHeight->text().toInt(),
-                               ui->fixtureWidth->text().toInt());
+    sceneTemplate.size = QSize(ui->fixtureWidth->text().toInt(),
+                               ui->fixtureHeight->text().toInt());
 
     return sceneTemplate;
 }

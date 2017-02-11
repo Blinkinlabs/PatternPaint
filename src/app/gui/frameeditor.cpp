@@ -19,6 +19,9 @@
 
 #define GRID_MIN_Y_SCALE        6   // Minimum scale that the image needs to scale to before the grid is displayed
 
+#define ZOOM_MIN                5
+#define ZOOM_MAX                100
+#define ZOOM_STEP               5
 
 QPoint FrameEditor::frameToImage(const int framePointX, const int framePointY ) const {
         int x = framePointX/pixelScale;
@@ -33,6 +36,7 @@ QPoint FrameEditor::imageToFrame(const QPoint &imagePoint) const {
 FrameEditor::FrameEditor(QWidget *parent) :
     QWidget(parent),
     frameIndex(0),
+    scale(30),OB
     showPlaybackIndicator(false)
 {
     this->setAcceptDrops(true);
@@ -82,7 +86,43 @@ void FrameEditor::dropEvent(QDropEvent *event)
 //// And stop on the first one we've found.
 // return;
 // }
-// }
+    // }
+}
+
+void FrameEditor::zoomIn()
+{
+    scale += ZOOM_STEP;
+    if(scale>ZOOM_MAX)scale=ZOOM_MAX;
+
+    updateSize();
+    update();
+}
+
+void FrameEditor::zoomOut()
+{
+    scale -= ZOOM_STEP;
+    if(scale<ZOOM_MIN)scale=ZOOM_MIN;
+
+    updateSize();
+    update();
+}
+
+void FrameEditor::zoomToFit()
+{
+    //Does not work: first zoom to minimum
+    setBaseSize(QSize(1,1));
+    setMinimumSize(QSize(1,1));
+    updateGridSize();
+
+    //Then adjust to window size
+    QSize frameDateSize = frameData.size();
+    scale = size().height()/frameDateSize.height();
+    if(scale<ZOOM_MIN)scale=ZOOM_MIN;
+    if(scale>ZOOM_MAX)scale=ZOOM_MAX;
+
+    updateSize();
+    update();
+
 }
 
 const QImage &FrameEditor::getPatternAsImage() const
@@ -92,8 +132,6 @@ const QImage &FrameEditor::getPatternAsImage() const
 
 void FrameEditor::updateSize()
 {
-    scale = 200;
-
     if(hasImage()) {
         // Calculate the display size based on the scaled frameData
         scaledSize = frameData.size()*scale;
