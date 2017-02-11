@@ -36,7 +36,7 @@ QPoint FrameEditor::imageToFrame(const QPoint &imagePoint) const {
 FrameEditor::FrameEditor(QWidget *parent) :
     QWidget(parent),
     frameIndex(0),
-    scale(30),OB
+    scale(30),
     showPlaybackIndicator(false)
 {
     this->setAcceptDrops(true);
