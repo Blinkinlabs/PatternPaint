@@ -113,7 +113,7 @@ void FrameEditor::zoomOut()
 void FrameEditor::zoomToFit()
 {
     // first zoom to min
-    scale=0.1;
+    scale=1;
     fitToWindow = false;
     updateSize();
     update();
@@ -188,18 +188,18 @@ void FrameEditor::updateGridSize()
         // Draw vertical lines
         painter.setPen(COLOR_GRID_LINES);
         for (int x = 0; x <= frameSize.width(); x++) {
-            painter.drawLine(std::round(x*pixelScale),
+            painter.drawLine(x*pixelScale,
                              0,
-                             std::round(x*pixelScale),
+                             x*pixelScale,
                              gridPattern.height());
         }
 
         // Draw horizontal lines
         for (int y = 0; y <= frameSize.height(); y++) {
             painter.drawLine(0,
-                             std::round(y*pixelScale),
+                             y*pixelScale,
                              gridPattern.width(),
-                             std::round(y*pixelScale));
+                             y*pixelScale);
         }
     }
 }
@@ -295,11 +295,14 @@ void FrameEditor::setFrameData(int index, const QImage &data)
     if (sizeChanged) {
 
         if(fitToWindow){
-            updateGridSize();
 
             // Compute a new viewport size, based on the current viewport height
             float zoom = float(size().height())/data.size().height();
             this->setMinimumWidth(data.size().width()*zoom);
+
+            this->setBaseSize(data.size()*zoom);
+
+            updateGridSize();
 
         }else{
             updateSize();
