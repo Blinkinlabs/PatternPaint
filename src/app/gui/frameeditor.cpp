@@ -154,6 +154,12 @@ void FrameEditor::resizeEvent(QResizeEvent *resizeEvent)
         updateSize();
     }
 
+    float widgetAspect = float(baseSize().width())
+                         /baseSize().height();
+
+    float widgetWidth = height()*widgetAspect;
+    setMinimumWidth(widgetWidth);
+    setMaximumWidth(widgetWidth);
 
     QWidget::resizeEvent(resizeEvent);
 }
