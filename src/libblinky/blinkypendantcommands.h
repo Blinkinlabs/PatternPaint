@@ -8,11 +8,13 @@
 
 namespace BlinkyPendantCommands {
 
+QByteArray commandHeader();
+
 SerialCommand startWrite();
 
-SerialCommand writeFlashPage(QByteArray data);
+SerialCommand writeFlashChunk(const QByteArray &data);
 
-QList<SerialCommand> writeData(QByteArray &data);
+QList<SerialCommand> writeFlash(const QByteArray &data);
 
 SerialCommand stopWrite();
 

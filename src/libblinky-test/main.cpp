@@ -1,6 +1,7 @@
 #include <QtTest>
 
 #include "avr109commandstests.h"
+#include "blinkypendantcommandstests.h"
 #include "colormodetests.h"
 #include "serialcommandtests.h"
 #include "bytearrayhelperstests.h"
@@ -35,6 +36,9 @@ int main(int argc, char *argv[])
 
     ExponentialBrightnessTests exponentialBrightnessTests;
     result |= QTest::qExec(&exponentialBrightnessTests);
+
+    BlinkyPendantCommandsTests blinkyPendantCommandsTests;
+    result |= QTest::qExec(&blinkyPendantCommandsTests);
 
     return result;
 }

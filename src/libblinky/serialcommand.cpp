@@ -58,3 +58,13 @@ CompareResult SerialCommand::testResponse(const QByteArray &response)
         return RESPONSE_MISMATCH;
     }
 }
+
+bool SerialCommand::operator==(const SerialCommand& rhs) const
+{
+    return ((name == rhs.name)
+            && (data == rhs.data)
+            && (expectedResponse == rhs.expectedResponse)
+            && (expectedResponseMask == rhs.expectedResponseMask)
+            && (timeout == rhs.timeout)
+            );
+}
