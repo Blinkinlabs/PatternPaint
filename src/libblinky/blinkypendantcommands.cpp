@@ -62,7 +62,7 @@ SerialCommand writeFlashChunk(const QByteArray &data)
 {
     // TODO: How to error out here?
     if(data.length() != CHUNK_SIZE_BYTES)
-        qCritical() << "Bad data size"
+        qCritical() << "Bad data size, padding"
                     << "got:" << data.length()
                     << "expected:" << CHUNK_SIZE_BYTES;
 

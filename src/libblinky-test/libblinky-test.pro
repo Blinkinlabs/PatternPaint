@@ -22,7 +22,8 @@ HEADERS += \
     memorysectiontests.h \
     memorymaptests.h \
     exponentialbrightnesstests.h \
-    blinkypendantcommandstests.h
+    blinkypendantcommandstests.h \
+    lightbuddycommandstests.h
 
 SOURCES += \
     avr109commandstests.cpp \
@@ -33,4 +34,5 @@ SOURCES += \
     memorysectiontests.cpp \
     memorymaptests.cpp \
     exponentialbrightnesstests.cpp \
-    blinkypendantcommandstests.cpp
+    blinkypendantcommandstests.cpp \
+    lightbuddycommandstests.cpp

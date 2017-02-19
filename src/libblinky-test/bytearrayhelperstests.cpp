@@ -24,6 +24,26 @@ void ByteArrayHelpersTests::uint16ToByteArrayTest()
     QVERIFY(uint16ToByteArray(value) == result);
 }
 
+void ByteArrayHelpersTests::uint32ToByteArrayTest_data()
+{
+    QTest::addColumn<uint32_t>("value");
+    QTest::addColumn<QByteArray>("result");
+
+    QTest::newRow("zero")       << 0u         << QByteArray().append('\x00').append('\x00').append('\x00').append('\x00');
+    QTest::newRow("one")        << 1u         << QByteArray().append('\x00').append('\x00').append('\x00').append('\x01');
+    QTest::newRow("small")      << 300u       << QByteArray().append('\x00').append('\x00').append('\x01').append('\x2C');
+    QTest::newRow("almost max") << (UINT32_MAX - 1) << QByteArray().append('\xFF').append('\xFF').append('\xFF').append('\xFE');
+    QTest::newRow("max")        << UINT32_MAX << QByteArray().append('\xFF').append('\xFF').append('\xFF').append('\xFF');
+}
+
+void ByteArrayHelpersTests::uint32ToByteArrayTest()
+{
+    QFETCH(uint32_t, value);
+    QFETCH(QByteArray, result);
+
+    QVERIFY(uint32ToByteArray(value) == result);
+}
+
 void ByteArrayHelpersTests::chunkDataTest_data()
 {
     const int FLASH_PAGE_SIZE_BYTES = 128;
