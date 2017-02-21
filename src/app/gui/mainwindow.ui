@@ -189,7 +189,7 @@
           <x>0</x>
           <y>0</y>
           <width>500</width>
-          <height>280</height>
+          <height>267</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -645,7 +645,7 @@
      <x>0</x>
      <y>0</y>
      <width>880</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -672,6 +672,7 @@
      <addaction name="actionOpen_Frame_based_Pattern"/>
     </widget>
     <addaction name="menuNew"/>
+    <addaction name="actionOpen_project"/>
     <addaction name="menuOpen"/>
     <addaction name="menuExamples"/>
     <addaction name="separator"/>
@@ -829,7 +830,7 @@
      <normaloff>:/icons/images/icons/Save-100.png</normaloff>:/icons/images/icons/Save-100.png</iconset>
    </property>
    <property name="text">
-    <string>Save</string>
+    <string>Save project</string>
    </property>
    <property name="iconText">
     <string>Save</string>
@@ -1176,6 +1177,16 @@
   <action name="actionFirmware_Manager">
    <property name="text">
     <string>Firmware manager</string>
+   </property>
+  </action>
+  <action name="actionOpen_project">
+   <property name="text">
+    <string>Open project</string>
+   </property>
+  </action>
+  <action name="actionSave_project">
+   <property name="text">
+    <string>Save project</string>
    </property>
   </action>
  </widget>

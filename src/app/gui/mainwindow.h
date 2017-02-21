@@ -56,6 +56,7 @@ private slots:
     void connectionScannerTimer_timeout();
 
     void on_actionSave_triggered();
+
     void on_actionSave_as_triggered();
 
     void on_actionExit_triggered();
@@ -121,6 +122,8 @@ private slots:
 
     void on_actionConfigure_Scene_triggered();
 
+    void on_actionOpen_project_triggered();
+
     void on_actionOpen_Scrolling_Pattern_triggered();
 
     void on_actionOpen_Frame_based_Pattern_triggered();
@@ -159,6 +162,8 @@ private:
 
     PatternCollection patternCollection;
 
+    QString projectFilename;
+
     QLineEdit currentFrame;
 
     enum Modes {
@@ -178,6 +183,7 @@ private:
     bool promptForSave(Pattern *pattern);
     bool promptForSave(QList<Pattern *> patterns);
 
+    bool savePatternProject();
     bool savePattern(Pattern *item);
     bool savePatternAs(Pattern *item);
 

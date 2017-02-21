@@ -43,7 +43,7 @@ public:
 
     /// Initialize the pattern from an image file
     /// @param newFileInfo URL of file to load
-    bool load(const QString &newFileName);
+    bool load(const QImage &newSourceImage,const QString &newFileName);
 
     /// Save the pattern
     /// Note: The file must already have a filename, otherwise use saveAs
@@ -97,6 +97,8 @@ public:
     /// @return true if the pattern has unsaved changes
     bool getModified() const;
 
+    void setModified(bool modified);
+
     /// Get the underlying data model (for connection to a view)
     PatternModel *getModel() const;
 
@@ -105,6 +107,9 @@ public:
     {
         return uuid;
     }
+
+    /// Get the Type for this pattern
+    int getType() const;
 
     /// True if the pattern editor should show a playback indicator for ths
     /// pattern type

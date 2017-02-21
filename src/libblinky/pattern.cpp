@@ -63,14 +63,9 @@ QString Pattern::getName() const
     return fileInfo.baseName();
 }
 
-bool Pattern::load(const QString &newFileName)
+bool Pattern::load(const QImage &newSourceImage, const QString &newFileName)
 {
-    QImage sourceImage;
-
-    // Attempt to load the iamge
-    if (!sourceImage.load(newFileName))
-        return false;
-
+    QImage sourceImage = newSourceImage;
 
     switch (type) {
     case FrameBased:
@@ -188,6 +183,11 @@ bool Pattern::getModified() const
     return model->data(model->index(0), PatternModel::Modified).toBool();
 }
 
+void Pattern::setModified(bool modified)
+{
+    model->setData(model->index(0), modified, PatternModel::Modified);
+}
+
 void Pattern::resize(QSize newSize, bool scale)
 {
     Q_UNUSED(scale);
@@ -223,6 +223,11 @@ void Pattern::setEditImage(int index, const QImage &update)
 PatternModel * Pattern::getModel() const
 {
     return model;
+}
+
+int Pattern::getType() const
+{
+    return type;
 }
 
 int Pattern::getFrameCount() const
