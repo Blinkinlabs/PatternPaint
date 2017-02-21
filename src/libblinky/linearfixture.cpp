@@ -3,14 +3,9 @@
 LinearFixture::LinearFixture(unsigned int length, QObject *parent) :
     Fixture(parent)
 {
-    setLength(length);
-
     setName("Linear");
-}
 
-LinearFixture::~LinearFixture()
-{
-
+    setLength(length);
 }
 
 unsigned int LinearFixture::getLength() const

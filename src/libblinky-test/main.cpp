@@ -10,6 +10,8 @@
 #include "memorymaptests.h"
 #include "exponentialbrightnesstests.h"
 #include "fixturetests.h"
+#include "matrixfixturetests.h"
+#include "linearfixturetests.h"
 
 int main(int argc, char *argv[])
 {
@@ -47,6 +49,12 @@ int main(int argc, char *argv[])
 
     FixtureTests fixtureTests;
     result |= QTest::qExec(&fixtureTests);
+
+    MatrixFixtureTests matrixFixtureTests;
+    result |= QTest::qExec(&matrixFixtureTests);
+
+    LinearFixtureTests linearFixtureTests;
+    result |= QTest::qExec(&linearFixtureTests);
 
     return result;
 }

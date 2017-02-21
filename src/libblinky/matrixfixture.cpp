@@ -3,11 +3,8 @@
 #include <limits>
 
 MatrixFixture::MatrixFixture(QSize size, MatrixMode matrixMode, QObject *parent) :
-    Fixture(parent),
-    matrixMode(matrixMode)
+    Fixture(parent)
 {
-    setSize(size);
-
     switch(matrixMode) {
     case MODE_ZIGZAG:
         setName("Matrix-Zigzag");
@@ -17,11 +14,9 @@ MatrixFixture::MatrixFixture(QSize size, MatrixMode matrixMode, QObject *parent)
         setName("Matrix-Rows");
         break;
     }
-}
 
-MatrixFixture::~MatrixFixture()
-{
-
+    setMode(matrixMode);
+    setSize(size);
 }
 
 QSize MatrixFixture::getSize() const
@@ -32,7 +27,22 @@ QSize MatrixFixture::getSize() const
 void MatrixFixture::setSize(QSize newSize)
 {
     size = newSize;
+    recalculateLocations();
+}
 
+MatrixFixture::MatrixMode MatrixFixture::getMode() const
+{
+    return matrixMode;
+}
+
+void MatrixFixture::setMode(MatrixFixture::MatrixMode newMatrixMode)
+{
+    matrixMode = newMatrixMode;
+    recalculateLocations();
+}
+
+void MatrixFixture::recalculateLocations()
+{
     QList<QPoint> newLocations;
 
     for (int x = 0; x < size.width(); x++) {
@@ -54,10 +64,3 @@ void MatrixFixture::setSize(QSize newSize)
 
     setLocations(newLocations);
 }
-
-MatrixFixture::MatrixMode MatrixFixture::getMode() const
-{
-    return matrixMode;
-}
-
-

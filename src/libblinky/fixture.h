@@ -36,7 +36,7 @@ public:
     virtual const QList<QPoint> & getLocations() const;
 
     // Get the number of LEDs in this fixture
-    virtual int getCount() const;
+    virtual unsigned int getCount() const;
 
     // Get the extents of this fixture in drawing pixel coordinates
     // TODO: Make float, handle negative coordinates

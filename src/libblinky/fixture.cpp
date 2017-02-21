@@ -92,7 +92,7 @@ const QList<QPoint> & Fixture::getLocations() const
     return locations;
 }
 
-int Fixture::getCount() const
+unsigned int Fixture::getCount() const
 {
     return locations.count();
 }

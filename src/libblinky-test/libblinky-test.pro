@@ -24,7 +24,9 @@ HEADERS += \
     exponentialbrightnesstests.h \
     blinkypendantcommandstests.h \
     lightbuddycommandstests.h \
-    fixturetests.h
+    fixturetests.h \
+    matrixfixturetests.h \
+    linearfixturetests.h
 
 SOURCES += \
     avr109commandstests.cpp \
@@ -37,4 +39,6 @@ SOURCES += \
     exponentialbrightnesstests.cpp \
     blinkypendantcommandstests.cpp \
     lightbuddycommandstests.cpp \
-    fixturetests.cpp
+    fixturetests.cpp \
+    matrixfixturetests.cpp \
+    linearfixturetests.cpp
