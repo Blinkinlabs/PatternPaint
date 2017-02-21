@@ -14,8 +14,6 @@ public:
                   QObject *parent = 0);
     ~LinearFixture();
 
-    QString getName() const;
-
     unsigned int getLength() const;
     void setLength(unsigned int newLength);
 

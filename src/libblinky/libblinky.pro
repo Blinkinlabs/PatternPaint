@@ -56,7 +56,8 @@ SOURCES +=  \
     firmwareimport.cpp \
     scenetemplate.cpp \
     exponentialbrightness.cpp \
-    linearfixture.cpp
+    linearfixture.cpp \
+    brightnessmodel.cpp
 
 # For platforms that have serial ports
 # TODO: Pull hard-coded references to BlinkyTape from the gui, allowing this section to be switchable

@@ -20,8 +20,6 @@ public:
 
     ~MatrixFixture();
 
-    QString getName() const;
-
     QSize getSize() const;
     void setSize(QSize newSize);
 

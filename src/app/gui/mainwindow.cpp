@@ -984,7 +984,7 @@ void MainWindow::updateBlinky()
     QImage frame = patternCollection.at(getCurrentPatternIndex())->getFrameImage(
         getCurrentFrameIndex());
 
-    QList<QColor> pixels = fixture->getColorStreamForFrame(frame);
+    QList<QColor> pixels = fixture->getColorStream(frame);
 
     // TODO:
     QByteArray ledData;

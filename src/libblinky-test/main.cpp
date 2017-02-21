@@ -9,6 +9,7 @@
 #include "memorysectiontests.h"
 #include "memorymaptests.h"
 #include "exponentialbrightnesstests.h"
+#include "fixturetests.h"
 
 int main(int argc, char *argv[])
 {
@@ -43,6 +44,9 @@ int main(int argc, char *argv[])
 
     LightBuddyCommandsTests lightBuddyCommandsTests;
     result |= QTest::qExec(&lightBuddyCommandsTests);
+
+    FixtureTests fixtureTests;
+    result |= QTest::qExec(&fixtureTests);
 
     return result;
 }

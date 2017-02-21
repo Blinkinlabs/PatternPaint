@@ -3,11 +3,6 @@
 
 #include <cmath>
 
-BrightnessModel::~BrightnessModel()
-{
-
-}
-
 ExponentialBrightness::ExponentialBrightness(float r, float g, float b) :
     rFactor_(r),
     gFactor_(g),

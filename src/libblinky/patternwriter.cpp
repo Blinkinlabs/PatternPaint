@@ -10,7 +10,7 @@ PatternWriter::PatternWriter(const Pattern *pattern, Encoding encoding, Fixture 
 {
     frameCount = pattern->getFrameCount();
     frameDelay = 1000/pattern->getFrameSpeed();
-    ledCount = fixture->getLedCount();
+    ledCount = fixture->getCount();
 
     // Create a new encoder
     switch (encoding) {
@@ -95,7 +95,7 @@ void PatternWriter::encodeImageRGB565_RLE(const Pattern *pattern)
     for (int frame = 0; frame < pattern->getFrameCount(); frame++) {
         header.append(QString("// Frame: %1\n").arg(frame));
 
-        QList<QColor> colorStream = fixture->getColorStreamForFrame(pattern->getFrameImage(frame));
+        QList<QColor> colorStream = fixture->getColorStream(pattern->getFrameImage(frame));
 
         int currentColor = 0;
         int runCount = 0;
@@ -144,7 +144,7 @@ void PatternWriter::encodeImageRGB565_RLE(const Pattern *pattern)
     header.append("};\n\n");
     header.append(QString("Animation animation(%1, animationData, Animation::RGB565_RLE, %2, %3);\n")
                   .arg(pattern->getFrameCount())
-                  .arg(fixture->getLedCount())
+                  .arg(fixture->getCount())
                   .arg(frameDelay));
 }
 
@@ -156,7 +156,7 @@ void PatternWriter::encodeImageRGB24(const Pattern *pattern)
     data.clear();
 
     for (int frame = 0; frame < pattern->getFrameCount(); frame++) {
-        QList<QColor> colorStream = fixture->getColorStreamForFrame(pattern->getFrameImage(frame));
+        QList<QColor> colorStream = fixture->getColorStream(pattern->getFrameImage(frame));
 
         for (int pixel = 0; pixel < colorStream.count(); pixel++) {
             QColor color = colorStream.at(pixel);
@@ -170,7 +170,7 @@ void PatternWriter::encodeImageRGB24(const Pattern *pattern)
     for (int frame = 0; frame < pattern->getFrameCount(); frame++) {
         header.append(QString("// Frame: %1\n").arg(frame));
 
-        QList<QColor> colorStream = fixture->getColorStreamForFrame(pattern->getFrameImage(frame));
+        QList<QColor> colorStream = fixture->getColorStream(pattern->getFrameImage(frame));
 
         for (int pixel = 0; pixel < colorStream.count(); pixel++) {
             QByteArray bytes = colorToBytes(fixture->getColorMode(), colorStream.at(pixel));
@@ -186,6 +186,6 @@ void PatternWriter::encodeImageRGB24(const Pattern *pattern)
     header.append("\n");
     header.append(QString("Animation animation(%1, animationData, Animation::RGB24, %2, %3);")
                   .arg(pattern->getFrameCount())
-                  .arg(fixture->getLedCount())
+                  .arg(fixture->getCount())
                   .arg(frameDelay));
 }
