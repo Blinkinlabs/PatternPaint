@@ -49,6 +49,7 @@ private:
 
     QSize scaledSize;       ///< Full size of the image being edited
     float scale;            ///< User-controlled scale factor
+    bool fitToWindow;
 
     QImage frameData;     ///< Frame image
     int frameIndex;                 ///< Frame index
