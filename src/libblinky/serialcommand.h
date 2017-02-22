@@ -33,6 +33,8 @@ public:
     QByteArray expectedResponse;    ///< Expected response from the bootloader
     QByteArray expectedResponseMask;///< Mask for interpreting expected response (0 is ignore)
     int timeout;
+
+    bool operator==(const SerialCommand& rhs) const;
 };
 
 #endif // SERIALCOMMAND_H

@@ -1,8 +1,10 @@
 #include <QtTest>
 
 #include "avr109commandstests.h"
+#include "blinkypendantcommandstests.h"
 #include "colormodetests.h"
 #include "serialcommandtests.h"
+#include "lightbuddycommandstests.h"
 #include "bytearrayhelperstests.h"
 #include "memorysectiontests.h"
 #include "memorymaptests.h"
@@ -35,6 +37,12 @@ int main(int argc, char *argv[])
 
     ExponentialBrightnessTests exponentialBrightnessTests;
     result |= QTest::qExec(&exponentialBrightnessTests);
+
+    BlinkyPendantCommandsTests blinkyPendantCommandsTests;
+    result |= QTest::qExec(&blinkyPendantCommandsTests);
+
+    LightBuddyCommandsTests lightBuddyCommandsTests;
+    result |= QTest::qExec(&lightBuddyCommandsTests);
 
     return result;
 }

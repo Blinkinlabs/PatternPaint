@@ -2,20 +2,20 @@
 
 #include <QDebug>
 
+#include "bytearrayhelpers.h"
+
 #define COMMAND_START_WRITE 0x01
 #define COMMAND_WRITE       0x02
 #define COMMAND_STOP_WRITE  0x03
 
 #define PAGE_SIZE_BYTES     1024    // Size unit for writes to flash
-#define WRITE_SIZE_BYTES    64      // Number of bytes the write command requires per call
+#define CHUNK_SIZE_BYTES    64      // Number of bytes the write command requires per call
 
 namespace BlinkyPendantCommands {
 
 QByteArray commandHeader()
 {
-    QByteArray output;
-    output.fill((char)0xFF,10);
-    return output;
+    return QByteArray(10, (char)0xFF);
 }
 
 SerialCommand startWrite()
@@ -38,52 +38,6 @@ SerialCommand startWrite()
     return SerialCommand("startWrite", command, response, responseMask, 2000);
 }
 
-SerialCommand writeFlashPage(QByteArray data)
-{
-    QByteArray command;
-    command += commandHeader();
-
-    command.append(COMMAND_WRITE);
-
-    command += data;
-
-    QByteArray response;
-    response.append('P');
-    response.append((char)0x00);
-    response.append((char)0x00);
-
-    QByteArray responseMask;
-    responseMask.append((char)0xFF);
-    responseMask.append((char)0xFF);
-    responseMask.append((char)0x00);
-
-    return SerialCommand("writePage", command, response, responseMask);
-}
-
-QList<SerialCommand> writeData(QByteArray &data)
-{
-    QList<SerialCommand> commands;
-
-    if (data.length() == 0) {
-        // TODO: How to report an error here?
-        qCritical() << "No data to write";
-        return commands;
-    }
-
-    // Pad the data to the page size
-    while (data.length()%PAGE_SIZE_BYTES != 0)
-        data.append((char)0xFF);
-
-    for (int currentChunkPosition = 0;
-         currentChunkPosition < data.length();
-         currentChunkPosition += WRITE_SIZE_BYTES) {
-
-        commands.append(writeFlashPage(data.mid(currentChunkPosition, WRITE_SIZE_BYTES)));
-    }
-
-    return commands;
-}
-
 SerialCommand stopWrite()
 {
     QByteArray command;
@@ -103,4 +57,55 @@ SerialCommand stopWrite()
 
     return SerialCommand("stopWrite", command, response, responseMask);
 }
+
+SerialCommand writeFlashChunk(const QByteArray &data)
+{
+    // TODO: How to error out here?
+    if(data.length() != CHUNK_SIZE_BYTES)
+        qCritical() << "Bad data size, padding"
+                    << "got:" << data.length()
+                    << "expected:" << CHUNK_SIZE_BYTES;
+
+    QByteArray paddedData(data.mid(0,CHUNK_SIZE_BYTES));
+
+    while (paddedData.length() < CHUNK_SIZE_BYTES)
+        paddedData.append((char)0xFF);
+
+    QByteArray command;
+    command += commandHeader();
+
+    command.append(COMMAND_WRITE);
+    command.append(paddedData);
+
+    QByteArray response;
+    response.append('P');
+    response.append((char)0x00);
+    response.append((char)0x00);
+
+    QByteArray responseMask;
+    responseMask.append((char)0xFF);
+    responseMask.append((char)0xFF);
+    responseMask.append((char)0x00);
+
+    return SerialCommand("writeFlashPage", command, response, responseMask);
+}
+
+QList<SerialCommand> writeFlash(const QByteArray &data)
+{
+    QByteArray paddedData(data);
+    QList<SerialCommand> commands;
+
+    // Pad the data to the page size
+    // TODO: Is this actually required? The firmware makes it look like
+    // only CHUNK_SIZE_BYTES is required.
+    while (paddedData.length() % PAGE_SIZE_BYTES != 0)
+        paddedData.append((char)0xFF);
+
+    for(QByteArray chunk : chunkData(paddedData, CHUNK_SIZE_BYTES)) {
+        commands.append(writeFlashChunk(chunk));
+    }
+
+    return commands;
+}
+
 }

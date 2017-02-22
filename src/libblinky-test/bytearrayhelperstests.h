@@ -10,6 +10,9 @@ private slots:
     void uint16ToByteArrayTest_data();
     void uint16ToByteArrayTest();
 
+    void uint32ToByteArrayTest_data();
+    void uint32ToByteArrayTest();
+
     void chunkDataTest_data();
     void chunkDataTest();
 };

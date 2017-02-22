@@ -118,3 +118,51 @@ void SerialCommandTests::compareMaskTest()
 
     QVERIFY(command.testResponse(response) == result);
 }
+
+void SerialCommandTests::equalsTest()
+{
+    SerialCommand a("name", QByteArray(3,'x'), QByteArray(4, 'y'), QByteArray(5, 'z'), 123);
+    SerialCommand b("name", QByteArray(3,'x'), QByteArray(4, 'y'), QByteArray(5, 'z'), 123);
+
+    QVERIFY((a == b));
+}
+
+void SerialCommandTests::equalsOperatorNameMismatchTest()
+{
+    SerialCommand a("name", QByteArray(3,'x'), QByteArray(4, 'y'), QByteArray(5, 'z'), 123);
+    SerialCommand b("nameb", QByteArray(3,'x'), QByteArray(4, 'y'), QByteArray(5, 'z'), 123);
+
+    QVERIFY(!(a == b));
+}
+
+void SerialCommandTests::equalsOperatorDataMismatchTest()
+{
+    SerialCommand a("name", QByteArray(3,'x'), QByteArray(4, 'y'), QByteArray(5, 'z'), 123);
+    SerialCommand b("name", QByteArray(3,'y'), QByteArray(4, 'y'), QByteArray(5, 'z'), 123);
+
+    QVERIFY(!(a == b));
+}
+
+void SerialCommandTests::equalsOperatorExpectedResponseMismatchTest()
+{
+    SerialCommand a("name", QByteArray(3,'x'), QByteArray(4, 'y'), QByteArray(5, 'z'), 123);
+    SerialCommand b("name", QByteArray(3,'x'), QByteArray(4, 'x'), QByteArray(5, 'z'), 123);
+
+    QVERIFY(!(a == b));
+}
+
+void SerialCommandTests::equalsOperatorExpectedResponseMaskMismatchTest()
+{
+    SerialCommand a("name", QByteArray(3,'x'), QByteArray(4, 'y'), QByteArray(5, 'z'), 123);
+    SerialCommand b("name", QByteArray(3,'x'), QByteArray(4, 'y'), QByteArray(5, 'a'), 123);
+
+    QVERIFY(!(a == b));
+}
+
+void SerialCommandTests::equalsOperatorTimeoutMismatchTest()
+{
+    SerialCommand a("name", QByteArray(3,'x'), QByteArray(4, 'y'), QByteArray(5, 'z'), 123);
+    SerialCommand b("name", QByteArray(3,'x'), QByteArray(4, 'y'), QByteArray(5, 'z'), 124);
+
+    QVERIFY(!(a == b));
+}

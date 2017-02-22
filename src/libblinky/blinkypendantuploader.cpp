@@ -133,7 +133,7 @@ bool BlinkyPendantUploader::storePatterns(BlinkyController &controller,
     commandQueue.enqueue(BlinkyPendantCommands::startWrite());
 
     // 2-n. write data (aligned to 1024-byte sectors, 64 bytes at a time)
-    commandQueue.enqueue(BlinkyPendantCommands::writeData(data));
+    commandQueue.enqueue(BlinkyPendantCommands::writeFlash(data));
 
     // n+1 stop write
     commandQueue.enqueue(BlinkyPendantCommands::stopWrite());

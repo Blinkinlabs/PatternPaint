@@ -21,7 +21,9 @@ HEADERS += \
     bytearrayhelperstests.h \
     memorysectiontests.h \
     memorymaptests.h \
-    exponentialbrightnesstests.h
+    exponentialbrightnesstests.h \
+    blinkypendantcommandstests.h \
+    lightbuddycommandstests.h
 
 SOURCES += \
     avr109commandstests.cpp \
@@ -31,4 +33,6 @@ SOURCES += \
     bytearrayhelperstests.cpp \
     memorysectiontests.cpp \
     memorymaptests.cpp \
-    exponentialbrightnesstests.cpp
+    exponentialbrightnesstests.cpp \
+    blinkypendantcommandstests.cpp \
+    lightbuddycommandstests.cpp

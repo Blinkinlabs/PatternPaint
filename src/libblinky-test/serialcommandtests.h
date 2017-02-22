@@ -15,6 +15,13 @@ private slots:
 
     void compareMaskTest_data();
     void compareMaskTest();
+
+    void equalsTest();
+    void equalsOperatorNameMismatchTest();
+    void equalsOperatorDataMismatchTest();
+    void equalsOperatorExpectedResponseMismatchTest();
+    void equalsOperatorExpectedResponseMaskMismatchTest();
+    void equalsOperatorTimeoutMismatchTest();
 };
 
 #endif // SERIALCOMMANDTESTS_H
