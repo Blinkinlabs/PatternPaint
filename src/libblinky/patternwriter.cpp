@@ -53,26 +53,6 @@ int PatternWriter::getFrameDelay() const
     return frameDelay;
 }
 
-int PatternWriter::colorCount() const
-{
-    // TODO
-    QImage image;
-
-    // Brute force method for counting the number of unique colors in the image
-    // TODO: Convert colors to compressed space (RGB565, etc) first?
-    QList<QRgb> colors;
-
-    for (int frame = 0; frame < image.width(); frame++) {
-        for (int pixel = 0; pixel < image.height(); pixel++) {
-            QRgb color = image.pixel(frame, pixel);
-            if (!colors.contains(color))
-                colors.append(color);
-        }
-    }
-
-    return colors.length();
-}
-
 int PatternWriter::QRgbTo565(QColor color)
 {
     QByteArray bytes = colorToBytes(fixture->getColorMode(), color);

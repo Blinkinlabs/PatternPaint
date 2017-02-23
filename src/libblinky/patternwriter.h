@@ -24,8 +24,6 @@ public:
     QByteArray &getData();
     QString getHeader() const;
 
-    int colorCount() const;  /// Number of unique colors in the original image
-
     int getFrameCount() const;
     int getLedCount() const;
     int getFrameDelay() const;
