@@ -110,8 +110,17 @@ void FrameEditor::zoomOut()
     update();
 }
 
-void FrameEditor::zoomToFit()
+void FrameEditor::zoomToFit(bool newFitToWindow)
 {
+    // TODO: There is a round trip here when enabled=true
+    if(newFitToWindow == fitToWindow)
+        return;
+
+    if(!newFitToWindow) {
+        fitToWindow = false;
+        return;
+    }
+
     // first zoom to min
     scale=1;
     fitToWindow = false;
@@ -162,6 +171,7 @@ void FrameEditor::resizeEvent(QResizeEvent *resizeEvent)
     setMaximumWidth(widgetWidth);
 
     QWidget::resizeEvent(resizeEvent);
+    emit(zoomToFitChanged(fitToWindow));
 }
 
 void FrameEditor::updateGridSize()

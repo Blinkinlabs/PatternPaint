@@ -189,7 +189,7 @@
           <x>0</x>
           <y>0</y>
           <width>500</width>
-          <height>280</height>
+          <height>268</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -645,7 +645,7 @@
      <x>0</x>
      <y>0</y>
      <width>880</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1236,6 +1236,9 @@
    </property>
   </action>
   <action name="actionZoomToFit">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../images.qrc">
      <normaloff>:/icons/images/icons/Zoom To Extents-100.png</normaloff>:/icons/images/icons/Zoom To Extents-100.png</iconset>

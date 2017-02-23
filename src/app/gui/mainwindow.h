@@ -106,12 +106,6 @@ private slots:
 
     void on_actionDeleteFrame_triggered();
 
-    void on_actionZoomIn_triggered();
-
-    void on_actionZoomOut_triggered();
-
-    void on_actionZoomToFit_triggered();
-
     void on_ExampleSelected(QAction *);
 
     void on_patternCollectionCurrentChanged(const QModelIndex &current, const QModelIndex &);

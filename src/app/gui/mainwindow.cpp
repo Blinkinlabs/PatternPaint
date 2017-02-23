@@ -169,8 +169,17 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(penSizeSpin, SIGNAL(valueChanged(int)),
             frameEditor, SLOT(setToolSize(int)));
 
+    connect(actionZoomToFit, SIGNAL(toggled(bool)),
+            frameEditor, SLOT(zoomToFit(bool)));
+    connect(actionZoomIn, SIGNAL(triggered(bool)),
+            frameEditor, SLOT(zoomIn()));
+    connect(actionZoomOut, SIGNAL(triggered(bool)),
+            frameEditor, SLOT(zoomOut()));
+
     connect(frameEditor, SIGNAL(dataEdited(int, const QImage)),
             this, SLOT(on_frameDataEdited(int, const QImage)));
+    connect(frameEditor, SIGNAL(zoomToFitChanged(bool)),
+            actionZoomToFit, SLOT(setChecked(bool)));
 
     frameEditor->setToolSize(DRAWING_SIZE_MINIMUM_VALUE);
 
@@ -1154,21 +1163,6 @@ void MainWindow::on_actionDeleteFrame_triggered()
 
     patternCollection.at(getCurrentPatternIndex())->deleteFrame(getCurrentFrameIndex());
     setNewFrame(getCurrentFrameIndex());
-}
-
-void MainWindow::on_actionZoomIn_triggered()
-{
-    frameEditor->zoomIn();
-}
-
-void MainWindow::on_actionZoomOut_triggered()
-{
-    frameEditor->zoomOut();
-}
-
-void MainWindow::on_actionZoomToFit_triggered()
-{
-    frameEditor->zoomToFit();
 }
 
 void MainWindow::setPatternModified(bool modified)

@@ -88,6 +88,7 @@ private:
 
 signals:
     void dataEdited(int index, const QImage &data);
+    void zoomToFitChanged(bool enabled);
 
 public slots:
     void setToolColor(QColor color);
@@ -100,7 +101,7 @@ public slots:
 
     void zoomIn();
     void zoomOut();
-    void zoomToFit();
+    void zoomToFit(bool newFitToWindow);
 };
 
 #endif // PATTERNDITOR_H
