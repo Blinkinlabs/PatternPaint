@@ -1156,6 +1156,21 @@ void MainWindow::on_actionDeleteFrame_triggered()
     setNewFrame(getCurrentFrameIndex());
 }
 
+void MainWindow::on_actionZoomIn_triggered()
+{
+    frameEditor->zoomIn();
+}
+
+void MainWindow::on_actionZoomOut_triggered()
+{
+    frameEditor->zoomOut();
+}
+
+void MainWindow::on_actionZoomToFit_triggered()
+{
+    frameEditor->zoomToFit();
+}
+
 void MainWindow::setPatternModified(bool modified)
 {
     actionSave->setEnabled(modified);

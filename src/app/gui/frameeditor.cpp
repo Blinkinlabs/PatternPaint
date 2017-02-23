@@ -19,8 +19,11 @@
 
 #define GRID_MIN_Y_SCALE        6   // Minimum scale that the image needs to scale to before the grid is displayed
 
+#define ZOOM_MIN                5
+#define ZOOM_MAX                100
+#define ZOOM_STEP               5
 
-QPoint FrameEditor::frameToImage(const int &framePointX, const int &framePointY ) const {
+QPoint FrameEditor::frameToImage(const int framePointX, const int framePointY ) const {
         int x = framePointX/pixelScale;
         int y = framePointY/pixelScale;
         return QPoint(x,y);
@@ -32,6 +35,8 @@ QPoint FrameEditor::imageToFrame(const QPoint &imagePoint) const {
 
 FrameEditor::FrameEditor(QWidget *parent) :
     QWidget(parent),
+    scale(ZOOM_MIN),
+    fitToWindow(true),
     frameIndex(0),
     showPlaybackIndicator(false)
 {
@@ -82,7 +87,41 @@ void FrameEditor::dropEvent(QDropEvent *event)
 //// And stop on the first one we've found.
 // return;
 // }
-// }
+    // }
+}
+
+void FrameEditor::zoomIn()
+{
+    scale += ZOOM_STEP;
+    if(scale>ZOOM_MAX)scale=ZOOM_MAX;
+    fitToWindow = false;
+
+    updateSize();
+    update();
+}
+
+void FrameEditor::zoomOut()
+{
+    scale -= ZOOM_STEP;
+    if(scale<ZOOM_MIN)scale=ZOOM_MIN;
+    fitToWindow = false;
+
+    updateSize();
+    update();
+}
+
+void FrameEditor::zoomToFit()
+{
+    // first zoom to min
+    scale=1;
+    fitToWindow = false;
+    updateSize();
+    update();
+
+    // then resize
+    fitToWindow = true;
+    updateGridSize();
+    update();
 }
 
 const QImage &FrameEditor::getPatternAsImage() const
@@ -90,9 +129,37 @@ const QImage &FrameEditor::getPatternAsImage() const
     return frameData;
 }
 
+void FrameEditor::updateSize()
+{
+    if(hasImage()) {
+        // Calculate the display size based on the scaled frameData
+        scaledSize = frameData.size()*scale;
+    }
+    else {
+        scaledSize = QSize(1,1);
+    }
+
+    // Update the widget geometry so that it can be resized correctly
+    setBaseSize(scaledSize);
+    setMinimumSize(scaledSize);
+    updateGridSize();
+}
+
 void FrameEditor::resizeEvent(QResizeEvent *resizeEvent)
 {
-    updateGridSize();
+
+    if(fitToWindow){
+        updateGridSize();
+    }else{
+        updateSize();
+    }
+
+    float widgetAspect = float(baseSize().width())
+                         /baseSize().height();
+
+    float widgetWidth = height()*widgetAspect;
+    setMinimumWidth(widgetWidth);
+    setMaximumWidth(widgetWidth);
 
     QWidget::resizeEvent(resizeEvent);
 }
@@ -102,14 +169,16 @@ void FrameEditor::updateGridSize()
     if (!hasImage())
         return;
 
-    // Update the widget geometry so that it can be resized correctly
-    this->setBaseSize(frameData.size());
-
     // Base the widget size on the window height
     // cast float to int to save rounded scale
     QSize frameSize = frameData.size();
 
-    pixelScale = float(size().height())/frameSize.height();
+    if(fitToWindow){
+        pixelScale = float(size().height())/frameSize.height();
+    }else{
+        pixelScale = float(scaledSize.height())/frameSize.height();
+    }
+    scale = pixelScale;
 
     // If the drawing space is large enough, make a grid pattern to superimpose over the image
     if (pixelScale >= GRID_MIN_Y_SCALE) {
@@ -125,18 +194,18 @@ void FrameEditor::updateGridSize()
         // Draw vertical lines
         painter.setPen(COLOR_GRID_LINES);
         for (int x = 0; x <= frameSize.width(); x++) {
-            painter.drawLine(std::round(x*pixelScale),
+            painter.drawLine(x*pixelScale,
                              0,
-                             std::round(x*pixelScale),
+                             x*pixelScale,
                              gridPattern.height());
         }
 
         // Draw horizontal lines
         for (int y = 0; y <= frameSize.height(); y++) {
             painter.drawLine(0,
-                             std::round(y*pixelScale),
+                             y*pixelScale,
                              gridPattern.width(),
-                             std::round(y*pixelScale));
+                             y*pixelScale);
         }
     }
 }
@@ -209,12 +278,13 @@ void FrameEditor::setShowPlaybakIndicator(bool newShowPlaybackIndicator)
     showPlaybackIndicator = newShowPlaybackIndicator;
 }
 
-void FrameEditor::setFrameData(int index, const QImage data)
+void FrameEditor::setFrameData(int index, const QImage &data)
 {
     // Don't update if we are currently in a draw operation
     if(!instrument.isNull() && instrument->hasPreview())
         return;
 
+    // TODO: Unclear logic
     if (data.isNull()) {
         frameData = data;
         frameIndex = index;
@@ -223,17 +293,27 @@ void FrameEditor::setFrameData(int index, const QImage data)
         return;
     }
 
-    // TODO: Unclear logic
-    bool updateSize = (!hasImage() || (data.size() != frameData.size()));
+    bool sizeChanged = (!hasImage() || (data.size() != frameData.size()));
 
     frameData = data;
     frameIndex = index;
 
-    if (updateSize) {
-        updateGridSize();
-        // Compute a new viewport size, based on the current viewport height
-        float scale = float(size().height())/data.size().height();
-        this->setMinimumWidth(data.size().width()*scale);
+    if (sizeChanged) {
+
+        if(fitToWindow){
+
+            // Compute a new viewport size, based on the current viewport height
+            float zoom = float(size().height())/data.size().height();
+            this->setMinimumWidth(data.size().width()*zoom);
+
+            this->setBaseSize(data.size()*zoom);
+
+            updateGridSize();
+
+        }else{
+            updateSize();
+        }
+
     }
 
     // and force a screen update
@@ -263,17 +343,20 @@ void FrameEditor::paintEvent(QPaintEvent *)
         return;
     }
 
+    // Base the widget size on the window height
+    // cast float to int to save rounded scale
+    QSize frameSize = frameData.size();
+
     // Draw the image and tool preview
-    // TODO: Why +1 here?
     painter.drawImage(QRect(0, 0,
-                            frameData.width()*pixelScale + 1,
-                            frameData.height()*pixelScale + 1),
+                            frameSize.width()*pixelScale,
+                            frameSize.height()*pixelScale),
                       frameData);
 
     if (!instrument.isNull() && instrument->hasPreview())
         painter.drawImage(QRect(0, 0,
-                                frameData.width()*pixelScale + 1,
-                                frameData.height()*pixelScale + 1),
+                                frameSize.width()*pixelScale,
+                                frameSize.height()*pixelScale),
                           (instrument->getPreview()));
 
     if (pixelScale >= GRID_MIN_Y_SCALE)
@@ -303,6 +386,8 @@ void FrameEditor::paintEvent(QPaintEvent *)
         painter.fillRect(QRect(topLeft, bottomRight), COLOR_PLAYBACK_TOP);
     }
 }
+
+
 
 void FrameEditor::applyInstrument(QImage &update)
 {
