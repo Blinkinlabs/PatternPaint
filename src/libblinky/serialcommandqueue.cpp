@@ -1,6 +1,7 @@
 #include "serialcommandqueue.h"
 
-SerialCommandQueue::SerialCommandQueue(QObject *parent) : QObject(parent)
+SerialCommandQueue::SerialCommandQueue(QObject *parent) :
+    QObject(parent)
 {
     serial = new QSerialPort(this);
     serial->setSettingsRestoredOnClose(false);
@@ -58,7 +59,7 @@ bool SerialCommandQueue::isConnected()
     return (serial != NULL && serial->isOpen());
 }
 
-void SerialCommandQueue::enqueue(QList<SerialCommand> commands)
+void SerialCommandQueue::enqueue(const QList<SerialCommand> &commands)
 {
     foreach (SerialCommand command, commands)
         enqueue(command);
@@ -75,18 +76,10 @@ void SerialCommandQueue::flushQueue()
     commandTimeoutTimer.stop();
 }
 
-void SerialCommandQueue::enqueue(SerialCommand command)
+void SerialCommandQueue::enqueue(const SerialCommand &command)
 {
 // qDebug() << "queuing command:" << command.name
 // << "length:" << command.data.count();
-
-    if (command.expectedResponseMask.count() > 0) {
-        if (command.expectedResponse.count() != command.expectedResponseMask.count()) {
-            qCritical() << "Expected response mask length incorrect!";
-            emit(error("Expected response mask length incorrect!"));
-            return;
-        }
-    }
 
     queue.push_back(command);
 
