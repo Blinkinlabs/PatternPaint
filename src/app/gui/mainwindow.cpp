@@ -489,10 +489,9 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered()
     QFileInfo fileInfo(fileName);
     settings.setValue("File/ExportArduinoDirectory", fileInfo.absolutePath());
 
-    PatternWriter patternWriter(patternCollection.at(getCurrentPatternIndex()),
-//                                PatternWriter::RGB24,
-                                PatternWriter::RGB565_RLE,
-                                fixture);
+    PatternWriter patternWriter(*(patternCollection.at(getCurrentPatternIndex())),
+                                *fixture,
+                                PatternWriter::RGB565_RLE);
 
     // Attempt to open the specified file
     QFile file(fileName);
@@ -503,7 +502,7 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered()
     }
 
     QTextStream ts(&file);
-    ts << patternWriter.getHeader();
+    ts << patternWriter.getDataAsHeader();
     file.close();
 }
 
@@ -695,9 +694,9 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
     QList<PatternWriter> patternWriters;
 
     foreach(Pattern* pattern, patternCollection.patterns()) {
-        PatternWriter patternWriter(pattern,
-                                    uploader->getSupportedEncodings().front(),
-                                    fixture);
+        PatternWriter patternWriter(*pattern,
+                                    *fixture,
+                                    uploader->getSupportedEncodings().front());
         patternWriters.append(patternWriter);
     }
 

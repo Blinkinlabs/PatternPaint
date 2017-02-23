@@ -18,11 +18,11 @@ public:
     };
 
     // Create an pattern from a QImage
-    PatternWriter(const Pattern *pattern, Encoding encoding, Fixture *fixture);
+    PatternWriter(const Pattern &pattern, const Fixture &fixture, Encoding encoding);
 
     Encoding getEncoding() const;
-    QByteArray &getData();
-    QString getHeader() const;
+    const QByteArray &getDataAsBinary() const;
+    const QString &getDataAsHeader() const;
 
     int getFrameCount() const;
     int getLedCount() const;
@@ -37,15 +37,14 @@ private:
     int frameCount;     /// Number of frames in this pattern
     int ledCount;       /// Number of LEDs attached to this blinky
     int frameDelay;     /// Length of time between frames of data, in ms
-    QPointer<Fixture> fixture;  /// Fixture we are writing to
 
     // Compress an RGB color to the 565 color space
     // TODO: Improve this conversion using a lookup table, instead of
     // decimation.
-    int QRgbTo565(QColor color);
+    int QRgbTo565(const QColor &color, ColorMode colorMode);
 
-    void encodeImageRGB24(const Pattern *pattern);
-    void encodeImageRGB565_RLE(const Pattern *pattern);
+    void encodeImageRGB24(const Pattern &pattern, const Fixture &fixture);
+    void encodeImageRGB565_RLE(const Pattern &pattern, const Fixture &fixture);
 };
 
 #endif // PATTERN_WRITER_H

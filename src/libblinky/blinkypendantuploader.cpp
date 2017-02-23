@@ -79,7 +79,7 @@ bool BlinkyPendantUploader::storePatterns(BlinkyController &controller,
         data.append((char)0x13);    // header
         data.append((char)0x37);
         data.append((char)patternWriters.front().getFrameCount());  // frame count
-        data += patternWriters.front().getData();       // image data (RGB24, uncompressed)
+        data += patternWriters.front().getDataAsBinary();       // image data (RGB24, uncompressed)
     } else {
         // Create the data structure to write to the device memory
         // Animation table
@@ -114,7 +114,7 @@ bool BlinkyPendantUploader::storePatterns(BlinkyController &controller,
             data += encodeWord(0);                          // Frame delay (2 bytes) TODO
 
             // Make sure we have an image compatible with the BlinkyPendant
-            patternData += pattern.getData();       // image data (RGB24, uncompressed)
+            patternData += pattern.getDataAsBinary();       // image data (RGB24, uncompressed)
         }
 
         data += patternData;
