@@ -43,6 +43,9 @@ FrameEditor::FrameEditor(QWidget *parent) :
     // Turn on mouse tracking so we can draw a preview
     // TODO: DO we need to do this here, or just in the constructor?
     setMouseTracking(true);
+
+    // Grab pinch gestures
+    grabGesture(Qt::PinchGesture);
 }
 
 bool FrameEditor::hasImage() const
@@ -379,16 +382,35 @@ int FrameEditor::getPenSize() const
     return toolSize;
 }
 
+void FrameEditor::pinchTriggered(QPinchGesture *gesture)
+{
+    if(gesture->changeFlags() & QPinchGesture::ScaleFactorChanged) {
+        setScale(scale * gesture->scaleFactor());
+    }
+}
+
 bool FrameEditor::event(QEvent *event)
 {
     // If it's a scroll event with the ctrl modifier, capture it
-    // In Windows 10, somehow pinch gestures are being captured here too :-/
-    // TODO: How does this look on macOS and Linux?
+    // In Windows 10, this also captures pinch events
     if(event->type() == QEvent::Wheel) {
-        QWheelEvent *e = static_cast<QWheelEvent*>(event);
-        if(e->modifiers().testFlag(Qt::ControlModifier)) {
-            setScale(scale*(1+(e->delta())/1200.0));
-            e->accept();
+        QWheelEvent *wheelEvent = static_cast<QWheelEvent*>(event);
+        if(wheelEvent->modifiers().testFlag(Qt::ControlModifier)) {
+            setScale(scale*(1+(wheelEvent->delta())/1200.0));
+
+            wheelEvent->accept();
+            return true;
+        }
+    }
+
+    // On macOS, this captures pinch events
+    else if(event->type() == QEvent::Gesture) {
+        QGestureEvent *gestureEvent = static_cast<QGestureEvent*>(event);
+
+        if(QGesture *pinch = gestureEvent->gesture(Qt::PinchGesture)) {
+            pinchTriggered(static_cast<QPinchGesture *>(pinch));
+
+            gestureEvent->accept();
             return true;
         }
     }

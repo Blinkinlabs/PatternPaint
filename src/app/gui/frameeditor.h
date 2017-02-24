@@ -6,6 +6,7 @@
 
 #include <QWidget>
 #include <QPointer>
+#include <QGesture>
 
 class QUndoStack;
 class PatternFrameUndoCommand;
@@ -81,6 +82,8 @@ private:
     void paintEvent(QPaintEvent *event);
 
     bool event(QEvent *event);
+
+    void pinchTriggered(QPinchGesture *gesture);
 
 signals:
     void dataEdited(int index, const QImage &data);
