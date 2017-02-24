@@ -25,10 +25,6 @@ public:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *);
 
-    // Handle file URLs dropped from other programs
-    void dragEnterEvent(QDragEnterEvent *event);
-    void dropEvent(QDropEvent *event);
-
 public:
 
     /// Instrument interface
@@ -46,8 +42,6 @@ public:
     int getPenSize() const;
 
 private:
-
-    QSize scaledSize;       ///< Full size of the image being edited
     float scale;            ///< User-controlled scale factor
     bool fitToWindow;
 
@@ -59,8 +53,6 @@ private:
     QPointer<AbstractInstrument> instrument;
 
     QImage gridPattern;    ///< Holds the pre-rendered grid overlay
-
-    float pixelScale;      ///< Number of pixels in the grid pattern per pattern pixel.
 
     QColor toolColor;      ///< Color of the current drawing tool (TODO: This should be a pointer to a tool)
     int toolSize;          ///< Size of the current drawing tool (TODO: This should be a pointer to a tool)
@@ -74,7 +66,7 @@ private:
     QPoint imageToFrame(const QPoint &imagePoint) const;
 
     /// Redraw the gridPattern to fit the current widget size.
-    void updateGridSize();
+    void updateGrid();
 
     /// Update the screen, but only if we haven't done so in a while
     void lazyUpdate();
@@ -84,7 +76,11 @@ private:
 
     void updateSize();
 
+    void setScale(float newScale);
+
     void paintEvent(QPaintEvent *event);
+
+    bool event(QEvent *event);
 
 signals:
     void dataEdited(int index, const QImage &data);

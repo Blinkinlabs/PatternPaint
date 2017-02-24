@@ -4,7 +4,6 @@ HEADERS += \
     $$PWD/mainwindow.h \
     $$PWD/systeminformation.h \
     $$PWD/aboutpatternpaint.h \
-    $$PWD/letterboxscrollarea.h \
     $$PWD/colorchooser.h \
     $$PWD/patterncollectionmodel.h \
     $$PWD/patterncollectiondelegate.h \
@@ -26,7 +25,6 @@ SOURCES += \
     $$PWD/mainwindow.cpp \
     $$PWD/systeminformation.cpp \
     $$PWD/aboutpatternpaint.cpp \
-    $$PWD/letterboxscrollarea.cpp \
     $$PWD/colorchooser.cpp \
     $$PWD/patterncollectionmodel.cpp \
     $$PWD/patterncollectiondelegate.cpp \

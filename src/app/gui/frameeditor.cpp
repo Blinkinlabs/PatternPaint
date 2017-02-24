@@ -19,18 +19,18 @@
 
 #define GRID_MIN_Y_SCALE        6   // Minimum scale that the image needs to scale to before the grid is displayed
 
-#define ZOOM_MIN                5
+#define ZOOM_MIN                1
 #define ZOOM_MAX                100
-#define ZOOM_STEP               5
+#define ZOOM_STEP               .25
 
 QPoint FrameEditor::frameToImage(const int framePointX, const int framePointY ) const {
-        int x = framePointX/pixelScale;
-        int y = framePointY/pixelScale;
+        int x = framePointX/scale;
+        int y = framePointY/scale;
         return QPoint(x,y);
 }
 
 QPoint FrameEditor::imageToFrame(const QPoint &imagePoint) const {
-    return imagePoint*pixelScale;
+    return imagePoint*scale;
 }
 
 FrameEditor::FrameEditor(QWidget *parent) :
@@ -40,8 +40,6 @@ FrameEditor::FrameEditor(QWidget *parent) :
     frameIndex(0),
     showPlaybackIndicator(false)
 {
-    this->setAcceptDrops(true);
-
     // Turn on mouse tracking so we can draw a preview
     // TODO: DO we need to do this here, or just in the constructor?
     setMouseTracking(true);
@@ -52,59 +50,30 @@ bool FrameEditor::hasImage() const
     return !frameData.isNull();
 }
 
-void FrameEditor::dragEnterEvent(QDragEnterEvent *event)
-{
-    if (!hasImage())
-        return;
-
-    if (event->mimeData()->hasUrls())
-        event->acceptProposedAction();
-}
-
-void FrameEditor::dropEvent(QDropEvent *event)
-{
-    Q_UNUSED(event);
-
-// TODO: Attempt to load the file as a single frame image, to replace this frame?
-
-// if(patternData == NULL) {
-////    if(patternItem == NULL) {
-// return;
-// }
-
-//// TODO: Pass this down for someone else to handle?
-
-// QList<QUrl> droppedUrls = event->mimeData()->urls();
-// int droppedUrlCnt = droppedUrls.size();
-// for(int i = 0; i < droppedUrlCnt; i++) {
-// QString localPath = droppedUrls[i].toLocalFile();
-// QFileInfo fileInfo(localPath);
-
-//// TODO: OS X Yosemite hack for /.file/id= references
-
-// if(fileInfo.isFile()) {
-// patternItem->replace(fileInfo.absoluteFilePath());
-//// And stop on the first one we've found.
-// return;
-// }
-    // }
-}
-
 void FrameEditor::zoomIn()
 {
-    scale += ZOOM_STEP;
-    if(scale>ZOOM_MAX)scale=ZOOM_MAX;
-    fitToWindow = false;
-
-    updateSize();
-    update();
+    setScale(scale*(1+ZOOM_STEP));
 }
 
 void FrameEditor::zoomOut()
 {
-    scale -= ZOOM_STEP;
-    if(scale<ZOOM_MIN)scale=ZOOM_MIN;
-    fitToWindow = false;
+    setScale(scale*(1-ZOOM_STEP));
+}
+
+void FrameEditor::setScale(float newScale)
+{
+    if (newScale <= ZOOM_MIN)
+        newScale = ZOOM_MIN;
+
+    if (newScale >= ZOOM_MAX)
+        newScale = ZOOM_MAX;
+
+    scale = newScale;
+
+    if(fitToWindow) {
+        fitToWindow = false;
+        emit(zoomToFitChanged(fitToWindow));
+    }
 
     updateSize();
     update();
@@ -112,24 +81,13 @@ void FrameEditor::zoomOut()
 
 void FrameEditor::zoomToFit(bool newFitToWindow)
 {
-    // TODO: There is a round trip here when enabled=true
     if(newFitToWindow == fitToWindow)
         return;
 
-    if(!newFitToWindow) {
-        fitToWindow = false;
-        return;
-    }
+    fitToWindow = newFitToWindow;
+    emit(zoomToFitChanged(fitToWindow));
 
-    // first zoom to min
-    scale=1;
-    fitToWindow = false;
     updateSize();
-    update();
-
-    // then resize
-    fitToWindow = true;
-    updateGridSize();
     update();
 }
 
@@ -138,86 +96,106 @@ const QImage &FrameEditor::getPatternAsImage() const
     return frameData;
 }
 
-void FrameEditor::updateSize()
-{
-    if(hasImage()) {
-        // Calculate the display size based on the scaled frameData
-        scaledSize = frameData.size()*scale;
-    }
-    else {
-        scaledSize = QSize(1,1);
-    }
-
-    // Update the widget geometry so that it can be resized correctly
-    setBaseSize(scaledSize);
-    setMinimumSize(scaledSize);
-    updateGridSize();
-}
-
 void FrameEditor::resizeEvent(QResizeEvent *resizeEvent)
 {
+    qDebug() << "Resize event"
+             << "scale:" << scale;
 
-    if(fitToWindow){
-        updateGridSize();
-    }else{
-        updateSize();
-    }
-
-    float widgetAspect = float(baseSize().width())
-                         /baseSize().height();
-
-    float widgetWidth = height()*widgetAspect;
-    setMinimumWidth(widgetWidth);
-    setMaximumWidth(widgetWidth);
+    updateSize();
 
     QWidget::resizeEvent(resizeEvent);
-    emit(zoomToFitChanged(fitToWindow));
 }
 
-void FrameEditor::updateGridSize()
+void FrameEditor::updateSize()
+{
+    // There are three inputs:
+    // hasImage(): (bool) true if we have an image to scale
+    // fitToWindow: (bool) true if we should dynamically adjust 'scale' to fit
+    //    the image height to the container (scroll area) size
+    // frameData.size(): base resolution of the image we are editing
+    // scale: (float) % to scale the image
+
+    // And x outputs:
+    // scale: % the frameData image is scaled by when drawing. Only adjusted
+    //    here if fitToWindow is true
+
+    if(!hasImage()) {
+        // Degenerate case- set our size to 0 to prevent the widget from drawing
+        setBaseSize(QSize());
+
+        // TODO: Do we need to clear anything else here?
+    }
+    else if(fitToWindow){
+        // We want to scale the image to fit the height of the QScrollArea viewport,
+        // and force the width based on the aspect ratio.
+        scale = float(size().height())/frameData.height();
+
+        // TODO: There's a recursion bug with this, that is triggered when the horizontal size
+        // is just wider than the viewport. This code tells the viewport to resize, which then
+        // turns on the scroll bars, which then makes the viewport just a little smaller, which then
+        // calls this code again, which then resizes so that it's just small enough to not need the scroll
+        // bars, and so on.
+        // This is a hacky workaround to try and stop this after a single cycle.
+        static QSize lastQScrollAreaSize;
+        if(lastQScrollAreaSize != parentWidget()->parentWidget()->size()) {
+            lastQScrollAreaSize = parentWidget()->parentWidget()->size();
+
+            setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+            setMinimumSize(frameData.width()*scale, 1);
+            setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+            setBaseSize(QSize(0,0));
+        }
+    }
+    else {
+        // Set the widget to a fixed size based on the frame data size and scale
+        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        setBaseSize(frameData.size()*scale);
+        setMinimumSize(baseSize());
+        setMaximumSize(baseSize());
+    }
+
+    qDebug() << "fitToWindow:" << fitToWindow
+             << "baseSize:" << baseSize()
+             << "QScrollArea_viewport.size():" << parentWidget()->size()
+             << "QScrollArea.size():" << parentWidget()->parentWidget()->size()
+             << "scale:" << scale;
+
+    updateGrid();
+}
+
+void FrameEditor::updateGrid()
 {
     if (!hasImage())
         return;
 
-    // Base the widget size on the window height
-    // cast float to int to save rounded scale
-    QSize frameSize = frameData.size();
-
-    if(fitToWindow){
-        pixelScale = float(size().height())/frameSize.height();
-    }else{
-        pixelScale = float(scaledSize.height())/frameSize.height();
+    if (scale < GRID_MIN_Y_SCALE) {
+        gridPattern = QImage();
+        return;
     }
-    scale = pixelScale;
 
-    // If the drawing space is large enough, make a grid pattern to superimpose over the image
-    if (pixelScale >= GRID_MIN_Y_SCALE) {
-        gridPattern = QImage(frameSize.width()*pixelScale,
-                             frameSize.height()*pixelScale,
-                             QImage::Format_ARGB32_Premultiplied);
-        gridPattern.fill(COLOR_CLEAR);
+    gridPattern = QImage(frameData.width()*scale,
+                         frameData.height()*scale,
+                         QImage::Format_ARGB32_Premultiplied);
+    gridPattern.fill(COLOR_CLEAR);
 
-        QPainter painter(&gridPattern);
-        painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
-        painter.setRenderHint(QPainter::Antialiasing, false);
+    QPainter painter(&gridPattern);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
+    painter.setRenderHint(QPainter::Antialiasing, false);
 
-        // Draw vertical lines
-        painter.setPen(COLOR_GRID_LINES);
-        for (int x = 0; x <= frameSize.width(); x++) {
-            painter.drawLine(x*pixelScale,
-                             0,
-                             x*pixelScale,
-                             gridPattern.height());
-        }
+    // Draw vertical lines
+    painter.setPen(COLOR_GRID_LINES);
+    for (int x = 0; x <= frameData.width(); x++)
+        painter.drawLine(x*scale,
+                         0,
+                         x*scale,
+                         gridPattern.height());
 
-        // Draw horizontal lines
-        for (int y = 0; y <= frameSize.height(); y++) {
-            painter.drawLine(0,
-                             y*pixelScale,
-                             gridPattern.width(),
-                             y*pixelScale);
-        }
-    }
+    // Draw horizontal lines
+    for (int y = 0; y <= frameData.height(); y++)
+        painter.drawLine(0,
+                         y*scale,
+                         gridPattern.width(),
+                         y*scale);
 }
 
 void FrameEditor::mousePressEvent(QMouseEvent *event)
@@ -308,23 +286,8 @@ void FrameEditor::setFrameData(int index, const QImage &data)
     frameData = data;
     frameIndex = index;
 
-    if (sizeChanged) {
-
-        if(fitToWindow){
-
-            // Compute a new viewport size, based on the current viewport height
-            float zoom = float(size().height())/data.size().height();
-            this->setMinimumWidth(data.size().width()*zoom);
-
-            this->setBaseSize(data.size()*zoom);
-
-            updateGridSize();
-
-        }else{
-            updateSize();
-        }
-
-    }
+    if (sizeChanged)
+        updateSize();
 
     // and force a screen update
     update();
@@ -353,23 +316,19 @@ void FrameEditor::paintEvent(QPaintEvent *)
         return;
     }
 
-    // Base the widget size on the window height
-    // cast float to int to save rounded scale
-    QSize frameSize = frameData.size();
-
     // Draw the image and tool preview
     painter.drawImage(QRect(0, 0,
-                            frameSize.width()*pixelScale,
-                            frameSize.height()*pixelScale),
+                            frameData.width()*scale,
+                            frameData.height()*scale),
                       frameData);
 
     if (!instrument.isNull() && instrument->hasPreview())
         painter.drawImage(QRect(0, 0,
-                                frameSize.width()*pixelScale,
-                                frameSize.height()*pixelScale),
+                                frameData.width()*scale,
+                                frameData.height()*scale),
                           (instrument->getPreview()));
 
-    if (pixelScale >= GRID_MIN_Y_SCALE)
+    if (scale >= GRID_MIN_Y_SCALE)
         painter.drawImage(0, 0, gridPattern);
 
     // TODO: How to do this more generically?
@@ -418,4 +377,21 @@ QColor FrameEditor::getPrimaryColor() const
 int FrameEditor::getPenSize() const
 {
     return toolSize;
+}
+
+bool FrameEditor::event(QEvent *event)
+{
+    // If it's a scroll event with the ctrl modifier, capture it
+    // In Windows 10, somehow pinch gestures are being captured here too :-/
+    // TODO: How does this look on macOS and Linux?
+    if(event->type() == QEvent::Wheel) {
+        QWheelEvent *e = static_cast<QWheelEvent*>(event);
+        if(e->modifiers().testFlag(Qt::ControlModifier)) {
+            setScale(scale*(1+(e->delta())/1200.0));
+            e->accept();
+            return true;
+        }
+    }
+
+    return QWidget::event(event);
 }
