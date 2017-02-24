@@ -39,16 +39,16 @@ class LineInstrument : public AbstractInstrument
     Q_OBJECT
 
 public:
-    explicit LineInstrument(QObject *parent = 0);
+    explicit LineInstrument(InstrumentConfiguration *instrumentConfiguration, QObject *parent = 0);
 
-    void mousePressEvent(QMouseEvent *event, FrameEditor &, const QPoint &);
-    void mouseMoveEvent(QMouseEvent *event, FrameEditor &, const QPoint &);
-    void mouseReleaseEvent(QMouseEvent *event, FrameEditor &, const QPoint &);
+    void mousePressEvent(QMouseEvent *event,  const QImage &frameData, const QPoint &);
+    void mouseMoveEvent(QMouseEvent *event, const QImage &frameData, const QPoint &);
+    void mouseReleaseEvent(QMouseEvent *event, FrameEditor &, const QImage &frameData, const QPoint &);
 
     QCursor cursor() const;
 
-protected:
-    void paint(FrameEditor &);
+private:
+    void paint();
 };
 
 #endif // LINEINSTRUMENT_H

@@ -29,11 +29,13 @@
 #include <QObject>
 #include <QMouseEvent>
 #include <QImage>
+#include <QPointer>
 #include <QCursor>
 #include <QPixmap>
 #include <QCursor>
+#include <instrumentconfiguration.h>
 
-class FrameEditor;
+#include "frameeditor.h"
 
 /// Abstract instrument class.
 class AbstractInstrument : public QObject
@@ -41,7 +43,9 @@ class AbstractInstrument : public QObject
     Q_OBJECT
 
 public:
-    explicit AbstractInstrument(const QString &resource, QObject *parent = 0);
+    explicit AbstractInstrument(const QString &resource,
+                                InstrumentConfiguration *instrumentConfiguration,
+                                QObject *parent = 0);
     virtual ~AbstractInstrument()
     {
     }
@@ -50,23 +54,23 @@ public:
     /// @param event - mouse event
     /// @param FrameEditor - editor
     /// @param QPoint - logical position on image
-    virtual void mousePressEvent(QMouseEvent *event, FrameEditor &, const QPoint &) = 0;
+    virtual void mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &) = 0;
 
-    /// mousePressEvent
+    /// mouseMoveEvent
     /// @param event - mouse event
     /// @param FrameEditor - editor
     /// @param QPoint - logical position on image
-    virtual void mouseMoveEvent(QMouseEvent *event, FrameEditor &, const QPoint &pt) = 0;
+    virtual void mouseMoveEvent(QMouseEvent *event, const QImage &frameData, const QPoint &pt) = 0;
 
-    /// mousePressEvent
+    /// mouseReleaseEvent
     /// @param event - mouse event
     /// @param FrameEditor - editor
     /// @param QPoint - logical position on image
-    virtual void mouseReleaseEvent(QMouseEvent *event, FrameEditor &, const QPoint &pt) = 0;
+    virtual void mouseReleaseEvent(QMouseEvent *event, FrameEditor &, const QImage &frameData, const QPoint &pt) = 0;
 
     /// Get the mouse cursor for this instrument
     /// @return cursor for this tool
-    virtual QCursor cursor() const;
+    virtual const QCursor & getCursor() const;
 
     /// Check if the tool has preview data to display
     /// @return true if the instrument has preview data to display
@@ -75,13 +79,16 @@ public:
     virtual const QImage &getPreview() const;
 
 protected:
-    QPoint mStartPoint, mEndPoint; ///< Point for events.
-    QImage toolPreview; ///< Scratch space to draw tool output onto
+    QPointer<InstrumentConfiguration> instrumentConfiguration;
+
+    QPoint startPoint;
+    QPoint endPoint; ///< Point for events.
+    QImage preview; ///< Scratch space to draw tool output onto
     bool drawing;       ///< True if we have an unsaved
 
 private:
-    QPixmap mpm;
-    QCursor mcur;
+    QPixmap icon;
+    QCursor cursor;
 };
 
 #endif // ABSTRACTINSTRUMENT_H

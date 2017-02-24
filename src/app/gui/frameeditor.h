@@ -39,10 +39,6 @@ public:
     /// @param update RGBA QImage to draw on top of the current
     void applyInstrument(QImage &update);
 
-    QColor getPrimaryColor() const;
-
-    int getPenSize() const;
-
 private:
     float scale;            ///< User-controlled scale factor
     bool fitToHeight;
@@ -56,9 +52,6 @@ private:
     QPoint lastMousePoint;
 
     QPointer<AbstractInstrument> instrument;
-
-    QColor toolColor;      ///< Color of the current drawing tool (TODO: This should be a pointer to a tool)
-    int toolSize;          ///< Size of the current drawing tool (TODO: This should be a pointer to a tool)
 
     bool showPlaybackIndicator;
 
@@ -92,8 +85,6 @@ signals:
     void zoomToFitChanged(bool enabled);
 
 public slots:
-    void setToolColor(QColor color);
-    void setToolSize(int size);
     void setInstrument(AbstractInstrument *);
     void setFixture(Fixture *);
     void setShowPlaybakIndicator(bool);

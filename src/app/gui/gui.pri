@@ -18,7 +18,8 @@ HEADERS += \
     $$PWD/outputpreview.h \
     $$PWD/debuglog.h \
     $$PWD/firmwaremanager.h \
-    $$PWD/intervalfilter.h
+    $$PWD/intervalfilter.h \
+    $$PWD/instrumentconfiguration.h
 
 
 SOURCES += \
@@ -39,7 +40,8 @@ SOURCES += \
     $$PWD/main.cpp \
     $$PWD/debuglog.cpp \
     $$PWD/firmwaremanager.cpp \
-    $$PWD/intervalfilter.cpp
+    $$PWD/intervalfilter.cpp \
+    $$PWD/instrumentconfiguration.cpp
 
 FORMS += \
     $$PWD/mainwindow.ui \

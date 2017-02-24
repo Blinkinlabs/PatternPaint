@@ -1,53 +1,53 @@
 #include "sprayinstrument.h"
 
-#include "frameeditor.h"
-
 #include <QPen>
 #include <QPainter>
 #include <math.h>
 
-SprayInstrument::SprayInstrument(QObject *parent) :
-    AbstractInstrument(":/instruments/images/instruments-icons/cursor_spray.png", parent)
+SprayInstrument::SprayInstrument(InstrumentConfiguration *instrumentConfiguration, QObject *parent) :
+    AbstractInstrument(":/instruments/images/instruments-icons/cursor_spray.png",
+                       instrumentConfiguration,
+                       parent)
 {
     drawing = false;
 }
 
-void SprayInstrument::mousePressEvent(QMouseEvent *event, FrameEditor &editor, const QPoint &pt)
+void SprayInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &pt)
 {
     if (event->button() == Qt::LeftButton) {
-        toolPreview = QImage(editor.getPatternAsImage().width(),
-                             editor.getPatternAsImage().height(),
+        preview = QImage(frameData.size(),
                              QImage::Format_ARGB32_Premultiplied);
-        toolPreview.fill(QColor(0, 0, 0, 0));
+        preview.fill(QColor(0, 0, 0, 0));
         drawing = true;
 
-        mStartPoint = mEndPoint = pt;
-        paint(editor);
+        startPoint = endPoint = pt;
+        paint();
     }
 }
 
-void SprayInstrument::mouseMoveEvent(QMouseEvent *, FrameEditor &editor, const QPoint &pt)
+void SprayInstrument::mouseMoveEvent(QMouseEvent *, const QImage &, const QPoint &pt)
 {
     if (!drawing)
         return;
 
-    mEndPoint = pt;
-    paint(editor);
-    mStartPoint = pt;
+    endPoint = pt;
+    paint();
+    startPoint = pt;
 }
 
-void SprayInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QPoint &)
+void SprayInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &frameData, const QPoint &)
 {
-    editor.applyInstrument(toolPreview);
+    editor.applyInstrument(preview);
     drawing = false;
 }
 
-void SprayInstrument::paint(FrameEditor &editor)
+void SprayInstrument::paint()
 {
-    QPainter painter(&toolPreview);
+    QPainter painter(&preview);
 
-    painter.setPen(QPen(editor.getPrimaryColor(), editor.getPenSize(), Qt::SolidLine, Qt::RoundCap,
-                        Qt::RoundJoin));
+    painter.setPen(QPen(instrumentConfiguration->getToolColor(),
+                        instrumentConfiguration->getPenSize(),
+                        Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
     int x;
     int y;
@@ -58,32 +58,32 @@ void SprayInstrument::paint(FrameEditor &editor)
         case 2:
         case 3:
             x = (qrand() % 5 - 2)
-                * sqrt(editor.getPenSize());
+                * sqrt(instrumentConfiguration->getPenSize());
             y = (qrand() % 5 - 2)
-                * sqrt(editor.getPenSize());
+                * sqrt(instrumentConfiguration->getPenSize());
             break;
         case 4:
         case 5:
         case 6:
         case 7:
             x = (qrand() % 10 - 4)
-                * sqrt(editor.getPenSize());
+                * sqrt(instrumentConfiguration->getPenSize());
             y = (qrand() % 10 - 4)
-                * sqrt(editor.getPenSize());
+                * sqrt(instrumentConfiguration->getPenSize());
             break;
         case 8:
         case 9:
         case 10:
         case 11:
             x = (qrand() % 15 - 7)
-                * sqrt(editor.getPenSize());
+                * sqrt(instrumentConfiguration->getPenSize());
             y = (qrand() % 15 - 7)
-                * sqrt(editor.getPenSize());
+                * sqrt(instrumentConfiguration->getPenSize());
             break;
         default:
             return;
         }
 
-        painter.drawPoint(mEndPoint.x() + x, mEndPoint.y() + y);
+        painter.drawPoint(endPoint.x() + x, endPoint.y() + y);
     }
 }

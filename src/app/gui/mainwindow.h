@@ -4,6 +4,7 @@
 #include "blinkycontroller.h"
 #include "blinkyuploader.h"
 #include "frameeditor.h"
+#include "instrumentconfiguration.h"
 #include "colorchooser.h"
 #include "patterncollection.h"
 #include "welcomescreen.h"
@@ -160,6 +161,7 @@ private:
     PatternCollection patternCollection;
 
     QLineEdit currentFrame;
+    InstrumentConfiguration instrumentConfiguration;
 
     enum Modes {
         Disconnected, Connected, Uploading

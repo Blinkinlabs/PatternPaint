@@ -197,7 +197,7 @@ void FrameEditor::mousePressEvent(QMouseEvent *event)
     if (!hasImage() || instrument.isNull())
         return;
 
-    instrument->mousePressEvent(event, *this, frameToImage(event->x(),event->y()));
+    instrument->mousePressEvent(event, frameData, frameToImage(event->x(),event->y()));
     lazyUpdate();
 }
 
@@ -217,8 +217,7 @@ void FrameEditor::mouseMoveEvent(QMouseEvent *event)
 
     lastMousePoint = mousePoint;
 
-    instrument->mouseMoveEvent(event, *this, mousePoint);
-
+    instrument->mouseMoveEvent(event, frameData, frameToImage(event->x(),event->y()));
     lazyUpdate();
 }
 
@@ -227,24 +226,14 @@ void FrameEditor::mouseReleaseEvent(QMouseEvent *event)
     if (!hasImage() || instrument.isNull())
         return;
 
-    instrument->mouseReleaseEvent(event, *this, frameToImage(event->x(),event->y()));
+    instrument->mouseReleaseEvent(event, *this, frameData, frameToImage(event->x(),event->y()));
     lazyUpdate();
-}
-
-void FrameEditor::setToolColor(QColor color)
-{
-    toolColor = color;
-}
-
-void FrameEditor::setToolSize(int size)
-{
-    toolSize = size;
 }
 
 void FrameEditor::setInstrument(AbstractInstrument *pi)
 {
     instrument = pi;
-    setCursor(instrument->cursor());
+    setCursor(instrument->getCursor());
 }
 
 void FrameEditor::setFixture(Fixture *newFixture)
@@ -313,11 +302,13 @@ void FrameEditor::paintEvent(QPaintEvent *)
                             frameData.height()*scale),
                       frameData);
 
-    if (!instrument.isNull() && instrument->hasPreview())
+    if (!instrument.isNull() && instrument->hasPreview()) {
+        qDebug() << instrument->getPreview();
         painter.drawImage(QRect(0, 0,
                                 frameData.width()*scale,
                                 frameData.height()*scale),
                           (instrument->getPreview()));
+    }
 
     if (scale >= GRID_MIN_Y_SCALE)
         painter.drawImage(0, 0, gridPattern);
@@ -357,17 +348,6 @@ void FrameEditor::applyInstrument(QImage &update)
     painter.end();
 
     emit(dataEdited(frameIndex, frameData));
-}
-
-
-QColor FrameEditor::getPrimaryColor() const
-{
-    return toolColor;
-}
-
-int FrameEditor::getPenSize() const
-{
-    return toolSize;
 }
 
 void FrameEditor::pinchTriggered(QPinchGesture *gesture)
