@@ -29,42 +29,77 @@ Fixture *Fixture::makeFixture(QString type, QSize size)
 Fixture::Fixture(QObject *parent) :
     QObject(parent)
 {
+
 }
 
 Fixture::~Fixture()
 {
-    if(brightnessModel != NULL)
-        delete brightnessModel;
 }
 
-QList<QColor> Fixture::getColorStreamForFrame(const QImage frame) const
+void Fixture::setName(const QString &newName)
+{
+    name = newName;
+}
+
+QString Fixture::getName() const
+{
+    return name;
+}
+
+QList<QColor> Fixture::getColorStream(const QImage &frame) const
 {
     QList<QColor> colorStream;
 
-    if (frame.isNull())
+    if(brightnessModel.isNull())
         return colorStream;
 
     foreach(QPoint point, locations) {
-        QColor pixel = frame.pixel(point);
+        QColor pixel(0,0,0,255);
+
+        if(frame.rect().contains(point))
+            pixel = frame.pixel(point);
+
         colorStream.append(brightnessModel->correct(pixel));
     }
 
     return colorStream;
 }
 
-QList<QPoint> Fixture::getOutputLocations() const
+void Fixture::setLocations(const QList<QPoint> &newLocations)
+{
+    locations = newLocations;
+
+    // Re-calculate extents
+    extents.setLeft(std::numeric_limits<int>::max());
+    extents.setRight(std::numeric_limits<int>::min());
+    extents.setTop(std::numeric_limits<int>::max());
+    extents.setBottom(std::numeric_limits<int>::min());
+
+    for(QPoint point : locations) {
+        if(extents.left() > point.x())
+            extents.setLeft(point.x());
+        if(extents.right() < point.x())
+            extents.setRight(point.x());
+        if(extents.top() > point.y())
+            extents.setTop(point.y());
+        if(extents.bottom() < point.y())
+            extents.setBottom(point.y());
+    }
+}
+
+const QList<QPoint> & Fixture::getLocations() const
 {
     return locations;
+}
+
+unsigned int Fixture::getCount() const
+{
+    return locations.count();
 }
 
 QRect Fixture::getExtents() const
 {
     return extents;
-}
-
-int Fixture::getLedCount() const
-{
-    return locations.count();
 }
 
 ColorMode Fixture::getColorMode() const
@@ -77,12 +112,12 @@ void Fixture::setColorMode(const ColorMode &newColorMode)
     colorMode = newColorMode;
 }
 
-BrightnessModel *Fixture::getBrightnessModel() const
+QSharedPointer<BrightnessModel> Fixture::getBrightnessModel() const
 {
     return brightnessModel;
 }
 
 void Fixture::setBrightnessModel(BrightnessModel *newBrightnessModel)
 {
-    brightnessModel = newBrightnessModel;
+    brightnessModel = QSharedPointer<BrightnessModel>(newBrightnessModel);
 }

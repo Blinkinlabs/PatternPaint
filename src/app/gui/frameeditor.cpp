@@ -1,6 +1,5 @@
 #include "frameeditor.h"
 #include "abstractinstrument.h"
-#include "eventratelimiter.h"
 
 #include <cmath>
 #include <QtWidgets>
@@ -19,27 +18,32 @@
 
 #define GRID_MIN_Y_SCALE        6   // Minimum scale that the image needs to scale to before the grid is displayed
 
+#define ZOOM_MIN                1
+#define ZOOM_MAX                100
+#define ZOOM_STEP               .25
 
-QPoint FrameEditor::frameToImage(const int &framePointX, const int &framePointY ) const {
-        int x = framePointX/pixelScale;
-        int y = framePointY/pixelScale;
+QPoint FrameEditor::frameToImage(const int framePointX, const int framePointY ) const {
+        int x = framePointX/scale;
+        int y = framePointY/scale;
         return QPoint(x,y);
 }
 
 QPoint FrameEditor::imageToFrame(const QPoint &imagePoint) const {
-    return imagePoint*pixelScale;
+    return imagePoint*scale;
 }
 
 FrameEditor::FrameEditor(QWidget *parent) :
     QWidget(parent),
+    scale(ZOOM_MIN),
+    fitToHeight(true),
     frameIndex(0),
+    mouseMoveIntervalFilter(MIN_MOUSE_INTERVAL),
     showPlaybackIndicator(false)
 {
-    this->setAcceptDrops(true);
-
-    // Turn on mouse tracking so we can draw a preview
-    // TODO: DO we need to do this here, or just in the constructor?
     setMouseTracking(true);
+
+    // Grab pinch gestures
+    grabGesture(Qt::PinchGesture);
 }
 
 bool FrameEditor::hasImage() const
@@ -47,98 +51,152 @@ bool FrameEditor::hasImage() const
     return !frameData.isNull();
 }
 
-void FrameEditor::dragEnterEvent(QDragEnterEvent *event)
+void FrameEditor::zoomIn()
 {
-    if (!hasImage())
+    setScale(scale*(1+ZOOM_STEP));
+}
+
+void FrameEditor::zoomOut()
+{
+    setScale(scale*(1-ZOOM_STEP));
+}
+
+void FrameEditor::setScale(float newScale)
+{
+    if (newScale <= ZOOM_MIN)
+        newScale = ZOOM_MIN;
+
+    if (newScale >= ZOOM_MAX)
+        newScale = ZOOM_MAX;
+
+    scale = newScale;
+
+    if(fitToHeight) {
+        fitToHeight = false;
+        emit(zoomToFitChanged(fitToHeight));
+    }
+
+    updateSize();
+    update();
+}
+
+void FrameEditor::zoomToFit(bool newFitToHeight)
+{
+    if(newFitToHeight == fitToHeight)
         return;
 
-    if (event->mimeData()->hasUrls())
-        event->acceptProposedAction();
-}
+    fitToHeight = newFitToHeight;
+    emit(zoomToFitChanged(fitToHeight));
 
-void FrameEditor::dropEvent(QDropEvent *event)
-{
-    Q_UNUSED(event);
-
-// TODO: Attempt to load the file as a single frame image, to replace this frame?
-
-// if(patternData == NULL) {
-////    if(patternItem == NULL) {
-// return;
-// }
-
-//// TODO: Pass this down for someone else to handle?
-
-// QList<QUrl> droppedUrls = event->mimeData()->urls();
-// int droppedUrlCnt = droppedUrls.size();
-// for(int i = 0; i < droppedUrlCnt; i++) {
-// QString localPath = droppedUrls[i].toLocalFile();
-// QFileInfo fileInfo(localPath);
-
-//// TODO: OS X Yosemite hack for /.file/id= references
-
-// if(fileInfo.isFile()) {
-// patternItem->replace(fileInfo.absoluteFilePath());
-//// And stop on the first one we've found.
-// return;
-// }
-// }
-}
-
-const QImage &FrameEditor::getPatternAsImage() const
-{
-    return frameData;
+    updateSize();
+    update();
 }
 
 void FrameEditor::resizeEvent(QResizeEvent *resizeEvent)
 {
-    updateGridSize();
+    updateSize();
 
     QWidget::resizeEvent(resizeEvent);
 }
 
-void FrameEditor::updateGridSize()
+void FrameEditor::updateSize()
+{
+    if(!hasImage()) {
+        // Degenerate case- set our size to 0 to prevent the widget from drawing
+        setBaseSize(QSize());
+
+        // TODO: Do we need to clear anything else here?
+    }
+    else if(fitToHeight){
+        // In fit-to-height mode, the image height should be maximized to fill the
+        // QScrollArea container. Unfortunately the available height of the QScrollArea
+        // depends on whether the scroll bar is visible or not, which depends on the
+        // scaled width of the frameData. The strategy then is to determine if the
+        // scroll bar should be drawn or not, based on the aspect ratio of the image.
+
+        scale = float(size().height())/frameData.height();
+
+        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        setMinimumSize(frameData.width()*scale, 1);
+        setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+        setBaseSize(QSize(0,0));
+
+        (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+        // Finally, force the horizontal scroll bar on or off depending on the parent widget size. If the scroll
+        // bar state changes, it will cause the size function to be called again.
+        QSize scrollAreaSize = (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->size();
+
+        float imageAspectRatio = float(frameData.width())/frameData.height();
+        float parentAspectRatio = float(scrollAreaSize.width())/scrollAreaSize.height();
+        if(imageAspectRatio > parentAspectRatio) {
+            (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        }
+        else {
+            (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        }
+
+    }
+    else {
+        // Set the widget to a fixed size based on the frame data size and scale
+        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        setBaseSize(frameData.size()*scale);
+        setMinimumSize(baseSize());
+        setMaximumSize(baseSize());
+
+        (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    }
+    updateGrid();
+}
+
+void FrameEditor::updateGrid()
 {
     if (!hasImage())
         return;
 
-    // Update the widget geometry so that it can be resized correctly
-    this->setBaseSize(frameData.size());
-
-    // Base the widget size on the window height
-    // cast float to int to save rounded scale
-    QSize frameSize = frameData.size();
-
-    pixelScale = float(size().height())/frameSize.height();
-
-    // If the drawing space is large enough, make a grid pattern to superimpose over the image
-    if (pixelScale >= GRID_MIN_Y_SCALE) {
-        gridPattern = QImage(frameSize.width()*pixelScale,
-                             frameSize.height()*pixelScale,
-                             QImage::Format_ARGB32_Premultiplied);
-        gridPattern.fill(COLOR_CLEAR);
-
-        QPainter painter(&gridPattern);
-        painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
-        painter.setRenderHint(QPainter::Antialiasing, false);
-
-        // Draw vertical lines
-        painter.setPen(COLOR_GRID_LINES);
-        for (int x = 0; x <= frameSize.width(); x++) {
-            painter.drawLine(std::round(x*pixelScale),
-                             0,
-                             std::round(x*pixelScale),
-                             gridPattern.height());
-        }
-
-        // Draw horizontal lines
-        for (int y = 0; y <= frameSize.height(); y++) {
-            painter.drawLine(0,
-                             std::round(y*pixelScale),
-                             gridPattern.width(),
-                             std::round(y*pixelScale));
-        }
+    if (scale < GRID_MIN_Y_SCALE) {
+        gridPattern = QImage();
+        return;
     }
+
+    gridPattern = QImage(frameData.width()*scale,
+                         frameData.height()*scale,
+                         QImage::Format_ARGB32_Premultiplied);
+    gridPattern.fill(COLOR_CLEAR);
+
+    QPainter painter(&gridPattern);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
+    painter.setRenderHint(QPainter::Antialiasing, false);
+
+    // Draw vertical lines
+    painter.setPen(COLOR_GRID_LINES);
+    for (int x = 0; x <= frameData.width(); x++)
+        painter.drawLine(x*scale,
+                         0,
+                         x*scale,
+                         gridPattern.height());
+
+    // Draw horizontal lines
+    for (int y = 0; y <= frameData.height(); y++)
+        painter.drawLine(0,
+                         y*scale,
+                         gridPattern.width(),
+                         y*scale);
+}
+
+void FrameEditor::enterEvent(QEvent *event)
+{
+    // Force a screen update here, to draw the instrument preview
+    update();
+    QWidget::enterEvent(event);
+}
+
+void FrameEditor::leaveEvent(QEvent *event)
+{
+    // Force a screen update here, to hide the instrument preview
+    update();
+    QWidget::leaveEvent(event);
 }
 
 void FrameEditor::mousePressEvent(QMouseEvent *event)
@@ -146,7 +204,7 @@ void FrameEditor::mousePressEvent(QMouseEvent *event)
     if (!hasImage() || instrument.isNull())
         return;
 
-    instrument->mousePressEvent(event, *this, frameToImage(event->x(),event->y()));
+    instrument->mousePressEvent(event, frameData, frameToImage(event->x(),event->y()));
     lazyUpdate();
 }
 
@@ -155,10 +213,7 @@ void FrameEditor::mouseMoveEvent(QMouseEvent *event)
     if (!hasImage() || instrument.isNull())
         return;
 
-    // Filter the move event if it came too quickly
-    static intervalFilter rateLimiter(MIN_MOUSE_INTERVAL);
-
-    if(!rateLimiter.check())
+    if(!mouseMoveIntervalFilter.check())
         return;
 
     QPoint mousePoint = frameToImage(event->x(),event->y());
@@ -169,8 +224,7 @@ void FrameEditor::mouseMoveEvent(QMouseEvent *event)
 
     lastMousePoint = mousePoint;
 
-    instrument->mouseMoveEvent(event, *this, mousePoint);
-
+    instrument->mouseMoveEvent(event, frameData, frameToImage(event->x(),event->y()));
     lazyUpdate();
 }
 
@@ -179,24 +233,14 @@ void FrameEditor::mouseReleaseEvent(QMouseEvent *event)
     if (!hasImage() || instrument.isNull())
         return;
 
-    instrument->mouseReleaseEvent(event, *this, frameToImage(event->x(),event->y()));
+    instrument->mouseReleaseEvent(event, *this, frameData, frameToImage(event->x(),event->y()));
     lazyUpdate();
-}
-
-void FrameEditor::setToolColor(QColor color)
-{
-    toolColor = color;
-}
-
-void FrameEditor::setToolSize(int size)
-{
-    toolSize = size;
 }
 
 void FrameEditor::setInstrument(AbstractInstrument *pi)
 {
     instrument = pi;
-    setCursor(instrument->cursor());
+    setCursor(instrument->getCursor());
 }
 
 void FrameEditor::setFixture(Fixture *newFixture)
@@ -209,12 +253,13 @@ void FrameEditor::setShowPlaybakIndicator(bool newShowPlaybackIndicator)
     showPlaybackIndicator = newShowPlaybackIndicator;
 }
 
-void FrameEditor::setFrameData(int index, const QImage data)
+void FrameEditor::setFrameData(int index, const QImage &data)
 {
-    // Don't update if we are currently in a draw operation
-    if(!instrument.isNull() && instrument->hasPreview())
-        return;
+//    // Don't update if we are currently in a draw operation
+//    if(!instrument.isNull() && instrument->hasPreview())
+//        return;
 
+    // TODO: Unclear logic
     if (data.isNull()) {
         frameData = data;
         frameIndex = index;
@@ -223,18 +268,13 @@ void FrameEditor::setFrameData(int index, const QImage data)
         return;
     }
 
-    // TODO: Unclear logic
-    bool updateSize = (!hasImage() || (data.size() != frameData.size()));
+    bool sizeChanged = (!hasImage() || (data.size() != frameData.size()));
 
     frameData = data;
     frameIndex = index;
 
-    if (updateSize) {
-        updateGridSize();
-        // Compute a new viewport size, based on the current viewport height
-        float scale = float(size().height())/data.size().height();
-        this->setMinimumWidth(data.size().width()*scale);
-    }
+    if (sizeChanged)
+        updateSize();
 
     // and force a screen update
     update();
@@ -243,7 +283,7 @@ void FrameEditor::setFrameData(int index, const QImage data)
 void FrameEditor::lazyUpdate()
 {
     // Ignore the update request if it came too quickly
-    static intervalFilter rateLimiter(MIN_UPDATE_INTERVAL);
+    static IntervalFilter rateLimiter(MIN_UPDATE_INTERVAL);
 
     if(!rateLimiter.check())
         return;
@@ -264,20 +304,21 @@ void FrameEditor::paintEvent(QPaintEvent *)
     }
 
     // Draw the image and tool preview
-    // TODO: Why +1 here?
     painter.drawImage(QRect(0, 0,
-                            frameData.width()*pixelScale + 1,
-                            frameData.height()*pixelScale + 1),
+                            frameData.width()*scale,
+                            frameData.height()*scale),
                       frameData);
 
-    if (!instrument.isNull() && instrument->hasPreview())
+    if (!instrument.isNull()
+            && instrument->hasPreview()
+            && underMouse()) {
         painter.drawImage(QRect(0, 0,
-                                frameData.width()*pixelScale + 1,
-                                frameData.height()*pixelScale + 1),
+                                frameData.width()*scale,
+                                frameData.height()*scale),
                           (instrument->getPreview()));
+    }
 
-    if (pixelScale >= GRID_MIN_Y_SCALE)
-        painter.drawImage(0, 0, gridPattern);
+    painter.drawImage(0, 0, gridPattern);
 
     // TODO: How to do this more generically?
     if (!fixture.isNull() && showPlaybackIndicator) {
@@ -304,6 +345,8 @@ void FrameEditor::paintEvent(QPaintEvent *)
     }
 }
 
+
+
 void FrameEditor::applyInstrument(QImage &update)
 {
     QPainter painter;
@@ -314,13 +357,38 @@ void FrameEditor::applyInstrument(QImage &update)
     emit(dataEdited(frameIndex, frameData));
 }
 
-
-QColor FrameEditor::getPrimaryColor() const
+void FrameEditor::pinchTriggered(QPinchGesture *gesture)
 {
-    return toolColor;
+    if(gesture->changeFlags() & QPinchGesture::ScaleFactorChanged) {
+        setScale(scale * gesture->scaleFactor());
+    }
 }
 
-int FrameEditor::getPenSize() const
+bool FrameEditor::event(QEvent *event)
 {
-    return toolSize;
+    // If it's a scroll event with the ctrl modifier, capture it
+    // In Windows 10, this also captures pinch events
+    if(event->type() == QEvent::Wheel) {
+        QWheelEvent *wheelEvent = static_cast<QWheelEvent*>(event);
+        if(wheelEvent->modifiers().testFlag(Qt::ControlModifier)) {
+            setScale(scale*(1+(wheelEvent->delta())/1200.0));
+
+            wheelEvent->accept();
+            return true;
+        }
+    }
+
+    // On macOS, this captures pinch events
+    else if(event->type() == QEvent::Gesture) {
+        QGestureEvent *gestureEvent = static_cast<QGestureEvent*>(event);
+
+        if(QGesture *pinch = gestureEvent->gesture(Qt::PinchGesture)) {
+            pinchTriggered(static_cast<QPinchGesture *>(pinch));
+
+            gestureEvent->accept();
+            return true;
+        }
+    }
+
+    return QWidget::event(event);
 }

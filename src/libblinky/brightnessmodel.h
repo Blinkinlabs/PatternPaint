@@ -2,9 +2,11 @@
 #define BRIGHTNESSMODEL_H
 
 #include <QColor>
+#include <QObject>
 
-class BrightnessModel
+class BrightnessModel : public QObject
 {
+    Q_OBJECT
 public:
     virtual ~BrightnessModel();
 
@@ -12,7 +14,7 @@ public:
     /// on a given color value. Note that it drops the alpha channel.
     /// @param uncorrected 32-bit RGB color value in screen space
     /// @return 32-bit RGB color value converted to LED space
-    virtual QColor correct(const QColor &uncorrected) const = 0;
+    virtual QColor correct(const QColor &uncorrected) const;
 };
 
 

@@ -22,7 +22,7 @@
 #include "sprayinstrument.h"
 #include "fillinstrument.h"
 
-#include "eventratelimiter.h"
+#include "intervalfilter.h"
 #include "pattern.h"
 #include "patterncollectiondelegate.h"
 
@@ -100,7 +100,7 @@ MainWindow::MainWindow(QWidget *parent) :
     instrumentToolbar->insertAction(actionPen, redoAction);
 
     // instruments
-    ColorpickerInstrument *cpi = new ColorpickerInstrument(this);
+    ColorpickerInstrument *cpi = new ColorpickerInstrument(&instrumentConfiguration, this);
     connect(cpi, SIGNAL(pickedColor(QColor)), SLOT(on_colorPicked(QColor)));
 
     connect(actionPen, SIGNAL(triggered(bool)), SLOT(on_instrumentSelected(bool)));
@@ -109,14 +109,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(actionPipette, SIGNAL(triggered(bool)), SLOT(on_instrumentSelected(bool)));
     connect(actionFill, SIGNAL(triggered(bool)), SLOT(on_instrumentSelected(bool)));
 
-    actionPen->setData(QVariant::fromValue(new PencilInstrument(this)));
-    actionLine->setData(QVariant::fromValue(new LineInstrument(this)));
-    actionSpray->setData(QVariant::fromValue(new SprayInstrument(this)));
+    actionPen->setData(QVariant::fromValue(new PencilInstrument(&instrumentConfiguration, this)));
+    actionLine->setData(QVariant::fromValue(new LineInstrument(&instrumentConfiguration, this)));
+    actionSpray->setData(QVariant::fromValue(new SprayInstrument(&instrumentConfiguration, this)));
     actionPipette->setData(QVariant::fromValue(cpi));
-    actionFill->setData(QVariant::fromValue(new FillInstrument(this)));
+    actionFill->setData(QVariant::fromValue(new FillInstrument(&instrumentConfiguration, this)));
 
     instrumentToolbar->addWidget(&colorChooser);
-    frameEditor->setToolColor(COLOR_TOOL_DEFAULT);
+    instrumentConfiguration.setToolColor(COLOR_TOOL_DEFAULT);
     colorChooser.setColor(COLOR_TOOL_DEFAULT);
 
     QSpinBox *penSizeSpin = new QSpinBox(this);
@@ -166,14 +166,24 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Our pattern editor wants to get some notifications
     connect(&colorChooser, SIGNAL(sendColor(QColor)),
-            frameEditor, SLOT(setToolColor(QColor)));
+            &instrumentConfiguration, SLOT(setToolColor(QColor)));
     connect(penSizeSpin, SIGNAL(valueChanged(int)),
-            frameEditor, SLOT(setToolSize(int)));
+            &instrumentConfiguration, SLOT(setToolSize(int)));
+
+    instrumentConfiguration.setToolSize(DRAWING_SIZE_MINIMUM_VALUE);
+
+
+    connect(actionZoomToFit, SIGNAL(toggled(bool)),
+            frameEditor, SLOT(zoomToFit(bool)));
+    connect(actionZoomIn, SIGNAL(triggered(bool)),
+            frameEditor, SLOT(zoomIn()));
+    connect(actionZoomOut, SIGNAL(triggered(bool)),
+            frameEditor, SLOT(zoomOut()));
 
     connect(frameEditor, SIGNAL(dataEdited(int, const QImage)),
             this, SLOT(on_frameDataEdited(int, const QImage)));
-
-    frameEditor->setToolSize(DRAWING_SIZE_MINIMUM_VALUE);
+    connect(frameEditor, SIGNAL(zoomToFitChanged(bool)),
+            actionZoomToFit, SLOT(setChecked(bool)));
 
     // The draw timer tells the pattern to advance
     connect(&drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
@@ -602,10 +612,9 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered()
     QFileInfo fileInfo(fileName);
     settings.setValue("File/ExportArduinoDirectory", fileInfo.absolutePath());
 
-    PatternWriter patternWriter(patternCollection.at(getCurrentPatternIndex()),
-//                                PatternWriter::RGB24,
-                                PatternWriter::RGB565_RLE,
-                                fixture);
+    PatternWriter patternWriter(*(patternCollection.at(getCurrentPatternIndex())),
+                                *fixture,
+                                PatternWriter::RGB565_RLE);
 
     // Attempt to open the specified file
     QFile file(fileName);
@@ -616,7 +625,7 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered()
     }
 
     QTextStream ts(&file);
-    ts << patternWriter.getHeader();
+    ts << patternWriter.getDataAsHeader();
     file.close();
 }
 
@@ -808,9 +817,9 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
     QList<PatternWriter> patternWriters;
 
     foreach(Pattern* pattern, patternCollection.patterns()) {
-        PatternWriter patternWriter(pattern,
-                                    uploader->getSupportedEncodings().front(),
-                                    fixture);
+        PatternWriter patternWriter(*pattern,
+                                    *fixture,
+                                    uploader->getSupportedEncodings().front());
         patternWriters.append(patternWriter);
     }
 
@@ -893,7 +902,7 @@ void MainWindow::on_instrumentSelected(bool)
 void MainWindow::on_colorPicked(QColor color)
 {
     colorChooser.setColor(color);
-    frameEditor->setToolColor(color);
+    instrumentConfiguration.setToolColor(color);
 }
 
 bool MainWindow::promptForSave(Pattern *pattern)
@@ -1101,7 +1110,7 @@ void MainWindow::updateBlinky()
     QImage frame = patternCollection.at(getCurrentPatternIndex())->getFrameImage(
         getCurrentFrameIndex());
 
-    QList<QColor> pixels = fixture->getColorStreamForFrame(frame);
+    QList<QColor> pixels = fixture->getColorStream(frame);
 
     // TODO:
     QByteArray ledData;

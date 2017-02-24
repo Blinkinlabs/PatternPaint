@@ -1,65 +1,69 @@
 #include "pencilinstrument.h"
 
-#include "frameeditor.h"
-
 #include <QPen>
 #include <QPainter>
 #include <QDebug>
 
-PencilInstrument::PencilInstrument(QObject *parent) :
-    AbstractInstrument(":/instruments/images/instruments-icons/cursor.png", parent)
+PencilInstrument::PencilInstrument(InstrumentConfiguration *instrumentConfiguration, QObject *parent) :
+    AbstractInstrument(":/instruments/images/instruments-icons/cursor.png",
+                       instrumentConfiguration,
+                       parent)
 {
+    cursor = QCursor(Qt::CrossCursor);
     drawing = false;
 }
 
-void PencilInstrument::mousePressEvent(QMouseEvent *event, FrameEditor &editor, const QPoint &pt)
+bool PencilInstrument::hasPreview() const
+{
+    return true;
+}
+
+void PencilInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &pt)
 {
     if (event->button() == Qt::LeftButton) {
-        toolPreview = QImage(editor.getPatternAsImage().width(),
-                             editor.getPatternAsImage().height(),
+        preview = QImage(frameData.size(),
                              QImage::Format_ARGB32_Premultiplied);
-        toolPreview.fill(QColor(0, 0, 0, 0));
+        preview.fill(QColor(0, 0, 0, 0));
 
-        mStartPoint = mEndPoint = pt;
-        paint(editor);
+        startPoint = pt;
+        paint(pt);
         drawing = true;
     }
 }
 
-void PencilInstrument::mouseMoveEvent(QMouseEvent *event, FrameEditor &editor, const QPoint &pt)
+void PencilInstrument::mouseMoveEvent(QMouseEvent *, const QImage &frameData, const QPoint &pt)
 {
-    if (!drawing)
-        return;
+    // If we aren't drawing, we're in preview mode- clear the frame before doing anything else.
+    if (!drawing) {
+        if(preview.size() != frameData.size())
+            preview = QImage(frameData.size(),
+                             QImage::Format_ARGB32_Premultiplied);
 
-    mEndPoint = pt;
-    if (event->buttons() & Qt::LeftButton)
-        paint(editor);
-    mStartPoint = pt;
+        preview.fill(QColor(0,0,0,0));
+        startPoint = pt;
+    }
+
+    paint(pt);
+    startPoint = pt;
 }
 
-void PencilInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QPoint &)
+void PencilInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &, const QPoint &)
 {
-    editor.applyInstrument(toolPreview);
+    editor.applyInstrument(preview);
     drawing = false;
 }
 
-QCursor PencilInstrument::cursor() const
+void PencilInstrument::paint(const QPoint &newPoint)
 {
-    // TODO: Pull this into the resource file, to keep consistancy across platforms
-    return Qt::CrossCursor;
-}
+    QPainter painter(&preview);
 
-void PencilInstrument::paint(FrameEditor &editor)
-{
-    QPainter painter(&toolPreview);
-
-    painter.setPen(QPen(editor.getPrimaryColor(),
-                        editor.getPenSize(),
+    painter.setPen(QPen(instrumentConfiguration->getToolColor(),
+                        instrumentConfiguration->getPenSize(),
                         Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
-    if (mStartPoint != mEndPoint)
-        painter.drawLine(mStartPoint, mEndPoint);
+    if (startPoint != newPoint)
+        painter.drawLine(startPoint, newPoint);
 
-    if (mStartPoint == mEndPoint)
-        painter.drawPoint(mStartPoint);
+    if (startPoint == newPoint)
+        painter.drawPoint(startPoint);
 }

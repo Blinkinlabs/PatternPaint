@@ -1,15 +1,15 @@
-#ifndef EVENTRATELIMITER_H
-#define EVENTRATELIMITER_H
+#ifndef INTERVALFILTER_H
+#define INTERVALFILTER_H
 
 #include <QtGlobal>
 
 /// Filter
-class intervalFilter
+class IntervalFilter
 {
 public:
     /// Start a new interval filter.
     /// @param minimumInterval Minimum elapsed time between events, in ms
-    intervalFilter(qint64 minimumInterval);
+    IntervalFilter(qint64 minimumInterval);
 
     /// Check if enough time has elapsed since the last event
     bool check();
@@ -22,4 +22,4 @@ private:
     qint64 lastEventTime;
 };
 
-#endif // EVENTRATELIMITER_H
+#endif // INTERVALFILTER_H

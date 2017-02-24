@@ -3,8 +3,6 @@
 
 #include "brightnessmodel.h"
 
-#include <QMetaType>
-
 // TODO: Use an actual minimum float value
 #define ZERO_VALUE float(.000001)
 

@@ -17,7 +17,7 @@ class SerialCommandQueue : public QObject
 {
     Q_OBJECT
 public:
-    explicit SerialCommandQueue(QObject *parent = 0);
+    SerialCommandQueue(QObject *parent = 0);
 
     bool open(QSerialPortInfo info);
     void close();
@@ -25,9 +25,8 @@ public:
     bool isConnected();
 
     // Queue a new command
-    void enqueue(SerialCommand command);
-
-    void enqueue(QList<SerialCommand> commands);
+    void enqueue(const SerialCommand &command);
+    void enqueue(const QList<SerialCommand> &commands);
 
     void flushQueue();
 

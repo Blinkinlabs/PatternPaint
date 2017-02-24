@@ -1,14 +1,14 @@
-#include "eventratelimiter.h"
+#include "intervalfilter.h"
 
 #include <QDateTime>
 
-intervalFilter::intervalFilter(qint64 minimumInterval) :
+IntervalFilter::IntervalFilter(qint64 minimumInterval) :
     minimumInterval(minimumInterval),
     lastEventTime(0)
 {
 }
 
-bool intervalFilter::check()
+bool IntervalFilter::check()
 {
     qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
 
@@ -20,7 +20,7 @@ bool intervalFilter::check()
     return elapsed;
 }
 
-void intervalFilter::force()
+void IntervalFilter::force()
 {
     lastEventTime = QDateTime::currentMSecsSinceEpoch();
 }

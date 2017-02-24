@@ -1,50 +1,46 @@
 #include "fillinstrument.h"
 
-#include "frameeditor.h"
-
 #include <QPen>
 #include <QPainter>
 #include <QDebug>
 
-FillInstrument::FillInstrument(QObject *parent) :
-    AbstractInstrument(":/instruments/images/instruments-icons/cursor_fill.png", parent)
+FillInstrument::FillInstrument(InstrumentConfiguration *instrumentConfiguration, QObject *parent) :
+    AbstractInstrument(":/instruments/images/instruments-icons/cursor_fill.png",
+                       instrumentConfiguration,
+                       parent)
 {
     drawing = false;
 }
 
-void FillInstrument::mousePressEvent(QMouseEvent *event, FrameEditor &editor, const QPoint &pt)
+void FillInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &pt)
 {
     if (event->button() == Qt::LeftButton) {
         drawing = true;
-        toolPreview = editor.getPatternAsImage();
+        preview = frameData;
 
-        mStartPoint = mEndPoint = pt;
-        paint(editor);
+        paint(pt);
     }
 }
 
-void FillInstrument::mouseMoveEvent(QMouseEvent *, FrameEditor &, const QPoint &)
+void FillInstrument::mouseMoveEvent(QMouseEvent *, const QImage &, const QPoint &)
 {
 }
 
-void FillInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QPoint &)
+void FillInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &, const QPoint &)
 {
-    editor.applyInstrument(toolPreview);
+    editor.applyInstrument(preview);
     drawing = false;
 }
 
-void FillInstrument::paint(FrameEditor &editor)
+void FillInstrument::paint(const QPoint &point)
 {
-    // Make a copy of the image
-    toolPreview = editor.getPatternAsImage();
-
-    QColor switchColor = editor.getPrimaryColor();
-    QRgb pixel(toolPreview.pixel(mStartPoint));
+    QColor switchColor = instrumentConfiguration->getToolColor();
+    QRgb pixel(preview.pixel(point));
 
     QColor oldColor(pixel);
 
     if (switchColor.rgb() != oldColor.rgb())
-        fill(mStartPoint, switchColor.rgb(), pixel, toolPreview);
+        fill(point, switchColor.rgb(), pixel, preview);
 }
 
 QList<QPoint> neighbors(const QPoint &pt, const QImage &img)

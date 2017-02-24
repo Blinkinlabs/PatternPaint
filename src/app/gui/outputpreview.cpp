@@ -26,8 +26,8 @@ void OutputPreview::setFrameData(int, const QImage data)
         return;
 
     extents = fixture->getExtents();
-    outputLocations = fixture->getOutputLocations();
-    colorStream = fixture->getColorStreamForFrame(data);
+    outputLocations = fixture->getLocations();
+    colorStream = fixture->getColorStream(data);
 
     update();
 }

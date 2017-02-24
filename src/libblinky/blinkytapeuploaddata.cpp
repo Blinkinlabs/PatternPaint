@@ -116,7 +116,7 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
                  << "Encoding:" << pattern.getEncoding()
                  << "Frame count:" << pattern.getFrameCount()
                  << "Frame delay:" << pattern.getFrameDelay()
-                 << "Count:" << pattern.getData().length()
+                 << "Count:" << pattern.getDataAsBinary().length()
                  << "Offset:" << dataOffset;
 
         // Build the table entry for this pattern
@@ -126,8 +126,8 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
         patternTable += encodeWordLSB(pattern.getFrameDelay());           // Offset 5: frame delay (2 bytes)
 
         // and append the image data
-        patternData += pattern.getData();
-        dataOffset += pattern.getData().count();
+        patternData += pattern.getDataAsBinary();
+        dataOffset += pattern.getDataAsBinary().count();
     }
 
     // Pad pattern table to FLASH_MEMORY_PAGE_SIZE_BYTES.

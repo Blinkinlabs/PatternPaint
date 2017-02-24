@@ -1,49 +1,46 @@
 #include "colorpickerinstrument.h"
 
-#include "frameeditor.h"
-
-ColorpickerInstrument::ColorpickerInstrument(QObject *parent) :
-    AbstractInstrument(":/instruments/images/instruments-icons/cursor_pipette.png", parent)
+ColorpickerInstrument::ColorpickerInstrument(InstrumentConfiguration *instrumentConfiguration, QObject *parent) :
+    AbstractInstrument(":/instruments/images/instruments-icons/cursor_pipette.png",
+                       instrumentConfiguration,
+                       parent)
 {
     drawing = false;
 }
 
-void ColorpickerInstrument::mousePressEvent(QMouseEvent *event, FrameEditor &editor,
+void ColorpickerInstrument::mousePressEvent(QMouseEvent *event,
+                                            const QImage &frameData,
                                             const QPoint &pt)
 {
     if (event->button() == Qt::LeftButton) {
-        mStartPoint = mEndPoint = pt;
-        paint(editor);
+        paint(frameData, pt);
         drawing = true;
     }
 }
 
-void ColorpickerInstrument::mouseMoveEvent(QMouseEvent *, FrameEditor &editor, const QPoint &pt)
+void ColorpickerInstrument::mouseMoveEvent(QMouseEvent *,
+                                           const QImage &frameData,
+                                           const QPoint &pt)
 {
     if(!drawing)
         return;
 
-    mStartPoint = mEndPoint = pt;
-    paint(editor);
+    paint(frameData, pt);
 }
 
-void ColorpickerInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &, const QPoint &)
+void ColorpickerInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &, const QImage &, const QPoint &)
 {
     drawing = false;
 }
 
-void ColorpickerInstrument::paint(FrameEditor &editor)
+void ColorpickerInstrument::paint(const QImage &frameData, const QPoint &point)
 {
-    bool inArea = true;
+    if (point.x() < 0 || point.y() < 0
+        || point.x() > frameData.width()
+        || point.y() > frameData.height())
+        return;
 
-    if (mStartPoint.x() < 0 || mStartPoint.y() < 0
-        || mStartPoint.x() > editor.width()
-        || mStartPoint.y() > editor.height())
-        inArea = false;
-
-    if (inArea) {
-        QRgb pixel(editor.getPatternAsImage().pixel(mStartPoint));
-        QColor getColor(pixel);
-        emit pickedColor(getColor);
-    }
+    QRgb pixel(frameData.pixel(point));
+    QColor getColor(pixel);
+    emit pickedColor(getColor);
 }

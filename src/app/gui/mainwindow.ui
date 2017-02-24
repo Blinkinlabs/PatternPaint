@@ -124,65 +124,20 @@
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
-      <widget class="LetterboxScrollArea" name="scrollArea">
+      <widget class="QScrollArea" name="scrollArea">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>1</verstretch>
         </sizepolicy>
        </property>
-       <property name="palette">
-        <palette>
-         <active>
-          <colorrole role="Base">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>233</red>
-             <green>233</green>
-             <blue>233</blue>
-            </color>
-           </brush>
-          </colorrole>
-         </active>
-         <inactive>
-          <colorrole role="Base">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>233</red>
-             <green>233</green>
-             <blue>233</blue>
-            </color>
-           </brush>
-          </colorrole>
-         </inactive>
-         <disabled>
-          <colorrole role="Base">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>237</red>
-             <green>237</green>
-             <blue>237</blue>
-            </color>
-           </brush>
-          </colorrole>
-         </disabled>
-        </palette>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="lineWidth">
-        <number>0</number>
        </property>
        <property name="widgetResizable">
         <bool>true</bool>
        </property>
+<<<<<<< HEAD
        <widget class="FrameEditor" name="frameEditor">
         <property name="geometry">
          <rect>
@@ -220,6 +175,12 @@
          <bool>false</bool>
         </property>
        </widget>
+=======
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <widget class="FrameEditor" name="frameEditor"/>
+>>>>>>> Blinkinlabs/master
       </widget>
       <widget class="PatternFrameListView" name="timeline">
        <property name="sizePolicy">
@@ -645,7 +606,11 @@
      <x>0</x>
      <y>0</y>
      <width>880</width>
+<<<<<<< HEAD
      <height>22</height>
+=======
+     <height>26</height>
+>>>>>>> Blinkinlabs/master
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -749,6 +714,10 @@
     <addaction name="menuToolbars"/>
     <addaction name="separator"/>
     <addaction name="actionOutput_Preview"/>
+    <addaction name="separator"/>
+    <addaction name="actionZoomToFit"/>
+    <addaction name="actionZoomIn"/>
+    <addaction name="actionZoomOut"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -820,6 +789,23 @@
    <addaction name="actionSpray"/>
    <addaction name="actionPipette"/>
    <addaction name="actionFill"/>
+  </widget>
+  <widget class="QToolBar" name="zoomToolbar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="windowTitle">
+    <string>Zoom Controls</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionZoomIn"/>
+   <addaction name="actionZoomOut"/>
+   <addaction name="actionZoomToFit"/>
   </widget>
   <action name="actionSave">
    <property name="enabled">
@@ -1179,6 +1165,7 @@
     <string>Firmware manager</string>
    </property>
   </action>
+<<<<<<< HEAD
   <action name="actionOpen_project">
    <property name="text">
     <string>Open project</string>
@@ -1187,17 +1174,68 @@
   <action name="actionSave_project">
    <property name="text">
     <string>Save project</string>
+=======
+  <action name="actionZoomIn">
+   <property name="icon">
+    <iconset resource="../images.qrc">
+     <normaloff>:/icons/images/icons/Zoom In-100.png</normaloff>:/icons/images/icons/Zoom In-100.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom in</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom in</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+=</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionZoomOut">
+   <property name="icon">
+    <iconset resource="../images.qrc">
+     <normaloff>:/icons/images/icons/Zoom Out-100.png</normaloff>:/icons/images/icons/Zoom Out-100.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom out</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom out</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+-</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionZoomToFit">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../images.qrc">
+     <normaloff>:/icons/images/icons/Zoom To Extents-100.png</normaloff>:/icons/images/icons/Zoom To Extents-100.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom to fit</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom to fit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+9</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+>>>>>>> Blinkinlabs/master
    </property>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
-  <customwidget>
-   <class>LetterboxScrollArea</class>
-   <extends>QScrollArea</extends>
-   <header>letterboxscrollarea.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>FrameEditor</class>
    <extends>QWidget</extends>

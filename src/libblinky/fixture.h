@@ -6,6 +6,7 @@
 #include <QList>
 #include <QColor>
 #include <QSize>
+#include <QSharedPointer>
 
 #include "colormode.h"
 #include "brightnessmodel.h"
@@ -22,31 +23,32 @@ public:
 
     virtual ~Fixture();
 
-    /// Get a user-readable description of the fixture
-    /// @return
-    virtual QString getName() const = 0;
+    virtual QString getName() const;
+    virtual void setName(const QString &newName);
 
-    virtual QList<QColor> getColorStreamForFrame(const QImage frame) const;
+    virtual ColorMode getColorMode() const;
+    virtual void setColorMode(const ColorMode &newColorMode);
 
-    // Get the cooridnates of each LED in this fixture, in order of their address
-    virtual QList<QPoint> getOutputLocations() const;
+    virtual QSharedPointer<BrightnessModel> getBrightnessModel() const;
+    virtual void setBrightnessModel(BrightnessModel *BrightnessModel);
+
+    virtual void setLocations(const QList<QPoint> &newLocations);
+    virtual const QList<QPoint> & getLocations() const;
+
+    // Get the number of LEDs in this fixture
+    virtual unsigned int getCount() const;
 
     // Get the extents of this fixture in drawing pixel coordinates
     // TODO: Make float, handle negative coordinates
     virtual QRect getExtents() const;
 
-    // Get the number of LEDs in this fixture
-    virtual int getLedCount() const;
+    virtual QList<QColor> getColorStream(const QImage &frame) const;
 
-    virtual ColorMode getColorMode() const;
-    virtual void setColorMode(const ColorMode &newColorMode);
+private:
+    QString name;
 
-    virtual BrightnessModel *getBrightnessModel() const;
-    virtual void setBrightnessModel(BrightnessModel *BrightnessModel);
-
-protected:
     ColorMode colorMode;
-    BrightnessModel *brightnessModel;
+    QSharedPointer<BrightnessModel> brightnessModel;
 
     QList<QPoint> locations;
     QRect extents;

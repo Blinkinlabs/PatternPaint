@@ -1,90 +1,70 @@
 #include "lineinstrument.h"
 
-#include "frameeditor.h"
-
 #include <QPen>
 #include <QPainter>
 #include <QImage>
 #include <QDebug>
 
-LineInstrument::LineInstrument(QObject *parent) :
-    AbstractInstrument(":/instruments/images/instruments-icons/cursor.png", parent)
+LineInstrument::LineInstrument(InstrumentConfiguration *instrumentConfiguration, QObject *parent) :
+    AbstractInstrument(":/instruments/images/instruments-icons/cursor.png",
+                       instrumentConfiguration,
+                       parent)
 {
+    cursor = QCursor(Qt::CrossCursor);
     drawing = false;
 }
 
-void LineInstrument::mousePressEvent(QMouseEvent *event, FrameEditor &editor, const QPoint &pt)
+bool LineInstrument::hasPreview() const
+{
+    return true;
+}
+
+void LineInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &pt)
 {
     if (event->button() == Qt::LeftButton) {
-        toolPreview = QImage(editor.getPatternAsImage().width(),
-                             editor.getPatternAsImage().height(),
+        preview = QImage(frameData.size(),
                              QImage::Format_ARGB32_Premultiplied);
-        toolPreview.fill(QColor(0, 0, 0, 0));
+        preview.fill(QColor(0, 0, 0, 0));
 
-        mStartPoint = mEndPoint = pt;
-        paint(editor);
+        firstPoint = pt;
+        paint(pt);
         drawing = true;
     }
 }
 
-void LineInstrument::mouseMoveEvent(QMouseEvent *, FrameEditor &editor, const QPoint &pt)
+void LineInstrument::mouseMoveEvent(QMouseEvent *, const QImage &frameData, const QPoint &pt)
 {
-    if (!drawing)
-        return;
+    // If we aren't drawing, we're in preview mode- clear the frame before doing anything else.
+    if (!drawing) {
+        if(preview.size() != frameData.size())
+            preview = QImage(frameData.size(),
+                             QImage::Format_ARGB32_Premultiplied);
 
-    mEndPoint = pt;
-    toolPreview.fill(QColor(0, 0, 0, 0));
-    paint(editor);
+        preview.fill(QColor(0,0,0,0));
+        firstPoint = pt;
+    }
+
+    preview.fill(QColor(0, 0, 0, 0));
+    paint(pt);
 }
 
-void LineInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QPoint &)
+void LineInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &, const QPoint &)
 {
-    editor.applyInstrument(toolPreview);
+    editor.applyInstrument(preview);
     drawing = false;
 }
 
-QCursor LineInstrument::cursor() const
+void LineInstrument::paint(const QPoint &newPoint)
 {
-    // TODO: Pull this into the resource file, to keep consistancy across platforms
-    return Qt::CrossCursor;
-}
+    QPainter painter(&preview);
 
-void LineInstrument::paint(FrameEditor &editor)
-{
-    QPainter painter(&toolPreview);
-
-    painter.setPen(QPen(editor.getPrimaryColor(), editor.getPenSize(),
+    painter.setPen(QPen(instrumentConfiguration->getToolColor(),
+                        instrumentConfiguration->getPenSize(),
                         Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
-    if (mStartPoint != mEndPoint) {
-#if defined(LINE_INSTRUMENT_WORKAROUND)
-        // Workaround for bug in Qt: see https://github.com/Blinkinlabs/PatternPaint/issues/66
-        QPoint newStartPoint(mStartPoint);
-        QPoint newEndPoint(mEndPoint);
+    if (firstPoint != newPoint)
+        painter.drawLine(firstPoint, newPoint);
 
-        int deltaX = (mEndPoint-mStartPoint).x();
-        int deltaY = (mEndPoint-mStartPoint).y();
-
-        qDebug() << "deltaX=" << deltaX << " deltaY=" << deltaY;
-
-        if ((deltaX > 0 && deltaY < 0) || (deltaX < 0 && deltaY > 0)) {
-            if (abs(deltaX) >= abs(deltaY)) {
-                qDebug() << "A";
-                newStartPoint += QPoint(0, 1);
-                newEndPoint += QPoint(0, 1);
-            } else {
-                qDebug() << "B";
-                newStartPoint += QPoint(1, 0);
-                newEndPoint += QPoint(1, 0);
-            }
-        }
-
-        painter.drawLine(newStartPoint, newEndPoint);
-#else
-        painter.drawLine(mStartPoint, mEndPoint);
-#endif
-    }
-
-    if (mStartPoint == mEndPoint)
-        painter.drawPoint(mStartPoint);
+    if (firstPoint == newPoint)
+        painter.drawPoint(newPoint);
 }

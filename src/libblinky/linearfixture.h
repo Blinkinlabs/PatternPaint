@@ -12,9 +12,6 @@ class LinearFixture : public Fixture
 public:
     LinearFixture(unsigned int length,
                   QObject *parent = 0);
-    ~LinearFixture();
-
-    QString getName() const;
 
     unsigned int getLength() const;
     void setLength(unsigned int newLength);
