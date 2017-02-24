@@ -22,7 +22,7 @@
 #include "sprayinstrument.h"
 #include "fillinstrument.h"
 
-#include "eventratelimiter.h"
+#include "intervalfilter.h"
 #include "pattern.h"
 #include "patterncollectiondelegate.h"
 

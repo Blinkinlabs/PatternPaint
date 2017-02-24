@@ -1,6 +1,5 @@
 #include "frameeditor.h"
 #include "abstractinstrument.h"
-#include "eventratelimiter.h"
 
 #include <cmath>
 #include <QtWidgets>
@@ -38,6 +37,7 @@ FrameEditor::FrameEditor(QWidget *parent) :
     scale(ZOOM_MIN),
     fitToHeight(true),
     frameIndex(0),
+    mouseMoveIntervalFilter(MIN_MOUSE_INTERVAL),
     showPlaybackIndicator(false)
 {
     // Turn on mouse tracking so we can draw a preview
@@ -206,10 +206,7 @@ void FrameEditor::mouseMoveEvent(QMouseEvent *event)
     if (!hasImage() || instrument.isNull())
         return;
 
-    // Filter the move event if it came too quickly
-    static intervalFilter rateLimiter(MIN_MOUSE_INTERVAL);
-
-    if(!rateLimiter.check())
+    if(!mouseMoveIntervalFilter.check())
         return;
 
     QPoint mousePoint = frameToImage(event->x(),event->y());
@@ -290,7 +287,7 @@ void FrameEditor::setFrameData(int index, const QImage &data)
 void FrameEditor::lazyUpdate()
 {
     // Ignore the update request if it came too quickly
-    static intervalFilter rateLimiter(MIN_UPDATE_INTERVAL);
+    static IntervalFilter rateLimiter(MIN_UPDATE_INTERVAL);
 
     if(!rateLimiter.check())
         return;

@@ -3,6 +3,7 @@
 
 #include "fixture.h"
 #include "pattern.h"
+#include "intervalfilter.h"
 
 #include <QWidget>
 #include <QPointer>
@@ -46,14 +47,15 @@ private:
     float scale;            ///< User-controlled scale factor
     bool fitToHeight;
 
-    QImage frameData;     ///< Frame image
-    int frameIndex;                 ///< Frame index
+    QImage frameData;       ///< Frame image
+    int frameIndex;         ///< Frame index
 
+    QImage gridPattern;    ///< Holds the pre-rendered grid overlay
+
+    IntervalFilter mouseMoveIntervalFilter;
     QPoint lastMousePoint;
 
     QPointer<AbstractInstrument> instrument;
-
-    QImage gridPattern;    ///< Holds the pre-rendered grid overlay
 
     QColor toolColor;      ///< Color of the current drawing tool (TODO: This should be a pointer to a tool)
     int toolSize;          ///< Size of the current drawing tool (TODO: This should be a pointer to a tool)

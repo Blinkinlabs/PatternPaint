@@ -15,10 +15,10 @@ HEADERS += \
     $$PWD/sceneconfiguration.h \
     $$PWD/defaults.h \
     $$PWD/patternframelistview.h \
-    $$PWD/eventratelimiter.h \
     $$PWD/outputpreview.h \
     $$PWD/debuglog.h \
-    $$PWD/firmwaremanager.h
+    $$PWD/firmwaremanager.h \
+    $$PWD/intervalfilter.h
 
 
 SOURCES += \
@@ -35,11 +35,11 @@ SOURCES += \
     $$PWD/preferences.cpp \
     $$PWD/sceneconfiguration.cpp \
     $$PWD/patternframelistview.cpp \
-    $$PWD/eventratelimiter.cpp \
     $$PWD/outputpreview.cpp \
     $$PWD/main.cpp \
     $$PWD/debuglog.cpp \
-    $$PWD/firmwaremanager.cpp
+    $$PWD/firmwaremanager.cpp \
+    $$PWD/intervalfilter.cpp
 
 FORMS += \
     $$PWD/mainwindow.ui \
