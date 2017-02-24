@@ -22,18 +22,17 @@ public:
     /// Re-size the display grid and selector based on new widget geometery
     void resizeEvent(QResizeEvent *resizeEvent);
 
+    void enterEvent(QEvent *event);
+    void leaveEvent(QEvent *event);
+
     // Pass messages to the selected instrument
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *);
+    void mouseReleaseEvent(QMouseEvent *event);
 
 public:
 
     /// Instrument interface
-
-    /// Get the image data for the current pattern
-    /// @return QImage containing the current pattern
-    const QImage &getPatternAsImage() const;
 
     /// Update the pattern with the given changes.
     /// @param update RGBA QImage to draw on top of the current

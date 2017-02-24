@@ -48,7 +48,7 @@ void LineInstrument::mouseMoveEvent(QMouseEvent *, const QImage &frameData, cons
     paint(pt);
 }
 
-void LineInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &frameData, const QPoint &)
+void LineInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &, const QPoint &)
 {
     editor.applyInstrument(preview);
     drawing = false;

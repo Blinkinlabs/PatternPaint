@@ -40,8 +40,6 @@ FrameEditor::FrameEditor(QWidget *parent) :
     mouseMoveIntervalFilter(MIN_MOUSE_INTERVAL),
     showPlaybackIndicator(false)
 {
-    // Turn on mouse tracking so we can draw a preview
-    // TODO: DO we need to do this here, or just in the constructor?
     setMouseTracking(true);
 
     // Grab pinch gestures
@@ -92,11 +90,6 @@ void FrameEditor::zoomToFit(bool newFitToHeight)
 
     updateSize();
     update();
-}
-
-const QImage &FrameEditor::getPatternAsImage() const
-{
-    return frameData;
 }
 
 void FrameEditor::resizeEvent(QResizeEvent *resizeEvent)
@@ -190,6 +183,20 @@ void FrameEditor::updateGrid()
                          y*scale,
                          gridPattern.width(),
                          y*scale);
+}
+
+void FrameEditor::enterEvent(QEvent *event)
+{
+    // Force a screen update here, to draw the instrument preview
+    update();
+    QWidget::enterEvent(event);
+}
+
+void FrameEditor::leaveEvent(QEvent *event)
+{
+    // Force a screen update here, to hide the instrument preview
+    update();
+    QWidget::leaveEvent(event);
 }
 
 void FrameEditor::mousePressEvent(QMouseEvent *event)
@@ -302,16 +309,16 @@ void FrameEditor::paintEvent(QPaintEvent *)
                             frameData.height()*scale),
                       frameData);
 
-    if (!instrument.isNull() && instrument->hasPreview()) {
-        qDebug() << instrument->getPreview();
+    if (!instrument.isNull()
+            && instrument->hasPreview()
+            && underMouse()) {
         painter.drawImage(QRect(0, 0,
                                 frameData.width()*scale,
                                 frameData.height()*scale),
                           (instrument->getPreview()));
     }
 
-    if (scale >= GRID_MIN_Y_SCALE)
-        painter.drawImage(0, 0, gridPattern);
+    painter.drawImage(0, 0, gridPattern);
 
     // TODO: How to do this more generically?
     if (!fixture.isNull() && showPlaybackIndicator) {

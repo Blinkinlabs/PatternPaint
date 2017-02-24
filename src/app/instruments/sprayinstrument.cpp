@@ -32,7 +32,7 @@ void SprayInstrument::mouseMoveEvent(QMouseEvent *, const QImage &, const QPoint
     paint(pt);
 }
 
-void SprayInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &frameData, const QPoint &)
+void SprayInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &, const QPoint &)
 {
     editor.applyInstrument(preview);
     drawing = false;

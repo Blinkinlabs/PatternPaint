@@ -43,12 +43,12 @@ public:
 
     void mousePressEvent(QMouseEvent *event,  const QImage &frameData, const QPoint &);
     void mouseMoveEvent(QMouseEvent *event, const QImage &frameData, const QPoint &);
-    void mouseReleaseEvent(QMouseEvent *event, FrameEditor &, const QImage &frameData, const QPoint &);
+    void mouseReleaseEvent(QMouseEvent *event, FrameEditor &, const QImage &, const QPoint &);
 
     bool hasPreview() const;
 
 private:
-    QPoint lastPoint;
+    QPoint firstPoint;
 
     void paint(const QPoint &newPoint);
 };
