@@ -45,7 +45,7 @@ public:
     void mouseReleaseEvent(QMouseEvent *event, FrameEditor &editor, const QImage &frameData, const QPoint &);
 
 private:
-    void paint();
+    void paint(const QPoint &newPoint);
 };
 
 #endif // SPRAYINSTRUMENT_H

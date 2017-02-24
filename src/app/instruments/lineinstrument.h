@@ -45,10 +45,12 @@ public:
     void mouseMoveEvent(QMouseEvent *event, const QImage &frameData, const QPoint &);
     void mouseReleaseEvent(QMouseEvent *event, FrameEditor &, const QImage &frameData, const QPoint &);
 
-    QCursor cursor() const;
+    bool hasPreview() const;
 
 private:
-    void paint();
+    QPoint lastPoint;
+
+    void paint(const QPoint &newPoint);
 };
 
 #endif // LINEINSTRUMENT_H

@@ -43,10 +43,10 @@ public:
 
     void mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &);
     void mouseMoveEvent(QMouseEvent *event, const QImage &frameData, const QPoint &);
-    void mouseReleaseEvent(QMouseEvent *event, FrameEditor &, const QImage &frameData, const QPoint &);
+    void mouseReleaseEvent(QMouseEvent *event, FrameEditor &, const QImage &, const QPoint &);
 
 private:
-    void paint();
+    void paint(const QPoint &point);
 
     void fill(const QPoint &, QRgb newColor, QRgb oldColor, QImage &pattern);
 };

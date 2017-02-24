@@ -81,12 +81,9 @@ public:
 protected:
     QPointer<InstrumentConfiguration> instrumentConfiguration;
 
-    QPoint startPoint;
-    QPoint endPoint; ///< Point for events.
     QImage preview; ///< Scratch space to draw tool output onto
     bool drawing;       ///< True if we have an unsaved
 
-private:
     QPixmap icon;
     QCursor cursor;
 };

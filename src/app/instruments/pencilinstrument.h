@@ -44,12 +44,15 @@ public:
                               QObject *parent = 0);
 
     void mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &);
-    void mouseMoveEvent(QMouseEvent *event, const QImage &frameData, const QPoint &);
+    void mouseMoveEvent(QMouseEvent *, const QImage &frameData, const QPoint &);
     void mouseReleaseEvent(QMouseEvent *event, FrameEditor &, const QImage &frameData, const QPoint &);
-    QCursor cursor() const;
+
+    bool hasPreview() const;
 
 private:
-    void paint();
+    QPoint startPoint;
+
+    void paint(const QPoint &newPoint);
 };
 
 #endif // PENCILINSTRUMENT_H

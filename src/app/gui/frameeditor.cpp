@@ -248,9 +248,9 @@ void FrameEditor::setShowPlaybakIndicator(bool newShowPlaybackIndicator)
 
 void FrameEditor::setFrameData(int index, const QImage &data)
 {
-    // Don't update if we are currently in a draw operation
-    if(!instrument.isNull() && instrument->hasPreview())
-        return;
+//    // Don't update if we are currently in a draw operation
+//    if(!instrument.isNull() && instrument->hasPreview())
+//        return;
 
     // TODO: Unclear logic
     if (data.isNull()) {

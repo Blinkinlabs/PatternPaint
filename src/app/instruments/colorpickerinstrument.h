@@ -51,7 +51,7 @@ public:
     }
 
 private:
-    void paint(const QImage &frameData);
+    void paint(const QImage &frameData, const QPoint &point);
 
 signals:
     void pickedColor(QColor);

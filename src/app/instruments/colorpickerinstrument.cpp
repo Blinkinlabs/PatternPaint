@@ -13,8 +13,7 @@ void ColorpickerInstrument::mousePressEvent(QMouseEvent *event,
                                             const QPoint &pt)
 {
     if (event->button() == Qt::LeftButton) {
-        startPoint = endPoint = pt;
-        paint(frameData);
+        paint(frameData, pt);
         drawing = true;
     }
 }
@@ -26,8 +25,7 @@ void ColorpickerInstrument::mouseMoveEvent(QMouseEvent *,
     if(!drawing)
         return;
 
-    startPoint = endPoint = pt;
-    paint(frameData);
+    paint(frameData, pt);
 }
 
 void ColorpickerInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &, const QImage &, const QPoint &)
@@ -35,14 +33,14 @@ void ColorpickerInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &, cons
     drawing = false;
 }
 
-void ColorpickerInstrument::paint(const QImage &frameData)
+void ColorpickerInstrument::paint(const QImage &frameData, const QPoint &point)
 {
-    if (startPoint.x() < 0 || startPoint.y() < 0
-        || startPoint.x() > frameData.width()
-        || startPoint.y() > frameData.height())
+    if (point.x() < 0 || point.y() < 0
+        || point.x() > frameData.width()
+        || point.y() > frameData.height())
         return;
 
-    QRgb pixel(frameData.pixel(startPoint));
+    QRgb pixel(frameData.pixel(point));
     QColor getColor(pixel);
     emit pickedColor(getColor);
 }

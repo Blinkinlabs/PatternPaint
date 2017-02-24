@@ -18,30 +18,29 @@ void FillInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameData
         drawing = true;
         preview = frameData;
 
-        startPoint = endPoint = pt;
-        paint();
+        paint(pt);
     }
 }
 
-void FillInstrument::mouseMoveEvent(QMouseEvent *, const QImage &frameData, const QPoint &)
+void FillInstrument::mouseMoveEvent(QMouseEvent *, const QImage &, const QPoint &)
 {
 }
 
-void FillInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &frameData, const QPoint &)
+void FillInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &, const QPoint &)
 {
     editor.applyInstrument(preview);
     drawing = false;
 }
 
-void FillInstrument::paint()
+void FillInstrument::paint(const QPoint &point)
 {
     QColor switchColor = instrumentConfiguration->getToolColor();
-    QRgb pixel(preview.pixel(startPoint));
+    QRgb pixel(preview.pixel(point));
 
     QColor oldColor(pixel);
 
     if (switchColor.rgb() != oldColor.rgb())
-        fill(startPoint, switchColor.rgb(), pixel, preview);
+        fill(point, switchColor.rgb(), pixel, preview);
 }
 
 QList<QPoint> neighbors(const QPoint &pt, const QImage &img)

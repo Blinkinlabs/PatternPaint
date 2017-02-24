@@ -10,7 +10,13 @@ LineInstrument::LineInstrument(InstrumentConfiguration *instrumentConfiguration,
                        instrumentConfiguration,
                        parent)
 {
+    cursor = QCursor(Qt::CrossCursor);
     drawing = false;
+}
+
+bool LineInstrument::hasPreview() const
+{
+    return true;
 }
 
 void LineInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &pt)
@@ -20,20 +26,26 @@ void LineInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameData
                              QImage::Format_ARGB32_Premultiplied);
         preview.fill(QColor(0, 0, 0, 0));
 
-        startPoint = endPoint = pt;
-        paint();
+        firstPoint = pt;
+        paint(pt);
         drawing = true;
     }
 }
 
 void LineInstrument::mouseMoveEvent(QMouseEvent *, const QImage &frameData, const QPoint &pt)
 {
-    if (!drawing)
-        return;
+    // If we aren't drawing, we're in preview mode- clear the frame before doing anything else.
+    if (!drawing) {
+        if(preview.size() != frameData.size())
+            preview = QImage(frameData.size(),
+                             QImage::Format_ARGB32_Premultiplied);
 
-    endPoint = pt;
+        preview.fill(QColor(0,0,0,0));
+        firstPoint = pt;
+    }
+
     preview.fill(QColor(0, 0, 0, 0));
-    paint();
+    paint(pt);
 }
 
 void LineInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &frameData, const QPoint &)
@@ -42,13 +54,7 @@ void LineInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const
     drawing = false;
 }
 
-QCursor LineInstrument::cursor() const
-{
-    // TODO: Pull this into the resource file, to keep consistancy across platforms
-    return Qt::CrossCursor;
-}
-
-void LineInstrument::paint()
+void LineInstrument::paint(const QPoint &newPoint)
 {
     QPainter painter(&preview);
 
@@ -56,9 +62,9 @@ void LineInstrument::paint()
                         instrumentConfiguration->getPenSize(),
                         Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 
-    if (startPoint != endPoint)
-        painter.drawLine(startPoint, endPoint);
+    if (firstPoint != newPoint)
+        painter.drawLine(firstPoint, newPoint);
 
-    if (startPoint == endPoint)
-        painter.drawPoint(startPoint);
+    if (firstPoint == newPoint)
+        painter.drawPoint(newPoint);
 }

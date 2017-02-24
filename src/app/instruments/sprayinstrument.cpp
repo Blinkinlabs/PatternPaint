@@ -20,8 +20,7 @@ void SprayInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameDat
         preview.fill(QColor(0, 0, 0, 0));
         drawing = true;
 
-        startPoint = endPoint = pt;
-        paint();
+        paint(pt);
     }
 }
 
@@ -30,9 +29,7 @@ void SprayInstrument::mouseMoveEvent(QMouseEvent *, const QImage &, const QPoint
     if (!drawing)
         return;
 
-    endPoint = pt;
-    paint();
-    startPoint = pt;
+    paint(pt);
 }
 
 void SprayInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &frameData, const QPoint &)
@@ -41,7 +38,7 @@ void SprayInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, cons
     drawing = false;
 }
 
-void SprayInstrument::paint()
+void SprayInstrument::paint(const QPoint &newPoint)
 {
     QPainter painter(&preview);
 
@@ -84,6 +81,6 @@ void SprayInstrument::paint()
             return;
         }
 
-        painter.drawPoint(endPoint.x() + x, endPoint.y() + y);
+        painter.drawPoint(newPoint.x() + x, newPoint.y() + y);
     }
 }
