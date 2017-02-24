@@ -9,3 +9,7 @@ src/*.user
 build-*
 PatternPaint/*.user
 windows-drivers/*
+
+*.221ffcd
+
+*.88acc22
