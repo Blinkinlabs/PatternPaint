@@ -44,7 +44,7 @@ public:
 
 private:
     float scale;            ///< User-controlled scale factor
-    bool fitToWindow;
+    bool fitToHeight;
 
     QImage frameData;     ///< Frame image
     int frameIndex;                 ///< Frame index
@@ -100,7 +100,7 @@ public slots:
 
     void zoomIn();
     void zoomOut();
-    void zoomToFit(bool newFitToWindow);
+    void zoomToFit(bool newFitToHeight);
 };
 
 #endif // PATTERNDITOR_H

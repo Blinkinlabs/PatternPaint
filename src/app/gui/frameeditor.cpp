@@ -36,7 +36,7 @@ QPoint FrameEditor::imageToFrame(const QPoint &imagePoint) const {
 FrameEditor::FrameEditor(QWidget *parent) :
     QWidget(parent),
     scale(ZOOM_MIN),
-    fitToWindow(true),
+    fitToHeight(true),
     frameIndex(0),
     showPlaybackIndicator(false)
 {
@@ -73,22 +73,22 @@ void FrameEditor::setScale(float newScale)
 
     scale = newScale;
 
-    if(fitToWindow) {
-        fitToWindow = false;
-        emit(zoomToFitChanged(fitToWindow));
+    if(fitToHeight) {
+        fitToHeight = false;
+        emit(zoomToFitChanged(fitToHeight));
     }
 
     updateSize();
     update();
 }
 
-void FrameEditor::zoomToFit(bool newFitToWindow)
+void FrameEditor::zoomToFit(bool newFitToHeight)
 {
-    if(newFitToWindow == fitToWindow)
+    if(newFitToHeight == fitToHeight)
         return;
 
-    fitToWindow = newFitToWindow;
-    emit(zoomToFitChanged(fitToWindow));
+    fitToHeight = newFitToHeight;
+    emit(zoomToFitChanged(fitToHeight));
 
     updateSize();
     update();
@@ -101,9 +101,6 @@ const QImage &FrameEditor::getPatternAsImage() const
 
 void FrameEditor::resizeEvent(QResizeEvent *resizeEvent)
 {
-    qDebug() << "Resize event"
-             << "scale:" << scale;
-
     updateSize();
 
     QWidget::resizeEvent(resizeEvent);
@@ -111,43 +108,41 @@ void FrameEditor::resizeEvent(QResizeEvent *resizeEvent)
 
 void FrameEditor::updateSize()
 {
-    // There are three inputs:
-    // hasImage(): (bool) true if we have an image to scale
-    // fitToWindow: (bool) true if we should dynamically adjust 'scale' to fit
-    //    the image height to the container (scroll area) size
-    // frameData.size(): base resolution of the image we are editing
-    // scale: (float) % to scale the image
-
-    // And x outputs:
-    // scale: % the frameData image is scaled by when drawing. Only adjusted
-    //    here if fitToWindow is true
-
     if(!hasImage()) {
         // Degenerate case- set our size to 0 to prevent the widget from drawing
         setBaseSize(QSize());
 
         // TODO: Do we need to clear anything else here?
     }
-    else if(fitToWindow){
-        // We want to scale the image to fit the height of the QScrollArea viewport,
-        // and force the width based on the aspect ratio.
+    else if(fitToHeight){
+        // In fit-to-height mode, the image height should be maximized to fill the
+        // QScrollArea container. Unfortunately the available height of the QScrollArea
+        // depends on whether the scroll bar is visible or not, which depends on the
+        // scaled width of the frameData. The strategy then is to determine if the
+        // scroll bar should be drawn or not, based on the aspect ratio of the image.
+
         scale = float(size().height())/frameData.height();
 
-        // TODO: There's a recursion bug with this, that is triggered when the horizontal size
-        // is just wider than the viewport. This code tells the viewport to resize, which then
-        // turns on the scroll bars, which then makes the viewport just a little smaller, which then
-        // calls this code again, which then resizes so that it's just small enough to not need the scroll
-        // bars, and so on.
-        // This is a hacky workaround to try and stop this after a single cycle.
-        static QSize lastQScrollAreaSize;
-        if(lastQScrollAreaSize != parentWidget()->parentWidget()->size()) {
-            lastQScrollAreaSize = parentWidget()->parentWidget()->size();
+        setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        setMinimumSize(frameData.width()*scale, 1);
+        setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+        setBaseSize(QSize(0,0));
 
-            setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-            setMinimumSize(frameData.width()*scale, 1);
-            setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
-            setBaseSize(QSize(0,0));
+        (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+        // Finally, force the horizontal scroll bar on or off depending on the parent widget size. If the scroll
+        // bar state changes, it will cause the size function to be called again.
+        QSize scrollAreaSize = (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->size();
+
+        float imageAspectRatio = float(frameData.width())/frameData.height();
+        float parentAspectRatio = float(scrollAreaSize.width())/scrollAreaSize.height();
+        if(imageAspectRatio > parentAspectRatio) {
+            (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
         }
+        else {
+            (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        }
+
     }
     else {
         // Set the widget to a fixed size based on the frame data size and scale
@@ -155,14 +150,10 @@ void FrameEditor::updateSize()
         setBaseSize(frameData.size()*scale);
         setMinimumSize(baseSize());
         setMaximumSize(baseSize());
+
+        (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     }
-
-    qDebug() << "fitToWindow:" << fitToWindow
-             << "baseSize:" << baseSize()
-             << "QScrollArea_viewport.size():" << parentWidget()->size()
-             << "QScrollArea.size():" << parentWidget()->parentWidget()->size()
-             << "scale:" << scale;
-
     updateGrid();
 }
 
