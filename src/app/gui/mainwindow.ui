@@ -137,50 +137,10 @@
        <property name="widgetResizable">
         <bool>true</bool>
        </property>
-<<<<<<< HEAD
-       <widget class="FrameEditor" name="frameEditor">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>500</width>
-          <height>267</height>
-         </rect>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>500</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>500</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="baseSize">
-         <size>
-          <width>10</width>
-          <height>10</height>
-         </size>
-        </property>
-        <property name="acceptDrops">
-         <bool>false</bool>
-        </property>
-       </widget>
-=======
        <property name="alignment">
         <set>Qt::AlignCenter</set>
        </property>
        <widget class="FrameEditor" name="frameEditor"/>
->>>>>>> Blinkinlabs/master
       </widget>
       <widget class="PatternFrameListView" name="timeline">
        <property name="sizePolicy">
@@ -606,11 +566,7 @@
      <x>0</x>
      <y>0</y>
      <width>880</width>
-<<<<<<< HEAD
-     <height>22</height>
-=======
      <height>26</height>
->>>>>>> Blinkinlabs/master
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -637,7 +593,6 @@
      <addaction name="actionOpen_Frame_based_Pattern"/>
     </widget>
     <addaction name="menuNew"/>
-    <addaction name="actionOpen_project"/>
     <addaction name="menuOpen"/>
     <addaction name="menuExamples"/>
     <addaction name="separator"/>
@@ -816,7 +771,7 @@
      <normaloff>:/icons/images/icons/Save-100.png</normaloff>:/icons/images/icons/Save-100.png</iconset>
    </property>
    <property name="text">
-    <string>Save project</string>
+    <string>Save</string>
    </property>
    <property name="iconText">
     <string>Save</string>
@@ -1165,16 +1120,6 @@
     <string>Firmware manager</string>
    </property>
   </action>
-<<<<<<< HEAD
-  <action name="actionOpen_project">
-   <property name="text">
-    <string>Open project</string>
-   </property>
-  </action>
-  <action name="actionSave_project">
-   <property name="text">
-    <string>Save project</string>
-=======
   <action name="actionZoomIn">
    <property name="icon">
     <iconset resource="../images.qrc">
@@ -1230,7 +1175,6 @@
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
->>>>>>> Blinkinlabs/master
    </property>
   </action>
  </widget>
