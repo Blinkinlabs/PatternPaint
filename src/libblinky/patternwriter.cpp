@@ -134,11 +134,8 @@ void PatternWriter::encodeImageRGB24(const Pattern &pattern, const Fixture &fixt
     for (int frame = 0; frame < pattern.getFrameCount(); frame++) {
         QList<QColor> colorStream = fixture.getColorStream(pattern.getFrameImage(frame));
 
-        for (int pixel = 0; pixel < colorStream.count(); pixel++) {
-            QColor color = colorStream.at(pixel);
-
+        foreach(QColor color, colorStream)
             data.append(colorToBytes(fixture.getColorMode(), color));
-        }
     }
 
     header.append("const uint8_t animationData[] PROGMEM = {\n");

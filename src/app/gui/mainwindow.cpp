@@ -981,26 +981,19 @@ void MainWindow::setNewFrame(int newFrame)
                    patternCollection.at(getCurrentPatternIndex())->getEditImage(newFrame));
 }
 
-void MainWindow::updateBlinky()
+void MainWindow::updateBlinky(const QImage &frame)
 {
     if (controller.isNull())
         return;
 
-    if (patternCollection.isEmpty())
-        return;
+    QList<QColor> colorStream = fixture->getColorStream(frame);
+    QByteArray data;
 
-    QImage frame = patternCollection.at(getCurrentPatternIndex())->getFrameImage(
-        getCurrentFrameIndex());
+    // TODO: This should be in a seperate preview output class?
+    foreach(QColor color, colorStream)
+        data.append(colorToBytes(fixture->getColorMode(), color));
 
-    QList<QColor> pixels = fixture->getColorStream(frame);
-
-    // TODO:
-    QByteArray ledData;
-    for (int i = 0; i < pixels.size(); i++) {
-        ledData.append(colorToBytes(fixture->getColorMode(), pixels[i]));
-    }
-
-    controller->sendUpdate(ledData);
+    controller->sendUpdate(data);
 }
 
 void MainWindow::on_actionClose_triggered()
@@ -1104,7 +1097,7 @@ void MainWindow::setFrameData(int index, const QImage &data)
 
     outputPreview->setFrameData(index, frame);
 
-    updateBlinky();
+    updateBlinky(frame);
 }
 
 void MainWindow::on_patternSizeUpdated()

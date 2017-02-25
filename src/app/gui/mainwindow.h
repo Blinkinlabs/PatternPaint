@@ -195,7 +195,7 @@ private:
 
     void setNewFrame(int newFrame);
 
-    void updateBlinky();
+    void updateBlinky(const QImage &frame);
 
 #if defined(Q_OS_MAC)
     /// Object to inhibit app nap when connected to a blinky
