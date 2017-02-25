@@ -1,4 +1,5 @@
 #include <QTest>
+#include <QSignalSpy>
 
 #include "fixturetests.h"
 #include "fixture.h"
@@ -43,10 +44,15 @@ void FixtureTests::setLocationsTest()
         locations.append(QPoint(i,i*10));
 
     Fixture fixture;
+
+    QSignalSpy spy(&fixture, SIGNAL(locationsChanged(void)));
+
     fixture.setLocations(locations);
 
     QVERIFY(fixture.getLocations() == locations);
     QVERIFY(fixture.getCount() == 100);
+
+    QCOMPARE(spy.count(), 1);
 }
 
 void FixtureTests::getExtentsTest_data()

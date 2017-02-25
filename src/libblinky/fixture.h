@@ -44,6 +44,9 @@ public:
 
     virtual QList<QColor> getColorStream(const QImage &frame) const;
 
+signals:
+    void locationsChanged(void);
+
 private:
     QString name;
 

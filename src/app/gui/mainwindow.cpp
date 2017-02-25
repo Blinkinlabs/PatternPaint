@@ -1097,12 +1097,7 @@ void MainWindow::on_PatternDataChanged(const QModelIndex &topLeft, const QModelI
 void MainWindow::setFrameData(int index, QImage data)
 {
     frameEditor->setFrameData(index, data);
-
-
-    //outputPreview->setFrameData(index, data);
-    if(!patternCollection.isEmpty())
-        outputPreview->setFrameData(index, patternCollection.at(getCurrentPatternIndex())->getFrameImage(
-                                    index));
+    outputPreview->setFrameData(index, data);
 
     updateBlinky();
 }

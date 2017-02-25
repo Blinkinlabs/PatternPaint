@@ -14,22 +14,20 @@ public:
     explicit OutputPreview(QWidget *parent = 0);
     ~OutputPreview();
 
-    void setFixture(Fixture* newFixture);
-    void setFrameData(int index, const QImage data);
-
 protected:
     void paintEvent(QPaintEvent *event);
 
 signals:
 
 public slots:
+    void fixtureLocationsChanged();
+
+    void setFixture(Fixture* newFixture);
+    void setFrameData(int index, const QImage &data);
 
 private:
     QPointer<Fixture> fixture;
-
-    QList<QPoint> outputLocations;
-    QList<QColor> colorStream;
-    QRect extents;
+    QImage frameData;
 };
 
 #endif // OUTPUTPREVIEW_H

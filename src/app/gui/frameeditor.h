@@ -85,9 +85,9 @@ signals:
 
 public slots:
     void setInstrument(AbstractInstrument *);
-    void setFixture(Fixture *);
     void setShowPlaybakIndicator(bool);
 
+    void setFixture(Fixture *);
     void setFrameData(int index, const QImage &data);
 
     void zoomIn();

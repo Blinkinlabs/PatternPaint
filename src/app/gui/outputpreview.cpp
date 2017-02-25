@@ -18,22 +18,32 @@ OutputPreview::~OutputPreview()
 void OutputPreview::setFixture(Fixture *newFixture)
 {
     fixture = newFixture;
+    connect(newFixture, SIGNAL(locationsChanged()),
+            this, SLOT(fixtureLocationsChanged()));
+
+    update();
 }
 
-void OutputPreview::setFrameData(int, const QImage data)
+void OutputPreview::fixtureLocationsChanged()
 {
-    if(fixture.isNull())
-        return;
+    update();
+}
 
-    extents = fixture->getExtents();
-    outputLocations = fixture->getLocations();
-    colorStream = fixture->getColorStream(data);
-
+void OutputPreview::setFrameData(int, const QImage &data)
+{
+    frameData = data;
     update();
 }
 
 void OutputPreview::paintEvent(QPaintEvent *)
 {
+    if(fixture.isNull() || frameData.isNull())
+        return;
+
+    QRect extents = fixture->getExtents();
+    QList<QPoint> outputLocations = fixture->getLocations();
+    QList<QColor> colorStream = fixture->getColorStream(frameData);
+
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
@@ -50,9 +60,6 @@ void OutputPreview::paintEvent(QPaintEvent *)
 
     painter.setViewTransformEnabled(true);
     painter.scale(scale,scale);
-
-    if(outputLocations.count() != colorStream.count())
-        return;
 
     for(int i = 0; i < outputLocations.count(); i++) {
         painter.fillRect(QRectF(outputLocations.at(i).x()+.5,outputLocations.at(i).y()+.5,
