@@ -16,6 +16,8 @@ HEADERS += \
     patternframeundocommand.h \
     patternscrollmodel.h \
     patternscrollundocommand.h \
+    patterncollection.h \
+    patterncollectionmodel.h \
     blinkycontroller.h \
     controllerinfo.h \
     blinkyuploader.h \
@@ -43,6 +45,8 @@ SOURCES +=  \
     patternframeundocommand.cpp \
     patternscrollmodel.cpp \
     patternscrollundocommand.cpp \
+    patterncollection.cpp \
+    patterncollectionmodel.cpp \
     blinkycontroller.cpp \
     controllerinfo.cpp \
     blinkytapecontrollerinfo.cpp \

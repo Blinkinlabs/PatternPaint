@@ -5,9 +5,7 @@ HEADERS += \
     $$PWD/systeminformation.h \
     $$PWD/aboutpatternpaint.h \
     $$PWD/colorchooser.h \
-    $$PWD/patterncollectionmodel.h \
     $$PWD/patterncollectiondelegate.h \
-    $$PWD/patterncollection.h \
     $$PWD/frameeditor.h \
     $$PWD/patterndelegate.h \
     $$PWD/welcomescreen.h \
@@ -27,9 +25,7 @@ SOURCES += \
     $$PWD/systeminformation.cpp \
     $$PWD/aboutpatternpaint.cpp \
     $$PWD/colorchooser.cpp \
-    $$PWD/patterncollectionmodel.cpp \
     $$PWD/patterncollectiondelegate.cpp \
-    $$PWD/patterncollection.cpp \
     $$PWD/frameeditor.cpp \
     $$PWD/patterndelegate.cpp \
     $$PWD/welcomescreen.cpp \
