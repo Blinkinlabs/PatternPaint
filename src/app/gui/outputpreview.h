@@ -20,8 +20,6 @@ protected:
 signals:
 
 public slots:
-    void fixtureLocationsChanged();
-
     void setFixture(Fixture* newFixture);
     void setFrameData(int index, const QImage &data);
 

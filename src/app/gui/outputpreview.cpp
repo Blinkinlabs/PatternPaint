@@ -18,15 +18,6 @@ OutputPreview::~OutputPreview()
 void OutputPreview::setFixture(Fixture *newFixture)
 {
     fixture = newFixture;
-    connect(newFixture, SIGNAL(locationsChanged()),
-            this, SLOT(fixtureLocationsChanged()));
-
-    update();
-}
-
-void OutputPreview::fixtureLocationsChanged()
-{
-    update();
 }
 
 void OutputPreview::setFrameData(int, const QImage &data)

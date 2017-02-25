@@ -877,7 +877,6 @@ void MainWindow::applyScene(const SceneTemplate &scene)
     fixture->setColorMode(scene.colorMode);
     fixture->setBrightnessModel(new ExponentialBrightness(1.8,1.8,2.1));
 
-
     // Wire in the fixture
     frameEditor->setFixture(fixture);
     outputPreview->setFixture(fixture);
@@ -1094,10 +1093,16 @@ void MainWindow::on_PatternDataChanged(const QModelIndex &topLeft, const QModelI
     }
 }
 
-void MainWindow::setFrameData(int index, QImage data)
+void MainWindow::setFrameData(int index, const QImage &data)
 {
     frameEditor->setFrameData(index, data);
-    outputPreview->setFrameData(index, data);
+
+    QImage frame;
+    if(!patternCollection.isEmpty()) {
+        frame = patternCollection.at(getCurrentPatternIndex())->getFrameImage(index);
+    }
+
+    outputPreview->setFrameData(index, frame);
 
     updateBlinky();
 }

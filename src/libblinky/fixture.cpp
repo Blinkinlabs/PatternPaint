@@ -85,8 +85,6 @@ void Fixture::setLocations(const QList<QPoint> &newLocations)
         if(extents.bottom() < point.y())
             extents.setBottom(point.y());
     }
-
-    emit(locationsChanged());
 }
 
 const QList<QPoint> & Fixture::getLocations() const
