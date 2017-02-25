@@ -82,9 +82,8 @@ void BlinkyTapeUploader::setDialogText()
                 "\n"
                 "Firmware: " + firmwareName + "\n";
 
-    for(MemorySection& section : flashData) {
+    for (MemorySection& section : flashData)
         flashUsed += section.data.length();
-    }
 
     float flashUsedPercent = float(flashUsed)*100/FLASH_MEMORY_AVAILABLE;
     textLabel.append(QString("Flash used: %1%").arg(QString::number(flashUsedPercent,'f', 1)));
@@ -206,7 +205,7 @@ bool BlinkyTapeUploader::startUpload(BlinkyController &blinky)
 {
     // TODO: Check if all flash sections fit in memory
     // TODO: Check that all sections are not overlapping
-    for(MemorySection& section : flashData) {
+    for (MemorySection& section : flashData) {
         if(section.address + section.data.length() > FLASH_MEMORY_AVAILABLE) {
             errorString = "Pattern data too large, cannot fit on device!";
             return false;
@@ -234,7 +233,7 @@ bool BlinkyTapeUploader::startUpload(qint64 timeout)
 {
     // TODO: Check if all flash sections fit in memory
     // TODO: Check that all sections are not overlapping
-    for(MemorySection& section : flashData) {
+    for (MemorySection& section : flashData) {
         if(section.address + section.data.length() > FLASH_MEMORY_AVAILABLE) {
             errorString = "Pattern data too large, cannot fit on device!";
             return false;
@@ -251,7 +250,7 @@ bool BlinkyTapeUploader::startUpload(qint64 timeout)
 
     // There are 4 commands for each page-
     // setaddress, writeflashpage, setaddress, verifyflashpage
-    foreach (MemorySection flashSection, flashData)
+    for (MemorySection flashSection : flashData)
         maxProgress += 4*flashSection.data.count()/FLASH_MEMORY_PAGE_SIZE_BYTES;
 
     setProgress(0);

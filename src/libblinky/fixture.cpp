@@ -53,7 +53,7 @@ QList<QColor> Fixture::getColorStream(const QImage &frame) const
     if(brightnessModel.isNull())
         return colorStream;
 
-    foreach(QPoint point, locations) {
+    for (QPoint point : locations) {
         QColor pixel(0,0,0,255);
 
         if(frame.rect().contains(point))

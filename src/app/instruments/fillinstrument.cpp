@@ -66,6 +66,6 @@ void FillInstrument::fill(const QPoint &point, QRgb newColor, QRgb oldColor, QIm
         return;
     pattern.setPixel(point, newColor);
 
-    foreach (const QPoint &p, neighbors(point, pattern))
+    for (const QPoint &p : neighbors(point, pattern))
         if (pattern.pixel(p) == oldColor) fill(p, newColor, oldColor, pattern);
 }

@@ -91,7 +91,7 @@ bool BlinkyPendantUploader::storePatterns(BlinkyController &controller,
         data.append((char)patternWriters.size()); // Number of patterns in the table
         data.append((char)PIXEL_COUNT);     // Number of LEDs in the pattern
 
-        foreach (PatternWriter pattern, patternWriters) {
+        for (PatternWriter pattern : patternWriters) {
             // Make sure we have an image compatible with the BlinkyPendant
             if (pattern.getLedCount() != 10) {
                 errorString = "Wrong pattern size- must be 10 pixels high!";

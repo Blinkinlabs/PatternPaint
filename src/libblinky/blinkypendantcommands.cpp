@@ -101,9 +101,8 @@ QList<SerialCommand> writeFlash(const QByteArray &data)
     while (paddedData.length() % PAGE_SIZE_BYTES != 0)
         paddedData.append((char)0xFF);
 
-    for(QByteArray chunk : chunkData(paddedData, CHUNK_SIZE_BYTES)) {
+    for (QByteArray chunk : chunkData(paddedData, CHUNK_SIZE_BYTES))
         commands.append(writeFlashChunk(chunk));
-    }
 
     return commands;
 }

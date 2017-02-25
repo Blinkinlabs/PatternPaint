@@ -61,7 +61,7 @@ bool SerialCommandQueue::isConnected()
 
 void SerialCommandQueue::enqueue(const QList<SerialCommand> &commands)
 {
-    foreach (SerialCommand command, commands)
+    for (const SerialCommand &command : commands)
         enqueue(command);
 }
 

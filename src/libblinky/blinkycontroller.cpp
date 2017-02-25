@@ -21,7 +21,7 @@ QList<QPointer<ControllerInfo> > BlinkyController::probe()
     QList<QSerialPortInfo> serialPorts = QSerialPortInfo::availablePorts();
     QList<QPointer<ControllerInfo> > controllerInfos;
 
-    foreach (const QSerialPortInfo &info, serialPorts) {
+    for (const QSerialPortInfo &info : serialPorts) {
         // Only connect to known BlinkyTapes
         if (info.vendorIdentifier() == BLINKYTAPE_SKETCH_VID
                 && info.productIdentifier() == BLINKYTAPE_SKETCH_PID)
@@ -57,7 +57,7 @@ QList<QSerialPortInfo> BlinkyController::probeBootloaders()
     QList<QSerialPortInfo> serialPorts = QSerialPortInfo::availablePorts();
     QList<QSerialPortInfo> tapes;
 
-    foreach (const QSerialPortInfo &info, serialPorts) {
+    for (const QSerialPortInfo &info : serialPorts) {
         // Only connect to known BlinkyTapes
         if (info.vendorIdentifier() == BLINKYTAPE_BOOTLOADER_VID
                 && info.productIdentifier() == BLINKYTAPE_BOOTLOADER_PID)

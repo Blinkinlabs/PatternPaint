@@ -48,13 +48,13 @@ void SystemInformation::on_refresh_clicked()
 
     // TODO: Get this from the controllers rather than building them here.
     report.append("Detected Blinkies: \n");
-    foreach (const QPointer<ControllerInfo> &info, BlinkyTape::probe())
+    for (const QPointer<ControllerInfo> &info : BlinkyTape::probe())
         report.append("  BlinkyTape:" + info->resourceName() + "\n");
-    foreach (const QSerialPortInfo &info, BlinkyTape::probeBootloaders())
+    for (const QSerialPortInfo &info : BlinkyTape::probeBootloaders())
         report.append("  BlinkyTape:" + info.portName() + " (bootloader)\n");
 
     report.append("Detected Serial Ports: \n");
-    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
+    for (const QSerialPortInfo &info : QSerialPortInfo::availablePorts()) {
         int version = getVersionForDevice(info.vendorIdentifier(), info.productIdentifier());
 
         report.append("  " + info.portName() + "\n");

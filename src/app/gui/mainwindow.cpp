@@ -234,7 +234,7 @@ MainWindow::MainWindow(QWidget *parent) :
     outputPreviewFrame->setVisible(settings.value("MainWindow/outputPreview", true).toBool());
 
     QList<QToolBar *> toolbars = this->findChildren<QToolBar *>();
-    foreach (QToolBar *toolbar, toolbars) {
+    for (QToolBar *toolbar : toolbars) {
         QAction *action = new QAction(this);
         action->setText(toolbar->windowTitle());
         action->setCheckable(true);
@@ -285,7 +285,7 @@ void MainWindow::populateExamplesMenu(QString directory, QMenu *menu)
     QDir examplesDir(directory);
     QFileInfoList examplesList = examplesDir.entryInfoList();
 
-    foreach(QFileInfo fileInfo, examplesList) {
+    for (QFileInfo fileInfo : examplesList) {
         // If we found a directory, create a submenu and call ourselves again to populate it
         if (fileInfo.isDir()) {
             QMenu *submenu = new QMenu(this);
@@ -703,7 +703,7 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
 
     QList<PatternWriter> patternWriters;
 
-    foreach(Pattern* pattern, patternCollection.patterns()) {
+    for (Pattern* pattern : patternCollection.patterns()) {
         PatternWriter patternWriter(*pattern,
                                     *fixture,
                                     uploader->getSupportedEncodings().front());
@@ -735,10 +735,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
     QList<Pattern *> unsavedPatterns;
 
-    foreach(Pattern* pattern, patternCollection.patterns()) {
+    for (Pattern* pattern : patternCollection.patterns())
         if (pattern->getModified())
             unsavedPatterns.append(pattern);
-    }
 
     if (!promptForSave(unsavedPatterns)) {
         event->ignore();
@@ -779,7 +778,7 @@ void MainWindow::on_instrumentSelected(bool)
 {
     QAction *act = static_cast<QAction *>(sender());
     Q_ASSERT(act != NULL);
-    foreach (QAction *a, instrumentToolbar->actions())
+    for (QAction *a : instrumentToolbar->actions())
         a->setChecked(false);
 
     act->setChecked(true);
@@ -816,7 +815,7 @@ bool MainWindow::promptForSave(QList<Pattern *> patterns)
     else {
         messageText += tr("The following patterns have been modified:\n");
 
-        foreach(Pattern *pattern, patterns)
+        for (Pattern *pattern : patterns)
             messageText += pattern->getName() + "\n";
     }
 
@@ -829,7 +828,7 @@ bool MainWindow::promptForSave(QList<Pattern *> patterns)
     int ans = msgBox.exec();
 
     if (ans == QMessageBox::Save) {
-        foreach(Pattern *pattern, patterns)
+        for (Pattern *pattern : patterns)
             if (!savePattern(pattern))
                 return false;
         return true;
@@ -846,7 +845,7 @@ void MainWindow::applyScene(const SceneTemplate &scene)
     // Test if any patterns need to be resized
     QList<Pattern *> needToResize;
 
-    foreach(Pattern* pattern, patternCollection.patterns())
+    for (Pattern* pattern : patternCollection.patterns())
         if (pattern->getFrameSize() != scene.size)
             needToResize.append(pattern);
 
@@ -863,9 +862,8 @@ void MainWindow::applyScene(const SceneTemplate &scene)
         int ans = msgBox.exec();
 
         if (ans == QMessageBox::Yes) {
-            foreach(Pattern* pattern, needToResize) {
+            for (Pattern* pattern : needToResize)
                 pattern->resize(scene.size, false);
-            }
         } else if (ans == QMessageBox::Cancel) {
             return;
         }
@@ -887,7 +885,7 @@ void MainWindow::applyScene(const SceneTemplate &scene)
         QDir examplesDir(scene.examples);
         QFileInfoList examplesList = examplesDir.entryInfoList();
 
-        foreach(QFileInfo fileinfo, examplesList) {
+        for (QFileInfo fileinfo : examplesList) {
             if (!fileinfo.isDir()) {
                 Pattern::PatternType type = Pattern::Scrolling;
                 if (fileinfo.fileName().endsWith(".frames.png"))
@@ -990,7 +988,7 @@ void MainWindow::updateBlinky(const QImage &frame)
     QByteArray data;
 
     // TODO: This should be in a seperate preview output class?
-    foreach(QColor color, colorStream)
+    for (QColor color : colorStream)
         data.append(colorToBytes(fixture->getColorMode(), color));
 
     controller->sendUpdate(data);
@@ -1068,7 +1066,7 @@ void MainWindow::on_PatternDataChanged(const QModelIndex &topLeft, const QModelI
 {
     int currentIndex = getCurrentFrameIndex();
 
-    foreach (int role, roles) {
+    for (int role : roles) {
         if (role == PatternModel::FileName) {
             setPatternName(patternCollection.at(getCurrentPatternIndex())->getName());
         } else if (role == PatternModel::Modified) {
@@ -1278,7 +1276,7 @@ void MainWindow::on_actionWelcome_triggered()
 
 void MainWindow::on_actionSave_All_triggered()
 {
-    foreach(Pattern *pattern, patternCollection.patterns())
+    for (Pattern *pattern : patternCollection.patterns())
         if (!savePattern(pattern))
             return;
 }
@@ -1287,12 +1285,12 @@ void MainWindow::on_actionClose_All_triggered()
 {
     QList<Pattern *> unsavedPatterns;
 
-    foreach(Pattern* pattern, patternCollection.patterns()) {
+    for (Pattern* pattern : patternCollection.patterns()) {
         if (pattern->getModified())
             unsavedPatterns.append(pattern);
     }
 
-    if(!promptForSave(unsavedPatterns))
+    if (!promptForSave(unsavedPatterns))
         return;
 
     patternCollection.clear();

@@ -60,7 +60,7 @@ bool LightBuddyUploader::storePatterns(BlinkyController &controller,
     maxProgress = 1;    // For the initial erase command
 
     // For each pattern, append the image data to the sketch
-    foreach(PatternWriter patternWriter, patternWriters) {
+    for (PatternWriter patternWriter : patternWriters) {
         if (patternWriter.getEncoding() != PatternWriter::RGB24) {
             errorString = "Lightbuddy only supports RGB24 encoding";
             return false;

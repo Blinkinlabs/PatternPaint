@@ -134,7 +134,7 @@ void PatternWriter::encodeImageRGB24(const Pattern &pattern, const Fixture &fixt
     for (int frame = 0; frame < pattern.getFrameCount(); frame++) {
         QList<QColor> colorStream = fixture.getColorStream(pattern.getFrameImage(frame));
 
-        foreach(QColor color, colorStream)
+        for (QColor color : colorStream)
             data.append(colorToBytes(fixture.getColorMode(), color));
     }
 

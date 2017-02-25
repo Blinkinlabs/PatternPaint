@@ -60,7 +60,7 @@ void FirmwareManager::on_addFirmware_clicked()
 void FirmwareManager::on_removeFirmware_clicked()
 {
 
-    for(QListWidgetItem *item : ui->FirmwareList->selectedItems()) {
+    for (QListWidgetItem *item : ui->FirmwareList->selectedItems()) {
 
         QMessageBox msgBox(this);
         msgBox.setWindowModality(Qt::WindowModal);

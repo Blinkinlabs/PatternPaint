@@ -111,7 +111,7 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
     int dataOffset = sketch.length();
 
     // Now, for each pattern, append the image data to the sketch
-    foreach(PatternWriter pattern, patterns) {
+    for (PatternWriter pattern : patterns) {
         qDebug() << "Adding pattern "
                  << "Encoding:" << pattern.getEncoding()
                  << "Frame count:" << pattern.getFrameCount()
