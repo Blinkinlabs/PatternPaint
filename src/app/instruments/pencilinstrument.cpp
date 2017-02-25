@@ -13,11 +13,6 @@ PencilInstrument::PencilInstrument(InstrumentConfiguration *instrumentConfigurat
     drawing = false;
 }
 
-bool PencilInstrument::hasPreview() const
-{
-    return true;
-}
-
 void PencilInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &pt)
 {
     if (event->button() == Qt::LeftButton) {
@@ -35,12 +30,8 @@ void PencilInstrument::mouseMoveEvent(QMouseEvent *, const QImage &frameData, co
 {
     // If we aren't drawing, we're in preview mode- clear the frame before doing anything else.
     if (!drawing) {
-        if(preview.size() != frameData.size())
-            preview = QImage(frameData.size(),
-                             QImage::Format_ARGB32_Premultiplied);
-
-        preview.fill(QColor(0,0,0,0));
-        startPoint = pt;
+        updatePreview(frameData, pt);
+        return;
     }
 
     paint(pt);
@@ -51,6 +42,30 @@ void PencilInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, con
 {
     editor.applyInstrument(preview);
     drawing = false;
+}
+
+void PencilInstrument::updatePreview(const QImage &frameData, QPoint point)
+{
+    if(preview.size() != frameData.size())
+        preview = QImage(frameData.size(),
+                         QImage::Format_ARGB32_Premultiplied);
+    preview.fill(QColor(0, 0, 0, 0));
+
+    QPainter painter(&preview);
+    QColor previewColor;
+
+    if(frameData.pixelColor(point).lightness() < 128) {
+        previewColor = QColor(128+20,128+20,128+20,128);
+    }
+    else {
+        previewColor = QColor(128-20,128-20,128-20,128);
+    }
+
+    painter.setPen(QPen(previewColor,
+                        instrumentConfiguration->getPenSize(),
+                        Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    painter.drawPoint(point);
+
 }
 
 void PencilInstrument::paint(const QPoint &newPoint)

@@ -72,17 +72,20 @@ public:
     /// @return cursor for this tool
     virtual const QCursor & getCursor() const;
 
-    /// Check if the tool has preview data to display
-    /// @return true if the instrument has preview data to display
-    virtual bool hasPreview() const;
-
+    /// Get the cursor preview for this instrument
     virtual const QImage &getPreview() const;
+
+    /// True if the tool is currently in a drawing operation
+    virtual bool isDrawing() const;
 
 protected:
     QPointer<InstrumentConfiguration> instrumentConfiguration;
 
-    QImage preview; ///< Scratch space to draw tool output onto
+    QImage preview;     ///< Scratch space to draw tool output onto
     bool drawing;       ///< True if we have an unsaved
+
+    /// Update the drawing preview. Default is a 1px cursor under the mouse
+    virtual void updatePreview(const QImage &frameData, QPoint point);
 
     QPixmap icon;
     QCursor cursor;

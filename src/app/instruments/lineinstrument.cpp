@@ -14,44 +14,59 @@ LineInstrument::LineInstrument(InstrumentConfiguration *instrumentConfiguration,
     drawing = false;
 }
 
-bool LineInstrument::hasPreview() const
-{
-    return true;
-}
-
-void LineInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &pt)
+void LineInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &point)
 {
     if (event->button() == Qt::LeftButton) {
         preview = QImage(frameData.size(),
                              QImage::Format_ARGB32_Premultiplied);
         preview.fill(QColor(0, 0, 0, 0));
 
-        firstPoint = pt;
-        paint(pt);
+        firstPoint = point;
+        paint(point);
         drawing = true;
     }
 }
 
-void LineInstrument::mouseMoveEvent(QMouseEvent *, const QImage &frameData, const QPoint &pt)
+void LineInstrument::mouseMoveEvent(QMouseEvent *, const QImage &frameData, const QPoint &point)
 {
     // If we aren't drawing, we're in preview mode- clear the frame before doing anything else.
     if (!drawing) {
-        if(preview.size() != frameData.size())
-            preview = QImage(frameData.size(),
-                             QImage::Format_ARGB32_Premultiplied);
-
-        preview.fill(QColor(0,0,0,0));
-        firstPoint = pt;
+        updatePreview(frameData, point);
+        return;
     }
 
     preview.fill(QColor(0, 0, 0, 0));
-    paint(pt);
+    paint(point);
 }
 
 void LineInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &, const QPoint &)
 {
     editor.applyInstrument(preview);
     drawing = false;
+}
+
+void LineInstrument::updatePreview(const QImage &frameData, QPoint point)
+{
+    if(preview.size() != frameData.size())
+        preview = QImage(frameData.size(),
+                         QImage::Format_ARGB32_Premultiplied);
+    preview.fill(QColor(0, 0, 0, 0));
+
+    QPainter painter(&preview);
+    QColor previewColor;
+
+    if(frameData.pixelColor(point).lightness() < 128) {
+        previewColor = QColor(128+20,128+20,128+20,128);
+    }
+    else {
+        previewColor = QColor(128-20,128-20,128-20,128);
+    }
+
+    painter.setPen(QPen(previewColor,
+                        instrumentConfiguration->getPenSize(),
+                        Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    painter.drawPoint(point);
+
 }
 
 void LineInstrument::paint(const QPoint &newPoint)

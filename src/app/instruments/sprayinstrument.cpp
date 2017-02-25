@@ -12,7 +12,7 @@ SprayInstrument::SprayInstrument(InstrumentConfiguration *instrumentConfiguratio
     drawing = false;
 }
 
-void SprayInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &pt)
+void SprayInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &point)
 {
     if (event->button() == Qt::LeftButton) {
         preview = QImage(frameData.size(),
@@ -20,16 +20,18 @@ void SprayInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameDat
         preview.fill(QColor(0, 0, 0, 0));
         drawing = true;
 
-        paint(pt);
+        paint(point);
     }
 }
 
-void SprayInstrument::mouseMoveEvent(QMouseEvent *, const QImage &, const QPoint &pt)
+void SprayInstrument::mouseMoveEvent(QMouseEvent *, const QImage &frameData, const QPoint &point)
 {
-    if (!drawing)
+    if(!drawing) {
+        updatePreview(frameData, point);
         return;
+    }
 
-    paint(pt);
+    paint(point);
 }
 
 void SprayInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &, const QPoint &)

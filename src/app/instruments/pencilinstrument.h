@@ -47,12 +47,12 @@ public:
     void mouseMoveEvent(QMouseEvent *, const QImage &frameData, const QPoint &);
     void mouseReleaseEvent(QMouseEvent *event, FrameEditor &, const QImage &frameData, const QPoint &);
 
-    bool hasPreview() const;
-
 private:
     QPoint startPoint;
 
     void paint(const QPoint &newPoint);
+
+    void updatePreview(const QImage &frameData, QPoint point);
 };
 
 #endif // PENCILINSTRUMENT_H

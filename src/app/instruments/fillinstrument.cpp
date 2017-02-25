@@ -12,18 +12,22 @@ FillInstrument::FillInstrument(InstrumentConfiguration *instrumentConfiguration,
     drawing = false;
 }
 
-void FillInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &pt)
+void FillInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &point)
 {
     if (event->button() == Qt::LeftButton) {
         drawing = true;
         preview = frameData;
 
-        paint(pt);
+        paint(point);
     }
 }
 
-void FillInstrument::mouseMoveEvent(QMouseEvent *, const QImage &, const QPoint &)
+void FillInstrument::mouseMoveEvent(QMouseEvent *, const QImage &frameData, const QPoint &point)
 {
+    if(!drawing) {
+        updatePreview(frameData, point);
+        return;
+    }
 }
 
 void FillInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &, const QPoint &)
@@ -43,25 +47,25 @@ void FillInstrument::paint(const QPoint &point)
         fill(point, switchColor.rgb(), pixel, preview);
 }
 
-QList<QPoint> neighbors(const QPoint &pt, const QImage &img)
+QList<QPoint> neighbors(const QPoint &point, const QImage &img)
 {
     QList<QPoint> res;
-    if (pt.x() > 0) res << QPoint(pt.x()-1, pt.y());
-    if (pt.y() > 0) res << QPoint(pt.x(), pt.y()-1);
-    if (pt.x() < img.width() - 1) res << QPoint(pt.x()+1, pt.y());
-    if (pt.y() < img.height() - 1) res << QPoint(pt.x(), pt.y()+1);
+    if (point.x() > 0) res << QPoint(point.x()-1, point.y());
+    if (point.y() > 0) res << QPoint(point.x(), point.y()-1);
+    if (point.x() < img.width() - 1) res << QPoint(point.x()+1, point.y());
+    if (point.y() < img.height() - 1) res << QPoint(point.x(), point.y()+1);
     return res;
 }
 
-void FillInstrument::fill(const QPoint &pt, QRgb newColor, QRgb oldColor, QImage &pattern)
+void FillInstrument::fill(const QPoint &point, QRgb newColor, QRgb oldColor, QImage &pattern)
 {
-    if (pt.x() >= pattern.width() || pt.y() >= pattern.height())
+    if (point.x() >= pattern.width() || point.y() >= pattern.height())
         return;
 
-    if (pattern.pixel(pt) != oldColor)
+    if (pattern.pixel(point) != oldColor)
         return;
-    pattern.setPixel(pt, newColor);
+    pattern.setPixel(point, newColor);
 
-    foreach (const QPoint &p, neighbors(pt, pattern))
+    foreach (const QPoint &p, neighbors(point, pattern))
         if (pattern.pixel(p) == oldColor) fill(p, newColor, oldColor, pattern);
 }

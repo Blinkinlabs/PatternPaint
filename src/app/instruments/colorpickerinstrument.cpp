@@ -22,8 +22,10 @@ void ColorpickerInstrument::mouseMoveEvent(QMouseEvent *,
                                            const QImage &frameData,
                                            const QPoint &pt)
 {
-    if(!drawing)
+    if(!drawing) {
+        updatePreview(frameData, pt);
         return;
+    }
 
     paint(frameData, pt);
 }
