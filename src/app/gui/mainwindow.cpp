@@ -448,35 +448,32 @@ bool MainWindow::savePatternProject()
     QFile file(projectFilename);
     file.open(QIODevice::WriteOnly | QIODevice::Text);
 
-    QXmlStreamWriter xmlWriter(&file);
-    xmlWriter.setAutoFormatting(true);
-    xmlWriter.writeStartDocument();
 
-    xmlWriter.writeStartElement("PatternPaintProject");
+    QDataStream out(&file);
+    out.setVersion(QDataStream::Qt_5_8);
 
-    // save system info
-    xmlWriter.writeStartElement("SystemInfo");
-    xmlWriter.writeTextElement("PatternPaintVersion", GIT_VERSION );
-    xmlWriter.writeTextElement("FormatVersion", PROJECT_FORMAT_VERSION );
-    xmlWriter.writeEndElement();
+    // write Header
+    out << (QString)PROJECT_HEADER;
+    out << (float)PROJECT_FORMAT_VERSION;
+    out << (QString)GIT_VERSION;
 
-    // save scene configuration
-    xmlWriter.writeStartElement("SceneConfiguration");
-    xmlWriter.writeTextElement("Firmware", settings.value("BlinkyTape/firmwareName", DEFAULT_FIRMWARE_NAME).toString());
-    xmlWriter.writeTextElement("FixtureType", fixture->getName());
-    xmlWriter.writeTextElement("Width", QString::number(fixture->getExtents().width()));
-    xmlWriter.writeTextElement("Height", QString::number(fixture->getExtents().height()));
-    xmlWriter.writeTextElement("ColorMode", QString::number(fixture->getColorMode()));
-    xmlWriter.writeEndElement();
+    // write scene configuration
+    out << (QString)settings.value("BlinkyTape/firmwareName", DEFAULT_FIRMWARE_NAME).toString();
+    out << (QString)fixture->getName();
+    out << (qint32)fixture->getExtents().width();
+    out << (qint32)fixture->getExtents().height();
+    out << (qint32)fixture->getColorMode();
 
-    // save pattern
+    // write pattern
+    out << (qint32)patternCollection.count();
+
     for(int i=0;i<patternCollection.count();i++){
-        xmlWriter.writeStartElement("Pattern");
-        xmlWriter.writeTextElement("name",patternCollection.at(i)->getName());
-        xmlWriter.writeTextElement("speed", QString::number(patternCollection.at(i)->getFrameSpeed()));
 
         int patternType = patternCollection.at(i)->getType();
-        xmlWriter.writeTextElement("type", QString::number(patternType));
+
+        out << (QString)patternCollection.at(i)->getName();
+        out << (float)patternCollection.at(i)->getFrameSpeed();
+        out << (qint32)patternType;
 
         Pattern::PatternType type = static_cast<Pattern::PatternType>(patternType);
         QSize frameSize = patternCollection.at(i)->getFrameSize();
@@ -508,20 +505,17 @@ bool MainWindow::savePatternProject()
         }
         }
 
+
         QByteArray ba;
         QBuffer buffer(&ba);
         buffer.open(QIODevice::WriteOnly);
         image.save(&buffer, "PNG"); // writes image into ba in PNG format
-        xmlWriter.writeTextElement("image", buffer.data().toHex());
-
-        xmlWriter.writeEndElement();
+        out << (QString)buffer.data().toHex();
 
         patternCollection.at(i)->setModified(false);
         setPatternModified(patternCollection.at(i)->getModified());
 
     }
-
-    xmlWriter.writeEndElement();
 
     file.close();
 
@@ -1347,9 +1341,16 @@ void MainWindow::on_actionConfigure_Scene_triggered()
 
 void MainWindow::on_actionOpen_project_triggered()
 {
-
     on_actionClose_All_triggered();
 
+    if(!openPatternProject()){
+        QMessageBox::critical(this,"Error","Project can not be read",QMessageBox::Ok);
+    }
+
+}
+
+bool MainWindow::openPatternProject()
+{
     QSettings settings;
     QString lastDirectory = settings.value("File/LoadDirectory").toString();
 
@@ -1362,7 +1363,7 @@ void MainWindow::on_actionOpen_project_triggered()
                                                     tr("Pattern Files (*.ppro)"));
 
     if (fileName.length() == 0)
-        return;
+        return true;
 
     QFileInfo fileInfo(fileName);
     settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
@@ -1372,127 +1373,103 @@ void MainWindow::on_actionOpen_project_triggered()
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly | QFile::Text)){
         qDebug()<< "Error: Cannot read project file ";
-        return;
+        return false;
     }
 
     // read project file
-
     SceneTemplate sceneTemplate;
-    QString PatternPaintVersion;
-    QString FormatVersion;
-    int width;
-    int height;
+    QString header;
+    QString patternPaintVersion;
+    float formatVersion;
+    qint32 width;
+    qint32 height;
+    qint32 colorMode;
+    qint32 patternCount;
+
+    QDataStream in(&file);
+    in.setVersion(QDataStream::Qt_5_8);
+
+    // read Header
+    in >> header;
+    if(header != PROJECT_HEADER){
+        qDebug()<< "Error: Header incorrectly";
+        return false;
+    }
+
+    in >> formatVersion;
+    if(formatVersion != PROJECT_FORMAT_VERSION){
+        qDebug()<< "Error: Format version incorrectly";
+        return false;
+    }
+
+    in >> patternPaintVersion;
 
 
-    QXmlStreamReader xmlReader(&file);
+    // read scene configuration
+    in >> sceneTemplate.firmwareName;
+    in >> sceneTemplate.fixtureType;
+    in >> width;
+    in >> height;
+    in >> colorMode;
 
-    if(xmlReader.readNextStartElement()) {
-        if (xmlReader.name() == "PatternPaintProject"){
-            while(xmlReader.readNextStartElement()){
-                if(xmlReader.name() == "SystemInfo"){
-                    while(xmlReader.readNextStartElement()){
-                       if(xmlReader.name() == "PatternPaintVersion"){
-                           PatternPaintVersion = xmlReader.readElementText();
-                       }else if(xmlReader.name() == "FormatVersion"){
-                           FormatVersion = xmlReader.readElementText();
-                           if(PROJECT_FORMAT_VERSION != FormatVersion){
-                               xmlReader.raiseError(QObject::tr("Incorrect format version"));
-                           }
-                       }
-                      else
-                          xmlReader.skipCurrentElement();
-                    }
-                }else if (xmlReader.name() == "SceneConfiguration"){
-                    while(xmlReader.readNextStartElement()){
-                        if(xmlReader.name() == "Firmware"){
-                            sceneTemplate.firmwareName = xmlReader.readElementText();
-                        }else if(xmlReader.name() == "FixtureType"){
-                            sceneTemplate.fixtureType = xmlReader.readElementText();
-                        }else if(xmlReader.name() == "Width"){
-                            width = xmlReader.readElementText().toInt();
-                        }else if(xmlReader.name() == "Height"){
-                            height = xmlReader.readElementText().toInt();
-                        }else if(xmlReader.name() == "ColorMode"){
-                            sceneTemplate.colorMode = (ColorMode)xmlReader.readElementText().toInt();
-                        }
-                        else
-                            xmlReader.skipCurrentElement();
-                    }
+    sceneTemplate.colorMode = (ColorMode)colorMode;
+    sceneTemplate.size = QSize(width,height);
+    applyScene(sceneTemplate);
 
-                    sceneTemplate.size = QSize(width,height);
-                    applyScene(sceneTemplate);
 
-                }else if (xmlReader.name() == "Pattern"){
-                    QString patternName;
-                    int patternSpeed;
-                    int patternType;
-                    QString imageData;
+    // read pattern
+    in >> patternCount;
 
-                    while(xmlReader.readNextStartElement()){
-                        if(xmlReader.name() == "name"){
-                            patternName = xmlReader.readElementText();
-                        }else if(xmlReader.name() == "speed"){
-                            patternSpeed = xmlReader.readElementText().toInt();
-                        }else if(xmlReader.name() == "type"){
-                            patternType = xmlReader.readElementText().toInt();
-                        }else if(xmlReader.name() == "image"){
-                            imageData = xmlReader.readElementText();
-                        }
-                        else
-                            xmlReader.skipCurrentElement();
-                    }
+    for(int i=0;i<patternCount;i++){
 
-                    QImage PatternImage;
-                    QByteArray readCompressed = QByteArray::fromHex(imageData.toLatin1());
-                    if(!PatternImage.loadFromData(readCompressed))
-                        xmlReader.raiseError(QObject::tr("fail to read image data"));
+        QString patternName;
+        float patternSpeed;
+        qint32 patternType;
+        QString imageData;
+        QImage PatternImage;
 
-                    //create new pattern
-                    QSettings settings;
-                    int frameCount = settings.value("Options/FrameCount", DEFAULT_FRAME_COUNT).toUInt();
+        in >> patternName;
+        in >> patternSpeed;
+        in >> patternType;
+        in >> imageData;
 
-                    QSize displaySize(fixture->getExtents().width(), fixture->getExtents().height());
+        QByteArray buffer = QByteArray::fromHex(imageData.toLatin1());
 
-                    Pattern::PatternType type = static_cast<Pattern::PatternType>(patternType);
-                    Pattern *pattern = new Pattern(type, displaySize, frameCount);
-
-                    if (!pattern->load(PatternImage,patternName)){
-                        xmlReader.raiseError(QObject::tr("can't load pattern"));
-                    }else{
-                        int newPosition = 0;
-                        if (getPatternCount() > 0)
-                            newPosition = getCurrentPatternIndex()+1;
-
-                        patternCollection.add(pattern, newPosition);
-                        patternCollectionListView->setCurrentIndex(patternCollectionListView->model()->index(newPosition,0));
-                        patternCollection.at(newPosition)->setFrameSpeed(patternSpeed);
-                    }
-
-                }
-                else
-                    xmlReader.skipCurrentElement();
-            }
+        if(!PatternImage.loadFromData(buffer)){
+            qDebug()<< "Error: fail to read image data";
+            return false;
         }
-        else
-            xmlReader.raiseError(QObject::tr("Incorrect file"));
+
+        //create new pattern
+        QSettings settings;
+        int frameCount = settings.value("Options/FrameCount", DEFAULT_FRAME_COUNT).toUInt();
+
+        QSize displaySize(fixture->getExtents().width(), fixture->getExtents().height());
+
+        Pattern::PatternType type = static_cast<Pattern::PatternType>(patternType);
+        Pattern *pattern = new Pattern(type, displaySize, frameCount);
+
+        if (!pattern->load(PatternImage,patternName)){
+            qDebug()<< "Error: can't load pattern";
+            return false;
+        }else{
+            int newPosition = 0;
+            if (getPatternCount() > 0)
+                newPosition = getCurrentPatternIndex()+1;
+
+            patternCollection.add(pattern, newPosition);
+            patternCollectionListView->setCurrentIndex(patternCollectionListView->model()->index(newPosition,0));
+            patternCollection.at(newPosition)->setFrameSpeed(patternSpeed);
+        }
+
+
     }
 
-    if(xmlReader.hasError()) {
-        qDebug() << "Error reading project:" << xmlReader.errorString();
+    qDebug() << "Project created with Pattern Paint version:" << patternPaintVersion;
+    qDebug() << "Format version:" << formatVersion;
+    qDebug() << "Project successful readed";
 
-        QMessageBox::critical(this,"Error","Error reading project: " + xmlReader.errorString(),QMessageBox::Ok);
-        return;
-    }else{
-        qDebug() << "Project created with Pattern Paint version:" << PatternPaintVersion;
-        qDebug() << "Format version:" << FormatVersion;
-        qDebug() << "Project successful readed";
-    }
-
-
-
-
-
-
+    return true;
 }
 
 void MainWindow::openPattern(Pattern::PatternType type)

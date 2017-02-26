@@ -185,6 +185,7 @@ private:
     bool promptForSave(Pattern *pattern);
     bool promptForSave(QList<Pattern *> patterns);
 
+    bool openPatternProject();
     bool savePatternProject();
     bool savePattern(Pattern *item);
     bool savePatternAs(Pattern *item);
