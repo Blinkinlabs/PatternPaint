@@ -4,7 +4,16 @@
 
 #include "memorysection.h"
 
-void MemorySectionTests::nameSetTest()
+void MemorySectionTests::EmptyConstructorTest()
+{
+    MemorySection testSection;
+
+    QVERIFY(testSection.name.isNull());
+    QVERIFY(testSection.address == 0);
+    QVERIFY(testSection.data.isNull());
+}
+
+void MemorySectionTests::FullConstructorTest()
 {
     QString name("name");
     unsigned int address = 32;

@@ -1,6 +1,8 @@
 #ifndef FIRMWAREIMPORT_H
 #define FIRMWAREIMPORT_H
 
+#include "memorysection.h"
+
 #include <QString>
 
 bool parseHexLine(QString line,
@@ -13,10 +15,10 @@ class FirmwareReader
 public:
     bool load(const QString &fileName);
 
-    const QByteArray &getData() const;
+    const MemorySection &getData() const;
 
 private:
-    QByteArray data;
+    MemorySection data;
 };
 
 #endif // FIRMWAREIMPORT_H

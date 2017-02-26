@@ -2,7 +2,7 @@
 
 #include <QtTest>
 
-#include "memorysection.h"
+#include "memorymap.h"
 
 void MemoryMapTests::constructorTest()
 {

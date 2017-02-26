@@ -81,7 +81,7 @@ bool parseHexLine(QString line,
     return true;
 }
 
-const QByteArray& FirmwareReader::getData() const {
+const MemorySection& FirmwareReader::getData() const {
     return data;
 }
 
@@ -96,7 +96,10 @@ bool FirmwareReader::load(const QString& fileName)
         return false;
     }
 
-    data.clear();
+    data.name = fileName;
+    data.address = 0;
+    data.data.clear();
+
     unsigned int nextAddress = 0;
 
     QTextStream in(&inputFile);
@@ -119,7 +122,7 @@ bool FirmwareReader::load(const QString& fileName)
                 return false;
             }
 
-            data.append(lineData);
+            data.data.append(lineData);
             nextAddress += lineData.count();
 
             break;
@@ -135,7 +138,7 @@ bool FirmwareReader::load(const QString& fileName)
     }
 
     inputFile.close();
-    qDebug() << "Firmware size:" << data.count();
+    qDebug() << "Firmware size:" << data.data.count();
 
     return true;
 }

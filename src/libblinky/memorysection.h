@@ -1,5 +1,5 @@
-#ifndef FLASHSECTION_H
-#define FLASHSECTION_H
+#ifndef MEMORYSECTION_H
+#define MEMORYSECTION_H
 
 #include <QMetaType>
 #include <QString>
@@ -8,7 +8,7 @@
 
 // Single contiguous secton of memory, eg flash
 struct MemorySection {
-    MemorySection() {}
+    MemorySection();
 
     /// Create a new flash section
     /// @param address Address in the flash memory where the data should be stored
@@ -25,21 +25,4 @@ struct MemorySection {
 
 Q_DECLARE_METATYPE(MemorySection)
 
-
-// Collection of multiple blocks of memory, with checking to
-// ensure they are all in bounds and do not overlap
-class MemoryMap {
-public:
-    MemoryMap(unsigned int start, unsigned int size);
-
-    // Add a new memory section to the map. Fails if the new section
-    // overlaps an existing section
-    bool addSection(const MemorySection& section);
-
-    QList<MemorySection> memorySections;     ///< List of memory sections
-
-    unsigned int start;
-    unsigned int size;
-};
-
-#endif // FLASHSECTION_H
+#endif // MEMORYSECTION_H

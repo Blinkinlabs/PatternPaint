@@ -91,30 +91,30 @@ void BlinkyTapeUploader::setDialogText()
 
 bool BlinkyTapeUploader::restoreFirmware(qint64 timeout)
 {
-    QByteArray sketch = FirmwareStore::getFirmwareData(BLINKYTAPE_FACTORY_FIRMWARE_NAME);
+    MemorySection sketch = FirmwareStore::getFirmwareData(BLINKYTAPE_FACTORY_FIRMWARE_NAME);
 
-    if(sketch.isNull()) {
+    if(sketch.data.isNull()) {
         qDebug() << "Error loading factory firmware!";
         return false;
     }
 
     // Put the sketch, pattern, and metadata into the programming queue.
-    flashData.append(MemorySection("Sketch", BLINKYTAPE_FACTORY_FIRMWARE_ADDRESS, sketch));
+    flashData.append(sketch);
 
     return startUpload(timeout);
 }
 
 bool BlinkyTapeUploader::updateFirmware(BlinkyController &blinky)
 {
-    QByteArray sketch = FirmwareStore::getFirmwareData(BLINKYTAPE_FACTORY_FIRMWARE_NAME);
+    MemorySection sketch = FirmwareStore::getFirmwareData(BLINKYTAPE_FACTORY_FIRMWARE_NAME);
 
-    if(sketch.isNull()) {
+    if(sketch.data.isNull()) {
         qDebug() << "Error loading factory firmware!";
         return false;
     }
 
     // Put the sketch, pattern, and metadata into the programming queue.
-    flashData.append(MemorySection("Sketch", BLINKYTAPE_FACTORY_FIRMWARE_ADDRESS, sketch));
+    flashData.append(sketch);
 
     return startUpload(blinky);
 }

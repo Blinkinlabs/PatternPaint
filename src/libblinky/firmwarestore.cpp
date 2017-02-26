@@ -74,12 +74,14 @@ QString FirmwareStore::getFirmwareDescription(const QString &name)
     return description;
 }
 
-QByteArray FirmwareStore::getFirmwareData(const QString &name)
+MemorySection FirmwareStore::getFirmwareData(const QString &name)
 {
+    MemorySection memorySection;
+
     QString directoryName = getFirmwareDirectoryName(name);
 
     if(directoryName.isNull())
-        return QByteArray();
+        return memorySection;
 
     QString filename;
     filename.append(directoryName);
@@ -89,7 +91,7 @@ QByteArray FirmwareStore::getFirmwareData(const QString &name)
 
     FirmwareReader reader;
     if(!reader.load(filename)) {
-        return QByteArray();
+        return memorySection;
     }
 
     return reader.getData();

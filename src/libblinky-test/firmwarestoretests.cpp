@@ -105,10 +105,10 @@ void FirmwareStoreTests::getFirmwareDescriptionHasBlinkyTapeDefaultTest()
 
 void FirmwareStoreTests::getFirmwareDataDoesntExistTest()
 {
-    QVERIFY(FirmwareStore::getFirmwareData("thisfirmwaredoesntexist").isNull());
+    QVERIFY(FirmwareStore::getFirmwareData("thisfirmwaredoesntexist").data.isNull());
 }
 
 void FirmwareStoreTests::getFirmwareDataHasBlinkyTapeDefaultTest()
 {
-    QVERIFY(!FirmwareStore::getFirmwareData(BLINKYTAPE_DEFAULT_FIRMWARE_NAME).isNull());
+    QVERIFY(!FirmwareStore::getFirmwareData(BLINKYTAPE_DEFAULT_FIRMWARE_NAME).data.isNull());
 }

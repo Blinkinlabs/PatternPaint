@@ -1,5 +1,10 @@
 #include "memorysection.h"
 
+MemorySection::MemorySection() :
+    address(0)
+{
+}
+
 MemorySection::MemorySection(const QString& name, unsigned int address, const QByteArray& data) :
     name(name),
     address(address),
@@ -24,10 +29,4 @@ bool MemorySection::overlaps(const MemorySection &rhs) const
     }
 
     return((extent() >= rhs.address) && (address <= rhs.extent()));
-}
-
-MemoryMap::MemoryMap(unsigned int start, unsigned int size) :
-    start(start),
-    size(size)
-{
 }

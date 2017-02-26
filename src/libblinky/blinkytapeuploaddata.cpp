@@ -11,7 +11,6 @@
 #define PATTERN_TABLE_HEADER_LENGTH     3
 #define PATTERN_TABLE_ENTRY_LENGTH      7
 
-#define FLASH_MEMORY_SKETCH_ADDRESS     0x0000  // Location of sketch
 #define FLASH_MEMORY_PATTERN_TABLE_ADDRESS (FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE_BYTES) // Location of pattern table
 
 
@@ -31,20 +30,15 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
     // all uploads
     qDebug() << "Selected firmware: " << firmwareName;
 
-    QByteArray firmwareData = FirmwareStore::getFirmwareData(firmwareName);
-    if(firmwareData.isNull()) {
+    sketchSection = FirmwareStore::getFirmwareData(firmwareName);
+    if(sketchSection.data.isNull()) {
         errorString = "Firmware read failed!";
         return false;
     }
 
     // Expand sketch size to FLASH_MEMORY_PAGE_SIZE_BYTES boundary
-    while (firmwareData.length() % FLASH_MEMORY_PAGE_SIZE_BYTES != 0)
-        firmwareData.append(static_cast<char>(0xFF));
-
-    sketchSection = MemorySection("Sketch",
-                                 FLASH_MEMORY_SKETCH_ADDRESS,
-                                 firmwareData);
-
+    while (sketchSection.data.length() % FLASH_MEMORY_PAGE_SIZE_BYTES != 0)
+        sketchSection.data.append(static_cast<char>(0xFF));
 
 
     // Next, build the pattern data section and pattern header table
@@ -82,7 +76,7 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
     for(int i = 0; i < brightnessSteps; i++)
         patternTable.append(static_cast<char>(brightnessStepModifiers[i]*maxBrightness/100));  // Offset 2: Brightness steps (8 bytes)
 
-    int dataOffset = firmwareData.length();
+    int dataOffset = sketchSection.extent();
 
     // Now, for each pattern, append the image data to the sketch
     for (PatternWriter pattern : patterns) {
@@ -108,16 +102,17 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
     while (patternTable.count() < FLASH_MEMORY_PAGE_SIZE_BYTES)
         patternTable.append(static_cast<char>(0xFF));
 
-    qDebug() << "Sketch size:" << firmwareData.count()
-             << "Pattern data size:" << patternData.count()
-             << "Pattern table size" << patternTable.count();
-
     patternDataSection = MemorySection("PatternData",
-                                      FLASH_MEMORY_SKETCH_ADDRESS + firmwareData.count(),
+                                      sketchSection.address + sketchSection.data.count(),
                                       patternData);
 
     patternTableSection = MemorySection("PatternTable",
                                        FLASH_MEMORY_PATTERN_TABLE_ADDRESS,
                                        patternTable);
+
+    qDebug() << "Sketch size:" << sketchSection.data.count()
+             << "Pattern data size:" << patternData.count()
+             << "Pattern table size" << patternTable.count();
+
     return true;
 }

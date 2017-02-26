@@ -7,7 +7,8 @@ class MemorySectionTests : public QObject
 {
     Q_OBJECT
 private slots:
-    void nameSetTest();
+    void EmptyConstructorTest();
+    void FullConstructorTest();
 
     void extentTest_data();
     void extentTest();
