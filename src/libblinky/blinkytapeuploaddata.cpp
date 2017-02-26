@@ -2,7 +2,8 @@
 
 #include "PatternPlayer_Sketch.h"
 #include "blinkytape.h"
-#include "firmwareimport.h"
+#include "firmwarestore.h"
+#include "firmwarereader.h"
 
 #include <QDebug>
 #include <QSettings>

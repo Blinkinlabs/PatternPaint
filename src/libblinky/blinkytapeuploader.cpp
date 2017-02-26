@@ -4,8 +4,8 @@
 #include "ProductionSketch.h"
 #include "blinkycontroller.h"
 #include "blinkytapeuploaddata.h"
-#include "firmwareimport.h"
-
+#include "firmwarereader.h"
+#include "firmwarestore.h"
 
 #include <QDebug>
 

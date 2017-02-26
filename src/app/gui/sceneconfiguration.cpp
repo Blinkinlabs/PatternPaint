@@ -1,6 +1,6 @@
 #include "sceneconfiguration.h"
 #include "ui_sceneconfiguration.h"
-#include "firmwareimport.h"
+#include "firmwarestore.h"
 
 #include <limits>
 #include <QDebug>

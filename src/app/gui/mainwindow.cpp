@@ -10,7 +10,7 @@
 #include "patternwriter.h"
 #include "debuglog.h"
 #include "firmwaremanager.h"
-#include "firmwareimport.h"
+#include "firmwarestore.h"
 
 #include "blinkytape.h"
 #include "blinkytapeuploader.h"
@@ -32,7 +32,7 @@
 #include "fixture.h"
 #include "preferences.h"
 #include "defaults.h"
-#include "firmwareimport.h"
+#include "firmwarestore.h"
 
 #include <QFileDialog>
 #include <QMessageBox>

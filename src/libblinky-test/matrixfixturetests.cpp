@@ -32,7 +32,7 @@ void MatrixFixtureTests::setSizeTest()
     matrixFixture.setSize(size);
 
     QVERIFY(matrixFixture.getSize() == size);
-    QVERIFY(matrixFixture.getCount() == size.width()*size.height());
+    QVERIFY(matrixFixture.getCount() == static_cast<unsigned int>(size.width()*size.height()));
 }
 
 void MatrixFixtureTests::setModeRowsTest_data()
@@ -84,7 +84,7 @@ void MatrixFixtureTests::setModeZigZagTest()
     matrixFixture.setSize(size);
 
     QVERIFY(matrixFixture.getSize() == size);
-    QVERIFY(matrixFixture.getCount() == size.width()*size.height());
+    QVERIFY(matrixFixture.getCount() == static_cast<unsigned int>(size.width()*size.height()));
 
     for(int x = 0; x < size.width(); x++) {
         for(int y = 0; y < size.height(); y++) {

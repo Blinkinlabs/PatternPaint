@@ -12,6 +12,8 @@
 #include "fixturetests.h"
 #include "matrixfixturetests.h"
 #include "linearfixturetests.h"
+#include "firmwarestoretests.h"
+#include "firmwarereadertests.h"
 
 int main(int argc, char *argv[])
 {
@@ -55,6 +57,12 @@ int main(int argc, char *argv[])
 
     LinearFixtureTests linearFixtureTests;
     result |= QTest::qExec(&linearFixtureTests);
+
+    FirmwareStoreTests firmwareStoreTests;
+    result |= QTest::qExec(&firmwareStoreTests);
+
+    FirmwareReaderTests firmwareReaderTests;
+    result |= QTest::qExec(&firmwareReaderTests);
 
     return result;
 }

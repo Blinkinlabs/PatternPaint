@@ -1,6 +1,7 @@
 #include "firmwaremanager.h"
 #include "ui_firmwaremanager.h"
-#include "firmwareimport.h"
+
+#include "firmwarestore.h"
 
 #include <QDebug>
 #include <QStandardPaths>

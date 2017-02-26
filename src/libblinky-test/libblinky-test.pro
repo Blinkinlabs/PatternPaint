@@ -26,7 +26,9 @@ HEADERS += \
     lightbuddycommandstests.h \
     fixturetests.h \
     matrixfixturetests.h \
-    linearfixturetests.h
+    linearfixturetests.h \
+    firmwarestoretests.h \
+    firmwarereadertests.h
 
 SOURCES += \
     avr109commandstests.cpp \
@@ -41,4 +43,6 @@ SOURCES += \
     lightbuddycommandstests.cpp \
     fixturetests.cpp \
     matrixfixturetests.cpp \
-    linearfixturetests.cpp
+    linearfixturetests.cpp \
+    firmwarestoretests.cpp \
+    firmwarereadertests.cpp

@@ -1,5 +1,6 @@
-#ifndef FIRMWAREIMPORT_H
-#define FIRMWAREIMPORT_H
+#ifndef FIRMWARESTORE_H
+#define FIRMWARESTORE_H
+
 
 #include <QString>
 
@@ -13,7 +14,7 @@ public:
     static QStringList listAvailableFirmware();
     static QString getFirmwareDescription(const QString &name);
 
-    bool addFirmware(const QString &dirSource);
+    bool addFirmware(const QString &sourcePathName);
     bool removeFirmware(const QString &name);
 
     QString getErrorString() const;
@@ -22,17 +23,4 @@ private:
     QString errorString;
 };
 
-class FirmwareReader
-{
-public:
-    bool load(const QString &filename);
-
-    const QByteArray &getData() const;
-    const QString &getName() const;
-
-private:
-    QByteArray data;
-    QString name;
-};
-
-#endif // FIRMWAREIMPORT_H
+#endif // FIRMWARESTORE_H
