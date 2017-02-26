@@ -1,41 +1,78 @@
 #!/bin/bash
 
+# Firmware builder for BlinkyTape devices in PatternPaint
+#
+# To use this, you'll need to install Arduino (1.8.1 is current as of writing).
+#
+# You'll also need to add the following board support packages:
+# * Blinkinlabs32u4 boards
+#
+# And the following libraries:
+# * FastLED (available through the library manager)
+# * BlinkyTape (download from https://github.com/Blinkinlabs/BlinkyTape_Arduino/releases)
+#
+# Note for Windows: you'll also need MinGW to run this script, as described in the PatternPaint readme.
+
+
+
 # Stop at any error
 set -e
 
-# Note: Use Arduino 1.6.12
-ARDUINO="/Applications/Arduino-1.6.12.app/Contents/MacOS/Arduino"
-BOARD="Blinkinlabs:avr:blinkytape"
-HEX_CONVERTER="src/PatternPlayer_Sketch/hex_to_header.py"
+if [ -z ${ARDUINO+x} ]; then
+	echo "ARDUINO not defined- please set it to the full path to the Arduino executable. For example:"
+	echo "macOS: export ARDUINO=/Applications/Arduino-1.6.12.app/Contents/MacOS/Arduino"
+	echo "Windows: export ARDUINO=/c/Program\ Files\ \(x86\)/Arduino/arduino.exe"
+	exit 1
+fi
 
-SKETCH_NAME='PatternPlayer_Sketch'
-SKETCH_DIR="$PWD/src/PatternPlayer_Sketch"
-OUTPUT_DIR="src/libblinky/controllers"
-OUTPUT_NAME="PATTERNPLAYER"
-
+BOARD="blinkinlabs:avr:blinkytape"
 ARDUINO_FLAGS="--verify --verbose --preserve-temp-files --board ${BOARD}"
 
-# Compile the sketch, and extract the .hex filename from the output, then convert it to a header
-#
-# | grep ${SKETCH_NAME}\.ino\.hex \     search for a line that contains the .hex filename
-HEX=`${ARDUINO} ${ARDUINO_FLAGS} ${SKETCH_DIR}/${SKETCH_NAME}.ino \
- | grep ${SKETCH_NAME}\.ino\.hex \
- | sed 's/\"//g' \
- | grep -oE "[^[:blank:]]+$"`
+# Project root
+BASEDIR=`pwd`
 
-${HEX_CONVERTER} ${HEX} ${OUTPUT_NAME} > ${OUTPUT_DIR}/${SKETCH_NAME}.h
+# Directory to place the compiled firmware
+OUTPUT_DIR=${BASEDIR}/src/libblinky/firmware/blinkytape
+
+# Temporary location to store firmware repos
+FIRMWARE=${BASEDIR}/firmware
+
+# BlinkyTape default firmware
+BLINKYTAPE_FIRMWARE=${FIRMWARE}/BlinkyTape
+
+################## Get device firmware repositories ##############
+function getRepo {
+	# $1 is output directory
+	# $2 is repo location
+
+	if [ ! -d "$1" ]; then
+		git clone --depth 1 $2 $1
+	else
+		pushd $1
+		git pull
+		popd
+	fi
+}
+
+getRepo ${BLINKYTAPE_FIRMWARE} https://github.com/Blinkinlabs/BlinkyTape_Arduino.git
 
 
-SKETCH_NAME='ProductionSketch'
-SKETCH_DIR="$PWD/..//BlinkyTape_Arduino/examples/ProductionSketch"
-OUTPUT_DIR="src/controllers"
-OUTPUT_NAME="PRODUCTION"
+################## Compile the firmware ##########################
+function compileFirmware {
+	# $1 is the base sketch directory
+	# $2 is the sketch name
+	# $3 is the hex file output directory
+	# $4 is the hex filename
 
-# Compile the sketch, and extract the .hex filename from the output, then convert it to a header
+	# Compile the sketch, and extract the .hex filename from the output, then convert it to a header
+	HEX=`"${ARDUINO}" ${ARDUINO_FLAGS} ${1}/${2}/${2}.ino \
+	 | grep ${2}\.ino\.hex \
+	 | sed 's/\"//g' \
+	 | grep -oE "[^[:blank:]]+$"`
+	echo ${HEX}
 
-HEX=`${ARDUINO} ${ARDUINO_FLAGS} ${SKETCH_DIR}/${SKETCH_NAME}.ino \
- | grep ${SKETCH_NAME}\.ino\.hex \
- | sed 's/\"//g' \
- | grep -oE "[^[:blank:]]+$"`
+	mv "${HEX}" ${3}/${4}/${4}.hex
+}
 
-${HEX_CONVERTER} ${HEX} ${OUTPUT_NAME} > ${OUTPUT_DIR}/${SKETCH_NAME}.h
+compileFirmware ${BASEDIR} "PatternPlayer_Sketch" ${OUTPUT_DIR} default
+compileFirmware ${BLINKYTAPE_FIRMWARE}/examples "ProductionSketch" ${OUTPUT_DIR} factory

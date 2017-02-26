@@ -1,65 +1,109 @@
 #include "firmwarestore.h"
+#include "firmwarereader.h"
 
 #include <QFileDialog>
 #include <QString>
 #include <QDebug>
 #include <QStandardPaths>
 
-QStringList FirmwareStore::listAvailableFirmware() {
+
+QStringList FirmwareStore::listFirmwareSearchPaths()
+{
+    QStringList firmwarePaths;
+
+    // Built-in firmware for BlinkyTape
+    firmwarePaths.push_back(":/firmware/blinkytape/");
+
+    // Search path for third party firmware
+    firmwarePaths.push_back(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).append(FIRMWARE_FOLDER));
+
+    return firmwarePaths;
+}
+
+QStringList FirmwareStore::listAvailableFirmware()
+{
     QStringList firmwareNames;
 
-    firmwareNames.push_back(DEFAULT_FIRMWARE_NAME);
+    for(QString firmwarePath : listFirmwareSearchPaths()) {
+        QDir directory(firmwarePath);
+        if (!directory.exists())
+            continue;
 
-    // search for third party Firmware
-    QString documents = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-    documents.append(FIRMWARE_FOLDER);
-    QDir firmwareDir(documents);
-    if (firmwareDir.exists()){
-        QStringList firmwarelist = firmwareDir.entryList(QDir::Dirs);
-        firmwarelist.removeFirst(); // TODO: Is this robust?
-        firmwarelist.removeFirst();
-        firmwareNames +=firmwarelist;
+        firmwareNames.append(directory.entryList(QDir::Dirs | QDir::NoDotAndDotDot));
     }
 
     return firmwareNames;
 }
 
-QString FirmwareStore::getFirmwareDescription(const QString &name) {
-
-    if(name==DEFAULT_FIRMWARE_NAME){
-        return QString()
-            .append("Default BlinkyTape Firmware\n")
-            .append("Use this for all standard functions");
+QString FirmwareStore::getFirmwareDirectoryName(const QString &name)
+{
+    for(QString firmwarePath : listFirmwareSearchPaths()) {
+        QDir directory(firmwarePath);
+        if (directory.exists(name))
+            return directory.absoluteFilePath(name);
     }
+
+    return QString();
+}
+
+
+QString FirmwareStore::getFirmwareDescription(const QString &name)
+{
+    QString directoryName = getFirmwareDirectoryName(name);
+
+    if(directoryName.isNull())
+        return QString();
 
     // read README.md
-    QString documents = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-    documents.append(FIRMWARE_FOLDER);
-    documents.append(name);
-    documents.append("/");
-    documents.append(FIRMWARE_DESCRIPTION_FILE);
+    QString filename;
+    filename.append(directoryName);
+    filename.append("/");
+    filename.append(FIRMWARE_DESCRIPTION_FILE);
 
-    QFile inputFile(documents);
-    if (!inputFile.open(QIODevice::ReadOnly))
-    {
-        return QString()
-            .append("No description available");
-    }
+    QFile readmeFile(filename);
+    if (!readmeFile.open(QIODevice::ReadOnly))
+        return QString().append("No description available");
 
     QString description;
 
-    QTextStream in(&inputFile);
+    QTextStream in(&readmeFile);
     description.append(in.readAll());
 
-    inputFile.close();
+    readmeFile.close();
 
     return description;
 }
 
-bool FirmwareStore::addFirmware(const QString &sourcePathName) {
-    qDebug() << "Adding firmware from directory:" << sourcePathName;
+QByteArray FirmwareStore::getFirmwareData(const QString &name)
+{
+    QString directoryName = getFirmwareDirectoryName(name);
 
+    if(directoryName.isNull())
+        return QByteArray();
+
+    QString filename;
+    filename.append(directoryName);
+    filename.append("/");
+    filename.append(name);
+    filename.append(".hex");
+
+    FirmwareReader reader;
+    if(!reader.load(filename)) {
+        return QByteArray();
+    }
+
+    return reader.getData();
+}
+
+
+bool FirmwareStore::addFirmware(const QString &sourcePathName)
+{
     QDir sourceDirectory(sourcePathName);
+
+    if(listAvailableFirmware().contains(sourceDirectory.dirName())) {
+        errorString = "Firmware with this name already exists, please use a different name!";
+        return false;
+    }
 
     if (!sourceDirectory.exists()){
         errorString = "Source directory doesn't exist";
@@ -117,35 +161,37 @@ bool FirmwareStore::addFirmware(const QString &sourcePathName) {
     destinationReadmeName.append("/");
     destinationReadmeName.append(FIRMWARE_DESCRIPTION_FILE);
 
-    if(!QFile::copy(sourceReadmeName, destinationReadmeName)){
+    if(!QFile::copy(sourceReadmeName, destinationReadmeName))
         qDebug() << "can not copy Firmware description file";
+
+    return true;
+}
+
+bool FirmwareStore::removeFirmware(const QString &name)
+{
+
+    QString firmwareDirectoryName = getFirmwareDirectoryName(name);
+
+    if(firmwareDirectoryName.isNull()) {
+        errorString = "No firmware with that name found";
+        return false;
+    }
+
+    if(firmwareDirectoryName.startsWith(":/")) {
+        errorString = "Cannot remove built-in firmware";
+        return false;
+    }
+
+    QDir firmwareDirectory(firmwareDirectoryName);
+    if(!firmwareDirectory.removeRecursively()) {
+        errorString = "Error removing firmware directory, please check manually";
+        return false;
     }
 
     return true;
 }
 
-bool FirmwareStore::removeFirmware(const QString &name) {
-    qDebug() << "remove Firmware " << name;
-
-    if (name == DEFAULT_FIRMWARE_NAME) {
-        errorString = "Cannot remove default firmware";
-        return false;
-    }
-
-    QString documents = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-    documents.append(FIRMWARE_FOLDER);
-    documents.append(name);
-
-    QDir firmwareDir(documents);
-
-    if(!firmwareDir.removeRecursively()) {
-        errorString = "Error removing firmware directory";
-        return false;
-    }
-
-    return true;
-}
-
-QString FirmwareStore::getErrorString() const {
+QString FirmwareStore::getErrorString() const
+{
     return errorString;
 }

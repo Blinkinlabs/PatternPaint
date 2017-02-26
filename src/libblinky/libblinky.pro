@@ -76,8 +76,6 @@ SOURCES +=  \
         serialcommandqueue.h \
         blinkytape.h \
         lightbuddyuploader.h \
-        PatternPlayer_Sketch.h \
-        ProductionSketch.h \
         usbutils.h
 
     SOURCES += \
@@ -89,3 +87,6 @@ SOURCES +=  \
         usbutils.cpp
 
 #}
+
+RESOURCES += \
+    firmware/firmware.qrc

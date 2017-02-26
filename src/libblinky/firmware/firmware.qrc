@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/firmware">
+        <file>blinkytape/default/default.hex</file>
+        <file>blinkytape/factory/factory.hex</file>
+        <file>blinkytape/default/README.md</file>
+    </qresource>
+</RCC>

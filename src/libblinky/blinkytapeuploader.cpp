@@ -1,10 +1,8 @@
 #include "blinkytapeuploader.h"
 
 #include "avr109commands.h"
-#include "ProductionSketch.h"
 #include "blinkycontroller.h"
 #include "blinkytapeuploaddata.h"
-#include "firmwarereader.h"
 #include "firmwarestore.h"
 
 #include <QDebug>
@@ -75,7 +73,7 @@ void BlinkyTapeUploader::setDialogText()
 {
 
     QSettings settings;
-    QString firmwareName = settings.value("BlinkyTape/firmwareName", DEFAULT_FIRMWARE_NAME).toString();
+    QString firmwareName = settings.value("BlinkyTape/firmwareName", BLINKYTAPE_DEFAULT_FIRMWARE_NAME).toString();
     int flashUsed = 0;
 
     textLabel = "Saving to Blinky...\n"
@@ -93,22 +91,30 @@ void BlinkyTapeUploader::setDialogText()
 
 bool BlinkyTapeUploader::restoreFirmware(qint64 timeout)
 {
-    QByteArray sketch = QByteArray(reinterpret_cast<const char *>(PRODUCTION_DATA),
-                                   PRODUCTION_LENGTH);
+    QByteArray sketch = FirmwareStore::getFirmwareData(BLINKYTAPE_FACTORY_FIRMWARE_NAME);
+
+    if(sketch.isNull()) {
+        qDebug() << "Error loading factory firmware!";
+        return false;
+    }
 
     // Put the sketch, pattern, and metadata into the programming queue.
-    flashData.append(MemorySection("Sketch", PRODUCTION_ADDRESS, sketch));
+    flashData.append(MemorySection("Sketch", BLINKYTAPE_FACTORY_FIRMWARE_ADDRESS, sketch));
 
     return startUpload(timeout);
 }
 
 bool BlinkyTapeUploader::updateFirmware(BlinkyController &blinky)
 {
-    QByteArray sketch = QByteArray(reinterpret_cast<const char *>(PRODUCTION_DATA),
-                                   PRODUCTION_LENGTH);
+    QByteArray sketch = FirmwareStore::getFirmwareData(BLINKYTAPE_FACTORY_FIRMWARE_NAME);
+
+    if(sketch.isNull()) {
+        qDebug() << "Error loading factory firmware!";
+        return false;
+    }
 
     // Put the sketch, pattern, and metadata into the programming queue.
-    flashData.append(MemorySection("Sketch", PRODUCTION_ADDRESS, sketch));
+    flashData.append(MemorySection("Sketch", BLINKYTAPE_FACTORY_FIRMWARE_ADDRESS, sketch));
 
     return startUpload(blinky);
 }
@@ -120,7 +126,7 @@ bool BlinkyTapeUploader::storePatterns(BlinkyController &blinky, QList<PatternWr
 
     // TODO: Get this from the current scene rather than from preferences
     QSettings settings;
-    QString firmwareName = settings.value("BlinkyTape/firmwareName", DEFAULT_FIRMWARE_NAME).toString();
+    QString firmwareName = settings.value("BlinkyTape/firmwareName", BLINKYTAPE_DEFAULT_FIRMWARE_NAME).toString();
 
     if (!data.init(firmwareName, patternWriters)) {
         errorString = data.errorString;

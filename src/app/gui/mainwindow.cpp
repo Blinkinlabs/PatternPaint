@@ -211,7 +211,7 @@ MainWindow::MainWindow(QWidget *parent) :
                                         QSize(DEFAULT_FIXTURE_WIDTH,
                                               DEFAULT_FIXTURE_HEIGHT)).toSize();
 
-    scene.firmwareName = settings.value("BlinkyTape/firmwareName", DEFAULT_FIRMWARE_NAME).toString();
+    scene.firmwareName = settings.value("BlinkyTape/firmwareName", BLINKYTAPE_DEFAULT_FIRMWARE_NAME).toString();
 
     scene.fixtureType = settings.value("Fixture/Type", DEFAULT_FIXTURE_TYPE).toString();
     scene.colorMode = (ColorMode)settings.value("Fixture/ColorOrder", RGB).toInt();
@@ -1207,7 +1207,7 @@ void MainWindow::on_actionConfigure_Scene_triggered()
     QSettings settings;
 
     // TODO: roll this into the persistant sceneTemplate
-    sceneTemplate.firmwareName = settings.value("BlinkyTape/firmwareName", DEFAULT_FIRMWARE_NAME).toString();
+    sceneTemplate.firmwareName = settings.value("BlinkyTape/firmwareName", BLINKYTAPE_DEFAULT_FIRMWARE_NAME).toString();
 
 
     sceneConfiguration.setSceneTemplate(sceneTemplate);

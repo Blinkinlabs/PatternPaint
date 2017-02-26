@@ -1,9 +1,7 @@
 #include "blinkytapeuploaddata.h"
 
-#include "PatternPlayer_Sketch.h"
 #include "blinkytape.h"
 #include "firmwarestore.h"
-#include "firmwarereader.h"
 
 #include <QDebug>
 #include <QSettings>
@@ -29,48 +27,23 @@ QByteArray encodeWordLSB(int data)
 
 bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter> &patterns)
 {
-
     // First, build the flash section for the sketch. This is the same for
     // all uploads
-
-    QByteArray sketch;          // Program data
-
     qDebug() << "Selected firmware: " << firmwareName;
-    if(firmwareName == DEFAULT_FIRMWARE_NAME){
-        sketch.append(reinterpret_cast<const char *>(PATTERNPLAYER_DATA), sizeof(PATTERNPLAYER_DATA));
-    }else{
-        // search for third party Firmware
-        QString documents = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-        documents.append(FIRMWARE_FOLDER);
-        documents.append(firmwareName);
-        QDir firmwareDir(documents);
 
-        if (firmwareDir.exists()){
-            documents.append("/");
-            documents.append(firmwareName);
-            documents.append(".hex");
-
-            FirmwareReader newFirmware;
-
-            if(newFirmware.load(documents)){
-                qDebug("Firmware successfully read");
-                sketch.append(newFirmware.getData());
-            }else{
-                errorString = "Firmware read failed!";
-                qDebug() << errorString;
-                return false;
-            }
-        }
+    QByteArray firmwareData = FirmwareStore::getFirmwareData(firmwareName);
+    if(firmwareData.isNull()) {
+        errorString = "Firmware read failed!";
+        return false;
     }
 
-
     // Expand sketch size to FLASH_MEMORY_PAGE_SIZE_BYTES boundary
-    while (sketch.length() % FLASH_MEMORY_PAGE_SIZE_BYTES != 0)
-        sketch.append(static_cast<char>(0xFF));
+    while (firmwareData.length() % FLASH_MEMORY_PAGE_SIZE_BYTES != 0)
+        firmwareData.append(static_cast<char>(0xFF));
 
     sketchSection = MemorySection("Sketch",
                                  FLASH_MEMORY_SKETCH_ADDRESS,
-                                 sketch);
+                                 firmwareData);
 
 
 
@@ -109,7 +82,7 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
     for(int i = 0; i < brightnessSteps; i++)
         patternTable.append(static_cast<char>(brightnessStepModifiers[i]*maxBrightness/100));  // Offset 2: Brightness steps (8 bytes)
 
-    int dataOffset = sketch.length();
+    int dataOffset = firmwareData.length();
 
     // Now, for each pattern, append the image data to the sketch
     for (PatternWriter pattern : patterns) {
@@ -135,12 +108,12 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
     while (patternTable.count() < FLASH_MEMORY_PAGE_SIZE_BYTES)
         patternTable.append(static_cast<char>(0xFF));
 
-    qDebug() << "Sketch size:" << sketch.count()
+    qDebug() << "Sketch size:" << firmwareData.count()
              << "Pattern data size:" << patternData.count()
              << "Pattern table size" << patternTable.count();
 
     patternDataSection = MemorySection("PatternData",
-                                      FLASH_MEMORY_SKETCH_ADDRESS + sketch.count(),
+                                      FLASH_MEMORY_SKETCH_ADDRESS + firmwareData.count(),
                                       patternData);
 
     patternTableSection = MemorySection("PatternTable",

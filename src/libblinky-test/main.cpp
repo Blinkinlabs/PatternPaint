@@ -58,11 +58,11 @@ int main(int argc, char *argv[])
     LinearFixtureTests linearFixtureTests;
     result |= QTest::qExec(&linearFixtureTests);
 
-    FirmwareStoreTests firmwareStoreTests;
-    result |= QTest::qExec(&firmwareStoreTests);
-
     FirmwareReaderTests firmwareReaderTests;
     result |= QTest::qExec(&firmwareReaderTests);
+
+    FirmwareStoreTests firmwareStoreTests;
+    result |= QTest::qExec(&firmwareStoreTests);
 
     return result;
 }
