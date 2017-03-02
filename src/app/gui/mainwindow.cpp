@@ -442,11 +442,12 @@ bool MainWindow::savePatternProject()
         projectFilename = fileName;
     }
 
+
     qDebug() << "Save project:" << projectFilename;
 
     // Create a new file
     QFile file(projectFilename);
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    file.open(QIODevice::WriteOnly);
 
 
     QDataStream out(&file);
@@ -464,62 +465,12 @@ bool MainWindow::savePatternProject()
     out << (qint32)fixture->getExtents().height();
     out << (qint32)fixture->getColorMode();
 
-    // write pattern
-    out << (qint32)patternCollection.count();
-
-    for(int i=0;i<patternCollection.count();i++){
-
-        int patternType = patternCollection.at(i)->getType();
-
-        out << (QString)patternCollection.at(i)->getName();
-        out << (float)patternCollection.at(i)->getFrameSpeed();
-        out << (qint32)patternType;
-
-        Pattern::PatternType type = static_cast<Pattern::PatternType>(patternType);
-        QSize frameSize = patternCollection.at(i)->getFrameSize();
-        QImage image;
-
-        switch (type) {
-        case Pattern::FrameBased:
-        {
-            // Create a big image consisting of all the frames side-by-side
-            image = QImage(frameSize.width()*patternCollection.at(i)->getFrameCount(), frameSize.height(),
-                            QImage::Format_ARGB32_Premultiplied);
-
-            // And copy the frames into it
-            QPainter painter;
-            painter.begin(&image);
-            painter.fillRect(image.rect(), QColor(0, 0, 0));
-            for (int j = 0; j < patternCollection.at(i)->getFrameCount(); j++) {
-                painter.drawImage(QPoint(frameSize.width()*j, 0),
-                                  patternCollection.at(i)->getFrameImage(j));
-            }
-            painter.end();
-            break;
-        }
-        case Pattern::Scrolling:
-        {
-            // Just grab the edit image.
-            image = patternCollection.at(i)->getEditImage(i);
-            break;
-        }
-        }
-
-
-        QByteArray ba;
-        QBuffer buffer(&ba);
-        buffer.open(QIODevice::WriteOnly);
-        image.save(&buffer, "PNG"); // writes image into ba in PNG format
-        out << (QString)buffer.data().toHex();
-
-        patternCollection.at(i)->setModified(false);
-        setPatternModified(patternCollection.at(i)->getModified());
-
-    }
+    patternCollection.writePatterns(out);
 
     file.close();
 
     return true;
+
 }
 
 bool MainWindow::savePatternAs(Pattern *item)
@@ -1368,23 +1319,23 @@ bool MainWindow::openPatternProject()
     QFileInfo fileInfo(fileName);
     settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
 
-    qDebug()<<"Open Project:"<<fileName;
+
+    qDebug()<<"Open Project:" << fileName;
 
     QFile file(fileName);
-    if (!file.open(QFile::ReadOnly | QFile::Text)){
+    if (!file.open(QIODevice::ReadOnly)){
         qDebug()<< "Error: Cannot read project file ";
         return false;
     }
 
     // read project file
-    SceneTemplate sceneTemplate;
+    SceneTemplate newSceneTemplate;
     QString header;
     QString patternPaintVersion;
     float formatVersion;
     qint32 width;
     qint32 height;
     qint32 colorMode;
-    qint32 patternCount;
 
     QDataStream in(&file);
     in.setVersion(QDataStream::Qt_5_8);
@@ -1404,70 +1355,28 @@ bool MainWindow::openPatternProject()
 
     in >> patternPaintVersion;
 
+    qDebug() << "Project created with Pattern Paint version:" << patternPaintVersion;
+
 
     // read scene configuration
-    in >> sceneTemplate.firmwareName;
-    in >> sceneTemplate.fixtureType;
+    in >> newSceneTemplate.firmwareName;
+    in >> newSceneTemplate.fixtureType;
     in >> width;
     in >> height;
     in >> colorMode;
 
-    sceneTemplate.colorMode = (ColorMode)colorMode;
-    sceneTemplate.size = QSize(width,height);
-    applyScene(sceneTemplate);
+    newSceneTemplate.colorMode = (ColorMode)colorMode;
+    newSceneTemplate.size = QSize(width,height);
 
+    if(in.status() == QDataStream::Ok)
+        applyScene(newSceneTemplate);
 
-    // read pattern
-    in >> patternCount;
-
-    for(int i=0;i<patternCount;i++){
-
-        QString patternName;
-        float patternSpeed;
-        qint32 patternType;
-        QString imageData;
-        QImage PatternImage;
-
-        in >> patternName;
-        in >> patternSpeed;
-        in >> patternType;
-        in >> imageData;
-
-        QByteArray buffer = QByteArray::fromHex(imageData.toLatin1());
-
-        if(!PatternImage.loadFromData(buffer)){
-            qDebug()<< "Error: fail to read image data";
-            return false;
-        }
-
-        //create new pattern
-        QSettings settings;
-        int frameCount = settings.value("Options/FrameCount", DEFAULT_FRAME_COUNT).toUInt();
-
-        QSize displaySize(fixture->getExtents().width(), fixture->getExtents().height());
-
-        Pattern::PatternType type = static_cast<Pattern::PatternType>(patternType);
-        Pattern *pattern = new Pattern(type, displaySize, frameCount);
-
-        if (!pattern->load(PatternImage,patternName)){
-            qDebug()<< "Error: can't load pattern";
-            return false;
-        }else{
-            int newPosition = 0;
-            if (getPatternCount() > 0)
-                newPosition = getCurrentPatternIndex()+1;
-
-            patternCollection.add(pattern, newPosition);
-            patternCollectionListView->setCurrentIndex(patternCollectionListView->model()->index(newPosition,0));
-            patternCollection.at(newPosition)->setFrameSpeed(patternSpeed);
-        }
-
-
+    if(patternCollection.readPatterns(in) && in.status() == QDataStream::Ok){
+        qDebug() << "Project successful readed";
+    }else{
+        qDebug() << "Project read failed!";
     }
 
-    qDebug() << "Project created with Pattern Paint version:" << patternPaintVersion;
-    qDebug() << "Format version:" << formatVersion;
-    qDebug() << "Project successful readed";
 
     return true;
 }

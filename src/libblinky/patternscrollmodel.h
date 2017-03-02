@@ -49,6 +49,9 @@ private:
 
     State state;
 
+    bool writeDataToStream(QDataStream& stream);
+    bool readDataFromStream(QDataStream& stream);
+
     void pushUndoState();
 
     void applyUndoState(State newState);

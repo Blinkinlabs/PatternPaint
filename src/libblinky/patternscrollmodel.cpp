@@ -75,6 +75,31 @@ void PatternScrollModel::applyUndoState(State newState)
     emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
 }
 
+bool PatternScrollModel::writeDataToStream(QDataStream& stream)
+{
+
+    stream << state.frameSize;
+    stream << state.fileName;
+    stream << state.frameSpeed;
+    stream << state.image;
+
+    return true;
+}
+
+bool PatternScrollModel::readDataFromStream(QDataStream& stream)
+{
+
+    stream >> state.frameSize;
+    stream >> state.fileName;
+    stream >> state.frameSpeed;
+    stream >> state.image;
+
+    if(state.image.isNull())
+      return false;
+
+    return true;
+}
+
 QVariant PatternScrollModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
