@@ -430,8 +430,8 @@ bool MainWindow::savePatternProject()
            lastDirectory = QDir::homePath();
 
         QString fileName = QFileDialog::getSaveFileName(this,
-                                                    tr("Save Project"), lastDirectory,
-                                                    tr("Project files (*.ppro)"));
+                                                    tr("Save project"), lastDirectory,
+                                                    tr("Pattern project files (*.ppro)"));
 
         if (fileName.length()==0 || fixture.isNull() || patternCollection.isEmpty())
             return false;
@@ -848,6 +848,24 @@ void MainWindow::on_colorPicked(QColor color)
 {
     colorChooser.setColor(color);
     instrumentConfiguration.setToolColor(color);
+}
+
+bool MainWindow::close_all()
+{
+    QList<Pattern *> unsavedPatterns;
+
+    foreach(Pattern* pattern, patternCollection.patterns()) {
+        if (pattern->getModified())
+            unsavedPatterns.append(pattern);
+    }
+
+    if(!promptForSave(unsavedPatterns))
+        return false;
+
+    patternCollection.clear();
+    projectFilename = "";
+
+    return true;
 }
 
 bool MainWindow::promptForSave(Pattern *pattern)
@@ -1292,7 +1310,6 @@ void MainWindow::on_actionConfigure_Scene_triggered()
 
 void MainWindow::on_actionOpen_project_triggered()
 {
-    on_actionClose_All_triggered();
 
     if(!openPatternProject()){
         QMessageBox::critical(this,"Error","Project can not be read",QMessageBox::Ok);
@@ -1310,10 +1327,13 @@ bool MainWindow::openPatternProject()
         lastDirectory = QDir::homePath();
 
     QString fileName = QFileDialog::getOpenFileName(this,
-                                                    tr("Open Project"), lastDirectory,
-                                                    tr("Pattern Files (*.ppro)"));
+                                                    tr("Open project"), lastDirectory,
+                                                    tr("Pattern project files (*.ppro)"));
 
     if (fileName.length() == 0)
+        return true;
+
+    if(!close_all())
         return true;
 
     QFileInfo fileInfo(fileName);
@@ -1375,6 +1395,7 @@ bool MainWindow::openPatternProject()
         qDebug() << "Project successful readed";
     }else{
         qDebug() << "Project read failed!";
+        return false;
     }
 
 
@@ -1445,18 +1466,7 @@ void MainWindow::on_actionSave_All_triggered()
 
 void MainWindow::on_actionClose_All_triggered()
 {
-    QList<Pattern *> unsavedPatterns;
-
-    foreach(Pattern* pattern, patternCollection.patterns()) {
-        if (pattern->getModified())
-            unsavedPatterns.append(pattern);
-    }
-
-    if(!promptForSave(unsavedPatterns))
-        return;
-
-    patternCollection.clear();
-    projectFilename = "";
+    close_all();
 }
 
 void MainWindow::on_actionDebug_Log_triggered()

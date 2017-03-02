@@ -182,6 +182,7 @@ private:
     void startPlayback();
     void stopPlayback();
 
+    bool close_all();
     bool promptForSave(Pattern *pattern);
     bool promptForSave(QList<Pattern *> patterns);
 
