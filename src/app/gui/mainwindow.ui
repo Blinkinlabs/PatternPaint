@@ -140,7 +140,16 @@
        <property name="alignment">
         <set>Qt::AlignCenter</set>
        </property>
-       <widget class="FrameEditor" name="frameEditor"/>
+       <widget class="FrameEditor" name="frameEditor">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>516</width>
+          <height>268</height>
+         </rect>
+        </property>
+       </widget>
       </widget>
       <widget class="PatternFrameListView" name="timeline">
        <property name="sizePolicy">
@@ -670,9 +679,11 @@
     <addaction name="separator"/>
     <addaction name="actionOutput_Preview"/>
     <addaction name="separator"/>
-    <addaction name="actionZoomToFit"/>
     <addaction name="actionZoomIn"/>
     <addaction name="actionZoomOut"/>
+    <addaction name="actionFitToScreen"/>
+    <addaction name="actionFitToWidth"/>
+    <addaction name="actionFitToHeight"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -760,7 +771,9 @@
    </attribute>
    <addaction name="actionZoomIn"/>
    <addaction name="actionZoomOut"/>
-   <addaction name="actionZoomToFit"/>
+   <addaction name="actionFitToScreen"/>
+   <addaction name="actionFitToWidth"/>
+   <addaction name="actionFitToHeight"/>
   </widget>
   <action name="actionSave">
    <property name="enabled">
@@ -1156,7 +1169,7 @@
     <bool>false</bool>
    </property>
   </action>
-  <action name="actionZoomToFit">
+  <action name="actionFitToScreen">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -1165,16 +1178,32 @@
      <normaloff>:/icons/images/icons/Zoom To Extents-100.png</normaloff>:/icons/images/icons/Zoom To Extents-100.png</iconset>
    </property>
    <property name="text">
-    <string>Zoom to fit</string>
+    <string>Fit to screen</string>
    </property>
    <property name="toolTip">
-    <string>Zoom to fit</string>
+    <string>Fit to screen</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+9</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionFitToWidth">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Fit to width</string>
+   </property>
+  </action>
+  <action name="actionFitToHeight">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Fit to height</string>
    </property>
   </action>
  </widget>

@@ -35,7 +35,7 @@ QPoint FrameEditor::imageToFrame(const QPoint &imagePoint) const {
 FrameEditor::FrameEditor(QWidget *parent) :
     QWidget(parent),
     scale(ZOOM_MIN),
-    fitToHeight(true),
+    scaleMode(FIT_TO_SCREEN),
     frameIndex(0),
     mouseMoveIntervalFilter(MIN_MOUSE_INTERVAL),
     showPlaybackIndicator(false)
@@ -71,25 +71,53 @@ void FrameEditor::setScale(float newScale)
 
     scale = newScale;
 
-    if(fitToHeight) {
-        fitToHeight = false;
-        emit(zoomToFitChanged(fitToHeight));
+    if(scaleMode != MANUAL) {
+        setScaleMode(MANUAL);
     }
+    else {
+        updateSize();
+        update();
+    }
+}
+
+void FrameEditor::setScaleMode(FrameEditor::ScaleMode newScaleMode)
+{
+    if(scaleMode == newScaleMode)
+        return;
+
+    qDebug() << "newScaleMode:" << newScaleMode;
+    scaleMode = newScaleMode;
+
+    emit(fitToHeightChanged(scaleMode == FIT_TO_HEIGHT));
+    emit(fitToWidthChanged(scaleMode == FIT_TO_WIDTH));
+    emit(fitToScreenChanged(scaleMode == FIT_TO_SCREEN));
 
     updateSize();
     update();
 }
 
-void FrameEditor::zoomToFit(bool newFitToHeight)
+void FrameEditor::setFitToHeight(bool selected)
 {
-    if(newFitToHeight == fitToHeight)
-        return;
+    if(selected)
+        setScaleMode(FIT_TO_HEIGHT);
+    else
+        setScaleMode(MANUAL);
+}
 
-    fitToHeight = newFitToHeight;
-    emit(zoomToFitChanged(fitToHeight));
+void FrameEditor::setFitToWidth(bool selected)
+{
+    if(selected)
+        setScaleMode(FIT_TO_WIDTH);
+    else
+        setScaleMode(MANUAL);
+}
 
-    updateSize();
-    update();
+void FrameEditor::setFitToScreen(bool selected)
+{
+    if(selected)
+        setScaleMode(FIT_TO_SCREEN);
+    else
+        setScaleMode(MANUAL);
 }
 
 void FrameEditor::resizeEvent(QResizeEvent *resizeEvent)
@@ -107,7 +135,7 @@ void FrameEditor::updateSize()
 
         // TODO: Do we need to clear anything else here?
     }
-    else if(fitToHeight){
+    else if(scaleMode == FIT_TO_HEIGHT){
         // In fit-to-height mode, the image height should be maximized to fill the
         // QScrollArea container. Unfortunately the available height of the QScrollArea
         // depends on whether the scroll bar is visible or not, which depends on the
@@ -129,24 +157,79 @@ void FrameEditor::updateSize()
 
         float imageAspectRatio = float(frameData.width())/frameData.height();
         float parentAspectRatio = float(scrollAreaSize.width())/scrollAreaSize.height();
-        if(imageAspectRatio > parentAspectRatio) {
-            (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-        }
-        else {
-            (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        }
 
+        if(imageAspectRatio > parentAspectRatio)
+            (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        else
+            (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    }
+    else if(scaleMode == FIT_TO_WIDTH){
+        // In fit-to-height mode, the image height should be maximized to fill the
+        // QScrollArea container. Unfortunately the available height of the QScrollArea
+        // depends on whether the scroll bar is visible or not, which depends on the
+        // scaled width of the frameData. The strategy then is to determine if the
+        // scroll bar should be drawn or not, based on the aspect ratio of the image.
+
+        scale = float(size().width())/frameData.width();
+
+        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        setMinimumSize(1, frameData.height()*scale);
+        setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+        setBaseSize(QSize(0,0));
+
+        (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+        // Finally, force the horizontal scroll bar on or off depending on the parent widget size. If the scroll
+        // bar state changes, it will cause the size function to be called again.
+        QSize scrollAreaSize = (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->size();
+
+        float imageAspectRatio = float(frameData.width())/frameData.height();
+        float parentAspectRatio = float(scrollAreaSize.width())/scrollAreaSize.height();
+
+        if(imageAspectRatio < parentAspectRatio)
+            (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        else
+            (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    }
+    else if(scaleMode == FIT_TO_SCREEN){
+        // In fit-to-height mode, the image height should be maximized to fill the
+        // QScrollArea container. Unfortunately the available height of the QScrollArea
+        // depends on whether the scroll bar is visible or not, which depends on the
+        // scaled width of the frameData. The strategy then is to determine if the
+        // scroll bar should be drawn or not, based on the aspect ratio of the image.
+
+        // Finally, force the horizontal scroll bar on or off depending on the parent widget size. If the scroll
+        // bar state changes, it will cause the size function to be called again.
+        QSize scrollAreaSize = (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->size();
+
+        float imageAspectRatio = float(frameData.width())/frameData.height();
+        float parentAspectRatio = float(scrollAreaSize.width())/scrollAreaSize.height();
+
+        if(imageAspectRatio < parentAspectRatio)
+            scale = float(size().height())/frameData.height();
+        else
+            scale = float(size().width())/frameData.width();
+
+
+        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        setMinimumSize(QSize(0,0));
+        setMaximumSize(frameData.size()*scale);
+        setBaseSize(QSize(0,0));
+
+        (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     }
     else {
         // Set the widget to a fixed size based on the frame data size and scale
         setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         setBaseSize(frameData.size()*scale);
-        setMinimumSize(baseSize());
-        setMaximumSize(baseSize());
+        setMinimumSize(frameData.size()*scale);
+        setMaximumSize(frameData.size()*scale);
 
         (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
         (static_cast<QScrollArea *>(parentWidget()->parentWidget()))->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     }
+
     updateGrid();
 }
 

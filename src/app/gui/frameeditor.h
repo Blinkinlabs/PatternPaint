@@ -30,6 +30,13 @@ public:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 
+    enum ScaleMode {
+        MANUAL,
+        FIT_TO_HEIGHT,
+        FIT_TO_WIDTH,
+        FIT_TO_SCREEN
+    };
+
 public:
 
     /// Instrument interface
@@ -40,6 +47,7 @@ public:
 
 private:
     float scale;            ///< User-controlled scale factor
+    ScaleMode scaleMode;
     bool fitToHeight;
 
     QImage frameData;       ///< Frame image
@@ -73,6 +81,8 @@ private:
 
     void setScale(float newScale);
 
+    void setScaleMode(FrameEditor::ScaleMode newScaleMode);
+
     void paintEvent(QPaintEvent *event);
 
     bool event(QEvent *event);
@@ -81,7 +91,10 @@ private:
 
 signals:
     void dataEdited(int index, const QImage &data);
-    void zoomToFitChanged(bool enabled);
+
+    void fitToHeightChanged(bool);
+    void fitToWidthChanged(bool);
+    void fitToScreenChanged(bool);
 
 public slots:
     void setInstrument(AbstractInstrument *);
@@ -92,7 +105,9 @@ public slots:
 
     void zoomIn();
     void zoomOut();
-    void zoomToFit(bool newFitToHeight);
+    void setFitToHeight(bool selected);
+    void setFitToWidth(bool selected);
+    void setFitToScreen(bool selected);
 };
 
 #endif // PATTERNDITOR_H

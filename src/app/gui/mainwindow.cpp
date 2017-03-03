@@ -171,18 +171,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
     instrumentConfiguration.setToolSize(DRAWING_SIZE_MINIMUM_VALUE);
 
+    connect(actionZoomIn, SIGNAL(triggered(bool)), frameEditor, SLOT(zoomIn()));
+    connect(actionZoomOut, SIGNAL(triggered(bool)), frameEditor, SLOT(zoomOut()));
 
-    connect(actionZoomToFit, SIGNAL(toggled(bool)),
-            frameEditor, SLOT(zoomToFit(bool)));
-    connect(actionZoomIn, SIGNAL(triggered(bool)),
-            frameEditor, SLOT(zoomIn()));
-    connect(actionZoomOut, SIGNAL(triggered(bool)),
-            frameEditor, SLOT(zoomOut()));
+    connect(actionFitToHeight, SIGNAL(triggered(bool)), frameEditor, SLOT(setFitToHeight(bool)));
+    connect(actionFitToWidth, SIGNAL(triggered(bool)), frameEditor, SLOT(setFitToWidth(bool)));
+    connect(actionFitToScreen, SIGNAL(triggered(bool)), frameEditor, SLOT(setFitToScreen(bool)));
 
-    connect(frameEditor, SIGNAL(dataEdited(int, const QImage)),
-            this, SLOT(on_frameDataEdited(int, const QImage)));
-    connect(frameEditor, SIGNAL(zoomToFitChanged(bool)),
-            actionZoomToFit, SLOT(setChecked(bool)));
+    connect(frameEditor, SIGNAL(fitToHeightChanged(bool)), actionFitToHeight, SLOT(setChecked(bool)));
+    connect(frameEditor, SIGNAL(fitToWidthChanged(bool)), actionFitToWidth, SLOT(setChecked(bool)));
+    connect(frameEditor, SIGNAL(fitToScreenChanged(bool)), actionFitToScreen, SLOT(setChecked(bool)));
 
     // The draw timer tells the pattern to advance
     connect(&drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
