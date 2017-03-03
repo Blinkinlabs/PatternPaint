@@ -10,24 +10,24 @@ ColorpickerInstrument::ColorpickerInstrument(InstrumentConfiguration *instrument
 
 void ColorpickerInstrument::mousePressEvent(QMouseEvent *event,
                                             const QImage &frameData,
-                                            const QPoint &pt)
+                                            const QPoint &point)
 {
     if (event->button() == Qt::LeftButton) {
-        paint(frameData, pt);
+        paint(frameData, point);
         drawing = true;
     }
 }
 
 void ColorpickerInstrument::mouseMoveEvent(QMouseEvent *,
                                            const QImage &frameData,
-                                           const QPoint &pt)
+                                           const QPoint &point)
 {
-    if(!drawing) {
-        updatePreview(frameData, pt);
+    if (!drawing) {
+        updatePreview(frameData, point);
         return;
     }
 
-    paint(frameData, pt);
+    paint(frameData, point);
 }
 
 void ColorpickerInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &, const QImage &, const QPoint &)

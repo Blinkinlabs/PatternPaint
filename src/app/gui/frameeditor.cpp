@@ -433,11 +433,11 @@ void FrameEditor::paintEvent(QPaintEvent *)
 
 
 
-void FrameEditor::applyInstrument(QImage &update)
+void FrameEditor::applyInstrument(QImage &newImage)
 {
     QPainter painter;
     painter.begin(&frameData);
-    painter.drawImage(0, 0, update);
+    painter.drawImage(0, 0, newImage);
     painter.end();
 
     emit(dataEdited(frameIndex, frameData));

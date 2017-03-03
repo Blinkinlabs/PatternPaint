@@ -34,10 +34,15 @@ void SprayInstrument::mouseMoveEvent(QMouseEvent *, const QImage &frameData, con
     paint(point);
 }
 
-void SprayInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &, const QPoint &)
+void SprayInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &frameData, const QPoint &point)
 {
+    if (!drawing)
+        return;
+
     editor.applyInstrument(preview);
     drawing = false;
+
+    updatePreview(frameData, point);
 }
 
 void SprayInstrument::paint(const QPoint &newPoint)

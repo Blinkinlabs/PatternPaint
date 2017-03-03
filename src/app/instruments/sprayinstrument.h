@@ -40,9 +40,9 @@ class SprayInstrument : public AbstractInstrument
 public:
     explicit SprayInstrument(InstrumentConfiguration *instrumentConfiguration, QObject *parent = 0);
 
-    void mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &);
-    void mouseMoveEvent(QMouseEvent *event, const QImage &, const QPoint &);
-    void mouseReleaseEvent(QMouseEvent *event, FrameEditor &editor, const QImage &frameData, const QPoint &);
+    void mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &point);
+    void mouseMoveEvent(QMouseEvent *event, const QImage &FrameEditor, const QPoint &point);
+    void mouseReleaseEvent(QMouseEvent *event, FrameEditor &editor, const QImage &frameData, const QPoint &point);
 
 private:
     void paint(const QPoint &newPoint);

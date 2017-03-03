@@ -43,7 +43,7 @@ public:
 
     void mousePressEvent(QMouseEvent *event,  const QImage &frameData, const QPoint &);
     void mouseMoveEvent(QMouseEvent *event, const QImage &frameData, const QPoint &);
-    void mouseReleaseEvent(QMouseEvent *event, FrameEditor &, const QImage &, const QPoint &);
+    void mouseReleaseEvent(QMouseEvent *event, FrameEditor &, const QImage &frameData, const QPoint &point);
 
 private:
     QPoint firstPoint;

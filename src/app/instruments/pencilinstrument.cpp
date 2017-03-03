@@ -13,35 +13,40 @@ PencilInstrument::PencilInstrument(InstrumentConfiguration *instrumentConfigurat
     drawing = false;
 }
 
-void PencilInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &pt)
+void PencilInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameData, const QPoint &point)
 {
     if (event->button() == Qt::LeftButton) {
         preview = QImage(frameData.size(),
                              QImage::Format_ARGB32_Premultiplied);
         preview.fill(QColor(0, 0, 0, 0));
 
-        startPoint = pt;
-        paint(pt);
+        startPoint = point;
+        paint(point);
         drawing = true;
     }
 }
 
-void PencilInstrument::mouseMoveEvent(QMouseEvent *, const QImage &frameData, const QPoint &pt)
+void PencilInstrument::mouseMoveEvent(QMouseEvent *, const QImage &frameData, const QPoint &point)
 {
     // If we aren't drawing, we're in preview mode- clear the frame before doing anything else.
     if (!drawing) {
-        updatePreview(frameData, pt);
+        updatePreview(frameData, point);
         return;
     }
 
-    paint(pt);
-    startPoint = pt;
+    paint(point);
+    startPoint = point;
 }
 
-void PencilInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &, const QPoint &)
+void PencilInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &frameData, const QPoint &point)
 {
+    if (!drawing)
+        return;
+
     editor.applyInstrument(preview);
     drawing = false;
+
+    updatePreview(frameData, point);
 }
 
 void PencilInstrument::updatePreview(const QImage &frameData, QPoint point)

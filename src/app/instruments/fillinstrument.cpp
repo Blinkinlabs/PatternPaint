@@ -24,16 +24,21 @@ void FillInstrument::mousePressEvent(QMouseEvent *event, const QImage &frameData
 
 void FillInstrument::mouseMoveEvent(QMouseEvent *, const QImage &frameData, const QPoint &point)
 {
-    if(!drawing) {
+    if (!drawing) {
         updatePreview(frameData, point);
         return;
     }
 }
 
-void FillInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &, const QPoint &)
+void FillInstrument::mouseReleaseEvent(QMouseEvent *, FrameEditor &editor, const QImage &frameData, const QPoint &point)
 {
+    if (!drawing)
+        return;
+
     editor.applyInstrument(preview);
     drawing = false;
+
+    updatePreview(frameData, point);
 }
 
 void FillInstrument::paint(const QPoint &point)

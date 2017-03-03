@@ -43,7 +43,7 @@ public:
 
     /// Update the pattern with the given changes.
     /// @param update RGBA QImage to draw on top of the current
-    void applyInstrument(QImage &update);
+    void applyInstrument(QImage &newImage);
 
 private:
     float scale;            ///< User-controlled scale factor
