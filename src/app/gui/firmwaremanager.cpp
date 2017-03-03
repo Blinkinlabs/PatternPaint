@@ -101,7 +101,7 @@ void FirmwareManager::on_FirmwareList_itemSelectionChanged()
 
     QString selectedFirmwareName = ui->FirmwareList->selectedItems().at(0)->text();
 
-    ui->FirmwareText->setText(FirmwareStore::getFirmwareDescription(selectedFirmwareName));
+    ui->FirmwareText->setText(FirmwareStore::getFirmwareDescription(selectedFirmwareName).join('\n'));
 
     QTextCursor cursor = ui->FirmwareText->textCursor();
     cursor.setPosition(0);

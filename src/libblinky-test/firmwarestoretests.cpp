@@ -90,15 +90,15 @@ void FirmwareStoreTests::getFirmwareDirectoryNameHasBlinkyTapeDefaultTest()
 
 void FirmwareStoreTests::getFirmwareDescriptionDoesntExistTest()
 {
-    QVERIFY(FirmwareStore::getFirmwareDescription("thisfirmwaredoesntexist").isNull());
+    QVERIFY(FirmwareStore::getFirmwareDescription("thisfirmwaredoesntexist").isEmpty());
 }
 
 
 void FirmwareStoreTests::getFirmwareDescriptionHasBlinkyTapeDefaultTest()
 {
-    QString expectedDescription;
-    expectedDescription.append("Default BlinkyTape Firmware\n");
-    expectedDescription.append("Use this for all standard functions\n");
+    QStringList expectedDescription;
+    expectedDescription.append("Default BlinkyTape Firmware");
+    expectedDescription.append("Use this for all standard functions");
 
     QVERIFY(FirmwareStore::getFirmwareDescription(BLINKYTAPE_DEFAULT_FIRMWARE_NAME) == expectedDescription);
 }

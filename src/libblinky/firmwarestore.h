@@ -19,7 +19,7 @@ public:
     static QStringList listAvailableFirmware();
 
     static QString getFirmwareDirectoryName(const QString &name);
-    static QString getFirmwareDescription(const QString &name);
+    static QStringList getFirmwareDescription(const QString &name);
     static MemorySection getFirmwareData(const QString &name);
 
     bool addFirmware(const QString &sourcePathName);

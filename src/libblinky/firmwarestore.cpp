@@ -47,12 +47,14 @@ QString FirmwareStore::getFirmwareDirectoryName(const QString &name)
 }
 
 
-QString FirmwareStore::getFirmwareDescription(const QString &name)
+QStringList FirmwareStore::getFirmwareDescription(const QString &name)
 {
+    QStringList description;
+
     QString directoryName = getFirmwareDirectoryName(name);
 
     if(directoryName.isNull())
-        return QString();
+        return description;
 
     // read README.md
     QString filename;
@@ -61,13 +63,16 @@ QString FirmwareStore::getFirmwareDescription(const QString &name)
     filename.append(FIRMWARE_DESCRIPTION_FILE);
 
     QFile readmeFile(filename);
-    if (!readmeFile.open(QIODevice::ReadOnly))
-        return QString().append("No description available");
+    if (!readmeFile.open(QIODevice::ReadOnly)) {
+        description.append("No description available");
+        return description;
+    }
 
-    QString description;
-
-    QTextStream in(&readmeFile);
-    description.append(in.readAll());
+    QTextStream textStream(&readmeFile);
+    QString line;
+    while(textStream.readLineInto(&line)) {
+        description.append(line);
+    }
 
     readmeFile.close();
 
