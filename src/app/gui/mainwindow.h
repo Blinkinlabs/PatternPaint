@@ -44,11 +44,6 @@ public slots:
 
     void applyScene(const SceneTemplate &scene);
 
-protected:
-    void closeEvent(QCloseEvent *event);
-
-    void showEvent(QShowEvent *event);
-
 private slots:
     void drawTimer_timeout();
 
@@ -171,6 +166,10 @@ private:
     // TODO: Manage these in a seperate class?
     QMetaObject::Connection timelineSelectedChangedConnection;
     QMetaObject::Connection patternDataChangedConnection;
+
+    void closeEvent(QCloseEvent *event);
+
+    void showEvent(QShowEvent *event);
 
     void populateExamplesMenu(QString directory, QMenu *menu);
 

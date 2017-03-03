@@ -18,7 +18,7 @@ include(../libblinky.pri)
 
 # TODO: Push this entirely into libblinky, and don't refer
 # serial directly in the GUI
-    QT += serialport
+QT += serialport
 
 
 #Target version and application information
@@ -39,16 +39,6 @@ mac {
 CONFIG(debug, debug|release) {
     message("Debug build, disabling app update checks")
     DEFINES += DISABLE_UPDATE_CHECKS
-}
-
-# Workaround for lineinstrument tool in QT 5.2 - 5.4
-# See: https://github.com/Blinkinlabs/PatternPaint/issues/66
-equals(QT_MAJOR_VERSION, 5){
-    greaterThan(QT_MINOR_VERSION,1) {
-        lessThan(QT_MINOR_VERSION,5) {
-            DEFINES += LINE_INSTRUMENT_WORKAROUND
-        }
-    }
 }
 
 RESOURCES += \
