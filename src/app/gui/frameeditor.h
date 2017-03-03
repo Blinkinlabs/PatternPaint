@@ -31,7 +31,7 @@ public:
     void mouseReleaseEvent(QMouseEvent *event);
 
     enum ScaleMode {
-        MANUAL,
+        FIXED_SIZE,
         FIT_TO_HEIGHT,
         FIT_TO_WIDTH,
         FIT_TO_SCREEN
