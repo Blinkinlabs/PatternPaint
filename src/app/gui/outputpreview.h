@@ -21,7 +21,7 @@ signals:
 
 public slots:
     void setFixture(Fixture* newFixture);
-    void setFrameData(int index, const QImage &data);
+    void setFrameImage(const QImage &data);
 
 private:
     QPointer<Fixture> fixture;

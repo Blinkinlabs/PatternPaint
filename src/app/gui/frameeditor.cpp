@@ -340,7 +340,7 @@ void FrameEditor::setShowPlaybakIndicator(bool newShowPlaybackIndicator)
     showPlaybackIndicator = newShowPlaybackIndicator;
 }
 
-void FrameEditor::setFrameData(int index, const QImage &data)
+void FrameEditor::setEditImage(int index, const QImage &data)
 {
     // Don't update if we are currently in a draw operation
     if(!instrument.isNull() && instrument->isDrawing())

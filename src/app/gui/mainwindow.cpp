@@ -975,8 +975,9 @@ void MainWindow::setNewFrame(int newFrame)
 
     currentFrame.setText(QString::number(getCurrentFrameIndex()+1));
 
-    setFrameData(getCurrentFrameIndex(),
+    editImageChanged(getCurrentFrameIndex(),
                    patternCollection.at(getCurrentPatternIndex())->getEditImage(newFrame));
+    frameImageChanged(patternCollection.at(getCurrentPatternIndex())->getFrameImage(newFrame));
 }
 
 void MainWindow::updateBlinky(const QImage &frame)
@@ -1015,7 +1016,8 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
 
         setPatternName("()");
         setPatternModified(false);
-        setFrameData(0, QImage());
+        editImageChanged(0, QImage());
+        frameImageChanged(QImage());
         frameEditor->setShowPlaybakIndicator(false);
         timeline->setVisible(false);
         patternSpeed->setValue(1);
@@ -1034,7 +1036,8 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
     setNewFrame(getCurrentFrameIndex());
     setPatternName(newpattern->getName());
     setPatternModified(newpattern->getModified());
-    setFrameData(getCurrentFrameIndex(), newpattern->getEditImage(getCurrentPatternIndex()));
+    editImageChanged(getCurrentFrameIndex(), newpattern->getEditImage(getCurrentPatternIndex()));
+    frameImageChanged(newpattern->getFrameImage(getCurrentPatternIndex()));
     frameEditor->setShowPlaybakIndicator(newpattern->hasPlaybackIndicator());
     timeline->setVisible(newpattern->hasTimeline());
     patternSpeed->setValue(newpattern->getFrameSpeed());
@@ -1079,45 +1082,54 @@ void MainWindow::on_PatternDataChanged(const QModelIndex &topLeft, const QModelI
     for (int role : roles) {
         if (role == PatternModel::FileName) {
             setPatternName(patternCollection.at(getCurrentPatternIndex())->getName());
-        } else if (role == PatternModel::Modified) {
+        }
+        else if (role == PatternModel::Modified) {
             setPatternModified(patternCollection.at(getCurrentPatternIndex())->getModified());
-        } else if (role == PatternModel::FrameImage) {
+        }
+        else if (role == PatternModel::FrameImage) {
             // If the current selection changed, refresh so that the FrameEditor contents will be redrawn
-            if (currentIndex >= topLeft.row() && currentIndex <= bottomRight.row()) {
-                setFrameData(getCurrentFrameIndex(),
-                               patternCollection.at(getCurrentPatternIndex())->getEditImage(
-                                   getCurrentFrameIndex()));
-            }
-        } else if (role == PatternModel::FrameSpeed) {
+            if (currentIndex < topLeft.row() || currentIndex > bottomRight.row())
+                continue;
+
+            editImageChanged(getCurrentFrameIndex(),
+                           patternCollection.at(getCurrentPatternIndex())->getEditImage(
+                               getCurrentFrameIndex()));
+            frameImageChanged(patternCollection.at(getCurrentPatternIndex())->getFrameImage(
+                               getCurrentFrameIndex()));
+        }
+        else if (role == PatternModel::FrameSpeed) {
             patternSpeed->setValue(patternCollection.at(getCurrentPatternIndex())->getFrameSpeed());
         }
     }
 }
 
-void MainWindow::setFrameData(int index, const QImage &data)
+void MainWindow::editImageChanged(int index, const QImage &data)
 {
-    frameEditor->setFrameData(index, data);
-
-    QImage frame;
-    if(!patternCollection.isEmpty()) {
-        frame = patternCollection.at(getCurrentPatternIndex())->getFrameImage(index);
-    }
-
-    outputPreview->setFrameData(index, frame);
-
-    updateBlinky(frame);
+    frameEditor->setEditImage(index, data);
 }
+
+void MainWindow::frameImageChanged(const QImage &data)
+{
+    outputPreview->setFrameImage(data);
+
+    updateBlinky(data);
+}
+
+
 
 void MainWindow::on_patternSizeUpdated()
 {
     if (patternCollection.isEmpty()) {
-        setFrameData(0, QImage());
+        editImageChanged(0, QImage());
+        frameImageChanged(QImage());
         return;
     }
 
-    setFrameData(getCurrentFrameIndex(),
-                   patternCollection.at(getCurrentPatternIndex())->getEditImage(
-                       getCurrentFrameIndex()));
+    editImageChanged(getCurrentFrameIndex(),
+                     patternCollection.at(getCurrentPatternIndex())->getEditImage(
+                         getCurrentFrameIndex()));
+    frameImageChanged(patternCollection.at(getCurrentPatternIndex())->getFrameImage(
+                         getCurrentFrameIndex()));
 }
 
 void MainWindow::on_frameDataEdited(int index, QImage update)

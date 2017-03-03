@@ -20,7 +20,7 @@ void OutputPreview::setFixture(Fixture *newFixture)
     fixture = newFixture;
 }
 
-void OutputPreview::setFrameData(int, const QImage &data)
+void OutputPreview::setFrameImage(const QImage &data)
 {
     frameData = data;
     update();
@@ -28,17 +28,16 @@ void OutputPreview::setFrameData(int, const QImage &data)
 
 void OutputPreview::paintEvent(QPaintEvent *)
 {
-    if(fixture.isNull() || frameData.isNull())
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.fillRect(this->rect(), QColor(100, 100, 100, 255));
+
+    if(fixture.isNull())
         return;
 
     QRect extents = fixture->getExtents();
     QList<QPoint> outputLocations = fixture->getLocations();
     QList<QColor> colorStream = fixture->getColorStream(frameData);
-
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing, true);
-
-    painter.fillRect(0, 0, this->width(), this->height(), QColor(100, 100, 100, 255));
 
     qreal width = extents.right()-extents.left() + 1 + PIXEL_WIDTH;
     qreal height = extents.bottom()-extents.top() + 1 + PIXEL_WIDTH;

@@ -101,7 +101,7 @@ public slots:
     void setShowPlaybakIndicator(bool);
 
     void setFixture(Fixture *);
-    void setFrameData(int index, const QImage &data);
+    void setEditImage(int index, const QImage &data);
 
     void zoomIn();
     void zoomOut();
