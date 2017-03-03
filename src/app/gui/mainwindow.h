@@ -170,6 +170,10 @@ private:
 
     QUndoGroup undoGroup;
 
+    // TODO: Manage these in a seperate class?
+    QMetaObject::Connection timelineSelectedChangedConnection;
+    QMetaObject::Connection patternDataChangedConnection;
+
     void populateExamplesMenu(QString directory, QMenu *menu);
 
     void showError(QString errorMessage);

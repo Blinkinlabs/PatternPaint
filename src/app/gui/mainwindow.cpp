@@ -1042,9 +1042,19 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
     actionSave_to_Blinky->setEnabled(mode == Connected);
 
     // TODO: Should we unregister these eventually?
+    if (timelineSelectedChangedConnection)
+        QObject::disconnect(timelineSelectedChangedConnection);
+
+    if (patternDataChangedConnection)
+        QObject::disconnect(patternDataChangedConnection);
+
+
+    timelineSelectedChangedConnection =
     connect(timeline->selectionModel(),
             SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
             this, SLOT(on_timelineSelectedChanged(const QModelIndex &, const QModelIndex &)));
+
+    patternDataChangedConnection =
     connect(timeline->model(),
             SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &, const QVector<int> &)),
             this,
