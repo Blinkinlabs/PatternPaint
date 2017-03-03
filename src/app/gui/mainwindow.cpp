@@ -178,6 +178,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(actionFitToWidth, SIGNAL(triggered(bool)), frameEditor, SLOT(setFitToWidth(bool)));
     connect(actionFitToScreen, SIGNAL(triggered(bool)), frameEditor, SLOT(setFitToScreen(bool)));
 
+    connect(frameEditor, SIGNAL(dataEdited(int, const QImage)), this, SLOT(on_frameDataEdited(int, const QImage)));
+
     connect(frameEditor, SIGNAL(fitToHeightChanged(bool)), actionFitToHeight, SLOT(setChecked(bool)));
     connect(frameEditor, SIGNAL(fitToWidthChanged(bool)), actionFitToWidth, SLOT(setChecked(bool)));
     connect(frameEditor, SIGNAL(fitToScreenChanged(bool)), actionFitToScreen, SLOT(setChecked(bool)));
