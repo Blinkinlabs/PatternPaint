@@ -40,8 +40,6 @@ public:
     ~MainWindow();
 
 public slots:
-    void on_patternSizeUpdated();
-
     void on_frameDataEdited(int index, QImage update);
 
     void applyScene(const SceneTemplate &scene);

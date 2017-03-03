@@ -963,6 +963,8 @@ void MainWindow::setNewFrame(int newFrame)
     if (patternCollection.isEmpty())
         return;
 
+    // TODO: Test if the current pattern index is valid
+
     // TODO: Detect if we changed frames and only continue if it's a new frame...
 
     if (newFrame > getFrameCount())
@@ -973,11 +975,6 @@ void MainWindow::setNewFrame(int newFrame)
 
     timeline->setCurrentIndex(timeline->model()->index(newFrame, 0));
 
-    currentFrame.setText(QString::number(getCurrentFrameIndex()+1));
-
-    editImageChanged(getCurrentFrameIndex(),
-                   patternCollection.at(getCurrentPatternIndex())->getEditImage(newFrame));
-    frameImageChanged(patternCollection.at(getCurrentPatternIndex())->getFrameImage(newFrame));
 }
 
 void MainWindow::updateBlinky(const QImage &frame)
@@ -1036,8 +1033,6 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
     setNewFrame(getCurrentFrameIndex());
     setPatternName(newpattern->getName());
     setPatternModified(newpattern->getModified());
-    editImageChanged(getCurrentFrameIndex(), newpattern->getEditImage(getCurrentPatternIndex()));
-    frameImageChanged(newpattern->getFrameImage(getCurrentPatternIndex()));
     frameEditor->setShowPlaybakIndicator(newpattern->hasPlaybackIndicator());
     timeline->setVisible(newpattern->hasTimeline());
     patternSpeed->setValue(newpattern->getFrameSpeed());
@@ -1065,13 +1060,15 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
                                        const QVector<int> &)));
 
     emit(patternStatusChanged(current.isValid()));
-
-    on_patternSizeUpdated();
 }
 
 void MainWindow::on_timelineSelectedChanged(const QModelIndex &current, const QModelIndex &)
 {
-    setNewFrame(current.row());
+    currentFrame.setText(QString::number(current.row()+1));
+
+    editImageChanged(current.row(),
+                   patternCollection.at(getCurrentPatternIndex())->getEditImage(current.row()));
+    frameImageChanged(patternCollection.at(getCurrentPatternIndex())->getFrameImage(current.row()));
 }
 
 void MainWindow::on_PatternDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
@@ -1113,23 +1110,6 @@ void MainWindow::frameImageChanged(const QImage &data)
     outputPreview->setFrameImage(data);
 
     updateBlinky(data);
-}
-
-
-
-void MainWindow::on_patternSizeUpdated()
-{
-    if (patternCollection.isEmpty()) {
-        editImageChanged(0, QImage());
-        frameImageChanged(QImage());
-        return;
-    }
-
-    editImageChanged(getCurrentFrameIndex(),
-                     patternCollection.at(getCurrentPatternIndex())->getEditImage(
-                         getCurrentFrameIndex()));
-    frameImageChanged(patternCollection.at(getCurrentPatternIndex())->getFrameImage(
-                         getCurrentFrameIndex()));
 }
 
 void MainWindow::on_frameDataEdited(int index, QImage update)
