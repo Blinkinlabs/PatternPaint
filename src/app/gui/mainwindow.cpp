@@ -1033,6 +1033,9 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
     setNewFrame(getCurrentFrameIndex());
     setPatternName(newpattern->getName());
     setPatternModified(newpattern->getModified());
+    editImageChanged(current.row(),
+                   patternCollection.at(getCurrentPatternIndex())->getEditImage(getCurrentFrameIndex()));
+    frameImageChanged(patternCollection.at(getCurrentPatternIndex())->getFrameImage(getCurrentFrameIndex()));
     frameEditor->setShowPlaybakIndicator(newpattern->hasPlaybackIndicator());
     timeline->setVisible(newpattern->hasTimeline());
     patternSpeed->setValue(newpattern->getFrameSpeed());
