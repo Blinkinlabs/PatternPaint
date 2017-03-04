@@ -14,6 +14,7 @@
 #include "linearfixturetests.h"
 #include "firmwarestoretests.h"
 #include "firmwarereadertests.h"
+#include "blinkytapeuploaddatatests.h"
 
 int main(int argc, char *argv[])
 {
@@ -27,9 +28,6 @@ int main(int argc, char *argv[])
 
     ColorModeTests colorModeTests;
     result |= QTest::qExec(&colorModeTests);
-
-    ByteArrayHelpersTests byteArrayHelpersTests;
-    result |= QTest::qExec(&byteArrayHelpersTests);
 
     SerialCommandTests serialCommandTests;
     result |= QTest::qExec(&serialCommandTests);
@@ -63,6 +61,12 @@ int main(int argc, char *argv[])
 
     FirmwareStoreTests firmwareStoreTests;
     result |= QTest::qExec(&firmwareStoreTests);
+
+    BlinkyTapeUploadDataTests blinkyTapeUploadDataTests;
+    result |= QTest::qExec(&blinkyTapeUploadDataTests);
+
+    ByteArrayHelpersTests byteArrayHelpersTests;
+    result |= QTest::qExec(&byteArrayHelpersTests);
 
     return result;
 }

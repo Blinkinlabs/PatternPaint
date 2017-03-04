@@ -4,14 +4,20 @@
 #include <QByteArray>
 #include <QList>
 
-// Utility function to transmit a uint16_t value
-QByteArray uint16ToByteArray(int value);
+// Convert a uint16_t value to a byte array, little-endian
+QByteArray uint16ToByteArrayLittle(uint16_t value);
 
-// Utility function to transmit a uint32_t value
+// Convert a uint16_t value to a byte array, big-endian
+QByteArray uint16ToByteArrayBig(int value);
+
+// Convert a uint32_t value to a byte array, big-endian
 QByteArray uint32ToByteArray(uint32_t value);
 
-// Utility function to split a qbytearray into regularly-sized pieces
-QList<QByteArray> chunkData(const QByteArray &data, int chunkSize);
+// Split a qbytearray into regularly-sized pieces
+QList<QByteArray> chunkData(const QByteArray &data, unsigned int chunkSize);
+
+// Pad a byte array to a multile of the given boundary size
+void padToBoundary(QByteArray &data, unsigned int boundary);
 
 
 #endif // BYTEARRAYHELPERS_H

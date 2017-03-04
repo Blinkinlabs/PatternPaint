@@ -56,7 +56,7 @@ void Avr109CommandsTests::setAddressTest()
 
     QByteArray expectedData;
     expectedData.append('A');
-    expectedData += uint16ToByteArray(address);
+    expectedData += uint16ToByteArrayBig(address);
 
     QByteArray expectedResponse = "\r";
     QByteArray expectedResponseMask;
@@ -98,7 +98,7 @@ void Avr109CommandsTests::writeFlashPageTest()
 
     QByteArray expectedData;
     expectedData.append('B');
-    expectedData.append(uint16ToByteArray(data.length()));
+    expectedData.append(uint16ToByteArrayBig(data.length()));
     expectedData.append('F');
     expectedData.append(data);
 
@@ -142,7 +142,7 @@ void Avr109CommandsTests::verifyFlashPageTest()
 
     QByteArray expectedData;
     expectedData.append('g');
-    expectedData.append(uint16ToByteArray(data.length()));
+    expectedData.append(uint16ToByteArrayBig(data.length()));
     expectedData.append('F');
 
     QByteArray expectedResponse;
@@ -164,7 +164,7 @@ void Avr109CommandsTests::writeEepromBlockTest()
 
     QByteArray expectedData;
     expectedData.append('B');
-    expectedData.append(uint16ToByteArray(data.length()));
+    expectedData.append(uint16ToByteArrayBig(data.length()));
     expectedData.append('E');
     expectedData.append(data);
 

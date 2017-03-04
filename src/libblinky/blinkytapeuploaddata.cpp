@@ -3,43 +3,34 @@
 #include "blinkytape.h"
 #include "firmwarestore.h"
 
+#include "bytearrayhelpers.h"
+
 #include <QDebug>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QFileDialog>
 
-#define PATTERN_TABLE_HEADER_LENGTH     3
-#define PATTERN_TABLE_ENTRY_LENGTH      7
+#define PATTERN_TABLE_HEADER_LENGTH_BYTES     3
+#define PATTERN_TABLE_ENTRY_LENGTH_BYTES      7
 
 #define FLASH_MEMORY_PATTERN_TABLE_ADDRESS (FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE_BYTES) // Location of pattern table
 
 
 #define BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT 36
 
-QByteArray encodeWordLSB(int data)
-{
-    QByteArray output;
-    output.append(static_cast<char>((data) & 0xFF));
-    output.append(static_cast<char>((data >> 8) & 0xFF));
-    return output;
-}
-
 bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter> &patterns)
 {
     // First, build the flash section for the sketch. This is the same for
     // all uploads
-    qDebug() << "Selected firmware: " << firmwareName;
+    MemorySection sketchSection = FirmwareStore::getFirmwareData(firmwareName);
 
-    sketchSection = FirmwareStore::getFirmwareData(firmwareName);
     if(sketchSection.data.isNull()) {
         errorString = "Firmware read failed!";
         return false;
     }
 
     // Expand sketch size to FLASH_MEMORY_PAGE_SIZE_BYTES boundary
-    while (sketchSection.data.length() % FLASH_MEMORY_PAGE_SIZE_BYTES != 0)
-        sketchSection.data.append(static_cast<char>(0xFF));
-
+    padToBoundary(sketchSection.data, FLASH_MEMORY_PAGE_SIZE_BYTES);
 
     // Next, build the pattern data section and pattern header table
 
@@ -53,7 +44,7 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
         return false;
     }
     if (patterns.count()
-        >= ((FLASH_MEMORY_PAGE_SIZE_BYTES - PATTERN_TABLE_HEADER_LENGTH) / PATTERN_TABLE_ENTRY_LENGTH)) {
+        >= ((FLASH_MEMORY_PAGE_SIZE_BYTES - PATTERN_TABLE_HEADER_LENGTH_BYTES) / PATTERN_TABLE_ENTRY_LENGTH_BYTES)) {
         errorString = QString("Too many patterns, cannot fit in pattern table.");
         return false;
     }
@@ -64,7 +55,10 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
 
     patternTable.append(static_cast<char>(patterns.count()));       // Offset 0: Pattern count (1 byte)
     // TODO: make the LED count to a separate, explicit parameter?
-    patternTable += encodeWordLSB(patterns.first().getLedCount());  // Offset 1: Number of LEDs connected to the controller (2 bytes)
+
+    // TODO: Test that the LED length is in range
+
+    patternTable += uint16ToByteArrayLittle(patterns.first().getLedCount());  // Offset 1: Number of LEDs connected to the controller (2 bytes)
 
     // TODO: Pass this in somehow.
     QSettings settings;
@@ -87,11 +81,13 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
                  << "Count:" << pattern.getDataAsBinary().length()
                  << "Offset:" << dataOffset;
 
+        // TOD: Test that all the values are in range
+
         // Build the table entry for this pattern
         patternTable.append((char)((pattern.getEncoding()) & 0xFF));   // Offset 0: encoding (1 byte)
-        patternTable += encodeWordLSB(dataOffset);                         // Offset 1: memory location (2 bytes)
-        patternTable += encodeWordLSB(pattern.getFrameCount());           // Offset 3: frame count (2 bytes)
-        patternTable += encodeWordLSB(pattern.getFrameDelay());           // Offset 5: frame delay (2 bytes)
+        patternTable += uint16ToByteArrayLittle(dataOffset);                         // Offset 1: memory location (2 bytes)
+        patternTable += uint16ToByteArrayLittle(pattern.getFrameCount());           // Offset 3: frame count (2 bytes)
+        patternTable += uint16ToByteArrayLittle(pattern.getFrameDelay());           // Offset 5: frame delay (2 bytes)
 
         // and append the image data
         patternData += pattern.getDataAsBinary();
@@ -99,20 +95,21 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
     }
 
     // Pad pattern table to FLASH_MEMORY_PAGE_SIZE_BYTES.
-    while (patternTable.count() < FLASH_MEMORY_PAGE_SIZE_BYTES)
-        patternTable.append(static_cast<char>(0xFF));
+    padToBoundary(patternTable, FLASH_MEMORY_PAGE_SIZE_BYTES);
 
-    patternDataSection = MemorySection("PatternData",
-                                      sketchSection.address + sketchSection.data.count(),
-                                      patternData);
+    flashData.append(sketchSection);
+    flashData.append(MemorySection("PatternData",
+                                   sketchSection.address + sketchSection.data.count(),
+                                   patternData));
+    flashData.append(MemorySection("PatternTable",
+                                   FLASH_MEMORY_PATTERN_TABLE_ADDRESS,
+                                   patternTable));
 
-    patternTableSection = MemorySection("PatternTable",
-                                       FLASH_MEMORY_PATTERN_TABLE_ADDRESS,
-                                       patternTable);
-
-    qDebug() << "Sketch size:" << sketchSection.data.count()
-             << "Pattern data size:" << patternData.count()
-             << "Pattern table size" << patternTable.count();
+    for(MemorySection &section : flashData)
+        qDebug() << "Section"
+                 << "name:" << section.name
+                 << "address:" << section.address
+                 << "size:" << section.data.count();
 
     return true;
 }

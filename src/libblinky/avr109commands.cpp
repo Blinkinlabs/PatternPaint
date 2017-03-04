@@ -39,7 +39,7 @@ SerialCommand setAddress(unsigned int address)
     // Note that the address is word defined for flash, but byte defined for EEPROM.
     QByteArray command;
     command.append('A');
-    command += uint16ToByteArray(address);
+    command += uint16ToByteArrayBig(address);
 
     QByteArray response;
     response.append('\r');
@@ -57,7 +57,7 @@ SerialCommand writeFlashPage(const QByteArray &data)
 
     QByteArray command;
     command.append('B'); // command: write memory
-    command += uint16ToByteArray(paddedData.count());  // write size (bytes)
+    command += uint16ToByteArrayBig(paddedData.count());  // write size (bytes)
     command.append('F'); // memory type: flash
     command += paddedData;
 
@@ -77,7 +77,7 @@ SerialCommand verifyFlashPage(const QByteArray &data)
 
     QByteArray command;
     command.append('g'); // command: verify memory
-    command += uint16ToByteArray(paddedData.count()); // read size (bytes)
+    command += uint16ToByteArrayBig(paddedData.count()); // read size (bytes)
     command.append('F'); // memory type: flash
 
     QByteArray response;
@@ -90,7 +90,7 @@ SerialCommand writeEepromBlock(const QByteArray &data)
 {
     QByteArray command;
     command.append('B'); // command: write memory
-    command += uint16ToByteArray(data.count());  // write size (bytes)
+    command += uint16ToByteArrayBig(data.count());  // write size (bytes)
     command.append('E'); // memory type: eeprom
     command += data;
 

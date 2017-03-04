@@ -28,7 +28,8 @@ HEADERS += \
     matrixfixturetests.h \
     linearfixturetests.h \
     firmwarestoretests.h \
-    firmwarereadertests.h
+    firmwarereadertests.h \
+    blinkytapeuploaddatatests.h
 
 SOURCES += \
     avr109commandstests.cpp \
@@ -45,4 +46,5 @@ SOURCES += \
     matrixfixturetests.cpp \
     linearfixturetests.cpp \
     firmwarestoretests.cpp \
-    firmwarereadertests.cpp
+    firmwarereadertests.cpp \
+    blinkytapeuploaddatatests.cpp

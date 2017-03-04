@@ -15,9 +15,7 @@ class BlinkyTapeUploadData
 public:
     bool init(const QString &firmwareName, QList<PatternWriter> &patterns);
 
-    MemorySection sketchSection;
-    MemorySection patternDataSection;
-    MemorySection patternTableSection;
+    QList<MemorySection> flashData;
 
     QString errorString;
 };

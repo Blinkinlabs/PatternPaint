@@ -133,9 +133,7 @@ bool BlinkyTapeUploader::storePatterns(BlinkyController &blinky, QList<PatternWr
         return false;
     }
 
-    flashData.append(data.sketchSection);
-    flashData.append(data.patternDataSection);
-    flashData.append(data.patternTableSection);
+    flashData = data.flashData;
 
     return startUpload(blinky);
 }
