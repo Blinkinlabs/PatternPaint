@@ -8,7 +8,7 @@ SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT] = {
         ":/scenetemplates/images/scenetemplates/blinkytape.jpg",
         ":/examples/blinkytape",
         "BlinkyTape",
-        "Default",
+        "default",
         "Linear",
         RGB,
         QSize(1,60)
@@ -18,7 +18,7 @@ SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT] = {
         ":/scenetemplates/images/scenetemplates/blinkytile.jpg",
         ":/examples/blinkytile",
         "Light Buddy (BlinkyTile)",
-        "Default",
+        "default",
         "Linear",
         RGB,
         QSize(1,56)
@@ -28,7 +28,7 @@ SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT] = {
         ":/scenetemplates/images/scenetemplates/pixels.jpg",
         ":/examples/blinkytape",
         "BlinkyTape",
-        "Default",
+        "default",
         "Linear",
         GRB,
         QSize(1,50)
@@ -38,7 +38,7 @@ SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT] = {
         ":/scenetemplates/images/scenetemplates/matrix.jpg",
         ":/examples/matrix",
         "BlinkyTape",
-        "Default",
+        "default",
         "Matrix-Zigzag",
         RGB,
         QSize(8,8)
@@ -48,7 +48,7 @@ SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT] = {
         ":/scenetemplates/images/scenetemplates/pendant.jpg",
         ":/examples/pendant",
         "BlinkyPendant",
-        "Default",
+        "default",
         "Linear",
         RGB,
         QSize(1,10)
@@ -58,7 +58,7 @@ SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT] = {
         ":/scenetemplates/images/scenetemplates/eightbyeight.jpg",
         ":/examples/matrix",
         "EightByEight",
-        "Default",
+        "default",
         "Matrix-Rows",
         RGB,
         QSize(8,8)
