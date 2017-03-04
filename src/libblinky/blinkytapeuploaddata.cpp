@@ -107,6 +107,7 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, const QList<Pattern
     patternTable.append(makePatternTableHeader(patterns.count(), patterns.first().getLedCount()));
     patternTable.append(makeBrightnessTable(maxBrightness));
 
+    unsigned int patternDataAddress = sketchSection.address + sketchSection.data.count();
 
     // Now, for each pattern, append the image data to the sketch
     for (PatternWriter pattern : patterns) {
@@ -115,13 +116,13 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, const QList<Pattern
                  << "Frame count:" << pattern.getFrameCount()
                  << "Frame delay:" << pattern.getFrameDelay()
                  << "Count:" << pattern.getDataAsBinary().length()
-                 << "Offset:" << sketchSection.extent() + patternData.count();
+                 << "Offset:" << patternDataAddress + patternData.count();
 
         // TOD: Test that all the values are in range
 
         // Build the table entry for this pattern
         patternTable.append(makePatternTableEntry(pattern.getEncoding(),
-                                                  sketchSection.extent() + patternData.count(),
+                                                  patternDataAddress + patternData.count(),
                                                   pattern.getFrameCount(),
                                                   pattern.getFrameDelay()));
 
@@ -129,12 +130,9 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, const QList<Pattern
         patternData += pattern.getDataAsBinary();
     }
 
-    // Pad pattern table to FLASH_MEMORY_PAGE_SIZE_BYTES.
-    padToBoundary(patternTable, FLASH_MEMORY_PAGE_SIZE_BYTES);
-
     flashData.append(sketchSection);
     flashData.append(MemorySection("PatternData",
-                                   sketchSection.extent(),
+                                   patternDataAddress,
                                    patternData));
     flashData.append(MemorySection("PatternTable",
                                    FLASH_MEMORY_PATTERN_TABLE_ADDRESS,

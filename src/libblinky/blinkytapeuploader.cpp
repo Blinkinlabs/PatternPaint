@@ -361,6 +361,7 @@ void BlinkyTapeUploader::doWork()
     {
         // Queue all of the flash sections to memory
         for(MemorySection& section : flashData) {
+            // TODO: How to report errors in command formation?
             commandQueue.enqueue(Avr109Commands::writeFlash(section.data, section.address));
             commandQueue.enqueue(Avr109Commands::verifyFlash(section.data, section.address));
         }
