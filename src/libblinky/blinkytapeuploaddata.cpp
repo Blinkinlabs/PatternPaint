@@ -10,16 +10,65 @@
 #include <QStandardPaths>
 #include <QFileDialog>
 
+#include <cmath>
+
 #define PATTERN_TABLE_HEADER_LENGTH_BYTES     3
+#define BRIGHTNESS_TABLE_LENGTH_BYTES     8
 #define PATTERN_TABLE_ENTRY_LENGTH_BYTES      7
+
+// Note: This is limited by the 1-byte header field to 255, max.
+#define MAX_PATTERN_COUNT ((FLASH_MEMORY_PAGE_SIZE_BYTES - PATTERN_TABLE_HEADER_LENGTH_BYTES - BRIGHTNESS_TABLE_LENGTH_BYTES) / PATTERN_TABLE_ENTRY_LENGTH_BYTES)
 
 #define FLASH_MEMORY_PATTERN_TABLE_ADDRESS (FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE_BYTES) // Location of pattern table
 
 
 #define BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT 36
 
-bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter> &patterns)
+
+QByteArray makePatternTableHeader(uint8_t patternCount, uint16_t ledCount) {
+    QByteArray header;
+
+    header.append(patternCount);                        // Offset 0: Pattern count (1 byte)
+    header.append(uint16ToByteArrayLittle(ledCount));   // Offset 1: Number of LEDs connected to the controller (2 bytes)
+
+    return header;
+}
+
+QByteArray makePatternTableEntry(PatternWriter::Encoding encoding, uint16_t offset, uint16_t frameCount, uint16_t frameDelay) {
+    QByteArray entry;
+
+    entry.append((char)((encoding) & 0xFF));            // Offset 0: encoding (1 byte)
+    entry.append(uint16ToByteArrayLittle(offset));      // Offset 1: memory location (2 bytes)
+    entry.append(uint16ToByteArrayLittle(frameCount));  // Offset 3: frame count (2 bytes)
+    entry.append(uint16ToByteArrayLittle(frameDelay));  // Offset 5: frame delay (2 bytes)
+
+    return entry;
+}
+
+QByteArray makeBrightnessTable(int maxBrightnessPercent) {
+    QByteArray brightnessTable;
+
+    if (maxBrightnessPercent < 0)
+        maxBrightnessPercent = 0;
+
+    if (maxBrightnessPercent > 100)
+        maxBrightnessPercent = 100;
+
+    float maxBrightness = maxBrightnessPercent/100.0;
+    QList<int> brightnessStepModifiers = {255,191,114,41,20,41,114,191};
+
+    for(int brightnessStepModifier : brightnessStepModifiers)
+        brightnessTable.append(static_cast<char>(round(brightnessStepModifier*maxBrightness)));
+
+    return brightnessTable;
+}
+
+bool BlinkyTapeUploadData::init(const QString &firmwareName, const QList<PatternWriter> &patterns)
 {
+    // TODO: Pass this in somehow.
+    QSettings settings;
+    int maxBrightness = settings.value("BlinkyTape/maxBrightness", BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT).toInt();
+
     // First, build the flash section for the sketch. This is the same for
     // all uploads
     MemorySection sketchSection = FirmwareStore::getFirmwareData(firmwareName);
@@ -29,48 +78,35 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
         return false;
     }
 
-    // Expand sketch size to FLASH_MEMORY_PAGE_SIZE_BYTES boundary
-    padToBoundary(sketchSection.data, FLASH_MEMORY_PAGE_SIZE_BYTES);
-
-    // Next, build the pattern data section and pattern header table
-
-
-    QByteArray patternData;     // Pattern Data
-    QByteArray patternTable;    // Pattern data header
-
     // Test for the minimum/maximum patterns count
     if (patterns.count() == 0) {
         errorString = QString("No Patterns detected!");
         return false;
     }
-    if (patterns.count()
-        >= ((FLASH_MEMORY_PAGE_SIZE_BYTES - PATTERN_TABLE_HEADER_LENGTH_BYTES) / PATTERN_TABLE_ENTRY_LENGTH_BYTES)) {
+
+    if (patterns.count() > MAX_PATTERN_COUNT) {
         errorString = QString("Too many patterns, cannot fit in pattern table.");
         return false;
     }
+
+    // Expand sketch size to FLASH_MEMORY_PAGE_SIZE_BYTES boundary
+    padToBoundary(sketchSection.data, FLASH_MEMORY_PAGE_SIZE_BYTES);
+
+    // Next, build the pattern data section and pattern header table
 
     qDebug() << "Building pattern array"
              << "Pattern count:" << patterns.count()
              << "Led count:" << patterns.first().getLedCount();
 
-    patternTable.append(static_cast<char>(patterns.count()));       // Offset 0: Pattern count (1 byte)
-    // TODO: make the LED count to a separate, explicit parameter?
+    QByteArray patternTable;    // Pattern data header
+    QByteArray patternData;     // Pattern Data
 
+    // TODO: make the LED count to a separate, explicit parameter?
     // TODO: Test that the LED length is in range
 
-    patternTable += uint16ToByteArrayLittle(patterns.first().getLedCount());  // Offset 1: Number of LEDs connected to the controller (2 bytes)
+    patternTable.append(makePatternTableHeader(patterns.count(), patterns.first().getLedCount()));
+    patternTable.append(makeBrightnessTable(maxBrightness));
 
-    // TODO: Pass this in somehow.
-    QSettings settings;
-    float maxBrightness = settings.value("BlinkyTape/maxBrightness", BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT).toInt();
-
-    const uint8_t brightnessSteps = 8;
-    float brightnessStepModifiers[brightnessSteps] = {255,191,114,41,20,41,114,191};
-
-    for(int i = 0; i < brightnessSteps; i++)
-        patternTable.append(static_cast<char>(brightnessStepModifiers[i]*maxBrightness/100));  // Offset 2: Brightness steps (8 bytes)
-
-    int dataOffset = sketchSection.extent();
 
     // Now, for each pattern, append the image data to the sketch
     for (PatternWriter pattern : patterns) {
@@ -79,19 +115,18 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
                  << "Frame count:" << pattern.getFrameCount()
                  << "Frame delay:" << pattern.getFrameDelay()
                  << "Count:" << pattern.getDataAsBinary().length()
-                 << "Offset:" << dataOffset;
+                 << "Offset:" << sketchSection.extent() + patternData.count();
 
         // TOD: Test that all the values are in range
 
         // Build the table entry for this pattern
-        patternTable.append((char)((pattern.getEncoding()) & 0xFF));   // Offset 0: encoding (1 byte)
-        patternTable += uint16ToByteArrayLittle(dataOffset);                         // Offset 1: memory location (2 bytes)
-        patternTable += uint16ToByteArrayLittle(pattern.getFrameCount());           // Offset 3: frame count (2 bytes)
-        patternTable += uint16ToByteArrayLittle(pattern.getFrameDelay());           // Offset 5: frame delay (2 bytes)
+        patternTable.append(makePatternTableEntry(pattern.getEncoding(),
+                                                  sketchSection.extent() + patternData.count(),
+                                                  pattern.getFrameCount(),
+                                                  pattern.getFrameDelay()));
 
         // and append the image data
         patternData += pattern.getDataAsBinary();
-        dataOffset += pattern.getDataAsBinary().count();
     }
 
     // Pad pattern table to FLASH_MEMORY_PAGE_SIZE_BYTES.
@@ -99,7 +134,7 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, QList<PatternWriter
 
     flashData.append(sketchSection);
     flashData.append(MemorySection("PatternData",
-                                   sketchSection.address + sketchSection.data.count(),
+                                   sketchSection.extent(),
                                    patternData));
     flashData.append(MemorySection("PatternTable",
                                    FLASH_MEMORY_PATTERN_TABLE_ADDRESS,

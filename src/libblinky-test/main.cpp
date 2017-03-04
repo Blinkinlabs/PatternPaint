@@ -62,11 +62,11 @@ int main(int argc, char *argv[])
     FirmwareStoreTests firmwareStoreTests;
     result |= QTest::qExec(&firmwareStoreTests);
 
-    BlinkyTapeUploadDataTests blinkyTapeUploadDataTests;
-    result |= QTest::qExec(&blinkyTapeUploadDataTests);
-
     ByteArrayHelpersTests byteArrayHelpersTests;
     result |= QTest::qExec(&byteArrayHelpersTests);
+
+    BlinkyTapeUploadDataTests blinkyTapeUploadDataTests;
+    result |= QTest::qExec(&blinkyTapeUploadDataTests);
 
     return result;
 }

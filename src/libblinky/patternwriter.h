@@ -17,7 +17,7 @@ public:
         RGB565_RLE = 1,      /// RGB 565 + RLE mode (compressed 16 bit)
     };
 
-    // Create an pattern from a QImage
+    // Compute the bitstream for a pattern
     PatternWriter(const Pattern &pattern, const Fixture &fixture, Encoding encoding);
 
     Encoding getEncoding() const;
