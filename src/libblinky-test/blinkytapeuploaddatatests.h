@@ -19,6 +19,8 @@ private slots:
     void tooManyPatternsFailsTest();
 
     void padsFirmwareSectionTest();
+
+    // TODO: Finish tests!
 };
 
 #endif // BLINKYTAPEUPLOADDATATESTS_H

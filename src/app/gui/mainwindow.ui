@@ -1184,7 +1184,7 @@
     <string>Fit to screen</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+9</string>
+    <string>Ctrl+0</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
@@ -1194,16 +1194,30 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset resource="../images.qrc">
+     <normaloff>:/icons/images/icons/Zoom To Width-100.png</normaloff>:/icons/images/icons/Zoom To Width-100.png</iconset>
+   </property>
    <property name="text">
     <string>Fit to width</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionFitToHeight">
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset resource="../images.qrc">
+     <normaloff>:/icons/images/icons/Zoom To Height-100.png</normaloff>:/icons/images/icons/Zoom To Height-100.png</iconset>
+   </property>
    <property name="text">
     <string>Fit to height</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
    </property>
   </action>
  </widget>

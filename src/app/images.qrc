@@ -33,6 +33,8 @@
         <file>images/icons/Zoom In-100.png</file>
         <file>images/icons/Zoom Out-100.png</file>
         <file>images/icons/Zoom To Extents-100.png</file>
+        <file>images/icons/Zoom To Height-100.png</file>
+        <file>images/icons/Zoom To Width-100.png</file>
     </qresource>
     <qresource prefix="/scenetemplates">
         <file>images/scenetemplates/matrix.jpg</file>
