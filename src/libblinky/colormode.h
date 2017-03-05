@@ -25,6 +25,6 @@ struct ColorModeNames {
 
 QByteArray colorToBytes(ColorMode colorMode, const QColor &color);
 
-extern ColorModeNames colorModeNames[COLOR_MODE_COUNT];
+extern const ColorModeNames colorModeNames[COLOR_MODE_COUNT];
 
 #endif // COLORMODE_H

@@ -1,6 +1,6 @@
 #include "colormode.h"
 
-ColorModeNames colorModeNames[COLOR_MODE_COUNT] = {
+const ColorModeNames colorModeNames[COLOR_MODE_COUNT] = {
     {RGB, "RGB"},
     {RBG, "RBG"},
     {GRB, "GRB"},

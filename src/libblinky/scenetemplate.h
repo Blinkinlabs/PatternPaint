@@ -19,6 +19,6 @@ struct SceneTemplate {
 };
 
 #define SCENE_TEMPLATE_COUNT 6
-extern SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT];
+extern const SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT];
 
 #endif // SCENETEMPLATE_H
