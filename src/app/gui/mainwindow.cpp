@@ -692,8 +692,10 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
     if (controller.isNull())
         return;
 
-    if (!controller->getUploader(uploader))
+    if (!controller->getUploader(uploader)) {
+        showError("Upload failed: Upload to this controller type not (yet) supported.");
         return;
+    }
 
     if (uploader.isNull())
         return;
