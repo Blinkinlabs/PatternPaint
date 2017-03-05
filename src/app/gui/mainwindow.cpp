@@ -125,13 +125,12 @@ MainWindow::MainWindow(QWidget *parent) :
     instrumentToolbar->addWidget(penSizeSpin);
 
     // tools
-    currentFrame.setMaximumWidth(30);
-    currentFrame.setMinimumWidth(30);
-    currentFrame.setValidator(new QIntValidator(1, std::numeric_limits<int>::max(), this));
-    currentFrame.setToolTip(tr("Current frame"));
-    playbackToolbar->insertWidget(actionStepForward, &currentFrame);
-    connect(&currentFrame, SIGNAL(textEdited(QString)), this, SLOT(frameIndex_valueChanged(QString)));
-    frameIndex_valueChanged("1");
+    frameIndexWidget.setMaximumWidth(30);
+    frameIndexWidget.setMinimumWidth(30);
+    frameIndexWidget.setValidator(new QIntValidator(1, std::numeric_limits<int>::max(), this));
+    frameIndexWidget.setToolTip(tr("Current frame"));
+    playbackToolbar->insertWidget(actionStepForward, &frameIndexWidget);
+    connect(&frameIndexWidget, SIGNAL(textEdited(QString)), this, SLOT(frameIndexWidget_valueChanged(QString)));
 
     // Pattern info
     patternSpeed->setRange(PATTERN_SPEED_MINIMUM_VALUE, PATTERN_SPEED_MAXIMUM_VALUE);
@@ -159,7 +158,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(patternStatusChanged(bool)),
             patternSpeed, SLOT(setEnabled(bool)));
     connect(this, SIGNAL(patternStatusChanged(bool)),
-            &currentFrame, SLOT(setEnabled(bool)));
+            &frameIndexWidget, SLOT(setEnabled(bool)));
 
     mode = Disconnected;
 
@@ -364,7 +363,7 @@ void MainWindow::drawTimer_timeout()
     if (getFrameCount() == 0)
         return;
 
-    setNewFrame((getCurrentFrameIndex()+1)%getFrameCount());
+    setFrameIndex((getCurrentFrameIndex()+1)%getFrameCount());
 }
 
 void MainWindow::connectionScannerTimer_timeout()
@@ -400,9 +399,9 @@ void MainWindow::patternSpeed_valueChanged(int value)
     drawTimer.setInterval(1000/value);
 }
 
-void MainWindow::frameIndex_valueChanged(QString value)
+void MainWindow::frameIndexWidget_valueChanged(QString value)
 {
-    setNewFrame(value.toInt() - 1);
+    setFrameIndex(value.toInt() - 1);
 }
 
 void MainWindow::on_actionPlay_triggered()
@@ -971,7 +970,7 @@ bool MainWindow::loadPattern(Pattern::PatternType type, const QString fileName)
     return true;
 }
 
-void MainWindow::setNewFrame(int newFrame)
+void MainWindow::setFrameIndex(int newIndex)
 {
     if (patternCollection.isEmpty())
         return;
@@ -980,14 +979,14 @@ void MainWindow::setNewFrame(int newFrame)
 
     // TODO: Detect if we changed frames and only continue if it's a new frame...
 
-    if (newFrame > getFrameCount())
-        newFrame = getFrameCount() - 1;
+    if (newIndex > getFrameCount())
+        newIndex = getFrameCount() - 1;
 
-    if (newFrame < 0)
-        newFrame = 0;
+    if (newIndex < 0)
+        newIndex = 0;
 
-    timeline->setCurrentIndex(timeline->model()->index(newFrame, 0));
-    currentFrame.setText(QString::number(newFrame+1));
+    timeline->setCurrentIndex(timeline->model()->index(newIndex, 0));
+    frameIndexWidget.setText(QString::number(newIndex+1));
 }
 
 void MainWindow::updateBlinky(const QImage &frame)
@@ -1034,7 +1033,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
         frameEditor->setShowPlaybakIndicator(false);
 
         patternSpeed->setValue(1);
-        currentFrame.setText("");
+        frameIndexWidget.setText("");
 
         actionSave_to_Blinky->setEnabled(false);
 
@@ -1042,6 +1041,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
         return;
     }
 
+    int previousFrameIndex = getCurrentFrameIndex();
     Pattern *newpattern = patternCollection.at(current.row());
 
     timeline->setModel(newpattern->getModel());
@@ -1049,12 +1049,11 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
 
     undoGroup.setActiveStack(newpattern->getUndoStack());
 
-    setNewFrame(getCurrentFrameIndex());
+    setFrameIndex(previousFrameIndex);
     setPatternName(newpattern->getName());
     setPatternModified(newpattern->getModified());
-    editImageChanged(getCurrentFrameIndex(),
-                   patternCollection.at(getCurrentPatternIndex())->getEditImage(getCurrentFrameIndex()));
-    frameImageChanged(patternCollection.at(getCurrentPatternIndex())->getFrameImage(getCurrentFrameIndex()));
+    editImageChanged(getCurrentFrameIndex(), newpattern->getEditImage(getCurrentFrameIndex()));
+    frameImageChanged(newpattern->getFrameImage(getCurrentFrameIndex()));
     frameEditor->setShowPlaybakIndicator(newpattern->hasPlaybackIndicator());
 
     patternSpeed->setValue(newpattern->getFrameSpeed());
@@ -1085,6 +1084,8 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
 
 void MainWindow::on_timelineSelectedChanged(const QModelIndex &current, const QModelIndex &)
 {
+    frameIndexWidget.setText(QString::number(current.row() + 1));
+
     editImageChanged(current.row(),
                    patternCollection.at(getCurrentPatternIndex())->getEditImage(current.row()));
     frameImageChanged(patternCollection.at(getCurrentPatternIndex())->getFrameImage(current.row()));
@@ -1149,7 +1150,7 @@ void MainWindow::on_actionStepForward_triggered()
     if (patternCollection.isEmpty())
         return;
 
-    setNewFrame((getCurrentFrameIndex()+1)%getFrameCount());
+    setFrameIndex((getCurrentFrameIndex()+1)%getFrameCount());
 }
 
 void MainWindow::on_actionStepBackward_triggered()
@@ -1157,7 +1158,7 @@ void MainWindow::on_actionStepBackward_triggered()
     if (patternCollection.isEmpty())
         return;
 
-    setNewFrame(getCurrentFrameIndex() <= 0 ? getFrameCount()-1 : getCurrentFrameIndex()-1);
+    setFrameIndex(getCurrentFrameIndex() <= 0 ? getFrameCount()-1 : getCurrentFrameIndex()-1);
 }
 
 void MainWindow::on_actionAddFrame_triggered()
@@ -1166,7 +1167,7 @@ void MainWindow::on_actionAddFrame_triggered()
         return;
 
     patternCollection.at(getCurrentPatternIndex())->addFrame(getCurrentFrameIndex());
-    setNewFrame(getCurrentFrameIndex()-1);
+    setFrameIndex(getCurrentFrameIndex()-1);
 }
 
 void MainWindow::on_actionDeleteFrame_triggered()
@@ -1175,7 +1176,7 @@ void MainWindow::on_actionDeleteFrame_triggered()
         return;
 
     patternCollection.at(getCurrentPatternIndex())->deleteFrame(getCurrentFrameIndex());
-    setNewFrame(getCurrentFrameIndex());
+    setFrameIndex(getCurrentFrameIndex());
 }
 
 void MainWindow::setPatternModified(bool modified)

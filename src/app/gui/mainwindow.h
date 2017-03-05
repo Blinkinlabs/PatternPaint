@@ -60,7 +60,7 @@ private slots:
 
     void patternSpeed_valueChanged(int value);
 
-    void frameIndex_valueChanged(QString value);
+    void frameIndexWidget_valueChanged(QString value);
 
     void on_actionPlay_triggered();
 
@@ -153,7 +153,7 @@ private:
 
     PatternCollection patternCollection;
 
-    QLineEdit currentFrame;
+    QLineEdit frameIndexWidget;
     InstrumentConfiguration instrumentConfiguration;
 
     enum Modes {
@@ -195,7 +195,7 @@ private:
 
     void setPatternModified(bool modified);
 
-    void setNewFrame(int newFrame);
+    void setFrameIndex(int newIndex);
 
     void updateBlinky(const QImage &frame);
 
