@@ -3,28 +3,35 @@
 
 #include <QPointer>
 
+namespace logDialog {
+
 // TODO: Make this a proper singleton
 QPointer<DebugLog> activeDialog;
 
 // Redirector to the current active dialog
-static void logDialogHandleMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
-    if(!activeDialog.isNull()) {
-        activeDialog->handleMessage(type, context, msg);
-    }
+static void HandleMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
+    if(activeDialog.isNull())
+        return;
+
+    activeDialog->handleMessage(type, context, msg);
 }
 
-static void logDialogRegister(QPointer<DebugLog> dialog) {
-    if(activeDialog.isNull()) {
-        activeDialog = dialog;
-        qInstallMessageHandler(&logDialogHandleMessage);
-    }
+static void Register(QPointer<DebugLog> dialog) {
+    if(!activeDialog.isNull())
+        return;
+
+    activeDialog = dialog;
+    qInstallMessageHandler(&logDialogHandleMessage);
 }
 
-static void logDialogUnregister(QPointer<DebugLog> dialog) {
-    if(activeDialog == dialog) {
-        qInstallMessageHandler(0);
-        activeDialog.clear();
-    }
+static void Unregister(QPointer<DebugLog> dialog) {
+    if(activeDialog != dialog)
+        return;
+
+    qInstallMessageHandler(0);
+    activeDialog.clear();
+}
+
 }
 
 DebugLog::DebugLog(QWidget *parent) :
@@ -37,7 +44,7 @@ DebugLog::DebugLog(QWidget *parent) :
     this->setAttribute(Qt::WA_DeleteOnClose, true);
 
     // And attemt to register to get messages
-    logDialogRegister(this);
+    logDialog::Register(this);
 }
 
 void DebugLog::handleMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -48,6 +55,6 @@ void DebugLog::handleMessage(QtMsgType type, const QMessageLogContext &context, 
 
 DebugLog::~DebugLog()
 {
-    logDialogUnregister(this);
+    logDialog::Unregister(this);
     delete ui;
 }
