@@ -184,6 +184,17 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(frameEditor, SIGNAL(fitToWidthChanged(bool)), actionFitToWidth, SLOT(setChecked(bool)));
     connect(frameEditor, SIGNAL(fitToScreenChanged(bool)), actionFitToScreen, SLOT(setChecked(bool)));
 
+    connect(this, SIGNAL(patternStatusChanged(bool)),
+            actionZoomIn, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(patternStatusChanged(bool)),
+            actionZoomOut, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(patternStatusChanged(bool)),
+            actionFitToHeight, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(patternStatusChanged(bool)),
+            actionFitToWidth, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(patternStatusChanged(bool)),
+            actionFitToScreen, SLOT(setEnabled(bool)));
+
     // The draw timer tells the pattern to advance
     connect(&drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
 
