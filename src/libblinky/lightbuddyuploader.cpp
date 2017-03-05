@@ -3,31 +3,10 @@
 #include "blinkycontroller.h"
 #include "lightbuddycommands.h"
 
+#include "bytearrayhelpers.h"
+
 #define FLASH_PAGE_SIZE 256
 #define MAX_PATTERN_SIZE 507648
-
-namespace {
-
-// TODO: Dupe in lightbuddycommands.cpp
-QByteArray encodeInt(int data)
-{
-    QByteArray output;
-    output.append((char)((data >> 24) & 0xFF));
-    output.append((char)((data >> 16) & 0xFF));
-    output.append((char)((data >>  8) & 0xFF));
-    output.append((char)((data) & 0xFF));
-    return output;
-}
-
-int decodeInt(QByteArray data)
-{
-    return ((int)data.at(0) << 24)
-           + ((int)data.at(1) << 16)
-           + ((int)data.at(2) << 8)
-           + ((int)data.at(3) << 0);
-}
-
-}
 
 LightBuddyUploader::LightBuddyUploader(QObject *parent) :
     BlinkyUploader(parent)
@@ -85,10 +64,10 @@ bool LightBuddyUploader::storePatterns(BlinkyController &controller,
         QByteArray data;
 
         // Build the header
-        data += encodeInt(patternWriter.getLedCount());
-        data += encodeInt(patternWriter.getFrameCount());
-        data += encodeInt(patternWriter.getFrameDelay());
-        data += encodeInt(patternWriter.getEncoding());
+        data += uint32ToByteArray(patternWriter.getLedCount());
+        data += uint32ToByteArray(patternWriter.getFrameCount());
+        data += uint32ToByteArray(patternWriter.getFrameDelay());
+        data += uint32ToByteArray(patternWriter.getEncoding());
 
         //data += patternWriter.getData();
         data += mungedPatternData;
@@ -207,7 +186,7 @@ void LightBuddyUploader::handleCommandFinished(QString command, QByteArray retur
         doWork();
 
     if (command == "fileNew") {
-        sector = decodeInt(returnData.mid(2, 4));
+        sector = byteArrayToUint32(returnData.mid(2, 4));
         qDebug() << "sector: " << sector;
 
         doWork();

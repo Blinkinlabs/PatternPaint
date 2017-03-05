@@ -13,6 +13,9 @@ QByteArray uint16ToByteArrayBig(int value);
 // Convert a uint32_t value to a byte array, big-endian
 QByteArray uint32ToByteArray(uint32_t value);
 
+// Convert a byte array to a uint32_t value, big-endian
+uint32_t byteArrayToUint32(const QByteArray& data);
+
 // Split a qbytearray into regularly-sized pieces
 QList<QByteArray> chunkData(const QByteArray &data, unsigned int chunkSize);
 

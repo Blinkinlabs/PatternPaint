@@ -16,6 +16,9 @@ private slots:
     void uint32ToByteArrayTest_data();
     void uint32ToByteArrayTest();
 
+    void byteArrayToUint32Test_data();
+    void byteArrayToUint32Test();
+
     void chunkDataTest_data();
     void chunkDataTest();
 

@@ -3,32 +3,10 @@
 #include "usbutils.h"
 #include "blinkycontroller.h"
 #include "blinkypendantcommands.h"
+#include "bytearrayhelpers.h"
 
 #define BLINKY_PENDANT_VERSION_1 256
 #define BLINKY_PENDANT_VERSION_2 512
-
-namespace {
-
-// TODO: Dupe in lightbuddycommands.cpp
-QByteArray encodeInt(int data)
-{
-    QByteArray output;
-    output.append((char)((data >> 24) & 0xFF));
-    output.append((char)((data >> 16) & 0xFF));
-    output.append((char)((data >>  8) & 0xFF));
-    output.append((char)((data) & 0xFF));
-    return output;
-}
-
-QByteArray encodeWord(int data)
-{
-    QByteArray output;
-    output.append((char)((data >>  8) & 0xFF));
-    output.append((char)((data) & 0xFF));
-    return output;
-}
-
-}
 
 BlinkyPendantUploader::BlinkyPendantUploader(QObject *parent) :
     BlinkyUploader(parent)
@@ -109,9 +87,9 @@ bool BlinkyPendantUploader::storePatterns(BlinkyController &controller,
 
             // Animation entry
             data.append((char)0);             // Encoding type (1 byte) (RGB24, uncompressed) (TODO)
-            data += encodeInt(patternData.length());        // Data offset (4 bytes)
-            data += encodeWord(pattern.getFrameCount());   // Frame count (2 bytes)
-            data += encodeWord(0);                          // Frame delay (2 bytes) TODO
+            data += uint32ToByteArray(patternData.length());        // Data offset (4 bytes)
+            data += uint16ToByteArrayBig(pattern.getFrameCount());   // Frame count (2 bytes)
+            data += uint16ToByteArrayBig(0);                          // Frame delay (2 bytes) TODO
 
             // Make sure we have an image compatible with the BlinkyPendant
             patternData += pattern.getDataAsBinary();       // image data (RGB24, uncompressed)

@@ -1,5 +1,7 @@
 #include "bytearrayhelpers.h"
 
+#include <QDebug>
+
 QByteArray uint16ToByteArrayLittle(uint16_t value)
 {
     QByteArray data;
@@ -35,6 +37,22 @@ QByteArray uint32ToByteArray(uint32_t value)
 
     return data;
 }
+
+uint32_t byteArrayToUint32(const QByteArray &data)
+{
+    uint32_t value = 0;
+
+    if (data.count() != 4)
+        return 0;
+
+    value += (uint8_t)data[0] << 24;
+    value += (uint8_t)data[1] << 16;
+    value += (uint8_t)data[2] << 8;
+    value += (uint8_t)data[3];
+
+    return value;
+}
+
 
 QList<QByteArray> chunkData(const QByteArray &data, unsigned int chunkSize)
 {

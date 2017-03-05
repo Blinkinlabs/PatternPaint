@@ -65,6 +65,32 @@ void ByteArrayHelpersTests::uint32ToByteArrayTest()
     QVERIFY(uint32ToByteArray(value) == result);
 }
 
+void ByteArrayHelpersTests::byteArrayToUint32Test_data()
+{
+    QTest::addColumn<QByteArray>("data");
+    QTest::addColumn<uint32_t>("result");
+
+    QTest::newRow("empty Byte Array")       << QByteArray() << 0u;
+    QTest::newRow("too small Byte Array")       << QByteArray(3, 'x') << 0u;
+    QTest::newRow("too big Byte Array")       << QByteArray(5, 'x') << 0u;
+
+    QTest::newRow("zero")       << QByteArray().append('\x00').append('\x00').append('\x00').append('\x00') << 0u;
+    QTest::newRow("one")        << QByteArray().append('\x00').append('\x00').append('\x00').append('\x01') << 1u;
+    QTest::newRow("small")      << QByteArray().append('\x00').append('\x00').append('\x01').append('\x2C') << 300u;
+    QTest::newRow("almost max") << QByteArray().append('\xFF').append('\xFF').append('\xFF').append('\xFE')
+                                << (std::numeric_limits<uint32_t>::max() - 1);
+    QTest::newRow("max")        << QByteArray().append('\xFF').append('\xFF').append('\xFF').append('\xFF')
+                                << std::numeric_limits<uint32_t>::max();
+}
+
+void ByteArrayHelpersTests::byteArrayToUint32Test()
+{
+    QFETCH(QByteArray, data);
+    QFETCH(uint32_t, result);
+
+    QVERIFY(byteArrayToUint32(data) == result);
+}
+
 void ByteArrayHelpersTests::chunkDataTest_data()
 {
     const unsigned int FLASH_PAGE_SIZE_BYTES = 128;
