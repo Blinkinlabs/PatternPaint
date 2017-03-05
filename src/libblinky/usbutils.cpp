@@ -1,7 +1,29 @@
 #include "usbutils.h"
 
+#include <QList>
+#include <QSerialPortInfo>
+
 #include <QDebug>
 #include <libusb-1.0/libusb.h>
+
+QList<QSerialPortInfo> getUsefulSerialPorts()
+{
+    QList<QSerialPortInfo> usablePorts;
+
+    for (const QSerialPortInfo &info : QSerialPortInfo::availablePorts()) {
+
+#if defined(Q_OS_MACX)
+        if(info.portName().startsWith("cu"))
+            continue;
+        if(info.portName().endsWith("Bluetooth-Incoming-Port"))
+            continue;
+#endif
+
+        usablePorts.append(info);
+    }
+
+    return usablePorts;
+}
 
 // TODO: This returns the first matching device. Should allow side channel info to look
 // up an exact match.

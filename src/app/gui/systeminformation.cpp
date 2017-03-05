@@ -40,13 +40,8 @@ void SystemInformation::on_refresh_clicked()
     report.append(__TIME__);
     report.append("\n");
 
-#if QT_VERSION > QT_VERSION_CHECK(5, 4, 0)
     report.append("Operating system: " + QSysInfo::prettyProductName() + "\n");
-#else
-    report.append("Operating system: ???\n");
-#endif
 
-    // TODO: Get this from the controllers rather than building them here.
     report.append("Detected Blinkies: \n");
     for (const QPointer<ControllerInfo> &info : BlinkyTape::probe())
         report.append("  BlinkyTape:" + info->resourceName() + "\n");
@@ -54,7 +49,7 @@ void SystemInformation::on_refresh_clicked()
         report.append("  BlinkyTape:" + info.portName() + " (bootloader)\n");
 
     report.append("Detected Serial Ports: \n");
-    for (const QSerialPortInfo &info : QSerialPortInfo::availablePorts()) {
+    for (const QSerialPortInfo &info : getUsefulSerialPorts()) {
         int version = getVersionForDevice(info.vendorIdentifier(), info.productIdentifier());
 
         report.append("  " + info.portName() + "\n");
@@ -65,11 +60,7 @@ void SystemInformation::on_refresh_clicked()
         if (version > -1)
             report.append("    Version: 0x" + QString::number(version, 16) + "\n");
 
-#if QT_VERSION > QT_VERSION_CHECK(5, 3, 0)
         report.append("    Serial: " + info.serialNumber() + "\n");
-#else
-        report.append("    Serial: ???\n");
-#endif
     }
 
     ui->infoBrowser->setText(report);

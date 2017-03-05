@@ -1,6 +1,7 @@
 #include "blinkycontroller.h"
 #include "controllerinfo.h"
 #include "blinkytapecontrollerinfo.h"
+#include "usbutils.h"
 
 #include <QList>
 #include <QSerialPortInfo>
@@ -18,7 +19,7 @@ void BlinkyController::close()
 // TODO: Support a method for loading these from preferences file
 QList<QPointer<ControllerInfo> > BlinkyController::probe()
 {
-    QList<QSerialPortInfo> serialPorts = QSerialPortInfo::availablePorts();
+    QList<QSerialPortInfo> serialPorts = getUsefulSerialPorts();
     QList<QPointer<ControllerInfo> > controllerInfos;
 
     for (const QSerialPortInfo &info : serialPorts) {
