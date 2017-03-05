@@ -79,7 +79,6 @@ private:
 
     int progress;           ///< Current upload progress, in command counts
     int maxProgress;        ///< Total expected progress states
-    QString textLabel;      ///< text in upload window
 
     QString errorString;    ///< Error string for asyncronous debugging
 

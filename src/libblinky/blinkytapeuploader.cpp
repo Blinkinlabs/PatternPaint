@@ -76,9 +76,10 @@ void BlinkyTapeUploader::setDialogText()
     QString firmwareName = settings.value("BlinkyTape/firmwareName", BLINKYTAPE_DEFAULT_FIRMWARE_NAME).toString();
     int flashUsed = 0;
 
-    textLabel = "Saving to Blinky...\n"
-                "\n"
-                "Firmware: " + firmwareName + "\n";
+    QString textLabel;
+    textLabel.append("Saving to Blinky...\n");
+    textLabel.append("\n");
+    textLabel.append("Firmware: " + firmwareName + "\n");
 
     for (MemorySection& section : flashData)
         flashUsed += section.data.length();
@@ -171,7 +172,6 @@ void BlinkyTapeUploader::handleCommandFinished(QString command, QByteArray retur
     Q_UNUSED(command);
     Q_UNUSED(returnData);
 
-// qDebug() << "Command finished:" << command;
     setProgress(progress + 1);
 }
 
@@ -202,22 +202,28 @@ void BlinkyTapeUploader::handleLastCommandFinished()
     }
 }
 
-
-
-
 bool BlinkyTapeUploader::startUpload(BlinkyController &blinky)
 {
-    // TODO: Check if all flash sections fit in memory
-    // TODO: Check that all sections are not overlapping
     for (MemorySection& section : flashData) {
-        if(section.address + section.data.length() > FLASH_MEMORY_AVAILABLE) {
-            errorString = "Pattern data too large, cannot fit on device!";
-            return false;
-        }
-
         qDebug() << "Flash Section:" << section.name
                  << "address: " << section.address
                  << "size: " << section.data.length();
+    }
+
+    // TODO: Check if all flash sections fit in memory
+    // TODO: Check that all sections are not overlapping
+    int flashUsed = 0;
+    for (MemorySection& section : flashData)
+        flashUsed += section.data.length();
+    int flashTotal = FLASH_MEMORY_AVAILABLE;
+
+    if (flashUsed > flashTotal) {
+        errorString = "Pattern data too large, cannot fit on device!\n";
+        errorString.append("Try removing some patterns, or making them shorter\n");
+        errorString.append("Flash used: " + QString::number(flashUsed) + " bytes\n");
+        errorString.append("Available space: " + QString::number(flashTotal) + " bytes");
+
+        return false;
     }
 
     // Now, start the polling processes to detect a new bootloader
@@ -235,17 +241,19 @@ bool BlinkyTapeUploader::startUpload(BlinkyController &blinky)
 
 bool BlinkyTapeUploader::startUpload(qint64 timeout)
 {
-    // TODO: Check if all flash sections fit in memory
-    // TODO: Check that all sections are not overlapping
-    for (MemorySection& section : flashData) {
-        if(section.address + section.data.length() > FLASH_MEMORY_AVAILABLE) {
-            errorString = "Pattern data too large, cannot fit on device!";
-            return false;
-        }
+    // TODO: This is duplicated in startUpload(Blinkycontroller &)
+    int flashUsed = 0;
+    for (MemorySection& section : flashData)
+        flashUsed += section.data.length();
+    int flashTotal = FLASH_MEMORY_AVAILABLE;
 
-        qDebug() << "Flash Section:" << section.name
-                 << "address: " << section.address
-                 << "size: " << section.data.length();
+    if (flashUsed > flashTotal) {
+        errorString = "Pattern data too large, cannot fit on device!\n";
+        errorString.append("Try removing some patterns, or making them shorter\n");
+        errorString.append("Flash used: " + QString::number(flashUsed) + " bytes\n");
+        errorString.append("Available space: " + QString::number(flashTotal) + " bytes");
+
+        return false;
     }
 
     maxProgress = 1;    // checkDeviceSignature
