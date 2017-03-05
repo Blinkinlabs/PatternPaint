@@ -667,6 +667,8 @@ void MainWindow::on_actionRestore_firmware_triggered()
         dialog->show();
 
         if (!uploader->restoreFirmware(-1)) {
+            dialog->close();    // TODO: Does the dialog get deleted by this?
+
             showError(uploader->getErrorString());
             return;
         }
@@ -686,6 +688,8 @@ void MainWindow::on_actionRestore_firmware_triggered()
         dialog->show();
 
         if (!uploader->updateFirmware(*controller)) {
+            dialog->close();    // TODO: Does the dialog get deleted by this?
+
             showError(uploader->getErrorString());
             return;
         }
@@ -729,6 +733,8 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
     dialog->show();
 
     if (!uploader->storePatterns(*controller, patternWriters)) {
+        dialog->close();    // TODO: Does the dialog get deleted by this?
+
         showError(uploader->getErrorString());
         return;
     }
