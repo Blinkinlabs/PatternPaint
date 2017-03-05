@@ -35,11 +35,8 @@
      <property name="frameShadow">
       <enum>QFrame::Plain</enum>
      </property>
-     <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAsNeeded</enum>
-     </property>
-     <property name="sizeAdjustPolicy">
-      <enum>QAbstractScrollArea::AdjustIgnored</enum>
+     <property name="resizeMode">
+      <enum>QListView::Adjust</enum>
      </property>
      <property name="viewMode">
       <enum>QListView::IconMode</enum>

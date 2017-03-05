@@ -24,7 +24,8 @@ WelcomeScreen::WelcomeScreen(QWidget *parent) :
     ui->SceneList->setIconSize(QSize(150, 150));
 
     for (int i = 0; i < SCENE_TEMPLATE_COUNT; i++) {
-        QListWidgetItem *item = new QListWidgetItem(sceneTemplates[i].name, ui->SceneList);
+        QListWidgetItem *item = new QListWidgetItem(ui->SceneList);
+        item->setText(sceneTemplates[i].name);
         item->setIcon(QIcon(sceneTemplates[i].photo));
     }
 
