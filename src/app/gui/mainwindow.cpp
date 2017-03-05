@@ -976,7 +976,7 @@ void MainWindow::setNewFrame(int newFrame)
         newFrame = 0;
 
     timeline->setCurrentIndex(timeline->model()->index(newFrame, 0));
-
+    currentFrame.setText(QString::number(newFrame+1));
 }
 
 void MainWindow::updateBlinky(const QImage &frame)
@@ -1010,41 +1010,46 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
 {
     // TODO: we're going to have to unload our references, but for now skip that.
     if (!current.isValid()) {
-        undoGroup.setActiveStack(NULL);
+
         timeline->setModel(NULL);
+        timeline->setVisible(false);
+
+        undoGroup.setActiveStack(NULL);
 
         setPatternName("()");
         setPatternModified(false);
         editImageChanged(0, QImage());
         frameImageChanged(QImage());
         frameEditor->setShowPlaybakIndicator(false);
-        timeline->setVisible(false);
+
         patternSpeed->setValue(1);
         currentFrame.setText("");
 
         actionSave_to_Blinky->setEnabled(false);
 
+        emit(patternStatusChanged(false));
         return;
     }
 
     Pattern *newpattern = patternCollection.at(current.row());
 
-    undoGroup.setActiveStack(newpattern->getUndoStack());
     timeline->setModel(newpattern->getModel());
+    timeline->setVisible(newpattern->hasTimeline());
+
+    undoGroup.setActiveStack(newpattern->getUndoStack());
 
     setNewFrame(getCurrentFrameIndex());
     setPatternName(newpattern->getName());
     setPatternModified(newpattern->getModified());
-    editImageChanged(current.row(),
+    editImageChanged(getCurrentFrameIndex(),
                    patternCollection.at(getCurrentPatternIndex())->getEditImage(getCurrentFrameIndex()));
     frameImageChanged(patternCollection.at(getCurrentPatternIndex())->getFrameImage(getCurrentFrameIndex()));
     frameEditor->setShowPlaybakIndicator(newpattern->hasPlaybackIndicator());
-    timeline->setVisible(newpattern->hasTimeline());
+
     patternSpeed->setValue(newpattern->getFrameSpeed());
 
     actionSave_to_Blinky->setEnabled(mode == Connected);
 
-    // TODO: Should we unregister these eventually?
     if (timelineSelectedChangedConnection)
         QObject::disconnect(timelineSelectedChangedConnection);
 
@@ -1064,13 +1069,11 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
             SLOT(on_PatternDataChanged(const QModelIndex &, const QModelIndex &,
                                        const QVector<int> &)));
 
-    emit(patternStatusChanged(current.isValid()));
+    emit(patternStatusChanged(true));
 }
 
 void MainWindow::on_timelineSelectedChanged(const QModelIndex &current, const QModelIndex &)
 {
-    currentFrame.setText(QString::number(current.row()+1));
-
     editImageChanged(current.row(),
                    patternCollection.at(getCurrentPatternIndex())->getEditImage(current.row()));
     frameImageChanged(patternCollection.at(getCurrentPatternIndex())->getFrameImage(current.row()));
