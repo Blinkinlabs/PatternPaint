@@ -207,5 +207,13 @@ void LightBuddyUploader::handleCommandFinished(QString command, QByteArray retur
 void LightBuddyUploader::setProgress(int newProgress)
 {
     progress = newProgress;
-    emit(progressChanged((newProgress*100)/maxProgress));
+
+    // Clip the progress so that it never reaches 100%.
+    // It will be closed by the finished() signal.
+    if (progress >= maxProgress)
+        maxProgress = progress + 1;
+
+    int progressPercent = (progress*100)/maxProgress;
+
+    emit(progressChanged(progressPercent));
 }

@@ -58,13 +58,12 @@ void BlinkyTapeUploader::setProgress(int newProgress)
 {
     progress = newProgress;
 
-    unsigned progressPercent = (progress*100)/maxProgress;
-    if (progressPercent > 100) {
-        qDebug() << "Progress error: progress % > 100"
-                 << "Progress:" << newProgress
-                 << "maxProgress:" << maxProgress;
-        progressPercent = 100;
-    }
+    // Clip the progress so that it never reaches 100%.
+    // It will be closed by the finished() signal.
+    if (progress >= maxProgress)
+        maxProgress = progress + 1;
+
+    int progressPercent = (progress*100)/maxProgress;
 
     emit(progressChanged(progressPercent));
 }
