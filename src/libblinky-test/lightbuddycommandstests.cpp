@@ -63,7 +63,7 @@ void LightBuddyCommandsTests::fileNewTest()
     expectedData.append(LightBuddyCommands::commandHeader());
     expectedData.append((char)COMMAND_NEW_FILE);
     expectedData.append((char)0x12);
-    expectedData.append(uint32ToByteArray(size));
+    expectedData.append(ByteArrayCommands::uint32ToByteArray(size));
 
     QByteArray expectedResponse;
     expectedResponse.append('P');
@@ -115,8 +115,8 @@ void LightBuddyCommandsTests::writePageTest()
     QByteArray expectedData;
     expectedData.append(LightBuddyCommands::commandHeader());
     expectedData.append((char)COMMAND_WRITE_PAGE);
-    expectedData.append(uint32ToByteArray(sector));
-    expectedData.append(uint32ToByteArray(offset));
+    expectedData.append(ByteArrayCommands::uint32ToByteArray(sector));
+    expectedData.append(ByteArrayCommands::uint32ToByteArray(offset));
     expectedData.append(paddedData);
 
     QByteArray expectedResponse;

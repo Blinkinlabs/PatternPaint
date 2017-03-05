@@ -56,7 +56,7 @@ void Avr109CommandsTests::setAddressTest()
 
     QByteArray expectedData;
     expectedData.append('A');
-    expectedData += uint16ToByteArrayBig(address);
+    expectedData += ByteArrayCommands::uint16ToByteArrayBig(address);
 
     QByteArray expectedResponse = "\r";
     QByteArray expectedResponseMask;
@@ -98,7 +98,7 @@ void Avr109CommandsTests::writeFlashPageTest()
 
     QByteArray expectedData;
     expectedData.append('B');
-    expectedData.append(uint16ToByteArrayBig(data.length()));
+    expectedData.append(ByteArrayCommands::uint16ToByteArrayBig(data.length()));
     expectedData.append('F');
     expectedData.append(data);
 
@@ -142,7 +142,7 @@ void Avr109CommandsTests::verifyFlashPageTest()
 
     QByteArray expectedData;
     expectedData.append('g');
-    expectedData.append(uint16ToByteArrayBig(data.length()));
+    expectedData.append(ByteArrayCommands::uint16ToByteArrayBig(data.length()));
     expectedData.append('F');
 
     QByteArray expectedResponse;
@@ -164,7 +164,7 @@ void Avr109CommandsTests::writeEepromBlockTest()
 
     QByteArray expectedData;
     expectedData.append('B');
-    expectedData.append(uint16ToByteArrayBig(data.length()));
+    expectedData.append(ByteArrayCommands::uint16ToByteArrayBig(data.length()));
     expectedData.append('E');
     expectedData.append(data);
 
@@ -213,7 +213,7 @@ void Avr109CommandsTests::writeFlashTest()
     QFETCH(int, address);
 
     // Build a list of expected output commands
-    QList<QByteArray> chunks = chunkData(data, FLASH_PAGE_SIZE_BYTES);
+    QList<QByteArray> chunks = ByteArrayCommands::chunkData(data, FLASH_PAGE_SIZE_BYTES);
 
     QList<SerialCommand> commands = Avr109Commands::writeFlash(data, address);
 
@@ -272,7 +272,7 @@ void Avr109CommandsTests::verifyFlashTest()
     QList<SerialCommand> commands = Avr109Commands::verifyFlash(data, address);
 
     // Build a list of expected output commands
-    QList<QByteArray> chunks = chunkData(data, FLASH_PAGE_SIZE_BYTES);
+    QList<QByteArray> chunks = ByteArrayCommands::chunkData(data, FLASH_PAGE_SIZE_BYTES);
 
     // There should be 1 setaddress and 1 verifyflashpage instruction per chunk
     QVERIFY(commands.length() == 2*chunks.length());
@@ -326,7 +326,7 @@ void Avr109CommandsTests::writeEepromTest()
     QVERIFY(commands.at(0) == expectedAddressCommand);
 
     // Next, there should be 1 or more writeFlashPage commands
-    QList<QByteArray> chunks = chunkData(data, EEPROM_CHUNK_SIZE_BYTES);
+    QList<QByteArray> chunks = ByteArrayCommands::chunkData(data, EEPROM_CHUNK_SIZE_BYTES);
 
     // Verify that there are the correct number of commands
     QVERIFY(commands.length() == (1 + chunks.length()));

@@ -64,10 +64,10 @@ bool LightBuddyUploader::storePatterns(BlinkyController &controller,
         QByteArray data;
 
         // Build the header
-        data += uint32ToByteArray(patternWriter.getLedCount());
-        data += uint32ToByteArray(patternWriter.getFrameCount());
-        data += uint32ToByteArray(patternWriter.getFrameDelay());
-        data += uint32ToByteArray(patternWriter.getEncoding());
+        data += ByteArrayCommands::uint32ToByteArray(patternWriter.getLedCount());
+        data += ByteArrayCommands::uint32ToByteArray(patternWriter.getFrameCount());
+        data += ByteArrayCommands::uint32ToByteArray(patternWriter.getFrameDelay());
+        data += ByteArrayCommands::uint32ToByteArray(patternWriter.getEncoding());
 
         //data += patternWriter.getData();
         data += mungedPatternData;
@@ -186,7 +186,7 @@ void LightBuddyUploader::handleCommandFinished(QString command, QByteArray retur
         doWork();
 
     if (command == "fileNew") {
-        sector = byteArrayToUint32(returnData.mid(2, 4));
+        sector = ByteArrayCommands::byteArrayToUint32(returnData.mid(2, 4));
         qDebug() << "sector: " << sector;
 
         doWork();

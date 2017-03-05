@@ -141,7 +141,7 @@ void BlinkyPendantCommandsTests::writeFlashTest()
         paddedData.append((char)0xFF);
 
     // Build a list of expected output commands
-    QList<QByteArray> chunks = chunkData(paddedData, CHUNK_SIZE_BYTES);
+    QList<QByteArray> chunks = ByteArrayCommands::chunkData(paddedData, CHUNK_SIZE_BYTES);
 
     QList<SerialCommand> commands = BlinkyPendantCommands::writeFlash(data);
 

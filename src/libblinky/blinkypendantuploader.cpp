@@ -87,9 +87,9 @@ bool BlinkyPendantUploader::storePatterns(BlinkyController &controller,
 
             // Animation entry
             data.append((char)0);             // Encoding type (1 byte) (RGB24, uncompressed) (TODO)
-            data += uint32ToByteArray(patternData.length());        // Data offset (4 bytes)
-            data += uint16ToByteArrayBig(pattern.getFrameCount());   // Frame count (2 bytes)
-            data += uint16ToByteArrayBig(0);                          // Frame delay (2 bytes) TODO
+            data += ByteArrayCommands::uint32ToByteArray(patternData.length());        // Data offset (4 bytes)
+            data += ByteArrayCommands::uint16ToByteArrayBig(pattern.getFrameCount());   // Frame count (2 bytes)
+            data += ByteArrayCommands::uint16ToByteArrayBig(0);                          // Frame delay (2 bytes) TODO
 
             // Make sure we have an image compatible with the BlinkyPendant
             patternData += pattern.getDataAsBinary();       // image data (RGB24, uncompressed)

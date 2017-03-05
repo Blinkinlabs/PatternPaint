@@ -2,6 +2,8 @@
 
 #include <QDebug>
 
+namespace ByteArrayCommands {
+
 QByteArray uint16ToByteArrayLittle(uint16_t value)
 {
     QByteArray data;
@@ -79,4 +81,6 @@ void padToBoundary(QByteArray &data, unsigned int boundary)
 
     if (data.size() % boundary != 0)
         data.append(boundary - (data.size()%boundary), 0xFF);
+}
+
 }

@@ -39,7 +39,7 @@ SerialCommand setAddress(unsigned int address)
     // Note that the address is word defined for flash, but byte defined for EEPROM.
     QByteArray command;
     command.append('A');
-    command += uint16ToByteArrayBig(address);
+    command += ByteArrayCommands::uint16ToByteArrayBig(address);
 
     QByteArray response;
     response.append('\r');
@@ -57,7 +57,7 @@ SerialCommand writeFlashPage(const QByteArray &data)
 
     QByteArray command;
     command.append('B'); // command: write memory
-    command += uint16ToByteArrayBig(paddedData.count());  // write size (bytes)
+    command += ByteArrayCommands::uint16ToByteArrayBig(paddedData.count());  // write size (bytes)
     command.append('F'); // memory type: flash
     command += paddedData;
 
@@ -77,7 +77,7 @@ SerialCommand verifyFlashPage(const QByteArray &data)
 
     QByteArray command;
     command.append('g'); // command: verify memory
-    command += uint16ToByteArrayBig(paddedData.count()); // read size (bytes)
+    command += ByteArrayCommands::uint16ToByteArrayBig(paddedData.count()); // read size (bytes)
     command.append('F'); // memory type: flash
 
     QByteArray response;
@@ -90,7 +90,7 @@ SerialCommand writeEepromBlock(const QByteArray &data)
 {
     QByteArray command;
     command.append('B'); // command: write memory
-    command += uint16ToByteArrayBig(data.count());  // write size (bytes)
+    command += ByteArrayCommands::uint16ToByteArrayBig(data.count());  // write size (bytes)
     command.append('E'); // memory type: eeprom
     command += data;
 
@@ -109,7 +109,7 @@ QList<SerialCommand> writeFlash(const QByteArray &data, unsigned int startAddres
         return commands;
     }
 
-    QList<QByteArray> chunks = chunkData(data, FLASH_PAGE_SIZE_BYTES);
+    QList<QByteArray> chunks = ByteArrayCommands::chunkData(data, FLASH_PAGE_SIZE_BYTES);
 
     for(int chunkIndex = 0; chunkIndex < chunks.length(); chunkIndex++) {
         // Write the word address for Flash writes
@@ -132,7 +132,7 @@ QList<SerialCommand> verifyFlash(const QByteArray &data, unsigned int startAddre
         return commands;
     }
 
-    QList<QByteArray> chunks = chunkData(data, FLASH_PAGE_SIZE_BYTES);
+    QList<QByteArray> chunks = ByteArrayCommands::chunkData(data, FLASH_PAGE_SIZE_BYTES);
 
     for(int chunkIndex = 0; chunkIndex < chunks.length(); chunkIndex++) {
         // Write the word address for Flash writes
@@ -156,7 +156,7 @@ QList<SerialCommand> writeEeprom(const QByteArray &data, unsigned int startAddre
     commands.append(setAddress(startAddress));
 
     // Write the data in small chunks, so that the write doesn't time out.
-    for (QByteArray chunk : chunkData(data, EEPROM_CHUNK_SIZE_BYTES))
+    for (QByteArray chunk : ByteArrayCommands::chunkData(data, EEPROM_CHUNK_SIZE_BYTES))
         commands.append(writeEepromBlock(chunk));
 
     return commands;

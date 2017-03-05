@@ -29,7 +29,7 @@ QByteArray makePatternTableHeader(uint8_t patternCount, uint16_t ledCount) {
     QByteArray header;
 
     header.append(patternCount);                        // Offset 0: Pattern count (1 byte)
-    header.append(uint16ToByteArrayLittle(ledCount));   // Offset 1: Number of LEDs connected to the controller (2 bytes)
+    header.append(ByteArrayCommands::uint16ToByteArrayLittle(ledCount));   // Offset 1: Number of LEDs connected to the controller (2 bytes)
 
     return header;
 }
@@ -38,9 +38,9 @@ QByteArray makePatternTableEntry(PatternWriter::Encoding encoding, uint16_t offs
     QByteArray entry;
 
     entry.append((char)((encoding) & 0xFF));            // Offset 0: encoding (1 byte)
-    entry.append(uint16ToByteArrayLittle(offset));      // Offset 1: memory location (2 bytes)
-    entry.append(uint16ToByteArrayLittle(frameCount));  // Offset 3: frame count (2 bytes)
-    entry.append(uint16ToByteArrayLittle(frameDelay));  // Offset 5: frame delay (2 bytes)
+    entry.append(ByteArrayCommands::uint16ToByteArrayLittle(offset));      // Offset 1: memory location (2 bytes)
+    entry.append(ByteArrayCommands::uint16ToByteArrayLittle(frameCount));  // Offset 3: frame count (2 bytes)
+    entry.append(ByteArrayCommands::uint16ToByteArrayLittle(frameDelay));  // Offset 5: frame delay (2 bytes)
 
     return entry;
 }
@@ -90,7 +90,7 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, const QList<Pattern
     }
 
     // Expand sketch size to FLASH_MEMORY_PAGE_SIZE_BYTES boundary
-    padToBoundary(sketchSection.data, FLASH_MEMORY_PAGE_SIZE_BYTES);
+    ByteArrayCommands::padToBoundary(sketchSection.data, FLASH_MEMORY_PAGE_SIZE_BYTES);
 
     // Next, build the pattern data section and pattern header table
 

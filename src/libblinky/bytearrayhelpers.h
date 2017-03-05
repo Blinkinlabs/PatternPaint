@@ -4,6 +4,8 @@
 #include <QByteArray>
 #include <QList>
 
+namespace ByteArrayCommands {
+
 // Convert a uint16_t value to a byte array, little-endian
 QByteArray uint16ToByteArrayLittle(uint16_t value);
 
@@ -22,5 +24,6 @@ QList<QByteArray> chunkData(const QByteArray &data, unsigned int chunkSize);
 // Pad a byte array to a multile of the given boundary size
 void padToBoundary(QByteArray &data, unsigned int boundary);
 
+}
 
 #endif // BYTEARRAYHELPERS_H
