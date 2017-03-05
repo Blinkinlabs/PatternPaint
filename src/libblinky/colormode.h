@@ -17,7 +17,7 @@ enum ColorMode {
 
 Q_DECLARE_METATYPE(ColorMode)
 
-struct ColorModes {
+struct ColorModeNames {
     ColorMode colorMode;
     QString name;
 };
@@ -25,6 +25,6 @@ struct ColorModes {
 
 QByteArray colorToBytes(ColorMode colorMode, const QColor &color);
 
-extern ColorModes colorModes[COLOR_MODE_COUNT];
+extern ColorModeNames colorModeNames[COLOR_MODE_COUNT];
 
 #endif // COLORMODE_H

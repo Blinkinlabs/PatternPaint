@@ -21,7 +21,7 @@ void ColorModeTests::colorModesTest()
     QFETCH(ColorMode, colorMode);
     QFETCH(QString, name);
 
-    QVERIFY(colorModes[colorMode].name == name);
+    QVERIFY(colorModeNames[colorMode].name == name);
 }
 
 

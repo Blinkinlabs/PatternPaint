@@ -45,7 +45,7 @@ SceneConfiguration::SceneConfiguration(QWidget *parent) :
 
     // Load the available color modes
     for (int i = 0; i < COLOR_MODE_COUNT; i++)
-        ui->ColorType->addItem(colorModes[i].name, colorModes[i].colorMode);
+        ui->ColorType->addItem(colorModeNames[i].name, colorModeNames[i].colorMode);
 }
 
 SceneConfiguration::~SceneConfiguration()
