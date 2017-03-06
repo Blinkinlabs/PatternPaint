@@ -6,6 +6,30 @@
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
       <item>
+        <title>PatternPaint 2.2.0</title>
+        <pubDate>Mon, 03 Mar 2017 12:00:00 +0000</pubDate>
+        <description>
+          <![CDATA[
+<b>Introducing PatternPaint 2.2<b>
+<br>Changelog:<br>
+<ul>
+<li>Flexible zoom: zoom in to edit a part of a pattern, or out to see the whole image</li>
+<li>Show memory usage information for BlinkyTape controllers during upload</li>
+<li>Improved output speed: Fixed bug where the Blinky was being updated multiple times for each output frame. Preview should now work at up to 99fps</li>
+<li>Allow custom firmware versions to be used with BlinkyTape</li>
+<li>Numerous bugfixes and improvements to the upload procedure</li>
+</ul>
+
+          ]]>
+        </description>
+        <enclosure url="https://github.com/Blinkinlabs/PatternPaint/releases/download/2.2.0/PatternPaint_2.2.0.dmg"
+          sparkle:version="2.2.0"
+          length="15693072"
+          type="application/octet-stream"
+        />
+      </item>
+
+      <item>
         <title>PatternPaint 2.1.0</title>
         <pubDate>Tue, 06 Dec 2016 12:00:00 +0000</pubDate>
         <description>
