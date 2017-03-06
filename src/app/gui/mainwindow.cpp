@@ -747,7 +747,8 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-#if defined(Q_OS_MACX)    // Workaround for issue #114, multile close events are sent when closing from the dock
+#if defined(Q_OS_MACX)
+    // Workaround for issue #114, multile close events are sent when closing from the dock
     if (!closeEventIntervalFilter.check()) {
         event->ignore();
         return;
@@ -778,7 +779,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     settings.setValue("MainWindow/outputPreview", this->actionOutput_Preview->isChecked());
 
 #if defined(Q_OS_MACX)    // Workaround for issue #114, multile close events are sent when closing from the dock
-    rateLimiter.force();
+    closeEventIntervalFilter.force();
 #endif
 
     QMainWindow::closeEvent(event);
