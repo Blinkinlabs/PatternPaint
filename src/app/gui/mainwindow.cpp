@@ -50,7 +50,11 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    colorChooser(this)
+    colorChooser(this),
+#if defined(Q_OS_MACX)
+    closeEventIntervalFilter(200),
+#endif
+    firstLoad(true)
 {
     setupUi(this);
 
@@ -744,8 +748,7 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
 #if defined(Q_OS_MACX)    // Workaround for issue #114, multile close events are sent when closing from the dock
-    static IntervalFilter rateLimiter(200);
-    if (!rateLimiter.check()) {
+    if (!closeEventIntervalFilter.check()) {
         event->ignore();
         return;
     }
@@ -785,7 +788,6 @@ void MainWindow::showEvent(QShowEvent *event)
 {
     QMainWindow::showEvent(event);
 
-    static bool firstLoad = true;
     if(firstLoad) {
         firstLoad = false;
         emit windowLoaded();

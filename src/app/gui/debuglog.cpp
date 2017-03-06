@@ -9,22 +9,22 @@ namespace logDialog {
 QPointer<DebugLog> activeDialog;
 
 // Redirector to the current active dialog
-static void HandleMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
+void HandleMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
     if(activeDialog.isNull())
         return;
 
     activeDialog->handleMessage(type, context, msg);
 }
 
-static void Register(QPointer<DebugLog> dialog) {
+void Register(QPointer<DebugLog> dialog) {
     if(!activeDialog.isNull())
         return;
 
     activeDialog = dialog;
-    qInstallMessageHandler(&logDialogHandleMessage);
+    qInstallMessageHandler(&logDialog::HandleMessage);
 }
 
-static void Unregister(QPointer<DebugLog> dialog) {
+void Unregister(QPointer<DebugLog> dialog) {
     if(activeDialog != dialog)
         return;
 

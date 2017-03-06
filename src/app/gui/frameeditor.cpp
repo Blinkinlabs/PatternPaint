@@ -37,6 +37,7 @@ FrameEditor::FrameEditor(QWidget *parent) :
     scale(ZOOM_MIN),
     scaleMode(FIT_TO_SCREEN),
     frameIndex(0),
+    lazyUpdateIntervalFilter(MIN_UPDATE_INTERVAL),
     mouseMoveIntervalFilter(MIN_MOUSE_INTERVAL),
     showPlaybackIndicator(false)
 {
@@ -371,9 +372,7 @@ void FrameEditor::setEditImage(int index, const QImage &data)
 void FrameEditor::lazyUpdate()
 {
     // Ignore the update request if it came too quickly
-    static IntervalFilter rateLimiter(MIN_UPDATE_INTERVAL);
-
-    if(!rateLimiter.check())
+    if(!lazyUpdateIntervalFilter.check())
         return;
 
     update();

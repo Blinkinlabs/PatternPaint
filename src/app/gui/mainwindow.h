@@ -144,6 +144,12 @@ private:
 
     ColorChooser colorChooser;
 
+#if defined(Q_OS_MACX)
+    IntervalFilter closeEventIntervalFilter;
+#endif
+
+    bool firstLoad;
+
     QTimer drawTimer;
     QTimer connectionScannerTimer;
 

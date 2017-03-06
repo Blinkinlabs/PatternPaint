@@ -55,6 +55,7 @@ private:
 
     QImage gridPattern;    ///< Holds the pre-rendered grid overlay
 
+    IntervalFilter lazyUpdateIntervalFilter;
     IntervalFilter mouseMoveIntervalFilter;
     QPoint lastMousePoint;
 
