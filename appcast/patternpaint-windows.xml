@@ -33,15 +33,15 @@
       <title>patternpaint 2.1.0</title>
       <pubdate>tue, 06 dec 2016 12:00:00 +0000</pubdate>
       <description>
-        <![cdata[
-<b>introducing patternpaint 2.1<b>
-<br>changelog:<br>
+        <![CDATA[
+<b>Introducing Patternpaint 2.1<b>
+<br>Changelog:<br>
 <ul>
-<li>control up to 512 leds with the blinkytape controller</li>
-<li>allow high brightness setting with the blinkytape controller</li>
-<li>enable manual update checks through the preferences window</li>
-<li>appimage release for linux systems</li>
-<li>lots of bugfixes</li>
+<li>Control up to 512 leds with the BlinkyTape controller</li>
+<li>Allow high brightness setting with the blinkytape controller</li>
+<li>Enable manual update checks through the preferences window</li>
+<li>Appimage release for linux systems</li>
+<li>Lots of bugfixes</li>
 </ul>
           ]]>
       </description>
