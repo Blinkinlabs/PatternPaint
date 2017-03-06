@@ -219,7 +219,7 @@ bool BlinkyTapeUploader::startUpload(BlinkyController &blinky)
     if (flashUsed > flashTotal) {
         errorString = "Pattern data too large, cannot fit on device!\n";
         errorString.append("Try removing some patterns, or making them shorter\n");
-        errorString.append("Flash used: " + QString::number(flashUsed) + " bytes\n");
+        errorString.append("Pattern size: " + QString::number(flashUsed) + " bytes\n");
         errorString.append("Available space: " + QString::number(flashTotal) + " bytes");
 
         return false;
@@ -249,7 +249,7 @@ bool BlinkyTapeUploader::startUpload(qint64 timeout)
     if (flashUsed > flashTotal) {
         errorString = "Pattern data too large, cannot fit on device!\n";
         errorString.append("Try removing some patterns, or making them shorter\n");
-        errorString.append("Flash used: " + QString::number(flashUsed) + " bytes\n");
+        errorString.append("Pattern size: " + QString::number(flashUsed) + " bytes\n");
         errorString.append("Available space: " + QString::number(flashTotal) + " bytes");
 
         return false;
