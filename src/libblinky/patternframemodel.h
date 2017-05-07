@@ -44,6 +44,9 @@ public:
 
     friend class PatternFrameUndoCommand;
 
+    bool writeDataToStream(QDataStream &stream);
+    bool readDataFromStream(QDataStream &stream);
+
 private:
     QUndoStack undoStack;       ///< Undo stack for this pattern
 

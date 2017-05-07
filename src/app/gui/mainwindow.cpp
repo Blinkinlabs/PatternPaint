@@ -54,7 +54,10 @@ MainWindow::MainWindow(QWidget *parent) :
 #if defined(Q_OS_MACX)
     closeEventIntervalFilter(200),
 #endif
-    firstLoad(true)
+    firstLoad(true),
+    projectFilename(""),
+    projectName(DEFAULT_PROJECT_NAME),
+    projectModified(false)
 {
     setupUi(this);
 
@@ -80,7 +83,7 @@ MainWindow::MainWindow(QWidget *parent) :
     toolButton->setIcon(QIcon(":/icons/images/icons/Create New-100.png"));
     toolButton->setMenu(menu);
     toolButton->setPopupMode(QToolButton::InstantPopup);
-    fileToolbar->insertWidget(this->actionClose, toolButton);
+    fileToolbar->insertWidget(this->actionDelete_pattern, toolButton);
 
     // prepare undo/redo
     menuEdit->addSeparator();
@@ -142,7 +145,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(patternSpeed, SIGNAL(valueChanged(int)), this, SLOT(patternSpeed_valueChanged(int)));
 
     connect(this, SIGNAL(patternStatusChanged(bool)),
-            actionClose, SLOT(setEnabled(bool)));
+            actionDelete_pattern, SLOT(setEnabled(bool)));
     connect(this, SIGNAL(patternStatusChanged(bool)),
             actionFlip_Horizontal, SLOT(setEnabled(bool)));
     connect(this, SIGNAL(patternStatusChanged(bool)),
@@ -262,6 +265,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Refresh the display for no pattern selected
     on_patternCollectionCurrentChanged(QModelIndex(), QModelIndex());
+
+    setTitleWindow(projectName);
 
     autoUpdater = NULL;
 
@@ -430,6 +435,66 @@ void MainWindow::stopPlayback()
     actionPlay->setIcon(QIcon(":/icons/images/icons/Play-100.png"));
 }
 
+bool MainWindow::savePatternProject()
+{
+    QSettings settings;
+
+    if(projectFilename==""){
+
+        QString lastDirectory = settings.value("File/SaveDirectory").toString();
+
+        QDir dir(lastDirectory);
+        if (!dir.isReadable())
+           lastDirectory = QDir::homePath();
+
+        lastDirectory += "/" + projectName;
+
+        QString fileName = QFileDialog::getSaveFileName(this,
+                                                    tr("Save project"), lastDirectory,
+                                                    tr("Pattern project files (*.ppro)"));
+
+        if (fileName.length()==0 || fixture.isNull() || patternCollection.isEmpty())
+            return false;
+
+        QFileInfo fileInfo(fileName);
+        settings.setValue("File/SaveDirectory", fileInfo.absolutePath());
+
+        projectFilename = fileName;
+    }
+
+
+    qDebug() << "Save project:" << projectFilename;
+
+    // Create a new file
+    QFile file(projectFilename);
+    file.open(QIODevice::WriteOnly);
+
+
+    QDataStream out(&file);
+    out.setVersion(QDataStream::Qt_5_8);
+
+    // write Header
+    out << (QString)PROJECT_HEADER;
+    out << (float)PROJECT_FORMAT_VERSION;
+    out << (QString)GIT_VERSION;
+
+    // write scene configuration
+    out << (QString)settings.value("BlinkyTape/firmwareName", BLINKYTAPE_DEFAULT_FIRMWARE_NAME).toString();
+    out << (QString)fixture->getName();
+    out << (qint32)fixture->getExtents().width();
+    out << (qint32)fixture->getExtents().height();
+    out << (qint32)fixture->getColorMode();
+
+    patternCollection.writePatterns(out);
+
+    file.close();
+
+    setProjectModified(false);
+
+    return true;
+
+}
+
 bool MainWindow::savePatternAs(Pattern *item)
 {
     QSettings settings;
@@ -438,6 +503,8 @@ bool MainWindow::savePatternAs(Pattern *item)
     QDir dir(lastDirectory);
     if (!dir.isReadable())
         lastDirectory = QDir::homePath();
+
+    lastDirectory += "/" + patternName->text();
 
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     tr("Save Pattern"), lastDirectory,
@@ -476,11 +543,12 @@ void MainWindow::on_actionSave_as_triggered()
     savePatternAs(patternCollection.at(getCurrentPatternIndex()));
 }
 
-void MainWindow::on_actionSave_triggered()
+void MainWindow::on_actionSave_project_triggered()
 {
     if (patternCollection.isEmpty())
         return;
-    savePattern(patternCollection.at(getCurrentPatternIndex()));
+    if(savePatternProject())
+        qDebug() << "Project successful saved";
 }
 
 void MainWindow::on_actionExit_triggered()
@@ -755,16 +823,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 #endif
 
-    QList<Pattern *> unsavedPatterns;
-
-    for (Pattern* pattern : patternCollection.patterns())
-        if (pattern->getModified())
-            unsavedPatterns.append(pattern);
-
-    if (!promptForSave(unsavedPatterns)) {
+    if(!promptForSaveProject()){
         event->ignore();
         return;
     }
+
 
     // If we are connected to a blinky, try to reset it so that it will start playing back its pattern
     if (!controller.isNull()) {
@@ -812,33 +875,60 @@ void MainWindow::on_colorPicked(QColor color)
     instrumentConfiguration.setToolColor(color);
 }
 
-bool MainWindow::promptForSave(Pattern *pattern)
+bool MainWindow::closeProject()
 {
-    if (!pattern->getModified())
-        return true;
+    if(!promptForSaveProject())
+        return false;
 
-    QList<Pattern *> patterns;
-    patterns.append(pattern);
-    return promptForSave(patterns);
+    patternCollection.clear();
+    projectFilename = "";
+    projectName = DEFAULT_PROJECT_NAME;
+    setProjectModified(false);
+
+    return true;
 }
 
-bool MainWindow::promptForSave(QList<Pattern *> patterns)
+bool MainWindow::promptForSaveImage(Pattern *pattern)
 {
-    if(patterns.count() == 0)
+
+    if (!pattern->getModified())
         return true;
 
     QString messageText;
 
-    if(patterns.count() == 1) {
-        messageText += tr("The pattern %1 has been modified.")
-                .arg(patterns.first()->getName());
-    }
-    else {
-        messageText += tr("The following patterns have been modified:\n");
+    messageText += tr("The pattern %1 has been modified.")
+            .arg(pattern->getName());
 
-        for (Pattern *pattern : patterns)
-            messageText += pattern->getName() + "\n";
+    QMessageBox msgBox(this);
+    msgBox.setWindowModality(Qt::WindowModal);
+    msgBox.setText(messageText);
+    msgBox.setInformativeText("Do you want to save your changes as image?");
+    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Save);
+    int ans = msgBox.exec();
+
+    if (ans == QMessageBox::Save) {
+            if (!savePattern(pattern))
+                return false;
+        return true;
     }
+
+    if (ans == QMessageBox::Discard)
+        return true;
+
+    return false;
+}
+
+bool MainWindow::promptForSaveProject()
+{
+
+    if(!projectModified)
+        return true;
+
+    QString messageText;
+
+    messageText += tr("The project %1 has been modified.")
+            .arg(projectName);
 
     QMessageBox msgBox(this);
     msgBox.setWindowModality(Qt::WindowModal);
@@ -849,9 +939,8 @@ bool MainWindow::promptForSave(QList<Pattern *> patterns)
     int ans = msgBox.exec();
 
     if (ans == QMessageBox::Save) {
-        for (Pattern *pattern : patterns)
-            if (!savePattern(pattern))
-                return false;
+        if(!savePatternProject())
+            return false;
         return true;
     }
 
@@ -976,6 +1065,8 @@ bool MainWindow::loadPattern(Pattern::PatternType type, const QString fileName)
     patternCollectionListView->setCurrentIndex(patternCollectionListView->model()->index(newPosition,
                                                                                          0));
 
+    setProjectModified(true);
+
     return true;
 }
 
@@ -1013,12 +1104,17 @@ void MainWindow::updateBlinky(const QImage &frame)
     controller->sendUpdate(data);
 }
 
-void MainWindow::on_actionClose_triggered()
+void MainWindow::setTitleWindow(QString title)
+{
+    this->setWindowTitle("Pattern Paint - " + title);
+}
+
+void MainWindow::on_actionDelete_pattern_triggered()
 {
     if (patternCollection.isEmpty())
         return;
 
-    if (!promptForSave(patternCollection.at(getCurrentPatternIndex())))
+    if (!promptForSaveImage(patternCollection.at(getCurrentPatternIndex())))
         return;
 
     // TODO: remove the undo stack from the undo group?
@@ -1036,7 +1132,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
         undoGroup.setActiveStack(NULL);
 
         setPatternName("()");
-        setPatternModified(false);
+        setProjectModified(false);
         editImageChanged(0, QImage());
         frameImageChanged(QImage());
         frameEditor->setShowPlaybakIndicator(false);
@@ -1058,9 +1154,11 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
 
     undoGroup.setActiveStack(newpattern->getUndoStack());
 
+    if(newpattern->getModified())
+        setProjectModified(true);
+
     setFrameIndex(previousFrameIndex);
     setPatternName(newpattern->getName());
-    setPatternModified(newpattern->getModified());
     editImageChanged(getCurrentFrameIndex(), newpattern->getEditImage(getCurrentFrameIndex()));
     frameImageChanged(newpattern->getFrameImage(getCurrentFrameIndex()));
     frameEditor->setShowPlaybakIndicator(newpattern->hasPlaybackIndicator());
@@ -1110,7 +1208,8 @@ void MainWindow::on_PatternDataChanged(const QModelIndex &topLeft, const QModelI
             setPatternName(patternCollection.at(getCurrentPatternIndex())->getName());
         }
         else if (role == PatternModel::Modified) {
-            setPatternModified(patternCollection.at(getCurrentPatternIndex())->getModified());
+            if(patternCollection.at(getCurrentPatternIndex())->getModified())
+                setProjectModified(true);
         }
         else if (role == PatternModel::FrameImage) {
             // If the current selection changed, refresh so that the FrameEditor contents will be redrawn
@@ -1188,9 +1287,11 @@ void MainWindow::on_actionDeleteFrame_triggered()
     setFrameIndex(getCurrentFrameIndex());
 }
 
-void MainWindow::setPatternModified(bool modified)
+void MainWindow::setProjectModified(bool modified)
 {
-    actionSave->setEnabled(modified);
+    projectModified = modified;
+    actionSave_project->setEnabled(modified);
+
 }
 
 void MainWindow::on_ExampleSelected(QAction *action)
@@ -1248,6 +1349,108 @@ void MainWindow::on_actionConfigure_Scene_triggered()
         return;
 
     applyScene(sceneConfiguration.getSceneTemplate());
+    setProjectModified(true);
+}
+
+void MainWindow::on_actionOpen_project_triggered()
+{
+
+    if(!openPatternProject()){
+        closeProject();
+        QMessageBox::critical(this,"Error","Project can not be read",QMessageBox::Ok);
+        return;
+    }
+
+    setTitleWindow(projectName);
+
+}
+
+bool MainWindow::openPatternProject()
+{
+    QSettings settings;
+    QString lastDirectory = settings.value("File/LoadDirectory").toString();
+
+    QDir dir(lastDirectory);
+    if (!dir.isReadable())
+        lastDirectory = QDir::homePath();
+
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Open project"), lastDirectory,
+                                                    tr("Pattern project files (*.ppro)"));
+
+    if (fileName.length() == 0)
+        return true;
+
+    if(!closeProject())
+        return true;
+
+    QFileInfo fileInfo(fileName);
+    settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
+
+    projectFilename = fileName;
+    projectName = fileInfo.baseName();
+
+    qDebug()<<"Open Project:" << projectFilename;
+
+    QFile file(projectFilename);
+    if (!file.open(QIODevice::ReadOnly)){
+        qDebug()<< "Error: Cannot read project file ";
+        return false;
+    }
+
+    // read project file
+    SceneTemplate newSceneTemplate;
+    QString header;
+    QString patternPaintVersion;
+    float formatVersion;
+    qint32 width;
+    qint32 height;
+    qint32 colorMode;
+
+    QDataStream in(&file);
+    in.setVersion(QDataStream::Qt_5_8);
+
+    // read Header
+    in >> header;
+    if(header != PROJECT_HEADER){
+        qDebug()<< "Error: Header incorrectly";
+        return false;
+    }
+
+    in >> formatVersion;
+    if(formatVersion != PROJECT_FORMAT_VERSION){
+        qDebug()<< "Error: Format version incorrectly";
+        return false;
+    }
+
+    in >> patternPaintVersion;
+
+    qDebug() << "Project created with Pattern Paint version:" << patternPaintVersion;
+
+
+    // read scene configuration
+    in >> newSceneTemplate.firmwareName;
+    in >> newSceneTemplate.fixtureType;
+    in >> width;
+    in >> height;
+    in >> colorMode;
+
+    newSceneTemplate.colorMode = (ColorMode)colorMode;
+    newSceneTemplate.size = QSize(width,height);
+
+    if(in.status() == QDataStream::Ok)
+        applyScene(newSceneTemplate);
+
+    if(patternCollection.readPatterns(in) && in.status() == QDataStream::Ok){
+        qDebug() << "Project successful readed";
+    }else{
+        qDebug() << "Project read failed!";
+        return false;
+    }
+
+    setProjectModified(false);
+
+    return true;
 }
 
 void MainWindow::openPattern(Pattern::PatternType type)
@@ -1312,19 +1515,9 @@ void MainWindow::on_actionSave_All_triggered()
             return;
 }
 
-void MainWindow::on_actionClose_All_triggered()
+void MainWindow::on_actionNew_project_triggered()
 {
-    QList<Pattern *> unsavedPatterns;
-
-    for (Pattern* pattern : patternCollection.patterns()) {
-        if (pattern->getModified())
-            unsavedPatterns.append(pattern);
-    }
-
-    if (!promptForSave(unsavedPatterns))
-        return;
-
-    patternCollection.clear();
+    closeProject();
 }
 
 void MainWindow::on_actionDebug_Log_triggered()

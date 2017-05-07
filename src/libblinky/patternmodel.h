@@ -38,6 +38,9 @@ public:
     virtual bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex()) = 0;
     virtual bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex()) = 0;
 
+    virtual bool writeDataToStream(QDataStream& stream) = 0;
+    virtual bool readDataFromStream(QDataStream& stream) = 0;
+
     virtual QUndoStack *getUndoStack() = 0;
 };
 

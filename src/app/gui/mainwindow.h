@@ -49,9 +49,6 @@ private slots:
 
     void connectionScannerTimer_timeout();
 
-    void on_actionSave_triggered();
-    void on_actionSave_as_triggered();
-
     void on_actionExit_triggered();
 
     void on_actionAbout_triggered();
@@ -90,7 +87,7 @@ private slots:
 
     void on_colorPicked(QColor);
 
-    void on_actionClose_triggered();
+    void on_actionDelete_pattern_triggered();
 
     void on_actionStepForward_triggered();
 
@@ -109,23 +106,29 @@ private slots:
     void on_PatternDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
                                const QVector<int> &roles);
 
+    void on_actionSave_project_triggered();
+
+    void on_actionSave_as_triggered();
+
+    void on_actionSave_All_triggered();
+
+    void on_actionNew_project_triggered();
+
     void on_actionNew_ScrollingPattern_triggered();
 
     void on_actionNew_FramePattern_triggered();
 
-    void on_actionConfigure_Scene_triggered();
+    void on_actionOpen_project_triggered();
 
     void on_actionOpen_Scrolling_Pattern_triggered();
 
     void on_actionOpen_Frame_based_Pattern_triggered();
 
+    void on_actionConfigure_Scene_triggered();
+
     void on_actionPreferences_triggered();
 
     void on_actionWelcome_triggered();
-
-    void on_actionSave_All_triggered();
-
-    void on_actionClose_All_triggered();
 
     void on_windowLoaded();
 
@@ -149,6 +152,10 @@ private:
 #endif
 
     bool firstLoad;
+
+    QString projectFilename;
+    QString projectName;
+    bool projectModified;
 
     QTimer drawTimer;
     QTimer connectionScannerTimer;
@@ -184,8 +191,12 @@ private:
     void startPlayback();
     void stopPlayback();
 
-    bool promptForSave(Pattern *pattern);
-    bool promptForSave(QList<Pattern *> patterns);
+    bool promptForSaveImage(Pattern *pattern);
+    bool promptForSaveProject();
+
+    bool closeProject();
+    bool openPatternProject();
+    bool savePatternProject();
 
     bool savePattern(Pattern *item);
     bool savePatternAs(Pattern *item);
@@ -199,11 +210,13 @@ private:
     void editImageChanged(int index, const QImage &data);
     void frameImageChanged(const QImage &data);
 
-    void setPatternModified(bool modified);
+    void setProjectModified(bool modified);
 
     void setFrameIndex(int newIndex);
 
     void updateBlinky(const QImage &frame);
+
+    void setTitleWindow(QString title);
 
 #if defined(Q_OS_MAC)
     /// Object to inhibit app nap when connected to a blinky

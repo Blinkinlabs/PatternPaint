@@ -71,6 +71,34 @@ void PatternFrameModel::applyUndoState(State newState)
     emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
 }
 
+bool PatternFrameModel::writeDataToStream(QDataStream& stream)
+{
+    // TODO: push these into the state definition.
+    stream << state.frameSize;
+    stream << state.fileName;
+    stream << state.frameSpeed;
+    stream << state.frames;
+
+    return true;
+}
+
+bool PatternFrameModel::readDataFromStream(QDataStream& stream)
+{
+    // TODO: push these into the state definition.
+    stream >> state.frameSize;
+    stream >> state.fileName;
+    stream >> state.frameSpeed;
+    stream >> state.frames;
+
+    QImage image;
+    foreach(image, state.frames){
+        if(image.isNull())
+            return false;
+    }
+
+    return true;
+}
+
 QVariant PatternFrameModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())

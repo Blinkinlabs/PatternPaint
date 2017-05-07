@@ -188,6 +188,11 @@ bool Pattern::getModified() const
     return model->data(model->index(0), PatternModel::Modified).toBool();
 }
 
+void Pattern::setModified(bool modified)
+{
+    model->setData(model->index(0), modified, PatternModel::Modified);
+}
+
 void Pattern::resize(QSize newSize, bool scale)
 {
     Q_UNUSED(scale);
@@ -223,6 +228,11 @@ void Pattern::setEditImage(int index, const QImage &update)
 PatternModel * Pattern::getModel() const
 {
     return model;
+}
+
+int Pattern::getType() const
+{
+    return type;
 }
 
 int Pattern::getFrameCount() const

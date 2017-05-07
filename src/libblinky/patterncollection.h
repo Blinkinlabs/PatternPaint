@@ -25,6 +25,10 @@ public:
 
     bool isEmpty() const;
 
+    bool writePatterns(QDataStream& stream);
+
+    bool readPatterns(QDataStream& stream);
+
 private:
     PatternCollectionModel model;
 };

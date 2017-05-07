@@ -97,6 +97,8 @@ public:
     /// @return true if the pattern has unsaved changes
     bool getModified() const;
 
+    void setModified(bool modified);
+
     /// Get the underlying data model (for connection to a view)
     PatternModel *getModel() const;
 
@@ -105,6 +107,9 @@ public:
     {
         return uuid;
     }
+
+    /// Get the Type for this pattern
+    int getType() const;
 
     /// True if the pattern editor should show a playback indicator for ths
     /// pattern type

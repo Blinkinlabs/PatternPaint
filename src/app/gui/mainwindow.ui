@@ -145,8 +145,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>516</width>
-          <height>268</height>
+          <width>510</width>
+          <height>267</height>
          </rect>
         </property>
        </widget>
@@ -326,6 +326,12 @@
          </property>
          <property name="focusPolicy">
           <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="acceptDrops">
+          <bool>false</bool>
+         </property>
+         <property name="inputMethodHints">
+          <set>Qt::ImhNone</set>
          </property>
          <property name="text">
           <string>()</string>
@@ -575,7 +581,7 @@
      <x>0</x>
      <y>0</y>
      <width>880</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -589,28 +595,28 @@
     </widget>
     <widget class="QMenu" name="menuNew">
      <property name="title">
-      <string>New</string>
+      <string>Add new pattern</string>
      </property>
      <addaction name="actionNew_ScrollingPattern"/>
      <addaction name="actionNew_FramePattern"/>
     </widget>
     <widget class="QMenu" name="menuOpen">
      <property name="title">
-      <string>Open</string>
+      <string>Add image</string>
      </property>
      <addaction name="actionOpen_Scrolling_Pattern"/>
      <addaction name="actionOpen_Frame_based_Pattern"/>
     </widget>
-    <addaction name="menuNew"/>
-    <addaction name="menuOpen"/>
+    <addaction name="actionNew_project"/>
+    <addaction name="actionOpen_project"/>
     <addaction name="menuExamples"/>
     <addaction name="separator"/>
-    <addaction name="actionClose"/>
-    <addaction name="actionClose_All"/>
+    <addaction name="menuNew"/>
+    <addaction name="menuOpen"/>
+    <addaction name="actionDelete_pattern"/>
     <addaction name="separator"/>
-    <addaction name="actionSave"/>
+    <addaction name="actionSave_project"/>
     <addaction name="actionSave_as"/>
-    <addaction name="actionSave_All"/>
     <addaction name="separator"/>
     <addaction name="actionExport_pattern_for_Arduino"/>
     <addaction name="separator"/>
@@ -708,8 +714,10 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionClose"/>
-   <addaction name="actionSave"/>
+   <addaction name="actionNew_project"/>
+   <addaction name="actionOpen_project"/>
+   <addaction name="actionSave_project"/>
+   <addaction name="actionDelete_pattern"/>
    <addaction name="actionSave_to_Blinky"/>
   </widget>
   <widget class="QToolBar" name="playbackToolbar">
@@ -775,7 +783,7 @@
    <addaction name="actionFitToWidth"/>
    <addaction name="actionFitToHeight"/>
   </widget>
-  <action name="actionSave">
+  <action name="actionSave_project">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -784,10 +792,13 @@
      <normaloff>:/icons/images/icons/Save-100.png</normaloff>:/icons/images/icons/Save-100.png</iconset>
    </property>
    <property name="text">
-    <string>Save</string>
+    <string>Save Project</string>
    </property>
    <property name="iconText">
     <string>Save</string>
+   </property>
+   <property name="toolTip">
+    <string>Save Project</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -988,20 +999,23 @@
    <property name="text">
     <string>Save As...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
    </property>
   </action>
-  <action name="actionClose">
+  <action name="actionDelete_pattern">
    <property name="icon">
     <iconset resource="../images.qrc">
      <normaloff>:/icons/images/icons/Minus-100.png</normaloff>:/icons/images/icons/Minus-100.png</iconset>
    </property>
    <property name="text">
-    <string>Close</string>
+    <string>Delete pattern</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+W</string>
+    <string>Del</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
@@ -1107,20 +1121,21 @@
     <string>Output Preview</string>
    </property>
   </action>
-  <action name="actionClose_All">
+  <action name="actionNew_project">
+   <property name="icon">
+    <iconset resource="../images.qrc">
+     <normaloff>:/icons/images/icons/New-100.png</normaloff>:/icons/images/icons/New-100.png</iconset>
+   </property>
    <property name="text">
-    <string>Close All</string>
+    <string>New Project</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Shift+W</string>
+    <string>Ctrl+N</string>
    </property>
   </action>
   <action name="actionSave_All">
    <property name="text">
     <string>Save All</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+S</string>
    </property>
   </action>
   <action name="actionDebug_Log">
@@ -1145,7 +1160,7 @@
     <string>Zoom in</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+=</string>
+    <string>Ctrl++</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
@@ -1184,7 +1199,7 @@
     <string>Fit to screen</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+0</string>
+    <string>Ctrl+=</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
@@ -1218,6 +1233,21 @@
    </property>
    <property name="iconVisibleInMenu">
     <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionOpen_project">
+   <property name="icon">
+    <iconset resource="../images.qrc">
+     <normaloff>:/icons/images/icons/Open-100.png</normaloff>:/icons/images/icons/Open-100.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Project</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Project</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
  </widget>
