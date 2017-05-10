@@ -35,7 +35,8 @@ HEADERS += \
     linearfixture.h \
     firmwarestore.h \
     firmwarereader.h \
-    memorymap.h
+    memorymap.h \
+    blinkypendantuploaddata.h
 
 SOURCES +=  \
     fixture.cpp \
@@ -65,7 +66,8 @@ SOURCES +=  \
     brightnessmodel.cpp \
     firmwarestore.cpp \
     firmwarereader.cpp \
-    memorymap.cpp
+    memorymap.cpp \
+    blinkypendantuploaddata.cpp
 
 # For platforms that have serial ports
 # TODO: Pull hard-coded references to BlinkyTape from the gui, allowing this section to be switchable

@@ -3,10 +3,11 @@
 #include "usbutils.h"
 #include "blinkycontroller.h"
 #include "blinkypendantcommands.h"
-#include "bytearrayhelpers.h"
+#include "blinkypendantuploaddata.h"
 
-#define BLINKY_PENDANT_VERSION_1 256
-#define BLINKY_PENDANT_VERSION_2 512
+#define BLINKY_PENDANT_VERSION_1 0x0100
+#define BLINKY_PENDANT_VERSION_2 0x0200
+#define BLINKY_PENDANT_VERSION_3 0x0300
 
 BlinkyPendantUploader::BlinkyPendantUploader(QObject *parent) :
     BlinkyUploader(parent)
@@ -20,8 +21,7 @@ BlinkyPendantUploader::BlinkyPendantUploader(QObject *parent) :
 bool BlinkyPendantUploader::storePatterns(BlinkyController &controller,
                                         QList<PatternWriter> &patternWriters)
 {
-    // TODO: push the image conversions into here so they are less awkward.
-    #define PIXEL_COUNT 10
+    QByteArray data;
 
     // Probe for the blinkypendant version
     // TODO: Update the firmware first!
@@ -34,7 +34,6 @@ bool BlinkyPendantUploader::storePatterns(BlinkyController &controller,
     int version = getVersionForDevice(portInfo.vendorIdentifier(),
                                       portInfo.productIdentifier());
 
-    QByteArray data;
     if (version == BLINKY_PENDANT_VERSION_1) {
         qDebug() << "Using version 1 upload mechanism, please update firmware!";
 
@@ -58,44 +57,17 @@ bool BlinkyPendantUploader::storePatterns(BlinkyController &controller,
         data.append((char)0x37);
         data.append((char)patternWriters.front().getFrameCount());  // frame count
         data += patternWriters.front().getDataAsBinary();       // image data (RGB24, uncompressed)
-    } else {
-        // Create the data structure to write to the device memory
-        // Animation table
 
-        QByteArray patternData;
+    }
+    else {
+        BlinkyPendantUploadData uploadData;
 
-        data.append((char)0x31);    // header
-        data.append((char)0x23);
-        data.append((char)patternWriters.size()); // Number of patterns in the table
-        data.append((char)PIXEL_COUNT);     // Number of LEDs in the pattern
-
-        for (PatternWriter pattern : patternWriters) {
-            // Make sure we have an image compatible with the BlinkyPendant
-            if (pattern.getLedCount() != 10) {
-                errorString = "Wrong pattern size- must be 10 pixels high!";
-                return false;
-            }
-            if (pattern.getEncoding() != PatternWriter::RGB24) {
-                errorString = "Wrong encoding type- must be RGB24!";
-                return false;
-            }
-
-            if(pattern.getFrameCount() > 65535) {
-                errorString = "Pattern too long, must be < 65535 frames";
-                return false;
-            }
-
-            // Animation entry
-            data.append((char)0);             // Encoding type (1 byte) (RGB24, uncompressed) (TODO)
-            data += ByteArrayCommands::uint32ToByteArray(patternData.length());        // Data offset (4 bytes)
-            data += ByteArrayCommands::uint16ToByteArrayBig(pattern.getFrameCount());   // Frame count (2 bytes)
-            data += ByteArrayCommands::uint16ToByteArrayBig(0);                          // Frame delay (2 bytes) TODO
-
-            // Make sure we have an image compatible with the BlinkyPendant
-            patternData += pattern.getDataAsBinary();       // image data (RGB24, uncompressed)
+        if (!uploadData.init(patternWriters)) {
+            errorString = uploadData.errorString;
+            return false;
         }
 
-        data += patternData;
+        data = uploadData.data;
     }
 
     // TODO: Check if the data can fit in the device memory

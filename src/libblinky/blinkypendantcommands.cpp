@@ -95,9 +95,7 @@ QList<SerialCommand> writeFlash(const QByteArray &data)
     QByteArray paddedData(data);
     QList<SerialCommand> commands;
 
-    // Pad the data to the page size
-    // TODO: Is this actually required? The firmware makes it look like
-    // only CHUNK_SIZE_BYTES is required.
+    // Pad the data to a page boundary
     while (paddedData.length() % PAGE_SIZE_BYTES != 0)
         paddedData.append((char)0xFF);
 

@@ -2,7 +2,6 @@
 #define AVRUPLOADDATA_H
 
 #include <QByteArray>
-#include <vector>
 #include "patternwriter.h"
 #include "memorysection.h"
 

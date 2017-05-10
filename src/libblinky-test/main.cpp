@@ -15,6 +15,7 @@
 #include "firmwarestoretests.h"
 #include "firmwarereadertests.h"
 #include "blinkytapeuploaddatatests.h"
+#include "blinkypendantuploaddatatests.h"
 
 int main(int argc, char *argv[])
 {
@@ -67,6 +68,9 @@ int main(int argc, char *argv[])
 
     ByteArrayHelpersTests byteArrayHelpersTests;
     result |= QTest::qExec(&byteArrayHelpersTests);
+
+    BlinkyPendantUploadDataTests blinkyPendantUploadDataTests;
+    result |= QTest::qExec(&blinkyPendantUploadDataTests);
 
     return result;
 }
