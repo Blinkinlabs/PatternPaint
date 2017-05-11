@@ -10,12 +10,18 @@
 class BlinkyPendantUploadData
 {
 public:
-    static QByteArray makePatternTableHeader(uint8_t patternCount, uint8_t displayMode);
+    enum DisplayMode {
+        POV = 10,
+        TIMED = 11,
+    };
+
+    static QByteArray makePatternTableHeader(uint8_t patternCount, DisplayMode displayMode);
     static QByteArray makePatternTableEntry(uint32_t offset,
                                             uint16_t frameCount,
                                             uint16_t frameDelay);
 
-    bool init(const QList<PatternWriter> &patternWriters);
+    bool init(DisplayMode displayMode,
+              const QList<PatternWriter> &patternWriters);
 
     QByteArray data;
 

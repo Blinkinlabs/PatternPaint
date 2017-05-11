@@ -5,9 +5,14 @@
 #include "blinkypendantcommands.h"
 #include "blinkypendantuploaddata.h"
 
+#include <QSettings>
+
 #define BLINKY_PENDANT_VERSION_1 0x0100
 #define BLINKY_PENDANT_VERSION_2 0x0200
 #define BLINKY_PENDANT_VERSION_3 0x0300
+
+#define BLINKYPENDANT_DISPLAYMODE_DEFAULT "POV"
+
 
 BlinkyPendantUploader::BlinkyPendantUploader(QObject *parent) :
     BlinkyUploader(parent)
@@ -60,9 +65,21 @@ bool BlinkyPendantUploader::storePatterns(BlinkyController &controller,
 
     }
     else {
+        // TODO: Pass this in somehow.
+        QSettings settings;
+        QString displayModeString = settings.value("BlinkyPendant/displayMode",
+                                                   BLINKYPENDANT_DISPLAYMODE_DEFAULT).toString();
+        BlinkyPendantUploadData::DisplayMode displayMode;
+        if(displayModeString == "Timed") {
+            displayMode = BlinkyPendantUploadData::DisplayMode::TIMED;
+        }
+        else {
+            displayMode = BlinkyPendantUploadData::DisplayMode::POV;
+        }
+
         BlinkyPendantUploadData uploadData;
 
-        if (!uploadData.init(patternWriters)) {
+        if (!uploadData.init(displayMode, patternWriters)) {
             errorString = uploadData.errorString;
             return false;
         }

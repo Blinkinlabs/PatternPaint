@@ -9,7 +9,7 @@
 void BlinkyPendantUploadDataTests::makePatternHeaderTableTest()
 {
     uint8_t patternCount = 12;
-    uint8_t displayMode = 34;
+    BlinkyPendantUploadData::DisplayMode displayMode = BlinkyPendantUploadData::DisplayMode::POV;
 
     QByteArray expectedResponse;
     expectedResponse.append('\x31');
@@ -39,15 +39,17 @@ void BlinkyPendantUploadDataTests::makePatternTableEntryTest()
 void BlinkyPendantUploadDataTests::noPatternsFailsTest()
 {
     BlinkyPendantUploadData blinkyPendantUploadData;
+    BlinkyPendantUploadData::DisplayMode displayMode = BlinkyPendantUploadData::DisplayMode::POV;
     QList<PatternWriter> patternWriters;
 
-    QVERIFY(blinkyPendantUploadData.init(patternWriters) == false);
+    QVERIFY(blinkyPendantUploadData.init(displayMode, patternWriters) == false);
     QVERIFY(blinkyPendantUploadData.errorString == "No Patterns detected!");
 }
 
 void BlinkyPendantUploadDataTests::maxPatternsSucceedsTest()
 {
     BlinkyPendantUploadData blinkyPendantUploadData;
+    BlinkyPendantUploadData::DisplayMode displayMode = BlinkyPendantUploadData::DisplayMode::POV;
     QList<PatternWriter> patternWriters;
 
     Pattern pattern(Pattern::PatternType::Scrolling, QSize(1,1), 1);
@@ -57,12 +59,13 @@ void BlinkyPendantUploadDataTests::maxPatternsSucceedsTest()
     for(int i = 0; i < 255; i++)
         patternWriters.push_back(PatternWriter(pattern, fixture, encoding));
 
-    QVERIFY(blinkyPendantUploadData.init(patternWriters) == true);
+    QVERIFY(blinkyPendantUploadData.init(displayMode, patternWriters) == true);
 }
 
 void BlinkyPendantUploadDataTests::tooManyPatternsFailsTest()
 {
     BlinkyPendantUploadData blinkyPendantUploadData;
+    BlinkyPendantUploadData::DisplayMode displayMode = BlinkyPendantUploadData::DisplayMode::POV;
     QList<PatternWriter> patternWriters;
 
     Pattern pattern(Pattern::PatternType::Scrolling, QSize(1,1), 1);
@@ -72,7 +75,7 @@ void BlinkyPendantUploadDataTests::tooManyPatternsFailsTest()
     for(int i = 0; i < 256; i++)
         patternWriters.push_back(PatternWriter(pattern, fixture, encoding));
 
-    QVERIFY(blinkyPendantUploadData.init(patternWriters) == false);
+    QVERIFY(blinkyPendantUploadData.init(displayMode, patternWriters) == false);
     QVERIFY(blinkyPendantUploadData.errorString == "Too many patterns, cannot fit in pattern table.");
 }
 
@@ -80,6 +83,7 @@ void BlinkyPendantUploadDataTests::tooManyPatternsFailsTest()
 void BlinkyPendantUploadDataTests::wrongEncodingFails()
 {
     BlinkyPendantUploadData blinkyPendantUploadData;
+    BlinkyPendantUploadData::DisplayMode displayMode = BlinkyPendantUploadData::DisplayMode::POV;
     QList<PatternWriter> patternWriters;
 
     Pattern pattern(Pattern::PatternType::Scrolling, QSize(1,1), 1);
@@ -88,13 +92,14 @@ void BlinkyPendantUploadDataTests::wrongEncodingFails()
 
     patternWriters.push_back(PatternWriter(pattern, fixture, encoding));
 
-    QVERIFY(blinkyPendantUploadData.init(patternWriters) == false);
+    QVERIFY(blinkyPendantUploadData.init(displayMode, patternWriters) == false);
     QVERIFY(blinkyPendantUploadData.errorString == "Wrong encoding type- must be RGB24!");
 }
 
 void BlinkyPendantUploadDataTests::wrongLEDCountFails()
 {
     BlinkyPendantUploadData blinkyPendantUploadData;
+    BlinkyPendantUploadData::DisplayMode displayMode = BlinkyPendantUploadData::DisplayMode::POV;
     QList<PatternWriter> patternWriters;
 
     Pattern pattern(Pattern::PatternType::Scrolling, QSize(1,1), 1);
@@ -103,7 +108,7 @@ void BlinkyPendantUploadDataTests::wrongLEDCountFails()
 
     patternWriters.push_back(PatternWriter(pattern, fixture, encoding));
 
-    QVERIFY(blinkyPendantUploadData.init(patternWriters) == false);
+    QVERIFY(blinkyPendantUploadData.init(displayMode, patternWriters) == false);
     QVERIFY(blinkyPendantUploadData.errorString == "Wrong pattern size- must be 10 pixels high!");
 }
 
@@ -128,9 +133,10 @@ void BlinkyPendantUploadDataTests::uploadDataTest() {
     patternWriters.push_back(patternWriterB);
 
     BlinkyPendantUploadData blinkyPendantUploadData;
+    BlinkyPendantUploadData::DisplayMode displayMode = BlinkyPendantUploadData::DisplayMode::POV;
 
     QByteArray expectedData;
-    expectedData.append(BlinkyPendantUploadData::makePatternTableHeader(2, 10));
+    expectedData.append(BlinkyPendantUploadData::makePatternTableHeader(2, displayMode));
     expectedData.append(BlinkyPendantUploadData::makePatternTableEntry(0,
                                                                        patternWriterA.getFrameCount(),
                                                                        patternWriterA.getFrameDelay()));
@@ -141,6 +147,6 @@ void BlinkyPendantUploadDataTests::uploadDataTest() {
     expectedData.append(patternWriterA.getDataAsBinary());
     expectedData.append(patternWriterB.getDataAsBinary());
 
-    QVERIFY(blinkyPendantUploadData.init(patternWriters) == true);
+    QVERIFY(blinkyPendantUploadData.init(displayMode, patternWriters) == true);
     QVERIFY(blinkyPendantUploadData.data == expectedData);
 }

@@ -1,15 +1,11 @@
 #include "blinkypendantuploaddata.h"
 
-#include <QSettings>
-
 #include "bytearrayhelpers.h"
 
 // TODO: push the image conversions into here so they are less awkward.
 #define PIXEL_COUNT 10
 
-#define BLINKYPENDANT_DISPLAYMODE_DEFAULT 10 // 10 is for POV mode, 11 for timed playback
-
-QByteArray BlinkyPendantUploadData::makePatternTableHeader(uint8_t patternCount, uint8_t displayMode) {
+QByteArray BlinkyPendantUploadData::makePatternTableHeader(uint8_t patternCount, DisplayMode displayMode) {
     QByteArray header;
 
     header.append((char)0x31);    // header
@@ -34,11 +30,7 @@ QByteArray BlinkyPendantUploadData::makePatternTableEntry(uint32_t offset, uint1
 
 
 
-bool BlinkyPendantUploadData::init(const QList<PatternWriter> &patternWriters) {
-
-    // TODO: Pass this in somehow.
-    QSettings settings;
-    uint8_t displayMode = settings.value("BlinkyPendant/displayMode", BLINKYPENDANT_DISPLAYMODE_DEFAULT).toInt();
+bool BlinkyPendantUploadData::init(DisplayMode displayMode, const QList<PatternWriter> &patternWriters) {
 
     // Test for the minimum/maximum patterns count
     if (patternWriters.count() == 0) {

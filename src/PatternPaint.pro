@@ -1,4 +1,3 @@
-# myclock/myclock.pro
 TEMPLATE = subdirs
 SUBDIRS = \
     libblinky \
