@@ -18,6 +18,8 @@ private slots:
 //    void tooLongFrameCountFails();
 //    void tooLongFrameDelayFails();
     void wrongLEDCountFails();
+
+    void uploadDataTest();
 };
 
 #endif // BLINKYPENDANTUPLOADDATATESTS_H

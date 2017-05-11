@@ -1,9 +1,10 @@
 #include "blinkypendantuploaddatatests.h"
 #include "blinkypendantuploaddata.h"
 #include "linearfixture.h"
+#include "exponentialbrightness.h"
 
 #include <QTest>
-
+#include <QList>
 
 void BlinkyPendantUploadDataTests::makePatternHeaderTableTest()
 {
@@ -104,4 +105,42 @@ void BlinkyPendantUploadDataTests::wrongLEDCountFails()
 
     QVERIFY(blinkyPendantUploadData.init(patternWriters) == false);
     QVERIFY(blinkyPendantUploadData.errorString == "Wrong pattern size- must be 10 pixels high!");
+}
+
+void BlinkyPendantUploadDataTests::uploadDataTest() {
+    LinearFixture fixture(10);
+    fixture.setBrightnessModel(new ExponentialBrightness(1,1,1));
+    fixture.setColorMode(ColorMode::RGB);
+
+    PatternWriter::Encoding encoding = PatternWriter::Encoding::RGB24;
+
+    Pattern patternA(Pattern::PatternType::Scrolling, QSize(1,10), 1);
+    patternA.setFrameSpeed(12);
+
+    Pattern patternB(Pattern::PatternType::Scrolling, QSize(20,10), 1);
+    patternB.setFrameSpeed(34);
+
+    QList<PatternWriter> patternWriters;
+    PatternWriter patternWriterA(patternA, fixture, encoding);
+    PatternWriter patternWriterB(patternB, fixture, encoding);
+
+    patternWriters.push_back(patternWriterA);
+    patternWriters.push_back(patternWriterB);
+
+    BlinkyPendantUploadData blinkyPendantUploadData;
+
+    QByteArray expectedData;
+    expectedData.append(BlinkyPendantUploadData::makePatternTableHeader(2, 10));
+    expectedData.append(BlinkyPendantUploadData::makePatternTableEntry(0,
+                                                                       patternWriterA.getFrameCount(),
+                                                                       patternWriterA.getFrameDelay()));
+
+    expectedData.append(BlinkyPendantUploadData::makePatternTableEntry(patternWriterA.getDataAsBinary().length(),
+                                                                       patternWriterB.getFrameCount(),
+                                                                       patternWriterB.getFrameDelay()));
+    expectedData.append(patternWriterA.getDataAsBinary());
+    expectedData.append(patternWriterB.getDataAsBinary());
+
+    QVERIFY(blinkyPendantUploadData.init(patternWriters) == true);
+    QVERIFY(blinkyPendantUploadData.data == expectedData);
 }
