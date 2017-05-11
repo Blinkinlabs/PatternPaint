@@ -76,6 +76,11 @@ void SerialCommandQueue::flushQueue()
     commandTimeoutTimer.stop();
 }
 
+int SerialCommandQueue::length()
+{
+    return queue.length();
+}
+
 void SerialCommandQueue::enqueue(const SerialCommand &command)
 {
 // qDebug() << "queuing command:" << command.name

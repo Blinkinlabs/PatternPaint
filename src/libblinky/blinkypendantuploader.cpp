@@ -88,6 +88,9 @@ bool BlinkyPendantUploader::storePatterns(BlinkyController &controller,
     // n+1 stop write
     commandQueue.enqueue(BlinkyPendantCommands::stopWrite());
 
+    // TODO: This might be partially depleted before this command is run?
+    maxProgress = commandQueue.length();
+
     return true;
 }
 
@@ -148,9 +151,14 @@ void BlinkyPendantUploader::handleCommandFinished(QString command, QByteArray re
 
 void BlinkyPendantUploader::setProgress(int newProgress)
 {
-    // TODO: Calculate max progress
-    int maxProgress = 10;
-
     progress = newProgress;
-    emit(progressChanged((progress*100)/maxProgress));
+
+    // Clip the progress so that it never reaches 100%.
+    // It will be closed by the finished() signal.
+    if (progress >= maxProgress)
+        maxProgress = progress + 1;
+
+    int progressPercent = (progress*100)/maxProgress;
+
+    emit(progressChanged(progressPercent));
 }

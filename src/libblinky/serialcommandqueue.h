@@ -30,6 +30,8 @@ public:
 
     void flushQueue();
 
+    int length();
+
 signals:
     void error(QString error);
     void commandFinished(QString command, QByteArray returnData);

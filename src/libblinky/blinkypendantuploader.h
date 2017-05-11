@@ -33,7 +33,8 @@ private:
     void setProgress(int newProgress);
 
     /// Current upload progress, in command counts
-    float progress;
+    int progress;           ///< Current upload progress, in command counts
+    int maxProgress;        ///< Total expected progress states
 
     QString errorString;
 
