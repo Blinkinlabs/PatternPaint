@@ -52,3 +52,20 @@ QByteArray colorToBytes(ColorMode colorMode, const QColor &color)
 
     return bytes;
 }
+
+bool colorModeValid(ColorMode colorMode) {
+    switch (colorMode) {
+    case RGB:
+    case RBG:
+    case GRB:
+    case GBR:
+    case BRG:
+    case BGR:
+        return true;
+        break;
+
+    default:
+        return false;
+        break;
+    }
+}

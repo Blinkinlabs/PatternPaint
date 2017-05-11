@@ -24,6 +24,29 @@ void ColorModeTests::colorModesTest()
     QVERIFY(colorModeNames[colorMode].name == name);
 }
 
+void ColorModeTests::colorModeValidTest_data()
+{
+    QTest::addColumn<ColorMode>("colorMode");
+    QTest::addColumn<bool>("expectedResult");
+
+    QTest::newRow("RGB")   << ColorMode::RGB << true;
+    QTest::newRow("RBG")   << ColorMode::RBG << true;
+    QTest::newRow("GRB")   << ColorMode::GRB << true;
+    QTest::newRow("GBR")   << ColorMode::GBR << true;
+    QTest::newRow("BRG")   << ColorMode::BRG << true;
+    QTest::newRow("BGR")   << ColorMode::BGR << true;
+
+    QTest::newRow("RGB-1")   << (ColorMode)(ColorMode::RGB - 1) << false;
+    QTest::newRow("BGR+1")   << (ColorMode)(ColorMode::BGR + 1) << false;
+}
+
+void ColorModeTests::colorModeValidTest()
+{
+    QFETCH(ColorMode, colorMode);
+    QFETCH(bool, expectedResult);
+
+    QVERIFY(colorModeValid(colorMode) == expectedResult);
+}
 
 
 void ColorModeTests::colorToBytesTest_data()
@@ -47,4 +70,9 @@ void ColorModeTests::colorToBytesTest()
     QFETCH(QByteArray, bytes);
 
     QVERIFY(colorToBytes(colorMode, color) == bytes);
+}
+
+void ColorModeTests::colorToBytesBadModeFailsTest()
+{
+    QVERIFY(colorToBytes(COLOR_MODE_COUNT, QColor(1,2,3)).length() == 0);
 }
