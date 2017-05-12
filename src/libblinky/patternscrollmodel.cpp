@@ -33,7 +33,9 @@ Qt::ItemFlags PatternScrollModel::flags(const QModelIndex &index) const
     if (!index.isValid())
         return Qt::ItemIsEnabled;
 
-    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+    return (Qt::ItemIsEnabled
+            | Qt::ItemIsSelectable
+            | Qt::ItemIsEditable);
 }
 
 Qt::DropActions PatternScrollModel::supportedDropActions() const

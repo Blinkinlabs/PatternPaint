@@ -16,6 +16,7 @@
 #include "firmwarereadertests.h"
 #include "blinkytapeuploaddatatests.h"
 #include "blinkypendantuploaddatatests.h"
+#include "patternframemodeltests.h"
 
 int main(int argc, char *argv[])
 {
@@ -71,6 +72,9 @@ int main(int argc, char *argv[])
 
     BlinkyPendantUploadDataTests blinkyPendantUploadDataTests;
     result |= QTest::qExec(&blinkyPendantUploadDataTests);
+
+    PatternFrameModelTests patternFrameModelTests;
+    result |= QTest::qExec(&patternFrameModelTests);
 
     return result;
 }

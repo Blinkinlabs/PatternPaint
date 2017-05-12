@@ -15,9 +15,13 @@ int PatternCollectionModel::rowCount(const QModelIndex &) const
 Qt::ItemFlags PatternCollectionModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
-        return Qt::ItemIsEnabled | Qt::ItemIsDropEnabled;
+        return (Qt::ItemIsEnabled
+                | Qt::ItemIsDropEnabled);
 
-    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable | Qt::ItemIsDragEnabled;
+    return (Qt::ItemIsEnabled
+            | Qt::ItemIsSelectable
+            | Qt::ItemIsEditable
+            | Qt::ItemIsDragEnabled);
 }
 
 Qt::DropActions PatternCollectionModel::supportedDropActions() const

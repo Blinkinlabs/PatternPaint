@@ -6,9 +6,6 @@
 #include <QDebug>
 #include <QPainter>
 
-#define FRAME_COLOR_DEFAULT    QColor(0, 0, 0, 255)
-#define PATTERN_FRAME_SPEED_DEFAULT_VALUE 10
-
 PatternFrameModel::PatternFrameModel(QSize size, QObject *parent) :
     PatternModel(parent)
 {
@@ -27,14 +24,19 @@ int PatternFrameModel::rowCount(const QModelIndex &) const
 Qt::ItemFlags PatternFrameModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
-        return Qt::ItemIsEnabled | Qt::ItemIsDropEnabled;
+        return (Qt::ItemIsEnabled
+                | Qt::ItemIsDropEnabled);
 
-    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable | Qt::ItemIsDragEnabled;
+    return (Qt::ItemIsEnabled
+            | Qt::ItemIsSelectable
+            | Qt::ItemIsEditable
+            | Qt::ItemIsDragEnabled);
 }
 
 Qt::DropActions PatternFrameModel::supportedDropActions() const
 {
-    return Qt::CopyAction | Qt::MoveAction;
+    return (Qt::CopyAction
+            | Qt::MoveAction);
 }
 
 void PatternFrameModel::pushUndoState()
@@ -76,12 +78,13 @@ QVariant PatternFrameModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    if (index.row() >= state.frames.count() || index.row() < 0)
+    if (index.row() >= state.frames.count())
         return QVariant();
 
     if (role == FrameImage || role == Qt::EditRole || role == EditImage)
         return state.frames.at(index.row());
 
+    // TODO: Why are these stored here?
     if (role == FrameSize)
         return state.frameSize;
 
@@ -102,11 +105,20 @@ bool PatternFrameModel::setData(const QModelIndex &index, const QVariant &value,
     if (!index.isValid())
         return false;
 
+    if (index.row() >= state.frames.count())
+        return false;
+
+    // TODO: Only push an undo state if the operation succeeds?
     pushUndoState();
 
     if (role == FrameImage || role == Qt::EditRole || role == EditImage) {
+        QImage newImage = value.value<QImage>();
+
+        if(newImage.size() != state.frameSize)
+            return false;
+
         // TODO: enforce size scaling here?
-        state.frames.replace(index.row(), value.value<QImage>());
+        state.frames.replace(index.row(), newImage);
         QVector<int> roles;
         roles.append(FrameImage);
         emit dataChanged(index, index, roles);
@@ -116,20 +128,7 @@ bool PatternFrameModel::setData(const QModelIndex &index, const QVariant &value,
     if (role == FrameSize) {
         for (int row = 0; row < rowCount(); row++) {
             state.frameSize = value.toSize();
-            QImage newImage;
-            bool scale = true;      // Enforce scaling...
-
-            if (scale) {
-                newImage = state.frames.at(row).scaled(state.frameSize);
-            } else {
-                newImage = QImage(state.frameSize,
-                                  QImage::Format_ARGB32_Premultiplied);
-                newImage.fill(FRAME_COLOR_DEFAULT);
-
-                QPainter painter(&newImage);
-                painter.drawImage(0, 0, state.frames.at(row));
-            }
-
+            QImage newImage = state.frames.at(row).scaled(state.frameSize);
             state.frames.replace(row, newImage);
         }
 
@@ -209,3 +208,25 @@ bool PatternFrameModel::removeRows(int position, int rows, const QModelIndex &)
     emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
     return true;
 }
+
+//QDataStream &operator<<(QDataStream &out, const PatternFrameModel &ba)
+//{
+//    if (ba.isNull() && out.version() >= 6) {
+//        out << (quint32)0xffffffff;
+//        return out;
+//    }
+//    return out.writeBytes(ba.constData(), ba.size());
+//}
+
+
+//QDataStream &operator>>(QDataStream &in, PatternFrameModel &ba)
+//{
+//    ba.clear();
+//    quint32 len;
+//    in >> len;
+//    if (len == 0xffffffff)
+//        return in;
+
+//    const quint32 Step = 1024 * 1024;
+//    quint32 allocated = 0;
+//}

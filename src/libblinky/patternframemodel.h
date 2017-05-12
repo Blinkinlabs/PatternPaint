@@ -9,6 +9,9 @@
 
 class PatternFrameUndoCommand;
 
+#define FRAME_COLOR_DEFAULT    QColor(0, 0, 0, 255)
+#define PATTERN_FRAME_SPEED_DEFAULT_VALUE 10
+
 /// Model for a pattern made from a list of QImage frames
 class PatternFrameModel : public PatternModel
 {
@@ -52,6 +55,12 @@ private:
     void pushUndoState();
 
     void applyUndoState(State newState);
+
+//    friend QDataStream &operator<<(QDataStream &, const PatternFrameModel &);
+//    friend QDataStream &operator>>(QDataStream &, PatternFrameModel &);
 };
+
+
+
 
 #endif // PATTERNFRAMEMODEL_H
