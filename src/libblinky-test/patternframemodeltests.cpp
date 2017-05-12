@@ -1,3 +1,4 @@
+#include <QBuffer>
 #include <QSignalSpy>
 #include <QTest>
 
@@ -123,13 +124,13 @@ void PatternFrameModelTests::insertRowsAtFront()
 
     // Insert one row, then color its image red
     model.insertRows(0,1);
-    model.setData(model.index(0,0), redImage, PatternFrameModel::FrameImage);
+    model.setData(model.index(0), redImage, PatternFrameModel::FrameImage);
 
     // Insert a row at the front, then verify the images are in the correct order.
     QVERIFY(model.insertRows(0,1) == true);
 
-    QVERIFY(model.data(model.index(0,0), PatternFrameModel::FrameImage).value<QImage>() == defaultImage);
-    QVERIFY(model.data(model.index(1,0), PatternFrameModel::FrameImage).value<QImage>() == redImage);
+    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>() == defaultImage);
+    QVERIFY(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>() == redImage);
 
     QVERIFY(spy.count() == 4); // 1 for 'modified', 2 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?
@@ -153,13 +154,13 @@ void PatternFrameModelTests::insertRowsAtBack()
 
     // Insert one row, then color its image red
     model.insertRows(0,1);
-    model.setData(model.index(0,0), redImage, PatternFrameModel::FrameImage);
+    model.setData(model.index(0), redImage, PatternFrameModel::FrameImage);
 
     // Insert a row at the front, then verify the images are in the correct order.
     QVERIFY(model.insertRows(1,1) == true);
 
-    QVERIFY(model.data(model.index(0,0), PatternFrameModel::FrameImage).value<QImage>() == redImage);
-    QVERIFY(model.data(model.index(1,0), PatternFrameModel::FrameImage).value<QImage>() == defaultImage);
+    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>() == redImage);
+    QVERIFY(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>() == defaultImage);
 
     QVERIFY(spy.count() == 4); // 1 for 'modified', 2 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?
@@ -183,15 +184,15 @@ void PatternFrameModelTests::insertRowsInMiddle()
 
     // Insert two rows, then color them red
     model.insertRows(0,2);
-    model.setData(model.index(0,0), redImage, PatternFrameModel::FrameImage);
-    model.setData(model.index(1,0), redImage, PatternFrameModel::FrameImage);
+    model.setData(model.index(0), redImage, PatternFrameModel::FrameImage);
+    model.setData(model.index(1), redImage, PatternFrameModel::FrameImage);
 
     // Insert a row in the middle, then verify the images are in the correct order.
     QVERIFY(model.insertRows(1,1) == true);
 
-    QVERIFY(model.data(model.index(0,0), PatternFrameModel::FrameImage).value<QImage>() == redImage);
-    QVERIFY(model.data(model.index(1,0), PatternFrameModel::FrameImage).value<QImage>() == defaultImage);
-    QVERIFY(model.data(model.index(2,0), PatternFrameModel::FrameImage).value<QImage>() == redImage);
+    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>() == redImage);
+    QVERIFY(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>() == defaultImage);
+    QVERIFY(model.data(model.index(2), PatternFrameModel::FrameImage).value<QImage>() == redImage);
 
     QVERIFY(spy.count() == 5); // 1 for 'modified', 2 for 'insertRows', 2 for 'setData'
     // TODO: Verify the spy messages are correct?
@@ -290,13 +291,13 @@ void PatternFrameModelTests::removeRowsAtFront()
 
     // Insert two rows, color the first one red and the second one green
     model.insertRows(0,2);
-    model.setData(model.index(0,0), redImage, PatternFrameModel::FrameImage);
-    model.setData(model.index(1,0), greenImage, PatternFrameModel::FrameImage);
+    model.setData(model.index(0), redImage, PatternFrameModel::FrameImage);
+    model.setData(model.index(1), greenImage, PatternFrameModel::FrameImage);
 
     // Remove the first one, then verify that the remaining row is green.
     QVERIFY(model.removeRows(0,1) == true);
 
-    QVERIFY(model.data(model.index(0,0), PatternFrameModel::FrameImage).value<QImage>() == greenImage);
+    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>() == greenImage);
 
     QVERIFY(spy.count() == 5); // 1 for 'modified', 1 for 'insertRows', 2 for 'setData', 1 for 'removeRows'
     // TODO: Verify the spy messages are correct?
@@ -320,13 +321,13 @@ void PatternFrameModelTests::removeRowsAtBack()
 
     // Insert two rows, color the first one red and the second one green
     model.insertRows(0,2);
-    model.setData(model.index(0,0), redImage, PatternFrameModel::FrameImage);
-    model.setData(model.index(1,0), greenImage, PatternFrameModel::FrameImage);
+    model.setData(model.index(0), redImage, PatternFrameModel::FrameImage);
+    model.setData(model.index(1), greenImage, PatternFrameModel::FrameImage);
 
     // Remove the second one, then verify that the remaining row is red.
     QVERIFY(model.removeRows(1,1) == true);
 
-    QVERIFY(model.data(model.index(0,0), PatternFrameModel::FrameImage).value<QImage>() == redImage);
+    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>() == redImage);
 
     QVERIFY(spy.count() == 5); // 1 for 'modified', 1 for 'insertRows', 2 for 'setData', 1 for 'removeRows'
     // TODO: Verify the spy messages are correct?
@@ -350,15 +351,15 @@ void PatternFrameModelTests::removeRowsInMiddle()
 
     // Insert three rows, color them red, green,red
     model.insertRows(0,3);
-    model.setData(model.index(0,0), redImage, PatternFrameModel::FrameImage);
-    model.setData(model.index(1,0), greenImage, PatternFrameModel::FrameImage);
-    model.setData(model.index(2,0), redImage, PatternFrameModel::FrameImage);
+    model.setData(model.index(0), redImage, PatternFrameModel::FrameImage);
+    model.setData(model.index(1), greenImage, PatternFrameModel::FrameImage);
+    model.setData(model.index(2), redImage, PatternFrameModel::FrameImage);
 
     // Remove the second one, then verify that the remaining rows are red.
     QVERIFY(model.removeRows(1,1) == true);
 
-    QVERIFY(model.data(model.index(0,0), PatternFrameModel::FrameImage).value<QImage>() == redImage);
-    QVERIFY(model.data(model.index(1,0), PatternFrameModel::FrameImage).value<QImage>() == redImage);
+    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>() == redImage);
+    QVERIFY(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>() == redImage);
 
     QVERIFY(spy.count() == 6); // 1 for 'modified', 1 for 'insertRows', 3 for 'setData', 1 for 'removeRows'
     // TODO: Verify the spy messages are correct?
@@ -378,7 +379,7 @@ void PatternFrameModelTests::dataIndexOutOfRangeTest()
     PatternFrameModel model(startSize);
 
     model.insertRows(0,1);
-    QModelIndex modelIndex = model.index(0,0);
+    QModelIndex modelIndex = model.index(0);
     model.removeRows(0,1);
     QVERIFY(modelIndex.row() == 0);
 
@@ -399,7 +400,7 @@ void PatternFrameModelTests::setDataIndexOutOfRangeTest()
     PatternFrameModel model(startSize);
 
     model.insertRows(0,1);
-    QModelIndex modelIndex = model.index(0,0);
+    QModelIndex modelIndex = model.index(0);
     model.removeRows(0,1);
     QVERIFY(modelIndex.row() == 0);
 
@@ -412,7 +413,7 @@ void PatternFrameModelTests::canSetFrameImageBadSizeTest()
     PatternFrameModel model(startSize);
     model.insertRows(0,1);
 
-    QModelIndex modelIndex = model.index(0,0);
+    QModelIndex modelIndex = model.index(0);
 
     QImage image(startSize*2, QImage::Format_ARGB32_Premultiplied);
 
@@ -429,7 +430,7 @@ void PatternFrameModelTests::canSetFrameImageTest()
 
     model.insertRows(0,1);
 
-    QModelIndex modelIndex = model.index(0,0);
+    QModelIndex modelIndex = model.index(0);
 
     QImage image(startSize, QImage::Format_ARGB32_Premultiplied);
     image.fill(FRAME_COLOR_DEFAULT);
@@ -456,7 +457,7 @@ void PatternFrameModelTests::canSetFrameSizeTest()
 
     model.insertRows(0,1);
 
-    QModelIndex modelIndex = model.index(0,0);
+    QModelIndex modelIndex = model.index(0);
 
     QVERIFY(model.data(modelIndex, PatternFrameModel::FrameSize).toSize() == startSize);
 
@@ -481,7 +482,7 @@ void PatternFrameModelTests::canSetFrameSpeedTest()
 
     model.insertRows(0,1);
 
-    QModelIndex modelIndex = model.index(0,0);
+    QModelIndex modelIndex = model.index(0);
 
     QVERIFY(model.data(modelIndex, PatternFrameModel::FrameSpeed).toFloat() == PATTERN_FRAME_SPEED_DEFAULT_VALUE);
 
@@ -504,7 +505,7 @@ void PatternFrameModelTests::canSetFileNameTest()
 
     model.insertRows(0,1);
 
-    QModelIndex modelIndex = model.index(0,0);
+    QModelIndex modelIndex = model.index(0);
 
     QVERIFY(model.data(modelIndex, PatternFrameModel::FileName).toString() == "");
 
@@ -527,7 +528,7 @@ void PatternFrameModelTests::canSetModifiedTest()
 
     model.insertRows(0,1);
 
-    QModelIndex modelIndex = model.index(0,0);
+    QModelIndex modelIndex = model.index(0);
 
     QVERIFY(model.data(modelIndex, PatternFrameModel::Modified).toBool() == true);
 
@@ -536,4 +537,108 @@ void PatternFrameModelTests::canSetModifiedTest()
 
     QVERIFY(spy.count() == 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?
+}
+
+void PatternFrameModelTests::readFromStreamTest()
+{
+    // Build some data for the read test
+    QSize frameSize(10,11);
+    QString fileName("filename");
+    float frameSpeed = 1.234;
+    QList<QImage> frames;
+
+    QImage redImage(frameSize, QImage::Format_ARGB32_Premultiplied);
+    redImage.fill(Qt::GlobalColor::red);
+
+    QImage greenImage(frameSize, QImage::Format_ARGB32_Premultiplied);
+    greenImage.fill(Qt::GlobalColor::green);
+
+    frames.append(redImage);
+    frames.append(greenImage);
+
+    // Pack the data into a stream
+    QBuffer buffer;
+    buffer.open(QBuffer::ReadWrite);
+
+    QDataStream stream;
+    stream.setDevice(&buffer);
+
+    stream << frameSize;
+    stream << fileName;
+    stream << frameSpeed;
+    stream << frames;
+    stream << QString("endOfStream");
+    buffer.reset();
+
+    // Read the data back to verify functionality.
+    PatternFrameModel model(frameSize*10);
+    stream >> model;
+
+    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameSize) == frameSize);
+    QVERIFY(model.data(model.index(0), PatternFrameModel::FileName).toString() == fileName);
+    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameSpeed).toFloat() == frameSpeed);
+    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>() == redImage);
+    QVERIFY(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>() == greenImage);
+
+    QString endOfStreamMarker;
+    stream >> endOfStreamMarker;
+    QVERIFY(endOfStreamMarker == "endOfStream");
+}
+
+void PatternFrameModelTests::writeToStreamTest()
+{
+    // Build some data for the write test
+    QSize frameSize(10,11);
+    QString fileName("filename");
+    float frameSpeed = 1.234;
+
+    QImage redImage(frameSize, QImage::Format_ARGB32_Premultiplied);
+    redImage.fill(Qt::GlobalColor::red);
+
+    QImage greenImage(frameSize, QImage::Format_ARGB32_Premultiplied);
+    greenImage.fill(Qt::GlobalColor::green);
+
+    // Load it into the model
+    PatternFrameModel model(frameSize*10);
+    model.insertRows(0,2);
+    model.setData(model.index(0), frameSize, PatternFrameModel::FrameSize);
+    model.setData(model.index(0), fileName, PatternFrameModel::FileName);
+    model.setData(model.index(0), frameSpeed, PatternFrameModel::FrameSpeed);
+    model.setData(model.index(0), redImage, PatternFrameModel::FrameImage);
+    model.setData(model.index(1), redImage, PatternFrameModel::FrameImage);
+
+    // Pack the model into a stream
+    QBuffer buffer;
+    buffer.open(QBuffer::ReadWrite);
+
+    QDataStream stream;
+    stream.setDevice(&buffer);
+
+    stream << model;
+    stream << QString("endOfStream");
+    buffer.reset();
+
+    // Then read the data out from the stream
+    QSize readFrameSize;
+    QString readFileName;
+    float readFrameSpeed;
+    QList<QImage> readFrames;
+
+    stream >> readFrameSize;
+    stream >> readFileName;
+    stream >> readFrameSpeed;
+    stream >> readFrames;
+
+    for(QImage &frame : readFrames)
+        frame = frame.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+
+    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameSize) == readFrameSize);
+    QVERIFY(model.data(model.index(0), PatternFrameModel::FileName).toString() == readFileName);
+    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameSpeed).toFloat() == readFrameSpeed);
+    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>() == readFrames.at(0));
+    QVERIFY(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>() == readFrames.at(1));
+
+    QString endOfStreamMarker;
+    stream >> endOfStreamMarker;
+    QVERIFY(endOfStreamMarker == "endOfStream");
 }

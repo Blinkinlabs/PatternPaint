@@ -46,6 +46,9 @@ private slots:
     void canSetFrameSpeedTest();
     void canSetFileNameTest();
     void canSetModifiedTest();
+
+    void readFromStreamTest();
+    void writeToStreamTest();
 };
 
 #endif // PATTERNFRAMEMODELTESTS_H

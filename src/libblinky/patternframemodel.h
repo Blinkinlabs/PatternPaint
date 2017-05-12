@@ -56,8 +56,8 @@ private:
 
     void applyUndoState(State newState);
 
-//    friend QDataStream &operator<<(QDataStream &, const PatternFrameModel &);
-//    friend QDataStream &operator>>(QDataStream &, PatternFrameModel &);
+    friend QDataStream &operator<<(QDataStream &, const PatternFrameModel &);
+    friend QDataStream &operator>>(QDataStream &, PatternFrameModel &);
 };
 
 

@@ -221,24 +221,35 @@ bool PatternFrameModel::removeRows(int position, int rows, const QModelIndex &)
     return true;
 }
 
-//QDataStream &operator<<(QDataStream &out, const PatternFrameModel &ba)
-//{
-//    if (ba.isNull() && out.version() >= 6) {
-//        out << (quint32)0xffffffff;
-//        return out;
-//    }
-//    return out.writeBytes(ba.constData(), ba.size());
-//}
+QDataStream &operator<<(QDataStream &stream, const PatternFrameModel &model)
+{
+    stream << model.state.frameSize;
+    stream << model.state.fileName;
+    stream << model.state.frameSpeed;
+    stream << model.state.frames;
+
+    return stream;
+}
 
 
-//QDataStream &operator>>(QDataStream &in, PatternFrameModel &ba)
-//{
-//    ba.clear();
-//    quint32 len;
-//    in >> len;
-//    if (len == 0xffffffff)
-//        return in;
+QDataStream &operator>>(QDataStream &stream, PatternFrameModel &model)
+{
+    PatternFrameModel::State newState;
 
-//    const quint32 Step = 1024 * 1024;
-//    quint32 allocated = 0;
-//}
+    // TODO: Version first?
+    stream >> newState.frameSize;
+    stream >> newState.fileName;
+    stream >> newState.frameSpeed;
+    stream >> newState.frames;
+
+    // TODO: Data validation?
+
+    // TODO: Not clear if the format actually makes a difference
+    for(QImage &frame : newState.frames)
+        frame = frame.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+
+    model.state = newState;
+    // TODO: Be noisy with messages, since our state just changed?
+
+    return stream;
+}
