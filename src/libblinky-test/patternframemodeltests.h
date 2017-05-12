@@ -16,8 +16,22 @@ private slots:
 
     void getUndoStackTest();
 
-    // insertRows
-    // removeRows
+    void insertRowsNegativeIndexFails();
+    void insertRowsTooHighIndexFails();
+    void insertRowsOneRow();
+    void insertRowsMultipleRows();
+    void insertRowsAtFront();
+    void insertRowsAtBack();
+    void insertRowsInMiddle();
+
+    void removeRowsNegativeIndexFails();
+    void removeRowsTooHighIndexFails();
+    void removeRowsTooHighCountFails();
+    void removeRowsOneRow();
+    void removeRowsMultipleRows();
+    void removeRowsAtFront();
+    void removeRowsAtBack();
+    void removeRowsInMiddle();
 
     void dataInvalidIndexTest();
     void dataIndexOutOfRangeTest();

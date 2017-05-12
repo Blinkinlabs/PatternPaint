@@ -174,6 +174,12 @@ bool PatternFrameModel::setData(const QModelIndex &index, const QVariant &value,
 
 bool PatternFrameModel::insertRows(int position, int rows, const QModelIndex &)
 {
+    if(position < 0)
+        return false;
+
+    if(position > state.frames.length())
+        return false;
+
     pushUndoState();
     beginInsertRows(QModelIndex(), position, position+rows-1);
 
@@ -194,6 +200,12 @@ bool PatternFrameModel::insertRows(int position, int rows, const QModelIndex &)
 
 bool PatternFrameModel::removeRows(int position, int rows, const QModelIndex &)
 {
+    if(position < 0)
+        return false;
+
+    if(position + rows > state.frames.length())
+        return false;
+
     pushUndoState();
     beginRemoveRows(QModelIndex(), position, position+rows-1);
 
