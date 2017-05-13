@@ -124,7 +124,7 @@ void PatternFrameModelTests::insertRowsAtFront()
 
     // Insert one row, then color its image red
     model.insertRows(0,1);
-    model.setData(model.index(0), redImage, PatternFrameModel::FrameImage);
+    model.setData(model.index(0), redImage, PatternFrameModel::EditImage);
 
     // Insert a row at the front, then verify the images are in the correct order.
     QVERIFY(model.insertRows(0,1) == true);
@@ -154,7 +154,7 @@ void PatternFrameModelTests::insertRowsAtBack()
 
     // Insert one row, then color its image red
     model.insertRows(0,1);
-    model.setData(model.index(0), redImage, PatternFrameModel::FrameImage);
+    model.setData(model.index(0), redImage, PatternFrameModel::EditImage);
 
     // Insert a row at the front, then verify the images are in the correct order.
     QVERIFY(model.insertRows(1,1) == true);
@@ -184,8 +184,8 @@ void PatternFrameModelTests::insertRowsInMiddle()
 
     // Insert two rows, then color them red
     model.insertRows(0,2);
-    model.setData(model.index(0), redImage, PatternFrameModel::FrameImage);
-    model.setData(model.index(1), redImage, PatternFrameModel::FrameImage);
+    model.setData(model.index(0), redImage, PatternFrameModel::EditImage);
+    model.setData(model.index(1), redImage, PatternFrameModel::EditImage);
 
     // Insert a row in the middle, then verify the images are in the correct order.
     QVERIFY(model.insertRows(1,1) == true);
@@ -291,8 +291,8 @@ void PatternFrameModelTests::removeRowsAtFront()
 
     // Insert two rows, color the first one red and the second one green
     model.insertRows(0,2);
-    model.setData(model.index(0), redImage, PatternFrameModel::FrameImage);
-    model.setData(model.index(1), greenImage, PatternFrameModel::FrameImage);
+    model.setData(model.index(0), redImage, PatternFrameModel::EditImage);
+    model.setData(model.index(1), greenImage, PatternFrameModel::EditImage);
 
     // Remove the first one, then verify that the remaining row is green.
     QVERIFY(model.removeRows(0,1) == true);
@@ -321,8 +321,8 @@ void PatternFrameModelTests::removeRowsAtBack()
 
     // Insert two rows, color the first one red and the second one green
     model.insertRows(0,2);
-    model.setData(model.index(0), redImage, PatternFrameModel::FrameImage);
-    model.setData(model.index(1), greenImage, PatternFrameModel::FrameImage);
+    model.setData(model.index(0), redImage, PatternFrameModel::EditImage);
+    model.setData(model.index(1), greenImage, PatternFrameModel::EditImage);
 
     // Remove the second one, then verify that the remaining row is red.
     QVERIFY(model.removeRows(1,1) == true);
@@ -351,9 +351,9 @@ void PatternFrameModelTests::removeRowsInMiddle()
 
     // Insert three rows, color them red, green,red
     model.insertRows(0,3);
-    model.setData(model.index(0), redImage, PatternFrameModel::FrameImage);
-    model.setData(model.index(1), greenImage, PatternFrameModel::FrameImage);
-    model.setData(model.index(2), redImage, PatternFrameModel::FrameImage);
+    model.setData(model.index(0), redImage, PatternFrameModel::EditImage);
+    model.setData(model.index(1), greenImage, PatternFrameModel::EditImage);
+    model.setData(model.index(2), redImage, PatternFrameModel::EditImage);
 
     // Remove the second one, then verify that the remaining rows are red.
     QVERIFY(model.removeRows(1,1) == true);
@@ -407,7 +407,17 @@ void PatternFrameModelTests::setDataIndexOutOfRangeTest()
     QVERIFY(model.setData(modelIndex, QImage(), PatternFrameModel::FrameImage) == false);
 }
 
-void PatternFrameModelTests::canSetFrameImageBadSizeTest()
+void PatternFrameModelTests::setFrameImageFailsTest()
+{
+    QSize startSize(10,10);
+    PatternFrameModel model(startSize);
+    model.insertRows(0,1);
+
+    QImage image = model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>();
+    QVERIFY(model.setData(model.index(0), image, PatternFrameModel::FrameImage) == false);
+}
+
+void PatternFrameModelTests::canSetEditImageBadSizeTest()
 {
     QSize startSize(10,10);
     PatternFrameModel model(startSize);
@@ -417,10 +427,10 @@ void PatternFrameModelTests::canSetFrameImageBadSizeTest()
 
     QImage image(startSize*2, QImage::Format_ARGB32_Premultiplied);
 
-    QVERIFY(model.setData(modelIndex, image, PatternFrameModel::FrameImage) == false);
+    QVERIFY(model.setData(modelIndex, image, PatternFrameModel::EditImage) == false);
 }
 
-void PatternFrameModelTests::canSetFrameImageTest()
+void PatternFrameModelTests::canSetEditImageTest()
 {
     QSize startSize(10,10);
     PatternFrameModel model(startSize);
@@ -435,12 +445,12 @@ void PatternFrameModelTests::canSetFrameImageTest()
     QImage image(startSize, QImage::Format_ARGB32_Premultiplied);
     image.fill(FRAME_COLOR_DEFAULT);
 
-    QVERIFY(model.data(modelIndex, PatternFrameModel::FrameImage).value<QImage>() == image);
+    QVERIFY(model.data(modelIndex, PatternFrameModel::EditImage).value<QImage>() == image);
 
     image.fill(Qt::GlobalColor::red);
 
-    QVERIFY(model.setData(modelIndex, image, PatternFrameModel::FrameImage) == true);
-    QVERIFY(model.data(modelIndex, PatternFrameModel::FrameImage).value<QImage>() == image);
+    QVERIFY(model.setData(modelIndex, image, PatternFrameModel::EditImage) == true);
+    QVERIFY(model.data(modelIndex, PatternFrameModel::EditImage).value<QImage>() == image);
 
     QVERIFY(spy.count() == 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?

@@ -39,7 +39,7 @@ private slots:
     void setDataInvalidIndexTest();
     void setDataIndexOutOfRangeTest();
 
-    void setFrameImageTestFails();
+    void setFrameImageFailsTest();
 
     void canSetEditImageBadSizeTest();
     void canSetEditImageTest();

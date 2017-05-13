@@ -410,7 +410,7 @@ void PatternScrollModelTests::setDataIndexOutOfRangeTest()
     QVERIFY(model.setData(modelIndex, QImage(), PatternScrollModel::FrameImage) == false);
 }
 
-void PatternScrollModelTests::setFrameImageTestFails()
+void PatternScrollModelTests::setFrameImageFailsTest()
 {
     QSize startSize(10,10);
     PatternScrollModel model(startSize);

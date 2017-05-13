@@ -111,7 +111,7 @@ bool PatternFrameModel::setData(const QModelIndex &index, const QVariant &value,
     // TODO: Only push an undo state if the operation succeeds?
     pushUndoState();
 
-    if (role == FrameImage || role == Qt::EditRole || role == EditImage) {
+    if (role == Qt::EditRole || role == EditImage) {
         QImage newImage = value.value<QImage>();
 
         if(newImage.size() != state.frameSize)
