@@ -7,6 +7,9 @@
 #include <QUndoStack>
 #include "patternmodel.h"
 
+#define FRAME_COLOR_DEFAULT    QColor(0, 0, 0, 255)
+#define PATTERN_FRAME_SPEED_DEFAULT_VALUE 20
+
 class PatternScrollUndoCommand;
 
 /// Model for a pattern made from a single QImage that the fixture scrolls across
@@ -52,6 +55,9 @@ private:
     void pushUndoState();
 
     void applyUndoState(State newState);
+
+    friend QDataStream &operator<<(QDataStream &, const PatternScrollModel &);
+//    friend QDataStream &operator>>(QDataStream &, PatternScrollModel &);
 };
 
 #endif // PATTERNSCROLLMODEL_H

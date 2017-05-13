@@ -17,6 +17,7 @@
 #include "blinkytapeuploaddatatests.h"
 #include "blinkypendantuploaddatatests.h"
 #include "patternframemodeltests.h"
+#include "patternscrollmodeltests.h"
 
 int main(int argc, char *argv[])
 {
@@ -75,6 +76,9 @@ int main(int argc, char *argv[])
 
     PatternFrameModelTests patternFrameModelTests;
     result |= QTest::qExec(&patternFrameModelTests);
+
+    PatternScrollModelTests patternScrollModelTests;
+    result |= QTest::qExec(&patternScrollModelTests);
 
     return result;
 }

@@ -31,7 +31,8 @@ HEADERS += \
     firmwarereadertests.h \
     blinkytapeuploaddatatests.h \
     blinkypendantuploaddatatests.h \
-    patternframemodeltests.h
+    patternframemodeltests.h \
+    patternscrollmodeltests.h
 
 SOURCES += \
     avr109commandstests.cpp \
@@ -51,4 +52,5 @@ SOURCES += \
     firmwarereadertests.cpp \
     blinkytapeuploaddatatests.cpp \
     blinkypendantuploaddatatests.cpp \
-    patternframemodeltests.cpp
+    patternframemodeltests.cpp \
+    patternscrollmodeltests.cpp

@@ -1,9 +1,9 @@
-#ifndef PATTERNFRAMEMODELTESTS_H
-#define PATTERNFRAMEMODELTESTS_H
+#ifndef PATTERNSCROLLMODELTESTS_H
+#define PATTERNSCROLLMODELTESTS_H
 
 #include <QObject>
 
-class PatternFrameModelTests : public QObject
+class PatternScrollModelTests : public QObject
 {
     Q_OBJECT
 private slots:
@@ -39,8 +39,10 @@ private slots:
     void setDataInvalidIndexTest();
     void setDataIndexOutOfRangeTest();
 
-    void canSetFrameImageBadSizeTest();
-    void canSetFrameImageTest();
+    void setFrameImageTestFails();
+
+    void canSetEditImageBadSizeTest();
+    void canSetEditImageTest();
 
     void canSetFrameSizeTest();
     void canSetFrameSpeedTest();
@@ -48,9 +50,11 @@ private slots:
     void canSetModifiedTest();
 
     // TODO: Frame resize tests
+    // TODO: getEditImage tests when the fixture size is larger than edit image size
+    // TODO: frameImage / editImage cross tests
 
-    void readFromStreamTest();
-    void writeToStreamTest();
+//    void readFromStreamTest();
+//    void writeToStreamTest();
 };
 
-#endif // PATTERNFRAMEMODELTESTS_H
+#endif // PATTERNSCROLLMODELTESTS_H

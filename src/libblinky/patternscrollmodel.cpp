@@ -6,9 +6,6 @@
 #include <QDebug>
 #include <QPainter>
 
-#define FRAME_COLOR_DEFAULT    QColor(0, 0, 0, 255)
-#define PATTERN_FRAME_SPEED_DEFAULT_VALUE 20
-
 PatternScrollModel::PatternScrollModel(QSize size, QObject *parent) :
     PatternModel(parent)
 {
@@ -19,8 +16,7 @@ PatternScrollModel::PatternScrollModel(QSize size, QObject *parent) :
     undoStack.setUndoLimit(50);
 
     // TODO: How to handle 0-sized image?
-    state.image = QImage(state.frameSize, QImage::Format_ARGB32_Premultiplied);
-    state.image.fill(FRAME_COLOR_DEFAULT);
+    state.image = QImage(0, state.frameSize.height(), QImage::Format_ARGB32_Premultiplied);
 }
 
 int PatternScrollModel::rowCount(const QModelIndex &) const
@@ -135,12 +131,11 @@ bool PatternScrollModel::setData(const QModelIndex &index, const QVariant &value
 
     pushUndoState();
 
-    if (role == FrameImage || role == Qt::EditRole) {
-        return false;
-    }
-
     if (role == EditImage) {
-        // TODO: enforce size scaling here?
+        QImage newImage = value.value<QImage>();
+
+        if(newImage.size() != state.image.size())
+            return false;
 
         QPainter painter;
         painter.begin(&state.image);
@@ -214,10 +209,19 @@ bool PatternScrollModel::setData(const QModelIndex &index, const QVariant &value
 
 bool PatternScrollModel::insertRows(int position, int rows, const QModelIndex &)
 {
+    if(position < 0)
+        return false;
+
+    if(position > state.image.width())
+        return false;
+
     pushUndoState();
     beginInsertRows(QModelIndex(), position, position+rows-1);
 
-    QImage newImage(state.image.width()+rows, state.frameSize.height(), QImage::Format_ARGB32_Premultiplied);
+    // Create a new image, then copy slice(s) of the original image into it.
+    QImage newImage(state.image.width()+rows,
+                    state.frameSize.height(),
+                    QImage::Format_ARGB32_Premultiplied);
 
     newImage.fill(FRAME_COLOR_DEFAULT);
 
@@ -249,6 +253,12 @@ bool PatternScrollModel::insertRows(int position, int rows, const QModelIndex &)
 
 bool PatternScrollModel::removeRows(int position, int rows, const QModelIndex &)
 {
+    if(position < 0)
+        return false;
+
+    if(position + rows > state.image.width())
+        return false;
+
     pushUndoState();
     beginRemoveRows(QModelIndex(), position, position+rows-1);
 
@@ -283,3 +293,35 @@ bool PatternScrollModel::removeRows(int position, int rows, const QModelIndex &)
     emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
     return true;
 }
+
+//QDataStream &operator<<(QDataStream &stream, const PatternScrollModel &model)
+//{
+//    stream << model.state.frameSize;
+//    stream << model.state.fileName;
+//    stream << model.state.frameSpeed;
+//    stream << model.state.frames;
+
+//    return stream;
+//}
+
+//QDataStream &operator>>(QDataStream &stream, PatternScrollModel &model)
+//{
+//    PatternFrameModel::State newState;
+
+//    // TODO: Version first?
+//    stream >> newState.frameSize;
+//    stream >> newState.fileName;
+//    stream >> newState.frameSpeed;
+//    stream >> newState.frames;
+
+//    // TODO: Data validation?
+
+//    // TODO: Not clear if the format actually makes a difference
+//    for(QImage &frame : newState.frames)
+//        frame = frame.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+
+//    model.state = newState;
+//    // TODO: Be noisy with messages, since our state just changed?
+
+//    return stream;
+//}
