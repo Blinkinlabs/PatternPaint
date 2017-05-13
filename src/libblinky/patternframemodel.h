@@ -9,9 +9,6 @@
 
 class PatternFrameUndoCommand;
 
-#define FRAME_COLOR_DEFAULT    QColor(0, 0, 0, 255)
-#define PATTERN_FRAME_SPEED_DEFAULT_VALUE 10
-
 /// Model for a pattern made from a list of QImage frames
 class PatternFrameModel : public PatternModel
 {

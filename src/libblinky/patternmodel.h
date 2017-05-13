@@ -5,6 +5,9 @@
 #include <QObject>
 #include <QUndoStack>
 
+#define FRAME_COLOR_DEFAULT    QColor(0, 0, 0, 255)
+#define PATTERN_FRAME_SPEED_DEFAULT_VALUE 20
+
 /// Interface for accessing a pattern model.
 class PatternModel : public QAbstractListModel
 {
