@@ -294,34 +294,33 @@ bool PatternScrollModel::removeRows(int position, int rows, const QModelIndex &)
     return true;
 }
 
-//QDataStream &operator<<(QDataStream &stream, const PatternScrollModel &model)
-//{
-//    stream << model.state.frameSize;
-//    stream << model.state.fileName;
-//    stream << model.state.frameSpeed;
-//    stream << model.state.frames;
+QDataStream &operator<<(QDataStream &stream, const PatternScrollModel &model)
+{
+    stream << model.state.frameSize;
+    stream << model.state.fileName;
+    stream << model.state.frameSpeed;
+    stream << model.state.image;
 
-//    return stream;
-//}
+    return stream;
+}
 
-//QDataStream &operator>>(QDataStream &stream, PatternScrollModel &model)
-//{
-//    PatternFrameModel::State newState;
+QDataStream &operator>>(QDataStream &stream, PatternScrollModel &model)
+{
+    PatternScrollModel::State newState;
 
-//    // TODO: Version first?
-//    stream >> newState.frameSize;
-//    stream >> newState.fileName;
-//    stream >> newState.frameSpeed;
-//    stream >> newState.frames;
+    // TODO: Version first?
+    stream >> newState.frameSize;
+    stream >> newState.fileName;
+    stream >> newState.frameSpeed;
+    stream >> newState.image;
 
-//    // TODO: Data validation?
+    // TODO: Data validation?
 
-//    // TODO: Not clear if the format actually makes a difference
-//    for(QImage &frame : newState.frames)
-//        frame = frame.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    // TODO: Not clear if the format actually makes a difference
+    newState.image = newState.image.convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
-//    model.state = newState;
-//    // TODO: Be noisy with messages, since our state just changed?
+    model.state = newState;
+    // TODO: Be noisy with messages, since our state just changed?
 
-//    return stream;
-//}
+    return stream;
+}

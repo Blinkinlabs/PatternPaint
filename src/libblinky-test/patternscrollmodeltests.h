@@ -53,8 +53,8 @@ private slots:
     // TODO: getEditImage tests when the fixture size is larger than edit image size
     // TODO: frameImage / editImage cross tests
 
-//    void readFromStreamTest();
-//    void writeToStreamTest();
+    void readFromStreamTest();
+    void writeToStreamTest();
 };
 
 #endif // PATTERNSCROLLMODELTESTS_H

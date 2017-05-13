@@ -57,7 +57,7 @@ private:
     void applyUndoState(State newState);
 
     friend QDataStream &operator<<(QDataStream &, const PatternScrollModel &);
-//    friend QDataStream &operator>>(QDataStream &, PatternScrollModel &);
+    friend QDataStream &operator>>(QDataStream &, PatternScrollModel &);
 };
 
 #endif // PATTERNSCROLLMODEL_H

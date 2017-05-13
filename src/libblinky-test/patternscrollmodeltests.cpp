@@ -550,106 +550,92 @@ void PatternScrollModelTests::canSetModifiedTest()
     // TODO: Verify the spy messages are correct?
 }
 
-//void PatternScrollModelTests::readFromStreamTest()
-//{
-//    // Build some data for the read test
-//    QSize frameSize(10,11);
-//    QString fileName("filename");
-//    float frameSpeed = 1.234;
-//    QList<QImage> frames;
+void PatternScrollModelTests::readFromStreamTest()
+{
+    // Build some data for the read test
+    QSize frameSize(10,11);
+    QString fileName("filename");
+    float frameSpeed = 1.234;
 
-//    QImage redImage(frameSize, QImage::Format_ARGB32_Premultiplied);
-//    redImage.fill(Qt::GlobalColor::red);
+    QImage image(frameSize, QImage::Format_ARGB32_Premultiplied);
+    image.fill(Qt::GlobalColor::red);
 
-//    QImage greenImage(frameSize, QImage::Format_ARGB32_Premultiplied);
-//    greenImage.fill(Qt::GlobalColor::green);
+    // Pack the data into a stream
+    QBuffer buffer;
+    buffer.open(QBuffer::ReadWrite);
 
-//    frames.append(redImage);
-//    frames.append(greenImage);
+    QDataStream stream;
+    stream.setDevice(&buffer);
 
-//    // Pack the data into a stream
-//    QBuffer buffer;
-//    buffer.open(QBuffer::ReadWrite);
+    stream << frameSize;
+    stream << fileName;
+    stream << frameSpeed;
+    stream << image;
+    stream << QString("endOfStream");
+    buffer.reset();
 
-//    QDataStream stream;
-//    stream.setDevice(&buffer);
+    // Read the data back to verify functionality.
+    PatternScrollModel model(frameSize*10);
+    stream >> model;
 
-//    stream << frameSize;
-//    stream << fileName;
-//    stream << frameSpeed;
-//    stream << frames;
-//    stream << QString("endOfStream");
-//    buffer.reset();
+    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameSize) == frameSize);
+    QVERIFY(model.data(model.index(0), PatternScrollModel::FileName).toString() == fileName);
+    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameSpeed).toFloat() == frameSpeed);
+    QVERIFY(model.data(model.index(0), PatternScrollModel::EditImage).value<QImage>() == image);
 
-//    // Read the data back to verify functionality.
-//    PatternScrollModel model(frameSize*10);
-//    stream >> model;
+    QString endOfStreamMarker;
+    stream >> endOfStreamMarker;
+    QVERIFY(endOfStreamMarker == "endOfStream");
+}
 
-//    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameSize) == frameSize);
-//    QVERIFY(model.data(model.index(0), PatternScrollModel::FileName).toString() == fileName);
-//    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameSpeed).toFloat() == frameSpeed);
-//    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameImage).value<QImage>() == redImage);
-//    QVERIFY(model.data(model.index(1), PatternScrollModel::FrameImage).value<QImage>() == greenImage);
+void PatternScrollModelTests::writeToStreamTest()
+{
+    // Build some data for the write test
+    QSize frameSize(10,11);
+    QString fileName("filename");
+    float frameSpeed = 1.234;
 
-//    QString endOfStreamMarker;
-//    stream >> endOfStreamMarker;
-//    QVERIFY(endOfStreamMarker == "endOfStream");
-//}
+    QImage image(QSize(2,11), QImage::Format_ARGB32_Premultiplied);
+    image.fill(Qt::GlobalColor::red);
 
-//void PatternScrollModelTests::writeToStreamTest()
-//{
-//    // Build some data for the write test
-//    QSize frameSize(10,11);
-//    QString fileName("filename");
-//    float frameSpeed = 1.234;
+    // Load it into the model
+    PatternScrollModel model(frameSize*10);
+    model.insertRows(0,2);
+    model.setData(model.index(0), frameSize, PatternScrollModel::FrameSize);
+    model.setData(model.index(0), fileName, PatternScrollModel::FileName);
+    model.setData(model.index(0), frameSpeed, PatternScrollModel::FrameSpeed);
+    model.setData(model.index(0), image, PatternScrollModel::EditImage);
 
-//    QImage redImage(frameSize, QImage::Format_ARGB32_Premultiplied);
-//    redImage.fill(Qt::GlobalColor::red);
+    // Pack the model into a stream
+    QBuffer buffer;
+    buffer.open(QBuffer::ReadWrite);
 
-//    QImage greenImage(frameSize, QImage::Format_ARGB32_Premultiplied);
-//    greenImage.fill(Qt::GlobalColor::green);
+    QDataStream stream;
+    stream.setDevice(&buffer);
 
-//    // Load it into the model
-//    PatternScrollModel model(frameSize*10);
-//    model.insertRows(0,2);
-//    model.setData(model.index(0), frameSize, PatternScrollModel::FrameSize);
-//    model.setData(model.index(0), fileName, PatternScrollModel::FileName);
-//    model.setData(model.index(0), frameSpeed, PatternScrollModel::FrameSpeed);
-//    model.setData(model.index(0), redImage, PatternScrollModel::FrameImage);
-//    model.setData(model.index(1), redImage, PatternScrollModel::FrameImage);
+    stream << model;
+    stream << QString("endOfStream");
+    buffer.reset();
 
-//    // Pack the model into a stream
-//    QBuffer buffer;
-//    buffer.open(QBuffer::ReadWrite);
+    // Then read the data out from the stream
+    QSize readFrameSize;
+    QString readFileName;
+    float readFrameSpeed;
+    QImage readImage;
 
-//    QDataStream stream;
-//    stream.setDevice(&buffer);
+    stream >> readFrameSize;
+    stream >> readFileName;
+    stream >> readFrameSpeed;
+    stream >> readImage;
 
-//    stream << model;
-//    stream << QString("endOfStream");
-//    buffer.reset();
+    readImage = readImage.convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
-//    // Then read the data out from the stream
-//    QSize readFrameSize;
-//    QString readFileName;
-//    float readFrameSpeed;
-//    QList<QImage> readFrames;
+    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameSize) == readFrameSize);
+    QVERIFY(model.data(model.index(0), PatternScrollModel::FileName).toString() == readFileName);
+    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameSpeed).toFloat() == readFrameSpeed);
+    QVERIFY(model.data(model.index(0), PatternScrollModel::EditImage).value<QImage>() == readImage);
 
-//    stream >> readFrameSize;
-//    stream >> readFileName;
-//    stream >> readFrameSpeed;
-//    stream >> readFrames;
-
-//    for(QImage &frame : readFrames)
-//        frame = frame.convertToFormat(QImage::Format_ARGB32_Premultiplied);
-
-//    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameSize) == readFrameSize);
-//    QVERIFY(model.data(model.index(0), PatternScrollModel::FileName).toString() == readFileName);
-//    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameSpeed).toFloat() == readFrameSpeed);
-//    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameImage).value<QImage>() == readFrames.at(0));
-//    QVERIFY(model.data(model.index(1), PatternScrollModel::FrameImage).value<QImage>() == readFrames.at(1));
-
-//    QString endOfStreamMarker;
-//    stream >> endOfStreamMarker;
-//    QVERIFY(endOfStreamMarker == "endOfStream");
-//}
+    QString endOfStreamMarker;
+    stream >> endOfStreamMarker;
+    QVERIFY(endOfStreamMarker == "endOfStream");
+}
