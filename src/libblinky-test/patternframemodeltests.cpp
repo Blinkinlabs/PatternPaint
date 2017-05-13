@@ -11,7 +11,7 @@ void PatternFrameModelTests::emptyAtConstructionTest()
     QSize startSize(1,2);
     PatternFrameModel model(startSize);
 
-    QVERIFY(model.rowCount() == 0);
+    QCOMPARE(model.rowCount(), 0);
 }
 
 void PatternFrameModelTests::flagsInvalidIndexTest()
@@ -19,7 +19,7 @@ void PatternFrameModelTests::flagsInvalidIndexTest()
     QSize startSize(1,2);
     PatternFrameModel model(startSize);
 
-    QVERIFY(model.flags(QModelIndex()) == (Qt::ItemIsEnabled | Qt::ItemIsDropEnabled));
+    QCOMPARE(model.flags(QModelIndex()), (Qt::ItemIsEnabled | Qt::ItemIsDropEnabled));
 }
 
 void PatternFrameModelTests::flagsValidIndexTest()
@@ -28,10 +28,10 @@ void PatternFrameModelTests::flagsValidIndexTest()
     PatternFrameModel model(startSize);
     model.insertRows(0,1);
 
-    QVERIFY(model.flags(model.index(0)) == (Qt::ItemIsEnabled
-                                            | Qt::ItemIsSelectable
-                                            | Qt::ItemIsEditable
-                                            | Qt::ItemIsDragEnabled));
+    QCOMPARE(model.flags(model.index(0)), (Qt::ItemIsEnabled
+                                           | Qt::ItemIsSelectable
+                                           | Qt::ItemIsEditable
+                                           | Qt::ItemIsDragEnabled));
 }
 
 void PatternFrameModelTests::supportedDropActionsTest()
@@ -40,8 +40,8 @@ void PatternFrameModelTests::supportedDropActionsTest()
     PatternFrameModel model(startSize);
     model.insertRows(0,1);
 
-    QVERIFY(model.supportedDropActions() == (Qt::CopyAction
-                                             | Qt::MoveAction));
+    QCOMPARE(model.supportedDropActions(), (Qt::CopyAction
+                                            | Qt::MoveAction));
 }
 
 void PatternFrameModelTests::getUndoStackTest()
@@ -61,7 +61,7 @@ void PatternFrameModelTests::insertRowsNegativeIndexFails()
     QSize startSize(1,2);
     PatternFrameModel model(startSize);
 
-    QVERIFY(model.rowCount() == 0);
+    QCOMPARE(model.rowCount(), 0);
     QVERIFY(model.insertRows(-1,1) == false);
 }
 
@@ -70,7 +70,7 @@ void PatternFrameModelTests::insertRowsTooHighIndexFails()
     QSize startSize(1,2);
     PatternFrameModel model(startSize);
 
-    QVERIFY(model.rowCount() == 0);
+    QCOMPARE(model.rowCount(), 0);
     QVERIFY(model.insertRows(1,1) == false);
 }
 
@@ -82,11 +82,11 @@ void PatternFrameModelTests::insertRowsOneRow()
                                               const QModelIndex &,
                                               const QVector<int> &)));
 
-    QVERIFY(model.rowCount() == 0);
+    QCOMPARE(model.rowCount(), 0);
     QVERIFY(model.insertRows(0,1) == true);
-    QVERIFY(model.rowCount() == 1);
+    QCOMPARE(model.rowCount(), 1);
 
-    QVERIFY(spy.count() == 2); // 1 for 'modified', 1 for 'insert rows'
+    QCOMPARE(spy.count(), 2); // 1 for 'modified', 1 for 'insert rows'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -98,11 +98,11 @@ void PatternFrameModelTests::insertRowsMultipleRows()
                                               const QModelIndex &,
                                               const QVector<int> &)));
 
-    QVERIFY(model.rowCount() == 0);
+    QCOMPARE(model.rowCount(), 0);
     QVERIFY(model.insertRows(0,3) == true);
-    QVERIFY(model.rowCount() == 3);
+    QCOMPARE(model.rowCount(), 3);
 
-    QVERIFY(spy.count() == 2); // 1 for 'modified', 1 for 'insertRows'
+    QCOMPARE(spy.count(), 2); // 1 for 'modified', 1 for 'insertRows'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -129,10 +129,10 @@ void PatternFrameModelTests::insertRowsAtFront()
     // Insert a row at the front, then verify the images are in the correct order.
     QVERIFY(model.insertRows(0,1) == true);
 
-    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>() == defaultImage);
-    QVERIFY(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>() == redImage);
+    QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>(), defaultImage);
+    QCOMPARE(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>(), redImage);
 
-    QVERIFY(spy.count() == 4); // 1 for 'modified', 2 for 'insertRows', 1 for 'setData'
+    QCOMPARE(spy.count(), 4); // 1 for 'modified', 2 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -159,10 +159,10 @@ void PatternFrameModelTests::insertRowsAtBack()
     // Insert a row at the front, then verify the images are in the correct order.
     QVERIFY(model.insertRows(1,1) == true);
 
-    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>() == redImage);
-    QVERIFY(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>() == defaultImage);
+    QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>(), redImage);
+    QCOMPARE(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>(), defaultImage);
 
-    QVERIFY(spy.count() == 4); // 1 for 'modified', 2 for 'insertRows', 1 for 'setData'
+    QCOMPARE(spy.count(), 4); // 1 for 'modified', 2 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -190,11 +190,11 @@ void PatternFrameModelTests::insertRowsInMiddle()
     // Insert a row in the middle, then verify the images are in the correct order.
     QVERIFY(model.insertRows(1,1) == true);
 
-    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>() == redImage);
-    QVERIFY(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>() == defaultImage);
-    QVERIFY(model.data(model.index(2), PatternFrameModel::FrameImage).value<QImage>() == redImage);
+    QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>(), redImage);
+    QCOMPARE(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>(), defaultImage);
+    QCOMPARE(model.data(model.index(2), PatternFrameModel::FrameImage).value<QImage>(), redImage);
 
-    QVERIFY(spy.count() == 5); // 1 for 'modified', 2 for 'insertRows', 2 for 'setData'
+    QCOMPARE(spy.count(), 5); // 1 for 'modified', 2 for 'insertRows', 2 for 'setData'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -204,7 +204,7 @@ void PatternFrameModelTests::removeRowsNegativeIndexFails()
     PatternFrameModel model(startSize);
     model.insertRows(0,1);
 
-    QVERIFY(model.rowCount() == 1);
+    QCOMPARE(model.rowCount(), 1);
     QVERIFY(model.removeRows(-1,1) == false);
 
     // TODO: Test that dataChanged() not signalled
@@ -217,7 +217,7 @@ void PatternFrameModelTests::removeRowsTooHighIndexFails()
     PatternFrameModel model(startSize);
     model.insertRows(0,1);
 
-    QVERIFY(model.rowCount() == 1);
+    QCOMPARE(model.rowCount(), 1);
     QVERIFY(model.removeRows(2,1) == false);
 
     // TODO: Test that dataChanged() not signalled
@@ -230,7 +230,7 @@ void PatternFrameModelTests::removeRowsTooHighCountFails()
     PatternFrameModel model(startSize);
     model.insertRows(0,1);
 
-    QVERIFY(model.rowCount() == 1);
+    QCOMPARE(model.rowCount(), 1);
     QVERIFY(model.removeRows(0,2) == false);
 
     // TODO: Test that dataChanged() not signalled
@@ -247,11 +247,11 @@ void PatternFrameModelTests::removeRowsOneRow()
 
     model.insertRows(0,1);
 
-    QVERIFY(model.rowCount() == 1);
+    QCOMPARE(model.rowCount(), 1);
     QVERIFY(model.removeRows(0,1) == true);
-    QVERIFY(model.rowCount() == 0);
+    QCOMPARE(model.rowCount(), 0);
 
-    QVERIFY(spy.count() == 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'removeRows'
+    QCOMPARE(spy.count(), 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'removeRows'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -265,11 +265,11 @@ void PatternFrameModelTests::removeRowsMultipleRows()
 
     model.insertRows(0,2);
 
-    QVERIFY(model.rowCount() == 2);
+    QCOMPARE(model.rowCount(), 2);
     QVERIFY(model.removeRows(0,2) == true);
-    QVERIFY(model.rowCount() == 0);
+    QCOMPARE(model.rowCount(), 0);
 
-    QVERIFY(spy.count() == 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'removeRows'
+    QCOMPARE(spy.count(), 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'removeRows'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -297,9 +297,9 @@ void PatternFrameModelTests::removeRowsAtFront()
     // Remove the first one, then verify that the remaining row is green.
     QVERIFY(model.removeRows(0,1) == true);
 
-    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>() == greenImage);
+    QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>(), greenImage);
 
-    QVERIFY(spy.count() == 5); // 1 for 'modified', 1 for 'insertRows', 2 for 'setData', 1 for 'removeRows'
+    QCOMPARE(spy.count(), 5); // 1 for 'modified', 1 for 'insertRows', 2 for 'setData', 1 for 'removeRows'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -327,9 +327,9 @@ void PatternFrameModelTests::removeRowsAtBack()
     // Remove the second one, then verify that the remaining row is red.
     QVERIFY(model.removeRows(1,1) == true);
 
-    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>() == redImage);
+    QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>(), redImage);
 
-    QVERIFY(spy.count() == 5); // 1 for 'modified', 1 for 'insertRows', 2 for 'setData', 1 for 'removeRows'
+    QCOMPARE(spy.count(), 5); // 1 for 'modified', 1 for 'insertRows', 2 for 'setData', 1 for 'removeRows'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -358,10 +358,10 @@ void PatternFrameModelTests::removeRowsInMiddle()
     // Remove the second one, then verify that the remaining rows are red.
     QVERIFY(model.removeRows(1,1) == true);
 
-    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>() == redImage);
-    QVERIFY(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>() == redImage);
+    QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>(), redImage);
+    QCOMPARE(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>(), redImage);
 
-    QVERIFY(spy.count() == 6); // 1 for 'modified', 1 for 'insertRows', 3 for 'setData', 1 for 'removeRows'
+    QCOMPARE(spy.count(), 6); // 1 for 'modified', 1 for 'insertRows', 3 for 'setData', 1 for 'removeRows'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -370,7 +370,7 @@ void PatternFrameModelTests::dataInvalidIndexTest()
     QSize startSize(1,2);
     PatternFrameModel model(startSize);
 
-    QVERIFY(model.data(QModelIndex(), PatternFrameModel::FrameImage) == QVariant());
+    QCOMPARE(model.data(QModelIndex(), PatternFrameModel::FrameImage), QVariant());
 }
 
 void PatternFrameModelTests::dataIndexOutOfRangeTest()
@@ -381,9 +381,9 @@ void PatternFrameModelTests::dataIndexOutOfRangeTest()
     model.insertRows(0,1);
     QModelIndex modelIndex = model.index(0);
     model.removeRows(0,1);
-    QVERIFY(modelIndex.row() == 0);
+    QCOMPARE(modelIndex.row(), 0);
 
-    QVERIFY(model.data(modelIndex, PatternFrameModel::FrameImage) == QVariant());
+    QCOMPARE(model.data(modelIndex, PatternFrameModel::FrameImage), QVariant());
 }
 
 void PatternFrameModelTests::setDataInvalidIndexTest()
@@ -445,14 +445,14 @@ void PatternFrameModelTests::canSetEditImageTest()
     QImage image(startSize, QImage::Format_ARGB32_Premultiplied);
     image.fill(FRAME_COLOR_DEFAULT);
 
-    QVERIFY(model.data(modelIndex, PatternFrameModel::EditImage).value<QImage>() == image);
+    QCOMPARE(model.data(modelIndex, PatternFrameModel::EditImage).value<QImage>(), image);
 
     image.fill(Qt::GlobalColor::red);
 
     QVERIFY(model.setData(modelIndex, image, PatternFrameModel::EditImage) == true);
-    QVERIFY(model.data(modelIndex, PatternFrameModel::EditImage).value<QImage>() == image);
+    QCOMPARE(model.data(modelIndex, PatternFrameModel::EditImage).value<QImage>(), image);
 
-    QVERIFY(spy.count() == 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
+    QCOMPARE(spy.count(), 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -469,16 +469,16 @@ void PatternFrameModelTests::canSetFrameSizeTest()
 
     QModelIndex modelIndex = model.index(0);
 
-    QVERIFY(model.data(modelIndex, PatternFrameModel::FrameSize).toSize() == startSize);
+    QCOMPARE(model.data(modelIndex, PatternFrameModel::FrameSize).toSize(), startSize);
 
     QSize newSize(3,4);
 
     QVERIFY(model.setData(modelIndex, newSize, PatternFrameModel::FrameSize) == true);
-    QVERIFY(model.data(modelIndex, PatternFrameModel::FrameSize).toSize() == newSize);
+    QCOMPARE(model.data(modelIndex, PatternFrameModel::FrameSize).toSize(), newSize);
 
-    QVERIFY(model.data(modelIndex, PatternFrameModel::FrameImage).value<QImage>().size() == newSize);
+    QCOMPARE(model.data(modelIndex, PatternFrameModel::FrameImage).value<QImage>().size(), newSize);
 
-    QVERIFY(spy.count() == 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
+    QCOMPARE(spy.count(), 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -494,14 +494,14 @@ void PatternFrameModelTests::canSetFrameSpeedTest()
 
     QModelIndex modelIndex = model.index(0);
 
-    QVERIFY(model.data(modelIndex, PatternFrameModel::FrameSpeed).toFloat() == PATTERN_FRAME_SPEED_DEFAULT_VALUE);
+    QCOMPARE(model.data(modelIndex, PatternFrameModel::FrameSpeed).toFloat(), PATTERN_FRAME_SPEED_DEFAULT_VALUE);
 
     float frameSpeed = PATTERN_FRAME_SPEED_DEFAULT_VALUE+1;
 
     QVERIFY(model.setData(modelIndex, frameSpeed, PatternFrameModel::FrameSpeed) == true);
-    QVERIFY(model.data(modelIndex, PatternFrameModel::FrameSpeed).toFloat() == frameSpeed);
+    QCOMPARE(model.data(modelIndex, PatternFrameModel::FrameSpeed).toFloat(), frameSpeed);
 
-    QVERIFY(spy.count() == 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
+    QCOMPARE(spy.count(), 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -517,14 +517,14 @@ void PatternFrameModelTests::canSetFileNameTest()
 
     QModelIndex modelIndex = model.index(0);
 
-    QVERIFY(model.data(modelIndex, PatternFrameModel::FileName).toString() == "");
+    QCOMPARE(model.data(modelIndex, PatternFrameModel::FileName).toString(), QString(""));
 
     QString fileName = "TestTest";
 
     QVERIFY(model.setData(modelIndex, fileName, PatternFrameModel::FileName) == true);
-    QVERIFY(model.data(modelIndex, PatternFrameModel::FileName).toString() == fileName);
+    QCOMPARE(model.data(modelIndex, PatternFrameModel::FileName).toString(), fileName);
 
-    QVERIFY(spy.count() == 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
+    QCOMPARE(spy.count(), 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -545,7 +545,7 @@ void PatternFrameModelTests::canSetModifiedTest()
     QVERIFY(model.setData(modelIndex, false, PatternFrameModel::Modified) == true);
     QVERIFY(model.data(modelIndex, PatternFrameModel::Modified).toBool() == false);
 
-    QVERIFY(spy.count() == 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
+    QCOMPARE(spy.count(), 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -584,15 +584,15 @@ void PatternFrameModelTests::readFromStreamTest()
     PatternFrameModel model(frameSize*10);
     stream >> model;
 
-    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameSize) == frameSize);
-    QVERIFY(model.data(model.index(0), PatternFrameModel::FileName).toString() == fileName);
-    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameSpeed).toFloat() == frameSpeed);
-    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>() == redImage);
-    QVERIFY(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>() == greenImage);
+    QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameSize).toSize(), frameSize);
+    QCOMPARE(model.data(model.index(0), PatternFrameModel::FileName).toString(), fileName);
+    QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameSpeed).toFloat(), frameSpeed);
+    QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>(), redImage);
+    QCOMPARE(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>(), greenImage);
 
     QString endOfStreamMarker;
     stream >> endOfStreamMarker;
-    QVERIFY(endOfStreamMarker == "endOfStream");
+    QCOMPARE(endOfStreamMarker, QString("endOfStream"));
 }
 
 void PatternFrameModelTests::writeToStreamTest()
@@ -642,13 +642,13 @@ void PatternFrameModelTests::writeToStreamTest()
     for(QImage &frame : readFrames)
         frame = frame.convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
-    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameSize) == readFrameSize);
-    QVERIFY(model.data(model.index(0), PatternFrameModel::FileName).toString() == readFileName);
-    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameSpeed).toFloat() == readFrameSpeed);
-    QVERIFY(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>() == readFrames.at(0));
-    QVERIFY(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>() == readFrames.at(1));
+    QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameSize).toSize(), readFrameSize);
+    QCOMPARE(model.data(model.index(0), PatternFrameModel::FileName).toString(), readFileName);
+    QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameSpeed).toFloat(), readFrameSpeed);
+    QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>(), readFrames.at(0));
+    QCOMPARE(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>(), readFrames.at(1));
 
     QString endOfStreamMarker;
     stream >> endOfStreamMarker;
-    QVERIFY(endOfStreamMarker == "endOfStream");
+    QCOMPARE(endOfStreamMarker, QString("endOfStream"));
 }

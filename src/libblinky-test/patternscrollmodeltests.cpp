@@ -11,7 +11,7 @@ void PatternScrollModelTests::emptyAtConstructionTest()
     QSize startSize(1,2);
     PatternScrollModel model(startSize);
 
-    QVERIFY(model.rowCount() == 0);
+    QCOMPARE(model.rowCount(), 0);
 }
 
 void PatternScrollModelTests::flagsInvalidIndexTest()
@@ -19,7 +19,7 @@ void PatternScrollModelTests::flagsInvalidIndexTest()
     QSize startSize(1,2);
     PatternScrollModel model(startSize);
 
-    QVERIFY(model.flags(QModelIndex()) == (Qt::ItemIsEnabled));
+    QCOMPARE(model.flags(QModelIndex()), (Qt::ItemIsEnabled));
 }
 
 void PatternScrollModelTests::flagsValidIndexTest()
@@ -28,9 +28,9 @@ void PatternScrollModelTests::flagsValidIndexTest()
     PatternScrollModel model(startSize);
     model.insertRows(0,1);
 
-    QVERIFY(model.flags(model.index(0)) == (Qt::ItemIsEnabled
-                                            | Qt::ItemIsSelectable
-                                            | Qt::ItemIsEditable));
+    QCOMPARE(model.flags(model.index(0)), (Qt::ItemIsEnabled
+                                           | Qt::ItemIsSelectable
+                                           | Qt::ItemIsEditable));
 }
 
 void PatternScrollModelTests::supportedDropActionsTest()
@@ -39,7 +39,7 @@ void PatternScrollModelTests::supportedDropActionsTest()
     PatternScrollModel model(startSize);
     model.insertRows(0,1);
 
-    QVERIFY(model.supportedDropActions() == 0);
+    QCOMPARE(model.supportedDropActions(), 0);
 }
 
 void PatternScrollModelTests::getUndoStackTest()
@@ -59,7 +59,7 @@ void PatternScrollModelTests::insertRowsNegativeIndexFails()
     QSize startSize(1,2);
     PatternScrollModel model(startSize);
 
-    QVERIFY(model.rowCount() == 0);
+    QCOMPARE(model.rowCount(), 0);
     QVERIFY(model.insertRows(-1,1) == false);
 }
 
@@ -68,7 +68,7 @@ void PatternScrollModelTests::insertRowsTooHighIndexFails()
     QSize startSize(1,2);
     PatternScrollModel model(startSize);
 
-    QVERIFY(model.rowCount() == 0);
+    QCOMPARE(model.rowCount(), 0);
     QVERIFY(model.insertRows(1,1) == false);
 }
 
@@ -80,11 +80,11 @@ void PatternScrollModelTests::insertRowsOneRow()
                                               const QModelIndex &,
                                               const QVector<int> &)));
 
-    QVERIFY(model.rowCount() == 0);
+    QCOMPARE(model.rowCount(), 0);
     QVERIFY(model.insertRows(0,1) == true);
-    QVERIFY(model.rowCount() == 1);
+    QCOMPARE(model.rowCount(), 1);
 
-    QVERIFY(spy.count() == 2); // 1 for 'modified', 1 for 'insert rows'
+    QCOMPARE(spy.count(), 2); // 1 for 'modified', 1 for 'insert rows'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -96,11 +96,11 @@ void PatternScrollModelTests::insertRowsMultipleRows()
                                               const QModelIndex &,
                                               const QVector<int> &)));
 
-    QVERIFY(model.rowCount() == 0);
+    QCOMPARE(model.rowCount(), 0);
     QVERIFY(model.insertRows(0,3) == true);
-    QVERIFY(model.rowCount() == 3);
+    QCOMPARE(model.rowCount(), 3);
 
-    QVERIFY(spy.count() == 2); // 1 for 'modified', 1 for 'insertRows'
+    QCOMPARE(spy.count(), 2); // 1 for 'modified', 1 for 'insertRows'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -126,10 +126,10 @@ void PatternScrollModelTests::insertRowsAtFront()
 
     // Insert a row at the front, then verify the images are in the correct order.
     QVERIFY(model.insertRows(0,1) == true);
-    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameImage).value<QImage>() == defaultImage);
-    QVERIFY(model.data(model.index(1), PatternScrollModel::FrameImage).value<QImage>() == redImage);
+    QCOMPARE(model.data(model.index(0), PatternScrollModel::FrameImage).value<QImage>(), defaultImage);
+    QCOMPARE(model.data(model.index(1), PatternScrollModel::FrameImage).value<QImage>(), redImage);
 
-    QVERIFY(spy.count() == 4); // 1 for 'modified', 2 for 'insertRows', 1 for 'setData'
+    QCOMPARE(spy.count(), 4); // 1 for 'modified', 2 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -156,10 +156,10 @@ void PatternScrollModelTests::insertRowsAtBack()
     // Insert a row at the front, then verify the images are in the correct order.
     QVERIFY(model.insertRows(1,1) == true);
 
-    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameImage).value<QImage>() == redImage);
-    QVERIFY(model.data(model.index(1), PatternScrollModel::FrameImage).value<QImage>() == defaultImage);
+    QCOMPARE(model.data(model.index(0), PatternScrollModel::FrameImage).value<QImage>(), redImage);
+    QCOMPARE(model.data(model.index(1), PatternScrollModel::FrameImage).value<QImage>(), defaultImage);
 
-    QVERIFY(spy.count() == 4); // 1 for 'modified', 2 for 'insertRows', 1 for 'setData'
+    QCOMPARE(spy.count(), 4); // 1 for 'modified', 2 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -189,11 +189,11 @@ void PatternScrollModelTests::insertRowsInMiddle()
     // Insert a row in the middle, then verify the images are in the correct order.
     QVERIFY(model.insertRows(1,1) == true);
 
-    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameImage).value<QImage>() == redImage);
-    QVERIFY(model.data(model.index(1), PatternScrollModel::FrameImage).value<QImage>() == defaultImage);
-    QVERIFY(model.data(model.index(2), PatternScrollModel::FrameImage).value<QImage>() == redImage);
+    QCOMPARE(model.data(model.index(0), PatternScrollModel::FrameImage).value<QImage>(), redImage);
+    QCOMPARE(model.data(model.index(1), PatternScrollModel::FrameImage).value<QImage>(), defaultImage);
+    QCOMPARE(model.data(model.index(2), PatternScrollModel::FrameImage).value<QImage>(), redImage);
 
-    QVERIFY(spy.count() == 4); // 1 for 'modified', 2 for 'insertRows', 1 for 'setData'
+    QCOMPARE(spy.count(), 4); // 1 for 'modified', 2 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -203,7 +203,7 @@ void PatternScrollModelTests::removeRowsNegativeIndexFails()
     PatternScrollModel model(startSize);
     model.insertRows(0,1);
 
-    QVERIFY(model.rowCount() == 1);
+    QCOMPARE(model.rowCount(), 1);
     QVERIFY(model.removeRows(-1,1) == false);
 
     // TODO: Test that dataChanged() not signalled
@@ -216,7 +216,7 @@ void PatternScrollModelTests::removeRowsTooHighIndexFails()
     PatternScrollModel model(startSize);
     model.insertRows(0,1);
 
-    QVERIFY(model.rowCount() == 1);
+    QCOMPARE(model.rowCount(), 1);
     QVERIFY(model.removeRows(2,1) == false);
 
     // TODO: Test that dataChanged() not signalled
@@ -229,7 +229,7 @@ void PatternScrollModelTests::removeRowsTooHighCountFails()
     PatternScrollModel model(startSize);
     model.insertRows(0,1);
 
-    QVERIFY(model.rowCount() == 1);
+    QCOMPARE(model.rowCount(), 1);
     QVERIFY(model.removeRows(0,2) == false);
 
     // TODO: Test that dataChanged() not signalled
@@ -246,11 +246,11 @@ void PatternScrollModelTests::removeRowsOneRow()
 
     model.insertRows(0,1);
 
-    QVERIFY(model.rowCount() == 1);
+    QCOMPARE(model.rowCount(), 1);
     QVERIFY(model.removeRows(0,1) == true);
-    QVERIFY(model.rowCount() == 0);
+    QCOMPARE(model.rowCount(), 0);
 
-    QVERIFY(spy.count() == 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'removeRows'
+    QCOMPARE(spy.count(), 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'removeRows'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -264,11 +264,11 @@ void PatternScrollModelTests::removeRowsMultipleRows()
 
     model.insertRows(0,2);
 
-    QVERIFY(model.rowCount() == 2);
+    QCOMPARE(model.rowCount(), 2);
     QVERIFY(model.removeRows(0,2) == true);
-    QVERIFY(model.rowCount() == 0);
+    QCOMPARE(model.rowCount(), 0);
 
-    QVERIFY(spy.count() == 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'removeRows'
+    QCOMPARE(spy.count(), 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'removeRows'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -296,9 +296,9 @@ void PatternScrollModelTests::removeRowsAtFront()
     // Remove the first one, then verify that the remaining row is the default color.
     QVERIFY(model.removeRows(0,1) == true);
 
-    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameImage).value<QImage>() == defaultImage);
+    QCOMPARE(model.data(model.index(0), PatternScrollModel::FrameImage).value<QImage>(), defaultImage);
 
-    QVERIFY(spy.count() == 5); // 1 for 'modified', 2 for 'insertRows', 1 for 'setData', 1 for 'removeRows'
+    QCOMPARE(spy.count(), 5); // 1 for 'modified', 2 for 'insertRows', 1 for 'setData', 1 for 'removeRows'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -326,9 +326,9 @@ void PatternScrollModelTests::removeRowsAtBack()
     // Remove the last one, then verify that the remaining row is red.
     QVERIFY(model.removeRows(1,1) == true);
 
-    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameImage).value<QImage>() == redImage);
+    QCOMPARE(model.data(model.index(0), PatternScrollModel::FrameImage).value<QImage>(), redImage);
 
-    QVERIFY(spy.count() == 5); // 1 for 'modified', 2 for 'insertRows', 1 for 'setData', 1 for 'removeRows'
+    QCOMPARE(spy.count(), 5); // 1 for 'modified', 2 for 'insertRows', 1 for 'setData', 1 for 'removeRows'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -354,17 +354,17 @@ void PatternScrollModelTests::removeRowsInMiddle()
     model.insertRows(0,1);
     model.insertRows(2,1);
 
-    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameImage).value<QImage>() == defaultImage);
-    QVERIFY(model.data(model.index(1), PatternScrollModel::FrameImage).value<QImage>() == redImage);
-    QVERIFY(model.data(model.index(2), PatternScrollModel::FrameImage).value<QImage>() == defaultImage);
+    QCOMPARE(model.data(model.index(0), PatternScrollModel::FrameImage).value<QImage>(), defaultImage);
+    QCOMPARE(model.data(model.index(1), PatternScrollModel::FrameImage).value<QImage>(), redImage);
+    QCOMPARE(model.data(model.index(2), PatternScrollModel::FrameImage).value<QImage>(), defaultImage);
 
     // Remove the middle one, then verify that the remaining rows are default color
     QVERIFY(model.removeRows(1,1) == true);
 
-    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameImage).value<QImage>() == defaultImage);
-    QVERIFY(model.data(model.index(1), PatternScrollModel::FrameImage).value<QImage>() == defaultImage);
+    QCOMPARE(model.data(model.index(0), PatternScrollModel::FrameImage).value<QImage>(), defaultImage);
+    QCOMPARE(model.data(model.index(1), PatternScrollModel::FrameImage).value<QImage>(), defaultImage);
 
-    QVERIFY(spy.count() == 6); // 1 for 'modified', 3 for 'insertRows', 1 for 'setData', 1 for 'removeRows'
+    QCOMPARE(spy.count(), 6); // 1 for 'modified', 3 for 'insertRows', 1 for 'setData', 1 for 'removeRows'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -373,7 +373,7 @@ void PatternScrollModelTests::dataInvalidIndexTest()
     QSize startSize(1,2);
     PatternScrollModel model(startSize);
 
-    QVERIFY(model.data(QModelIndex(), PatternScrollModel::FrameImage) == QVariant());
+    QCOMPARE(model.data(QModelIndex(), PatternScrollModel::FrameImage), QVariant());
 }
 
 void PatternScrollModelTests::dataIndexOutOfRangeTest()
@@ -384,9 +384,9 @@ void PatternScrollModelTests::dataIndexOutOfRangeTest()
     model.insertRows(0,1);
     QModelIndex modelIndex = model.index(0);
     model.removeRows(0,1);
-    QVERIFY(modelIndex.row() == 0);
+    QCOMPARE(modelIndex.row(), 0);
 
-    QVERIFY(model.data(modelIndex, PatternScrollModel::FrameImage) == QVariant());
+    QCOMPARE(model.data(modelIndex, PatternScrollModel::FrameImage), QVariant());
 }
 
 void PatternScrollModelTests::setDataInvalidIndexTest()
@@ -405,7 +405,7 @@ void PatternScrollModelTests::setDataIndexOutOfRangeTest()
     model.insertRows(0,1);
     QModelIndex modelIndex = model.index(0);
     model.removeRows(0,1);
-    QVERIFY(modelIndex.row() == 0);
+    QCOMPARE(modelIndex.row(), 0);
 
     QVERIFY(model.setData(modelIndex, QImage(), PatternScrollModel::FrameImage) == false);
 }
@@ -446,14 +446,14 @@ void PatternScrollModelTests::canSetEditImageTest()
     QImage image(QSize(1,10), QImage::Format_ARGB32_Premultiplied);
     image.fill(FRAME_COLOR_DEFAULT);
 
-    QVERIFY(model.data(modelIndex, PatternScrollModel::EditImage).value<QImage>() == image);
+    QCOMPARE(model.data(modelIndex, PatternScrollModel::EditImage).value<QImage>(), image);
 
     image.fill(Qt::GlobalColor::red);
 
     QVERIFY(model.setData(modelIndex, image, PatternScrollModel::EditImage) == true);
-    QVERIFY(model.data(modelIndex, PatternScrollModel::EditImage).value<QImage>() == image);
+    QCOMPARE(model.data(modelIndex, PatternScrollModel::EditImage).value<QImage>(), image);
 
-    QVERIFY(spy.count() == 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
+    QCOMPARE(spy.count(), 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -470,16 +470,16 @@ void PatternScrollModelTests::canSetFrameSizeTest()
 
     QModelIndex modelIndex = model.index(0);
 
-    QVERIFY(model.data(modelIndex, PatternScrollModel::FrameSize).toSize() == startSize);
+    QCOMPARE(model.data(modelIndex, PatternScrollModel::FrameSize).toSize(), startSize);
 
     QSize newSize(3,4);
 
     QVERIFY(model.setData(modelIndex, newSize, PatternScrollModel::FrameSize) == true);
-    QVERIFY(model.data(modelIndex, PatternScrollModel::FrameSize).toSize() == newSize);
+    QCOMPARE(model.data(modelIndex, PatternScrollModel::FrameSize).toSize(), newSize);
 
-    QVERIFY(model.data(modelIndex, PatternScrollModel::FrameImage).value<QImage>().size() == newSize);
+    QCOMPARE(model.data(modelIndex, PatternScrollModel::FrameImage).value<QImage>().size(), newSize);
 
-    QVERIFY(spy.count() == 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
+    QCOMPARE(spy.count(), 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -495,14 +495,14 @@ void PatternScrollModelTests::canSetFrameSpeedTest()
 
     QModelIndex modelIndex = model.index(0);
 
-    QVERIFY(model.data(modelIndex, PatternScrollModel::FrameSpeed).toFloat() == PATTERN_FRAME_SPEED_DEFAULT_VALUE);
+    QCOMPARE(model.data(modelIndex, PatternScrollModel::FrameSpeed).toFloat(), PATTERN_FRAME_SPEED_DEFAULT_VALUE);
 
     float frameSpeed = PATTERN_FRAME_SPEED_DEFAULT_VALUE+1;
 
     QVERIFY(model.setData(modelIndex, frameSpeed, PatternScrollModel::FrameSpeed) == true);
-    QVERIFY(model.data(modelIndex, PatternScrollModel::FrameSpeed).toFloat() == frameSpeed);
+    QCOMPARE(model.data(modelIndex, PatternScrollModel::FrameSpeed).toFloat(), frameSpeed);
 
-    QVERIFY(spy.count() == 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
+    QCOMPARE(spy.count(), 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -518,14 +518,14 @@ void PatternScrollModelTests::canSetFileNameTest()
 
     QModelIndex modelIndex = model.index(0);
 
-    QVERIFY(model.data(modelIndex, PatternScrollModel::FileName).toString() == "");
+    QCOMPARE(model.data(modelIndex, PatternScrollModel::FileName).toString(), QString(""));
 
     QString fileName = "TestTest";
 
     QVERIFY(model.setData(modelIndex, fileName, PatternScrollModel::FileName) == true);
-    QVERIFY(model.data(modelIndex, PatternScrollModel::FileName).toString() == fileName);
+    QCOMPARE(model.data(modelIndex, PatternScrollModel::FileName).toString(), fileName);
 
-    QVERIFY(spy.count() == 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
+    QCOMPARE(spy.count(), 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -546,7 +546,7 @@ void PatternScrollModelTests::canSetModifiedTest()
     QVERIFY(model.setData(modelIndex, false, PatternScrollModel::Modified) == true);
     QVERIFY(model.data(modelIndex, PatternScrollModel::Modified).toBool() == false);
 
-    QVERIFY(spy.count() == 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
+    QCOMPARE(spy.count(), 3); // 1 for 'modified', 1 for 'insertRows', 1 for 'setData'
     // TODO: Verify the spy messages are correct?
 }
 
@@ -578,14 +578,14 @@ void PatternScrollModelTests::readFromStreamTest()
     PatternScrollModel model(frameSize*10);
     stream >> model;
 
-    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameSize) == frameSize);
-    QVERIFY(model.data(model.index(0), PatternScrollModel::FileName).toString() == fileName);
-    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameSpeed).toFloat() == frameSpeed);
-    QVERIFY(model.data(model.index(0), PatternScrollModel::EditImage).value<QImage>() == image);
+    QCOMPARE(model.data(model.index(0), PatternScrollModel::FrameSize).toSize(), frameSize);
+    QCOMPARE(model.data(model.index(0), PatternScrollModel::FileName).toString(), fileName);
+    QCOMPARE(model.data(model.index(0), PatternScrollModel::FrameSpeed).toFloat(), frameSpeed);
+    QCOMPARE(model.data(model.index(0), PatternScrollModel::EditImage).value<QImage>(), image);
 
     QString endOfStreamMarker;
     stream >> endOfStreamMarker;
-    QVERIFY(endOfStreamMarker == "endOfStream");
+    QCOMPARE(endOfStreamMarker, QString("endOfStream"));
 }
 
 void PatternScrollModelTests::writeToStreamTest()
@@ -630,12 +630,12 @@ void PatternScrollModelTests::writeToStreamTest()
 
     readImage = readImage.convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
-    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameSize) == readFrameSize);
-    QVERIFY(model.data(model.index(0), PatternScrollModel::FileName).toString() == readFileName);
-    QVERIFY(model.data(model.index(0), PatternScrollModel::FrameSpeed).toFloat() == readFrameSpeed);
-    QVERIFY(model.data(model.index(0), PatternScrollModel::EditImage).value<QImage>() == readImage);
+    QCOMPARE(model.data(model.index(0), PatternScrollModel::FrameSize).toSize(), readFrameSize);
+    QCOMPARE(model.data(model.index(0), PatternScrollModel::FileName).toString(), readFileName);
+    QCOMPARE(model.data(model.index(0), PatternScrollModel::FrameSpeed).toFloat(), readFrameSpeed);
+    QCOMPARE(model.data(model.index(0), PatternScrollModel::EditImage).value<QImage>(), readImage);
 
     QString endOfStreamMarker;
     stream >> endOfStreamMarker;
-    QVERIFY(endOfStreamMarker == "endOfStream");
+    QCOMPARE(endOfStreamMarker, QString("endOfStream"));
 }
