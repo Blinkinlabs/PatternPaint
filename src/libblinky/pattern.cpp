@@ -96,7 +96,7 @@ bool Pattern::load(const QString &newFileName)
             painter.drawImage(QPoint(0, 0), sourceImage,
                               QRect(frameSize.width()*i, 0, frameSize.width(), frameSize.height()));
             painter.end();
-            model->setData(model->index(i), newFrameData, PatternModel::FrameImage);
+            model->setData(model->index(i), newFrameData, PatternModel::EditImage);
         }
 
         // If successful, record the filename and clear the undo stack.
