@@ -23,8 +23,6 @@
 
 #define CONNECTION_SCANNER_INTERVAL 1000 /// Interval between controller connection scans, in ms
 
-#define PROJECT_HEADER     "PatternPaint Project"   /// Header of PatternPaint Project
-#define PROJECT_FORMAT_VERSION     1.0              /// Version of PatternPaint Project format
 #define DEFAULT_PROJECT_NAME     "NEW"              /// Name for a new project
 
 #endif // DEFAULTS

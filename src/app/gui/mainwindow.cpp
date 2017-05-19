@@ -26,6 +26,7 @@
 #include "pattern.h"
 #include "patterncollectiondelegate.h"
 
+#include "projectfile.h"
 #include "patternframemodel.h"
 #include "patterndelegate.h"
 #include "patterncollection.h"
@@ -435,11 +436,18 @@ void MainWindow::stopPlayback()
     actionPlay->setIcon(QIcon(":/icons/images/icons/Play-100.png"));
 }
 
-bool MainWindow::savePatternProject()
+bool MainWindow::savePatternProject(bool save_as)
 {
     QSettings settings;
+    QString newProjectFilename;
 
-    if(projectFilename==""){
+    if(save_as){
+        newProjectFilename = "";
+    }else{
+        newProjectFilename = projectFilename;
+    }
+
+    if(newProjectFilename == ""){
 
         QString lastDirectory = settings.value("File/SaveDirectory").toString();
 
@@ -459,35 +467,22 @@ bool MainWindow::savePatternProject()
         QFileInfo fileInfo(fileName);
         settings.setValue("File/SaveDirectory", fileInfo.absolutePath());
 
-        projectFilename = fileName;
+        newProjectFilename = fileName;
+
+        if(!save_as){
+            projectFilename = fileName;
+            projectName = fileInfo.baseName();
+        }
+
     }
 
+    ProjectFile newProject;
 
-    qDebug() << "Save project:" << projectFilename;
-
-    // Create a new file
-    QFile file(projectFilename);
-    file.open(QIODevice::WriteOnly);
-
-
-    QDataStream out(&file);
-    out.setVersion(QDataStream::Qt_5_8);
-
-    // write Header
-    out << (QString)PROJECT_HEADER;
-    out << (float)PROJECT_FORMAT_VERSION;
-    out << (QString)GIT_VERSION;
-
-    // write scene configuration
-    out << (QString)settings.value("BlinkyTape/firmwareName", BLINKYTAPE_DEFAULT_FIRMWARE_NAME).toString();
-    out << (QString)fixture->getName();
-    out << (qint32)fixture->getExtents().width();
-    out << (qint32)fixture->getExtents().height();
-    out << (qint32)fixture->getColorMode();
-
-    patternCollection.writePatterns(out);
-
-    file.close();
+    if(!newProject.save(newProjectFilename, fixture, &patternCollection)){
+        if(!save_as)
+            projectFilename = "";
+        return false;
+    }
 
     setProjectModified(false);
 
@@ -536,7 +531,7 @@ bool MainWindow::savePattern(Pattern *item)
     }
 }
 
-void MainWindow::on_actionSave_as_triggered()
+void MainWindow::on_actionExport_image_triggered()
 {
     if (patternCollection.isEmpty())
         return;
@@ -547,8 +542,23 @@ void MainWindow::on_actionSave_project_triggered()
 {
     if (patternCollection.isEmpty())
         return;
-    if(savePatternProject())
-        qDebug() << "Project successful saved";
+
+    if(!savePatternProject(false)){
+        QMessageBox::critical(this,"Error","Project can not be save",QMessageBox::Ok);
+        return;
+    }else{
+        setTitleWindow(projectName);
+    }
+}
+
+void MainWindow::on_actionSave_project_as_triggered()
+{
+    if (patternCollection.isEmpty())
+        return;
+
+    if(!savePatternProject(true)){
+        QMessageBox::critical(this,"Error","Project can not be save",QMessageBox::Ok);
+    }
 }
 
 void MainWindow::on_actionExit_triggered()
@@ -939,7 +949,7 @@ bool MainWindow::promptForSaveProject()
     int ans = msgBox.exec();
 
     if (ans == QMessageBox::Save) {
-        if(!savePatternProject())
+        if(!savePatternProject(false))
             return false;
         return true;
     }
@@ -1390,65 +1400,17 @@ bool MainWindow::openPatternProject()
     projectFilename = fileName;
     projectName = fileInfo.baseName();
 
-    qDebug()<<"Open Project:" << projectFilename;
-
-    QFile file(projectFilename);
-    if (!file.open(QIODevice::ReadOnly)){
-        qDebug()<< "Error: Cannot read project file ";
-        return false;
-    }
-
-    // read project file
-    SceneTemplate newSceneTemplate;
-    QString header;
-    QString patternPaintVersion;
-    float formatVersion;
-    qint32 width;
-    qint32 height;
-    qint32 colorMode;
-
-    QDataStream in(&file);
-    in.setVersion(QDataStream::Qt_5_8);
-
-    // read Header
-    in >> header;
-    if(header != PROJECT_HEADER){
-        qDebug()<< "Error: Header incorrectly";
-        return false;
-    }
-
-    in >> formatVersion;
-    if(formatVersion != PROJECT_FORMAT_VERSION){
-        qDebug()<< "Error: Format version incorrectly";
-        return false;
-    }
-
-    in >> patternPaintVersion;
-
-    qDebug() << "Project created with Pattern Paint version:" << patternPaintVersion;
-
-
-    // read scene configuration
-    in >> newSceneTemplate.firmwareName;
-    in >> newSceneTemplate.fixtureType;
-    in >> width;
-    in >> height;
-    in >> colorMode;
-
-    newSceneTemplate.colorMode = (ColorMode)colorMode;
-    newSceneTemplate.size = QSize(width,height);
-
-    if(in.status() == QDataStream::Ok)
-        applyScene(newSceneTemplate);
-
-    if(patternCollection.readPatterns(in) && in.status() == QDataStream::Ok){
-        qDebug() << "Project successful readed";
-    }else{
-        qDebug() << "Project read failed!";
-        return false;
-    }
 
     setProjectModified(false);
+
+    SceneTemplate newSceneTemplate;
+    ProjectFile newProject;
+
+    if(newProject.open(projectFilename, &newSceneTemplate, &patternCollection)){
+        applyScene(newSceneTemplate);
+    }else{
+        return false;
+    }
 
     return true;
 }
