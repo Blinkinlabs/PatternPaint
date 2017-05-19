@@ -11,43 +11,32 @@ ProjectFile::ProjectFile()
 
 bool ProjectFile::save(QString filename, QPointer<Fixture> fixture, PatternCollection *newPatterncollection)
 {
-    QSettings settings;
 
     qDebug() << "Save project:" << filename;
 
     // Create a new file
     QFile file(filename);
-    file.open(QIODevice::WriteOnly);
-
-
-    QDataStream out(&file);
-    out.setVersion(QDataStream::Qt_5_8);
-
-    // write Header
-    out << (QString)PROJECT_HEADER;
-    out << (float)PROJECT_FORMAT_VERSION;
-    out << (QString)GIT_VERSION;
-
-    // write scene configuration
-    out << (QString)settings.value("BlinkyTape/firmwareName", BLINKYTAPE_DEFAULT_FIRMWARE_NAME).toString();
-    out << (QString)fixture->getName();
-    out << (qint32)fixture->getExtents().width();
-    out << (qint32)fixture->getExtents().height();
-    out << (qint32)fixture->getColorMode();
-
-    //writePatterns(out);
-
-    for(int i=0;i<newPatterncollection->count();i++){
-
-        out << (qint32)newPatterncollection->at(i)->getType();
-        newPatterncollection->at(i)->getModel()->writeDataToStream(out);
-
-        newPatterncollection->at(i)->setModified(false);
-        newPatterncollection->at(i)->getModified();
-
+    if(!file.open(QIODevice::WriteOnly)){
+        qDebug() << "Project save failed!";
+        return false;
     }
 
+    QDataStream out(&file);
+
+
+    // write header
+    writeHeaderVersion(out, PROJECT_FORMAT_VERSION);
+
+    // write scene configuration
+    writeSceneConfiguration(out, fixture);
+
+    // write patterns
+    writePatterns(out, newPatterncollection);
+
+
     file.close();
+
+    qDebug() << "Project successful saved";
 
     return true;
 }
@@ -64,45 +53,18 @@ bool ProjectFile::open(QString filename, SceneTemplate* newScenetemplate, Patter
     }
 
     // read project file
-    QString header;
-    QString patternPaintVersion;
-    float formatVersion;
-    qint32 width;
-    qint32 height;
-    qint32 colorMode;
-
     QDataStream in(&file);
-    in.setVersion(QDataStream::Qt_5_8);
 
-    // read Header
-    in >> header;
-    if(header != PROJECT_HEADER){
-        qDebug()<< "Error: Header incorrectly";
-        return false;
-    }
 
-    in >> formatVersion;
-    if(formatVersion != PROJECT_FORMAT_VERSION){
+    // read header
+    if(readHeaderVersion(in) != PROJECT_FORMAT_VERSION){
         qDebug()<< "Error: Format version incorrectly";
         return false;
     }
 
-    in >> patternPaintVersion;
-
-    qDebug() << "Project created with Pattern Paint version:" << patternPaintVersion;
-
 
     // read scene configuration
-    in >> newScenetemplate->firmwareName;
-    in >> newScenetemplate->fixtureType;
-    in >> width;
-    in >> height;
-    in >> colorMode;
-
-    newScenetemplate->colorMode = (ColorMode)colorMode;
-    newScenetemplate->size = QSize(width,height);
-
-    if(in.status() != QDataStream::Ok)
+    if(!readSceneConfiguration(in, newScenetemplate))
         return false;
 
 
@@ -114,11 +76,91 @@ bool ProjectFile::open(QString filename, SceneTemplate* newScenetemplate, Patter
         return false;
     }
 
+
     return true;
 }
 
+void ProjectFile::writeHeaderVersion(QDataStream &stream, float version)
+{
+    stream.setVersion(QDataStream::Qt_5_8);
 
-bool ProjectFile::readPatterns(QDataStream& stream, PatternCollection *newPatterncollection)
+    stream << (QString)PROJECT_HEADER;
+    stream << version;
+    stream << (QString)GIT_VERSION;
+}
+
+float ProjectFile::readHeaderVersion(QDataStream &stream)
+{
+
+    QString header;
+    QString patternPaintVersion;
+    float formatVersion;
+
+    stream.setVersion(QDataStream::Qt_5_8);
+
+    stream >> header;
+    if(header != PROJECT_HEADER){
+        qDebug()<< "Error: Header incorrectly";
+        return 0;
+    }
+
+    stream >> formatVersion;
+
+    stream >> patternPaintVersion;
+
+    qDebug() << "Project created with Pattern Paint version:" << patternPaintVersion;
+
+    return formatVersion;
+}
+
+void ProjectFile::writeSceneConfiguration(QDataStream &stream, QPointer<Fixture> fixture)
+{
+    QSettings settings;
+
+    stream << (QString)settings.value("BlinkyTape/firmwareName", BLINKYTAPE_DEFAULT_FIRMWARE_NAME).toString();
+    stream << (QString)fixture->getName();
+    stream << (qint32)fixture->getExtents().width();
+    stream << (qint32)fixture->getExtents().height();
+    stream << (qint32)fixture->getColorMode();
+}
+
+bool ProjectFile::readSceneConfiguration(QDataStream &stream, SceneTemplate *newScenetemplate)
+{
+
+    qint32 width;
+    qint32 height;
+    qint32 colorMode;
+
+    stream >> newScenetemplate->firmwareName;
+    stream >> newScenetemplate->fixtureType;
+    stream >> width;
+    stream >> height;
+    stream >> colorMode;
+
+    newScenetemplate->colorMode = (ColorMode)colorMode;
+    newScenetemplate->size = QSize(width,height);
+
+    if(stream.status() != QDataStream::Ok)
+        return false;
+
+    return true;
+}
+
+void ProjectFile::writePatterns(QDataStream &stream, PatternCollection *newPatterncollection)
+{
+    for(int i=0;i<newPatterncollection->count();i++){
+
+        stream << (qint32)newPatterncollection->at(i)->getType();
+        newPatterncollection->at(i)->getModel()->writeDataToStream(stream);
+
+        newPatterncollection->at(i)->setModified(false);
+        newPatterncollection->at(i)->getModified();
+
+    }
+}
+
+
+bool ProjectFile::readPatterns(QDataStream &stream, PatternCollection *newPatterncollection)
 {
 
     newPatterncollection->clear();

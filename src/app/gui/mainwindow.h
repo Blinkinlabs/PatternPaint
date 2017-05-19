@@ -108,7 +108,9 @@ private slots:
 
     void on_actionSave_project_triggered();
 
-    void on_actionSave_as_triggered();
+    void on_actionSave_project_as_triggered();
+
+    void on_actionExport_image_triggered();
 
     void on_actionSave_All_triggered();
 
@@ -196,7 +198,7 @@ private:
 
     bool closeProject();
     bool openPatternProject();
-    bool savePatternProject();
+    bool savePatternProject(bool save_as);
 
     bool savePattern(Pattern *item);
     bool savePatternAs(Pattern *item);

@@ -436,11 +436,18 @@ void MainWindow::stopPlayback()
     actionPlay->setIcon(QIcon(":/icons/images/icons/Play-100.png"));
 }
 
-bool MainWindow::savePatternProject()
+bool MainWindow::savePatternProject(bool save_as)
 {
     QSettings settings;
+    QString newProjectFilename;
 
-    if(projectFilename==""){
+    if(save_as){
+        newProjectFilename = "";
+    }else{
+        newProjectFilename = projectFilename;
+    }
+
+    if(newProjectFilename == ""){
 
         QString lastDirectory = settings.value("File/SaveDirectory").toString();
 
@@ -460,17 +467,24 @@ bool MainWindow::savePatternProject()
         QFileInfo fileInfo(fileName);
         settings.setValue("File/SaveDirectory", fileInfo.absolutePath());
 
-        projectFilename = fileName;
-        projectName = fileInfo.baseName();
+        newProjectFilename = fileName;
+
+        if(!save_as){
+            projectFilename = fileName;
+            projectName = fileInfo.baseName();
+        }
+
     }
-
-
-    setProjectModified(false);
 
     ProjectFile newProject;
 
-    if(!newProject.save(projectFilename, fixture, &patternCollection))
+    if(!newProject.save(newProjectFilename, fixture, &patternCollection)){
+        if(!save_as)
+            projectFilename = "";
         return false;
+    }
+
+    setProjectModified(false);
 
     return true;
 
@@ -517,7 +531,7 @@ bool MainWindow::savePattern(Pattern *item)
     }
 }
 
-void MainWindow::on_actionSave_as_triggered()
+void MainWindow::on_actionExport_image_triggered()
 {
     if (patternCollection.isEmpty())
         return;
@@ -528,9 +542,22 @@ void MainWindow::on_actionSave_project_triggered()
 {
     if (patternCollection.isEmpty())
         return;
-    if(savePatternProject()){
+
+    if(!savePatternProject(false)){
+        QMessageBox::critical(this,"Error","Project can not be save",QMessageBox::Ok);
+        return;
+    }else{
         setTitleWindow(projectName);
-        qDebug() << "Project successful saved";
+    }
+}
+
+void MainWindow::on_actionSave_project_as_triggered()
+{
+    if (patternCollection.isEmpty())
+        return;
+
+    if(!savePatternProject(true)){
+        QMessageBox::critical(this,"Error","Project can not be save",QMessageBox::Ok);
     }
 }
 
@@ -922,7 +949,7 @@ bool MainWindow::promptForSaveProject()
     int ans = msgBox.exec();
 
     if (ans == QMessageBox::Save) {
-        if(!savePatternProject())
+        if(!savePatternProject(false))
             return false;
         return true;
     }

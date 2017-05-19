@@ -21,6 +21,16 @@ public:
 
     bool open(QString filename, SceneTemplate* newScenetemplate, PatternCollection* newPatterncollection);
 
+    void writeHeaderVersion(QDataStream& stream, float version);
+
+    float readHeaderVersion(QDataStream& stream);
+
+    void writeSceneConfiguration(QDataStream &stream, QPointer<Fixture> fixture);
+
+    bool readSceneConfiguration(QDataStream &stream, SceneTemplate* newScenetemplate);
+
+    void writePatterns(QDataStream &stream, PatternCollection* newPatterncollection);
+
     bool readPatterns(QDataStream& stream, PatternCollection* newPatterncollection);
 };
 
