@@ -26,6 +26,7 @@
 #include "pattern.h"
 #include "patterncollectiondelegate.h"
 
+#include "projectfile.h"
 #include "patternframemodel.h"
 #include "patterndelegate.h"
 #include "patterncollection.h"
@@ -460,36 +461,16 @@ bool MainWindow::savePatternProject()
         settings.setValue("File/SaveDirectory", fileInfo.absolutePath());
 
         projectFilename = fileName;
+        projectName = fileInfo.baseName();
     }
 
 
-    qDebug() << "Save project:" << projectFilename;
-
-    // Create a new file
-    QFile file(projectFilename);
-    file.open(QIODevice::WriteOnly);
-
-
-    QDataStream out(&file);
-    out.setVersion(QDataStream::Qt_5_8);
-
-    // write Header
-    out << (QString)PROJECT_HEADER;
-    out << (float)PROJECT_FORMAT_VERSION;
-    out << (QString)GIT_VERSION;
-
-    // write scene configuration
-    out << (QString)settings.value("BlinkyTape/firmwareName", BLINKYTAPE_DEFAULT_FIRMWARE_NAME).toString();
-    out << (QString)fixture->getName();
-    out << (qint32)fixture->getExtents().width();
-    out << (qint32)fixture->getExtents().height();
-    out << (qint32)fixture->getColorMode();
-
-    patternCollection.writePatterns(out);
-
-    file.close();
-
     setProjectModified(false);
+
+    ProjectFile newProject;
+
+    if(!newProject.save(projectFilename, fixture, &patternCollection))
+        return false;
 
     return true;
 
@@ -547,8 +528,10 @@ void MainWindow::on_actionSave_project_triggered()
 {
     if (patternCollection.isEmpty())
         return;
-    if(savePatternProject())
+    if(savePatternProject()){
+        setTitleWindow(projectName);
         qDebug() << "Project successful saved";
+    }
 }
 
 void MainWindow::on_actionExit_triggered()
@@ -1390,65 +1373,17 @@ bool MainWindow::openPatternProject()
     projectFilename = fileName;
     projectName = fileInfo.baseName();
 
-    qDebug()<<"Open Project:" << projectFilename;
-
-    QFile file(projectFilename);
-    if (!file.open(QIODevice::ReadOnly)){
-        qDebug()<< "Error: Cannot read project file ";
-        return false;
-    }
-
-    // read project file
-    SceneTemplate newSceneTemplate;
-    QString header;
-    QString patternPaintVersion;
-    float formatVersion;
-    qint32 width;
-    qint32 height;
-    qint32 colorMode;
-
-    QDataStream in(&file);
-    in.setVersion(QDataStream::Qt_5_8);
-
-    // read Header
-    in >> header;
-    if(header != PROJECT_HEADER){
-        qDebug()<< "Error: Header incorrectly";
-        return false;
-    }
-
-    in >> formatVersion;
-    if(formatVersion != PROJECT_FORMAT_VERSION){
-        qDebug()<< "Error: Format version incorrectly";
-        return false;
-    }
-
-    in >> patternPaintVersion;
-
-    qDebug() << "Project created with Pattern Paint version:" << patternPaintVersion;
-
-
-    // read scene configuration
-    in >> newSceneTemplate.firmwareName;
-    in >> newSceneTemplate.fixtureType;
-    in >> width;
-    in >> height;
-    in >> colorMode;
-
-    newSceneTemplate.colorMode = (ColorMode)colorMode;
-    newSceneTemplate.size = QSize(width,height);
-
-    if(in.status() == QDataStream::Ok)
-        applyScene(newSceneTemplate);
-
-    if(patternCollection.readPatterns(in) && in.status() == QDataStream::Ok){
-        qDebug() << "Project successful readed";
-    }else{
-        qDebug() << "Project read failed!";
-        return false;
-    }
 
     setProjectModified(false);
+
+    SceneTemplate newSceneTemplate;
+    ProjectFile newProject;
+
+    if(newProject.open(projectFilename, &newSceneTemplate, &patternCollection)){
+        applyScene(newSceneTemplate);
+    }else{
+        return false;
+    }
 
     return true;
 }

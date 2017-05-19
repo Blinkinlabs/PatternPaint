@@ -4,6 +4,7 @@ TARGET = blinky
 TEMPLATE = lib
 
 include(../libusb.pri)
+include(../gitversion.pri)
 
 HEADERS += \
     fixture.h \
@@ -35,7 +36,8 @@ HEADERS += \
     linearfixture.h \
     firmwarestore.h \
     firmwarereader.h \
-    memorymap.h
+    memorymap.h \
+    projectfile.h
 
 SOURCES +=  \
     fixture.cpp \
@@ -65,7 +67,8 @@ SOURCES +=  \
     brightnessmodel.cpp \
     firmwarestore.cpp \
     firmwarereader.cpp \
-    memorymap.cpp
+    memorymap.cpp \
+    projectfile.cpp
 
 # For platforms that have serial ports
 # TODO: Pull hard-coded references to BlinkyTape from the gui, allowing this section to be switchable
