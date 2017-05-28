@@ -12,11 +12,14 @@ private slots:
     void setSizeTest_data();
     void setSizeTest();
 
+    void setModeZigZagTest_data();
+    void setModeZigZagTest();
+
     void setModeRowsTest_data();
     void setModeRowsTest();
 
-    void setModeZigZagTest_data();
-    void setModeZigZagTest();
+    void setModeColsTest_data();
+    void setModeColsTest();
 };
 
 #endif // MATRIXFIXTURETESTS_H
