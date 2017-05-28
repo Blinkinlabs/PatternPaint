@@ -5,6 +5,7 @@
 #include "colormodetests.h"
 #include "serialcommandtests.h"
 #include "lightbuddycommandstests.h"
+#include "eightbyeightcommandstests.h"
 #include "bytearrayhelperstests.h"
 #include "memorysectiontests.h"
 #include "memorymaptests.h"
@@ -79,6 +80,9 @@ int main(int argc, char *argv[])
 
     PatternScrollModelTests patternScrollModelTests;
     result |= QTest::qExec(&patternScrollModelTests);
+
+    EightByEightCommandsTests eightByEightCommandsTests;
+    result |= QTest::qExec(&eightByEightCommandsTests);
 
     return result;
 }

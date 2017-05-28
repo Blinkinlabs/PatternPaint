@@ -36,7 +36,9 @@ HEADERS += \
     firmwarestore.h \
     firmwarereader.h \
     memorymap.h \
-    blinkypendantuploaddata.h
+    blinkypendantuploaddata.h \
+    eightbyeightcommands.h \
+    eightbyeightuploader.h
 
 SOURCES +=  \
     fixture.cpp \
@@ -67,7 +69,9 @@ SOURCES +=  \
     firmwarestore.cpp \
     firmwarereader.cpp \
     memorymap.cpp \
-    blinkypendantuploaddata.cpp
+    blinkypendantuploaddata.cpp \
+    eightbyeightcommands.cpp \
+    eightbyeightuploader.cpp
 
 # For platforms that have serial ports
 # TODO: Pull hard-coded references to BlinkyTape from the gui, allowing this section to be switchable

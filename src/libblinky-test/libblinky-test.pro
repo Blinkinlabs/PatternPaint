@@ -32,7 +32,8 @@ HEADERS += \
     blinkytapeuploaddatatests.h \
     blinkypendantuploaddatatests.h \
     patternframemodeltests.h \
-    patternscrollmodeltests.h
+    patternscrollmodeltests.h \
+    eightbyeightcommandstests.h
 
 SOURCES += \
     avr109commandstests.cpp \
@@ -53,4 +54,5 @@ SOURCES += \
     blinkytapeuploaddatatests.cpp \
     blinkypendantuploaddatatests.cpp \
     patternframemodeltests.cpp \
-    patternscrollmodeltests.cpp
+    patternscrollmodeltests.cpp \
+    eightbyeightcommandstests.cpp

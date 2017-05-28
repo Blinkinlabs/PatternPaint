@@ -1,5 +1,5 @@
 #include "blinkytapeuploader.h"
-
+#include "eightbyeightuploader.h"
 #include "blinkypendantuploader.h"
 #include "lightbuddyuploader.h"
 #include "blinkytape.h"
@@ -297,6 +297,9 @@ bool BlinkyTape::getUploader(QPointer<BlinkyUploader> &uploader)
     else if (serialInfo.vendorIdentifier() == LIGHTBUDDY_SKETCH_VID
              && serialInfo.productIdentifier() == LIGHTBUDDY_SKETCH_PID)
         uploader = new LightBuddyUploader(parent());
+    else if (serialInfo.vendorIdentifier() == EIGHTBYEIGHT_SKETCH_VID
+             && serialInfo.productIdentifier() == EIGHTBYEIGHT_SKETCH_PID)
+        uploader = new EightByEightUploader(parent());
     else
         return false;
 
