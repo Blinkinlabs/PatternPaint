@@ -59,7 +59,7 @@ const SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT] = {
         ":/examples/matrix",
         "EightByEight",
         "default",
-        "Matrix-Rows",
+        "Matrix-Cols",
         RGB,
         QSize(8,8)
     },

@@ -15,6 +15,9 @@ Fixture *Fixture::makeFixture(QString type, QSize size)
     else if(type == "Matrix-Rows") {
         fixture = new MatrixFixture(size, MatrixFixture::MODE_ROWS);
     }
+    else if(type == "Matrix-Cols") {
+        fixture = new MatrixFixture(size, MatrixFixture::MODE_COLS);
+    }
     else if(type == "Linear") {
         fixture = new LinearFixture(size.height());
     }

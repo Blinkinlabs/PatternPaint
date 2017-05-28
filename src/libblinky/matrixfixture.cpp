@@ -9,6 +9,9 @@ MatrixFixture::MatrixFixture(QSize size, MatrixMode matrixMode, QObject *parent)
     case MODE_ZIGZAG:
         setName("Matrix-Zigzag");
         break;
+    case MODE_COLS:
+        setName("Matrix-Cols");
+        break;
     case MODE_ROWS:
     default:
         setName("Matrix-Rows");
@@ -52,6 +55,9 @@ void MatrixFixture::recalculateLocations()
             switch(matrixMode) {
             case MODE_ZIGZAG:
                 point = QPoint(x, x%2 ? size.height()-1-y : y);
+                break;
+            case MODE_COLS:
+                point = QPoint(y, x);
                 break;
             case MODE_ROWS:
                 point = QPoint(x, y);

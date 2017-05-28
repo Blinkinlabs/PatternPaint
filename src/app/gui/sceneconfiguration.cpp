@@ -39,6 +39,7 @@ SceneConfiguration::SceneConfiguration(QWidget *parent) :
     ui->FixtureType->addItem("Linear");
     ui->FixtureType->addItem("Matrix-Zigzag");
     ui->FixtureType->addItem("Matrix-Rows");
+    ui->FixtureType->addItem("Matrix-Cols");
 
     ui->fixtureHeight->setValidator(new QIntValidator(1, std::numeric_limits<int>::max(), this));
     ui->fixtureWidth->setValidator(new QIntValidator(1, std::numeric_limits<int>::max(), this));

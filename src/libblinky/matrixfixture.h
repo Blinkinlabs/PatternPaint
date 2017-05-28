@@ -12,7 +12,8 @@ class MatrixFixture : public Fixture
 public:
     enum MatrixMode {
         MODE_ZIGZAG,
-        MODE_ROWS
+        MODE_ROWS,
+        MODE_COLS
     };
 
     MatrixFixture(QSize size, MatrixMode matrixMode,
