@@ -11,10 +11,10 @@ void SerialCommandTests::initTest()
     int timeout = 12;
 
     SerialCommand testCommand(name,  data, expectedResponse, timeout);
-    QVERIFY(name == testCommand.name);
-    QVERIFY(data == testCommand.data);
-    QVERIFY(expectedResponse == testCommand.expectedResponse);
-    QVERIFY(timeout == testCommand.timeout);
+    QCOMPARE(name, testCommand.name);
+    QCOMPARE(data, testCommand.data);
+    QCOMPARE(expectedResponse, testCommand.expectedResponse);
+    QCOMPARE(timeout, testCommand.timeout);
 }
 
 void SerialCommandTests::initMaskedTest()
@@ -27,11 +27,11 @@ void SerialCommandTests::initMaskedTest()
 
     SerialCommand testCommand(name,  data, expectedResponse, expectedResponseMask,
                               timeout);
-    QVERIFY(name == testCommand.name);
-    QVERIFY(data == testCommand.data);
-    QVERIFY(expectedResponse == testCommand.expectedResponse);
-    QVERIFY(expectedResponseMask == testCommand.expectedResponseMask);
-    QVERIFY(timeout == testCommand.timeout);
+    QCOMPARE(name, testCommand.name);
+    QCOMPARE(data, testCommand.data);
+    QCOMPARE(expectedResponse, testCommand.expectedResponse);
+    QCOMPARE(expectedResponseMask, testCommand.expectedResponseMask);
+    QCOMPARE(timeout, testCommand.timeout);
 }
 
 void SerialCommandTests::compareNoMaskTest_data()
@@ -69,7 +69,7 @@ void SerialCommandTests::compareNoMaskTest()
 
     SerialCommand command("",QByteArray(), expectedResponse);
 
-    QVERIFY(command.testResponse(response) == result);
+    QCOMPARE(command.testResponse(response), result);
 }
 
 void SerialCommandTests::compareMaskTest_data()
@@ -116,7 +116,7 @@ void SerialCommandTests::compareMaskTest()
 
     SerialCommand command("",QByteArray(), expectedResponse, expectedResponseMask);
 
-    QVERIFY(command.testResponse(response) == result);
+    QCOMPARE(command.testResponse(response), result);
 }
 
 void SerialCommandTests::equalsTest()
@@ -124,7 +124,7 @@ void SerialCommandTests::equalsTest()
     SerialCommand a("name", QByteArray(3,'x'), QByteArray(4, 'y'), QByteArray(5, 'z'), 123);
     SerialCommand b("name", QByteArray(3,'x'), QByteArray(4, 'y'), QByteArray(5, 'z'), 123);
 
-    QVERIFY((a == b));
+    QCOMPARE(a, b);
 }
 
 void SerialCommandTests::equalsOperatorNameMismatchTest()

@@ -6,7 +6,7 @@
 void FirmwareStoreTests::listFirmwareSearchPathsTest()
 {
     // There should be at least the BlinkyTape built-in and third-party locations
-    QVERIFY(FirmwareStore::listFirmwareSearchPaths().count() == 2);
+    QCOMPARE(FirmwareStore::listFirmwareSearchPaths().count(), 2);
 }
 
 void FirmwareStoreTests::addFirmwareBadSourceDirectoryTest()
@@ -14,8 +14,8 @@ void FirmwareStoreTests::addFirmwareBadSourceDirectoryTest()
     FirmwareStore firmwareStore;
     QString expectedError = "Source directory doesn't exist";
 
-    QVERIFY(firmwareStore.addFirmware(":/does/not/exist") == false);
-    QVERIFY(firmwareStore.getErrorString() == expectedError);
+    QCOMPARE(firmwareStore.addFirmware(":/does/not/exist"), false);
+    QCOMPARE(firmwareStore.getErrorString(), expectedError);
 }
 
 void FirmwareStoreTests::addFirmwareEmptyDirectoryTest()
@@ -26,8 +26,8 @@ void FirmwareStoreTests::addFirmwareEmptyDirectoryTest()
     FirmwareStore firmwareStore;
     QString expectedError = "Firmware hex file not found";
 
-    QVERIFY(firmwareStore.addFirmware(dir.path()) == false);
-    QVERIFY(firmwareStore.getErrorString() == expectedError);
+    QCOMPARE(firmwareStore.addFirmware(dir.path()), false);
+    QCOMPARE(firmwareStore.getErrorString(), expectedError);
 }
 
 void FirmwareStoreTests::addFirmwareAlreadyExistsTest()
@@ -35,8 +35,8 @@ void FirmwareStoreTests::addFirmwareAlreadyExistsTest()
     FirmwareStore firmwareStore;
     QString expectedError = "Firmware with this name already exists, please use a different name!";
 
-    QVERIFY(firmwareStore.addFirmware(BLINKYTAPE_DEFAULT_FIRMWARE_NAME) == false);
-    QVERIFY(firmwareStore.getErrorString() == expectedError);
+    QCOMPARE(firmwareStore.addFirmware(BLINKYTAPE_DEFAULT_FIRMWARE_NAME), false);
+    QCOMPARE(firmwareStore.getErrorString(), expectedError);
 }
 
 void FirmwareStoreTests::removeFirmwareDoesntExitTest()
@@ -44,8 +44,8 @@ void FirmwareStoreTests::removeFirmwareDoesntExitTest()
     FirmwareStore firmwareStore;
     QString expectedError = "No firmware with that name found";
 
-    QVERIFY(firmwareStore.removeFirmware("thisfirmwaredoesntexist") == false);
-    QVERIFY(firmwareStore.getErrorString() == expectedError);
+    QCOMPARE(firmwareStore.removeFirmware("thisfirmwaredoesntexist"), false);
+    QCOMPARE(firmwareStore.getErrorString(), expectedError);
 }
 
 void FirmwareStoreTests::removeFirmwareDefaultFailsTest()
@@ -53,8 +53,8 @@ void FirmwareStoreTests::removeFirmwareDefaultFailsTest()
     FirmwareStore firmwareStore;
     QString expectedError = "Cannot remove built-in firmware";
 
-    QVERIFY(firmwareStore.removeFirmware(BLINKYTAPE_DEFAULT_FIRMWARE_NAME) == false);
-    QVERIFY(firmwareStore.getErrorString() == expectedError);
+    QCOMPARE(firmwareStore.removeFirmware(BLINKYTAPE_DEFAULT_FIRMWARE_NAME), false);
+    QCOMPARE(firmwareStore.getErrorString(), expectedError);
 }
 
 void FirmwareStoreTests::listAvailableFirmwareBlinkyTapeFirmwaresTest_data()
@@ -85,7 +85,7 @@ void FirmwareStoreTests::getFirmwareDirectoryNameHasBlinkyTapeDefaultTest()
 {
     QString expectedDirectory(":/firmware/blinkytape/default");
 
-    QVERIFY(FirmwareStore::getFirmwareDirectoryName(BLINKYTAPE_DEFAULT_FIRMWARE_NAME) == expectedDirectory);
+    QCOMPARE(FirmwareStore::getFirmwareDirectoryName(BLINKYTAPE_DEFAULT_FIRMWARE_NAME), expectedDirectory);
 }
 
 void FirmwareStoreTests::getFirmwareDescriptionDoesntExistTest()
@@ -100,7 +100,7 @@ void FirmwareStoreTests::getFirmwareDescriptionHasBlinkyTapeDefaultTest()
     expectedDescription.append("Default BlinkyTape Firmware");
     expectedDescription.append("Use this for all standard functions");
 
-    QVERIFY(FirmwareStore::getFirmwareDescription(BLINKYTAPE_DEFAULT_FIRMWARE_NAME) == expectedDescription);
+    QCOMPARE(FirmwareStore::getFirmwareDescription(BLINKYTAPE_DEFAULT_FIRMWARE_NAME), expectedDescription);
 }
 
 void FirmwareStoreTests::getFirmwareDataDoesntExistTest()

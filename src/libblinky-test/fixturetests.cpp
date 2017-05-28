@@ -13,7 +13,7 @@ void FixtureTests::setNameTest()
     Fixture fixture;
     fixture.setName(name);
 
-    QVERIFY(fixture.getName() == name);
+    QCOMPARE(fixture.getName(), name);
 }
 
 void FixtureTests::setColorModeTest()
@@ -23,7 +23,7 @@ void FixtureTests::setColorModeTest()
     Fixture fixture;
     fixture.setColorMode(colorMode);
 
-    QVERIFY(fixture.getColorMode() == colorMode);
+    QCOMPARE(fixture.getColorMode(), colorMode);
 }
 
 void FixtureTests::setBrightnessModelTest()
@@ -46,8 +46,8 @@ void FixtureTests::setLocationsTest()
 
     fixture.setLocations(locations);
 
-    QVERIFY(fixture.getLocations() == locations);
-    QVERIFY(fixture.getCount() == 100);
+    QCOMPARE(fixture.getLocations(), locations);
+    QCOMPARE(fixture.getCount(), (unsigned int)100);
 }
 
 void FixtureTests::getExtentsTest_data()
@@ -74,7 +74,7 @@ void FixtureTests::getExtentsTest()
     Fixture fixture;
     fixture.setLocations(locations);
 
-    QVERIFY(fixture.getExtents() == extents);
+    QCOMPARE(fixture.getExtents(), extents);
 
 }
 
@@ -87,7 +87,7 @@ void FixtureTests::getColorStreamNullBrightnessModelTest()
 
     QList<QColor> colorStream = fixture.getColorStream(QImage());
 
-    QVERIFY(colorStream.count() == 0);
+    QCOMPARE(colorStream.count(), 0);
 }
 
 void FixtureTests::getColorStreamNullFrameTest()
@@ -101,8 +101,8 @@ void FixtureTests::getColorStreamNullFrameTest()
 
     QList<QColor> colorStream = fixture.getColorStream(QImage());
 
-    QVERIFY(colorStream.count() == 1);
-    QVERIFY(colorStream.at(0) == QColor(0,0,0,255));
+    QCOMPARE(colorStream.count(), 1);
+    QCOMPARE(colorStream.at(0), QColor(0,0,0,255));
 }
 
 void FixtureTests::getColorStreamBadLocationsTest()
@@ -122,11 +122,11 @@ void FixtureTests::getColorStreamBadLocationsTest()
 
     QList<QColor> colorStream = fixture.getColorStream(image);
 
-    QVERIFY(colorStream.count() == 4);
-    QVERIFY(colorStream.at(0) == QColor(0,0,0,255));
-    QVERIFY(colorStream.at(1) == QColor(1,2,3,255));
-    QVERIFY(colorStream.at(2) == QColor(1,2,3,255));
-    QVERIFY(colorStream.at(3) == QColor(0,0,0,255));
+    QCOMPARE(colorStream.count(), 4);
+    QCOMPARE(colorStream.at(0), QColor(0,0,0,255));
+    QCOMPARE(colorStream.at(1), QColor(1,2,3,255));
+    QCOMPARE(colorStream.at(2), QColor(1,2,3,255));
+    QCOMPARE(colorStream.at(3), QColor(0,0,0,255));
 }
 
 void FixtureTests::getColorStreamBrightnessModelAppliedTest()
@@ -143,7 +143,6 @@ void FixtureTests::getColorStreamBrightnessModelAppliedTest()
 
     QList<QColor> colorStream = fixture.getColorStream(image);
 
-    QVERIFY(colorStream.count() == 1);
-    QVERIFY(colorStream.at(0) == QColor(128,64,32,255));
-
+    QCOMPARE(colorStream.count(), 1);
+    QCOMPARE(colorStream.at(0), QColor(128,64,32,255));
 }

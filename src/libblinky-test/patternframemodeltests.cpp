@@ -402,7 +402,7 @@ void PatternFrameModelTests::setDataIndexOutOfRangeTest()
     model.insertRows(0,1);
     QModelIndex modelIndex = model.index(0);
     model.removeRows(0,1);
-    QVERIFY(modelIndex.row() == 0);
+    QCOMPARE(modelIndex.row(), 0);
 
     QVERIFY(model.setData(modelIndex, QImage(), PatternFrameModel::FrameImage) == false);
 }

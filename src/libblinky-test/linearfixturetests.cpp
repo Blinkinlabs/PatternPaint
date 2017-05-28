@@ -7,8 +7,8 @@ void LinearFixtureTests::constructorTest()
 {
     LinearFixture linearFixture(0);
 
-    QVERIFY(linearFixture.getLength() == 0);
-    QVERIFY(linearFixture.getCount() == 0);
+    QCOMPARE(linearFixture.getLength(), (unsigned int)0);
+    QCOMPARE(linearFixture.getCount(), (unsigned int)0);
 }
 
 void LinearFixtureTests::setLengthTest_data()
@@ -28,10 +28,10 @@ void LinearFixtureTests::setLengthTest()
 
     linearFixture.setLength(length);
 
-    QVERIFY(linearFixture.getLength() == length);
-    QVERIFY(linearFixture.getCount() == length);
+    QCOMPARE(linearFixture.getLength(), length);
+    QCOMPARE(linearFixture.getCount(), length);
 
     for(unsigned int offset = 0; offset < length; offset++) {
-        QVERIFY(linearFixture.getLocations().at(offset) == QPoint(0,offset));
+        QCOMPARE(linearFixture.getLocations().at(offset), QPoint(0,offset));
     }
 }

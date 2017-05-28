@@ -16,7 +16,7 @@ void LightBuddyCommandsTests::commandHeaderTest()
 {
     QByteArray expectedResponse(12, (char)0xFF);
 
-    QVERIFY(LightBuddyCommands::commandHeader() == expectedResponse);
+    QCOMPARE(LightBuddyCommands::commandHeader(), expectedResponse);
 }
 
 void LightBuddyCommandsTests::eraseFlashTest()
@@ -39,11 +39,11 @@ void LightBuddyCommandsTests::eraseFlashTest()
 
     SerialCommand command = LightBuddyCommands::eraseFlash();
 
-    QVERIFY(command.name == "eraseFlash");
-    QVERIFY(command.data == expectedData);
-    QVERIFY(command.expectedResponse == expectedResponse);
-    QVERIFY(command.expectedResponseMask == expectedResponseMask);
-    QVERIFY(command.timeout == 20000);
+    QCOMPARE(command.name, QString("eraseFlash"));
+    QCOMPARE(command.data, expectedData);
+    QCOMPARE(command.expectedResponse, expectedResponse);
+    QCOMPARE(command.expectedResponseMask, expectedResponseMask);
+    QCOMPARE(command.timeout, 20000);
 }
 
 void LightBuddyCommandsTests::fileNewTest_data()
@@ -83,11 +83,11 @@ void LightBuddyCommandsTests::fileNewTest()
 
     SerialCommand command = LightBuddyCommands::fileNew(size);
 
-    QVERIFY(command.name == "fileNew");
-    QVERIFY(command.data == expectedData);
-    QVERIFY(command.expectedResponse == expectedResponse);
-    QVERIFY(command.expectedResponseMask == expectedResponseMask);
-    QVERIFY(command.timeout == 5000);
+    QCOMPARE(command.name, QString("fileNew"));
+    QCOMPARE(command.data, expectedData);
+    QCOMPARE(command.expectedResponse, expectedResponse);
+    QCOMPARE(command.expectedResponseMask, expectedResponseMask);
+    QCOMPARE(command.timeout, 5000);
 }
 
 void LightBuddyCommandsTests::writePageTest_data()
@@ -131,10 +131,10 @@ void LightBuddyCommandsTests::writePageTest()
 
     SerialCommand command = LightBuddyCommands::writePage(sector, offset, data);
 
-    QVERIFY(command.name == "writePage");
-    QVERIFY(command.data == expectedData);
-    QVERIFY(command.expectedResponse == expectedResponse);
-    QVERIFY(command.expectedResponseMask == expectedResponseMask);
+    QCOMPARE(command.name, QString("writePage"));
+    QCOMPARE(command.data, expectedData);
+    QCOMPARE(command.expectedResponse, expectedResponse);
+    QCOMPARE(command.expectedResponseMask, expectedResponseMask);
 }
 
 void LightBuddyCommandsTests::reloadAnimationsTest()
@@ -155,8 +155,8 @@ void LightBuddyCommandsTests::reloadAnimationsTest()
 
     SerialCommand command = LightBuddyCommands::reloadAnimations();
 
-    QVERIFY(command.name == "reloadAnimations");
-    QVERIFY(command.data == expectedData);
-    QVERIFY(command.expectedResponse == expectedResponse);
-    QVERIFY(command.expectedResponseMask == expectedResponseMask);
+    QCOMPARE(command.name, QString("reloadAnimations"));
+    QCOMPARE(command.data, expectedData);
+    QCOMPARE(command.expectedResponse, expectedResponse);
+    QCOMPARE(command.expectedResponseMask, expectedResponseMask);
 }

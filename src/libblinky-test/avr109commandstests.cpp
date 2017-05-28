@@ -17,10 +17,10 @@ void Avr109CommandsTests::checkDeviceSignatureTest()
     QByteArray expectedResponseMask;
 
     SerialCommand command = Avr109Commands::checkDeviceSignature();
-    QVERIFY(command.name == "checkDeviceSignature");
-    QVERIFY(command.data == expectedData);
-    QVERIFY(command.expectedResponse == expectedResponse);
-    QVERIFY(command.expectedResponseMask == expectedResponseMask);
+    QCOMPARE(command.name, QString("checkDeviceSignature"));
+    QCOMPARE(command.data, expectedData);
+    QCOMPARE(command.expectedResponse, expectedResponse);
+    QCOMPARE(command.expectedResponseMask, expectedResponseMask);
 }
 
 void Avr109CommandsTests::resetTest()
@@ -30,10 +30,10 @@ void Avr109CommandsTests::resetTest()
     QByteArray expectedResponseMask;
 
     SerialCommand command = Avr109Commands::reset();
-    QVERIFY(command.name == "reset");
-    QVERIFY(command.data == expectedData);
-    QVERIFY(command.expectedResponse == expectedResponse);
-    QVERIFY(command.expectedResponseMask == expectedResponseMask);
+    QCOMPARE(command.name, QString("reset"));
+    QCOMPARE(command.data, expectedData);
+    QCOMPARE(command.expectedResponse, expectedResponse);
+    QCOMPARE(command.expectedResponseMask, expectedResponseMask);
 }
 
 void Avr109CommandsTests::chipEraseTest()
@@ -43,11 +43,11 @@ void Avr109CommandsTests::chipEraseTest()
     QByteArray expectedResponseMask;
 
     SerialCommand command = Avr109Commands::chipErase();
-    QVERIFY(command.name == "chipErase");
-    QVERIFY(command.data == expectedData);
-    QVERIFY(command.expectedResponse == expectedResponse);
-    QVERIFY(command.expectedResponseMask == expectedResponseMask);
-    QVERIFY(command.timeout == 10000);
+    QCOMPARE(command.name, QString("chipErase"));
+    QCOMPARE(command.data, expectedData);
+    QCOMPARE(command.expectedResponse, expectedResponse);
+    QCOMPARE(command.expectedResponseMask, expectedResponseMask);
+    QCOMPARE(command.timeout, 10000);
 }
 
 void Avr109CommandsTests::setAddressTest()
@@ -62,10 +62,10 @@ void Avr109CommandsTests::setAddressTest()
     QByteArray expectedResponseMask;
 
     SerialCommand command = Avr109Commands::setAddress(address);
-    QVERIFY(command.name == "setAddress");
-    QVERIFY(command.data == expectedData);
-    QVERIFY(command.expectedResponse == expectedResponse);
-    QVERIFY(command.expectedResponseMask == expectedResponseMask);
+    QCOMPARE(command.name, QString("setAddress"));
+    QCOMPARE(command.data, expectedData);
+    QCOMPARE(command.expectedResponse, expectedResponse);
+    QCOMPARE(command.expectedResponseMask, expectedResponseMask);
 }
 
 void Avr109CommandsTests::writeFlashPageTest_data()
@@ -107,10 +107,10 @@ void Avr109CommandsTests::writeFlashPageTest()
 
     QByteArray expectedResponseMask;
 
-    QVERIFY(command.name == "writeFlashPage");
-    QVERIFY(command.data == expectedData);
-    QVERIFY(command.expectedResponse == expectedResponse);
-    QVERIFY(command.expectedResponseMask == expectedResponseMask);
+    QCOMPARE(command.name, QString("writeFlashPage"));
+    QCOMPARE(command.data, expectedData);
+    QCOMPARE(command.expectedResponse, expectedResponse);
+    QCOMPARE(command.expectedResponseMask, expectedResponseMask);
 }
 
 void Avr109CommandsTests::verifyFlashPageTest_data()
@@ -150,10 +150,10 @@ void Avr109CommandsTests::verifyFlashPageTest()
 
     QByteArray expectedResponseMask;
 
-    QVERIFY(command.name == "verifyFlashPage");
-    QVERIFY(command.data == expectedData);
-    QVERIFY(command.expectedResponse == expectedResponse);
-    QVERIFY(command.expectedResponseMask == expectedResponseMask);
+    QCOMPARE(command.name, QString("verifyFlashPage"));
+    QCOMPARE(command.data, expectedData);
+    QCOMPARE(command.expectedResponse, expectedResponse);
+    QCOMPARE(command.expectedResponseMask, expectedResponseMask);
 }
 
 void Avr109CommandsTests::writeEepromBlockTest()
@@ -173,10 +173,10 @@ void Avr109CommandsTests::writeEepromBlockTest()
 
     QByteArray expectedResponseMask;
 
-    QVERIFY(command.name == "writeEepromBlock");
-    QVERIFY(command.data == expectedData);
-    QVERIFY(command.expectedResponse == expectedResponse);
-    QVERIFY(command.expectedResponseMask == expectedResponseMask);
+    QCOMPARE(command.name, QString("writeEepromBlock"));
+    QCOMPARE(command.data, expectedData);
+    QCOMPARE(command.expectedResponse, expectedResponse);
+    QCOMPARE(command.expectedResponseMask, expectedResponseMask);
 }
 
 void Avr109CommandsTests::writeFlashBadAddressTest()
@@ -184,8 +184,8 @@ void Avr109CommandsTests::writeFlashBadAddressTest()
     QByteArray data(FLASH_PAGE_SIZE_BYTES*2, 'x');
 
     // Addresses that aren't page aligned should fail
-    QVERIFY(Avr109Commands::writeFlash(data, 1).length() == 0);
-    QVERIFY(Avr109Commands::writeFlash(data, FLASH_PAGE_SIZE_BYTES + 1).length() == 0);
+    QCOMPARE(Avr109Commands::writeFlash(data, 1).length(), 0);
+    QCOMPARE(Avr109Commands::writeFlash(data, FLASH_PAGE_SIZE_BYTES + 1).length(), 0);
 }
 
 void Avr109CommandsTests::writeFlashTest_data()
@@ -218,7 +218,7 @@ void Avr109CommandsTests::writeFlashTest()
     QList<SerialCommand> commands = Avr109Commands::writeFlash(data, address);
 
     // There should be 1 setaddress and 1 writeflashpage instruction per chunk
-    QVERIFY(commands.length() == 2*chunks.length());
+    QCOMPARE(commands.length(), 2*chunks.length());
 
     // Verify each chunk is correct
     for(int chunkIndex = 0; chunkIndex < chunks.length(); chunkIndex++) {
@@ -229,8 +229,8 @@ void Avr109CommandsTests::writeFlashTest()
         SerialCommand expectedAddressCommand = Avr109Commands::setAddress(expectedAddress >> 1);
         SerialCommand expectedWriteFlashPageCommand = Avr109Commands::writeFlashPage(chunks.at(chunkIndex));
 
-        QVERIFY(commands.at(chunkIndex*2    ) == expectedAddressCommand);
-        QVERIFY(commands.at(chunkIndex*2 + 1) == expectedWriteFlashPageCommand);
+        QCOMPARE(commands.at(chunkIndex*2    ), expectedAddressCommand);
+        QCOMPARE(commands.at(chunkIndex*2 + 1), expectedWriteFlashPageCommand);
     }
 }
 
@@ -239,8 +239,8 @@ void Avr109CommandsTests::verifyFlashBadAddressTest()
     QByteArray data(FLASH_PAGE_SIZE_BYTES*2, 'x');
 
     // Addresses that aren't word aligned should fail
-    QVERIFY(Avr109Commands::verifyFlash(data, 1).length() == 0);
-    QVERIFY(Avr109Commands::verifyFlash(data, FLASH_PAGE_SIZE_BYTES + 1).length() == 0);
+    QCOMPARE(Avr109Commands::verifyFlash(data, 1).length(), 0);
+    QCOMPARE(Avr109Commands::verifyFlash(data, FLASH_PAGE_SIZE_BYTES + 1).length(), 0);
 }
 
 
@@ -275,7 +275,7 @@ void Avr109CommandsTests::verifyFlashTest()
     QList<QByteArray> chunks = ByteArrayCommands::chunkData(data, FLASH_PAGE_SIZE_BYTES);
 
     // There should be 1 setaddress and 1 verifyflashpage instruction per chunk
-    QVERIFY(commands.length() == 2*chunks.length());
+    QCOMPARE(commands.length(), 2*chunks.length());
 
     // Verify each chunk is correct
     for(int chunkIndex = 0; chunkIndex < chunks.length(); chunkIndex++) {
@@ -286,8 +286,8 @@ void Avr109CommandsTests::verifyFlashTest()
         SerialCommand expectedAddressCommand = Avr109Commands::setAddress(expectedAddress >> 1);
         SerialCommand expectedVerifyFlashPageCommand = Avr109Commands::verifyFlashPage(chunks.at(chunkIndex));
 
-        QVERIFY(commands.at(chunkIndex*2    ) == expectedAddressCommand);
-        QVERIFY(commands.at(chunkIndex*2 + 1) == expectedVerifyFlashPageCommand);
+        QCOMPARE(commands.at(chunkIndex*2    ), expectedAddressCommand);
+        QCOMPARE(commands.at(chunkIndex*2 + 1), expectedVerifyFlashPageCommand);
     }
 }
 
@@ -323,19 +323,19 @@ void Avr109CommandsTests::writeEepromTest()
     // Note: The address has no special aligment requirements
     SerialCommand expectedAddressCommand = Avr109Commands::setAddress(address);
 
-    QVERIFY(commands.at(0) == expectedAddressCommand);
+    QCOMPARE(commands.at(0), expectedAddressCommand);
 
     // Next, there should be 1 or more writeFlashPage commands
     QList<QByteArray> chunks = ByteArrayCommands::chunkData(data, EEPROM_CHUNK_SIZE_BYTES);
 
     // Verify that there are the correct number of commands
-    QVERIFY(commands.length() == (1 + chunks.length()));
+    QCOMPARE(commands.length(), (1 + chunks.length()));
 
     // Verify each chunk is correct
     for(int chunkIndex = 0; chunkIndex < chunks.length(); chunkIndex++) {
         SerialCommand expectedCommand = Avr109Commands::writeEepromBlock(chunks.at(chunkIndex));
 
-        QVERIFY(commands.at(1+chunkIndex) == expectedCommand);
+        QCOMPARE(commands.at(1+chunkIndex), expectedCommand);
     }
 }
 

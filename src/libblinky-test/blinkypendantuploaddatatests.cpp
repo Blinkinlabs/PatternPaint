@@ -17,7 +17,7 @@ void BlinkyPendantUploadDataTests::makePatternHeaderTableTest()
     expectedResponse.append((char)patternCount);
     expectedResponse.append((char)displayMode);
 
-    QVERIFY(BlinkyPendantUploadData::makePatternTableHeader(patternCount,displayMode) == expectedResponse);
+    QCOMPARE(BlinkyPendantUploadData::makePatternTableHeader(patternCount,displayMode), expectedResponse);
 }
 
 void BlinkyPendantUploadDataTests::makePatternTableEntryTest()
@@ -33,7 +33,7 @@ void BlinkyPendantUploadDataTests::makePatternTableEntryTest()
     expectedResponse.append('\x12');
     expectedResponse.append('\x34');
 
-    QVERIFY(BlinkyPendantUploadData::makePatternTableEntry(305419896, 39612, 4660) == expectedResponse);
+    QCOMPARE(BlinkyPendantUploadData::makePatternTableEntry(305419896, 39612, 4660), expectedResponse);
 }
 
 void BlinkyPendantUploadDataTests::noPatternsFailsTest()
@@ -42,8 +42,8 @@ void BlinkyPendantUploadDataTests::noPatternsFailsTest()
     BlinkyPendantUploadData::DisplayMode displayMode = BlinkyPendantUploadData::DisplayMode::POV;
     QList<PatternWriter> patternWriters;
 
-    QVERIFY(blinkyPendantUploadData.init(displayMode, patternWriters) == false);
-    QVERIFY(blinkyPendantUploadData.errorString == "No Patterns detected!");
+    QCOMPARE(blinkyPendantUploadData.init(displayMode, patternWriters), false);
+    QCOMPARE(blinkyPendantUploadData.errorString, QString("No Patterns detected!"));
 }
 
 void BlinkyPendantUploadDataTests::maxPatternsSucceedsTest()
@@ -59,7 +59,7 @@ void BlinkyPendantUploadDataTests::maxPatternsSucceedsTest()
     for(int i = 0; i < 255; i++)
         patternWriters.push_back(PatternWriter(pattern, fixture, encoding));
 
-    QVERIFY(blinkyPendantUploadData.init(displayMode, patternWriters) == true);
+    QCOMPARE(blinkyPendantUploadData.init(displayMode, patternWriters), true);
 }
 
 void BlinkyPendantUploadDataTests::tooManyPatternsFailsTest()
@@ -75,8 +75,8 @@ void BlinkyPendantUploadDataTests::tooManyPatternsFailsTest()
     for(int i = 0; i < 256; i++)
         patternWriters.push_back(PatternWriter(pattern, fixture, encoding));
 
-    QVERIFY(blinkyPendantUploadData.init(displayMode, patternWriters) == false);
-    QVERIFY(blinkyPendantUploadData.errorString == "Too many patterns, cannot fit in pattern table.");
+    QCOMPARE(blinkyPendantUploadData.init(displayMode, patternWriters), false);
+    QCOMPARE(blinkyPendantUploadData.errorString, QString("Too many patterns, cannot fit in pattern table."));
 }
 
 
@@ -92,8 +92,8 @@ void BlinkyPendantUploadDataTests::wrongEncodingFails()
 
     patternWriters.push_back(PatternWriter(pattern, fixture, encoding));
 
-    QVERIFY(blinkyPendantUploadData.init(displayMode, patternWriters) == false);
-    QVERIFY(blinkyPendantUploadData.errorString == "Wrong encoding type- must be RGB24!");
+    QCOMPARE(blinkyPendantUploadData.init(displayMode, patternWriters), false);
+    QCOMPARE(blinkyPendantUploadData.errorString, QString("Wrong encoding type- must be RGB24!"));
 }
 
 void BlinkyPendantUploadDataTests::wrongLEDCountFails()
@@ -108,8 +108,8 @@ void BlinkyPendantUploadDataTests::wrongLEDCountFails()
 
     patternWriters.push_back(PatternWriter(pattern, fixture, encoding));
 
-    QVERIFY(blinkyPendantUploadData.init(displayMode, patternWriters) == false);
-    QVERIFY(blinkyPendantUploadData.errorString == "Wrong pattern size- must be 10 pixels high!");
+    QCOMPARE(blinkyPendantUploadData.init(displayMode, patternWriters), false);
+    QCOMPARE(blinkyPendantUploadData.errorString, QString("Wrong pattern size- must be 10 pixels high!"));
 }
 
 void BlinkyPendantUploadDataTests::uploadDataTest() {
@@ -147,6 +147,6 @@ void BlinkyPendantUploadDataTests::uploadDataTest() {
     expectedData.append(patternWriterA.getDataAsBinary());
     expectedData.append(patternWriterB.getDataAsBinary());
 
-    QVERIFY(blinkyPendantUploadData.init(displayMode, patternWriters) == true);
-    QVERIFY(blinkyPendantUploadData.data == expectedData);
+    QCOMPARE(blinkyPendantUploadData.init(displayMode, patternWriters), true);
+    QCOMPARE(blinkyPendantUploadData.data, expectedData);
 }

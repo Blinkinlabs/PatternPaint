@@ -11,8 +11,8 @@ void MemoryMapTests::constructorTest()
 
     MemoryMap memoryMap(start, size);
 
-    QVERIFY(memoryMap.start == start);
-    QVERIFY(memoryMap.size == size);
+    QCOMPARE(memoryMap.start, start);
+    QCOMPARE(memoryMap.size, size);
     QVERIFY(memoryMap.memorySections.isEmpty());
 }
 

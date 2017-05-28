@@ -13,9 +13,9 @@ void ExponentialBrightnessTests::constructorTest()
 
     ExponentialBrightness brightness(rFactor,gFactor,bFactor);
 
-    QVERIFY(brightness.rFactor() == rFactor);
-    QVERIFY(brightness.gFactor() == gFactor);
-    QVERIFY(brightness.bFactor() == bFactor);
+    QCOMPARE(brightness.rFactor(), rFactor);
+    QCOMPARE(brightness.gFactor(), gFactor);
+    QCOMPARE(brightness.bFactor(), bFactor);
 }
 
 void ExponentialBrightnessTests::constructorZeroTest()
@@ -26,9 +26,9 @@ void ExponentialBrightnessTests::constructorZeroTest()
 
     ExponentialBrightness brightness(rFactor,gFactor,bFactor);
 
-    QVERIFY(brightness.rFactor() == ZERO_VALUE);
-    QVERIFY(brightness.gFactor() == ZERO_VALUE);
-    QVERIFY(brightness.bFactor() == ZERO_VALUE);
+    QCOMPARE(brightness.rFactor(), ZERO_VALUE);
+    QCOMPARE(brightness.gFactor(), ZERO_VALUE);
+    QCOMPARE(brightness.bFactor(), ZERO_VALUE);
 }
 
 
@@ -68,5 +68,5 @@ void ExponentialBrightnessTests::correctTest()
 
     ExponentialBrightness model(rFactor, gFactor, bFactor);
 
-    QVERIFY(model.correct(inputColor) == resultColor);
+    QCOMPARE(model.correct(inputColor), resultColor);
 }

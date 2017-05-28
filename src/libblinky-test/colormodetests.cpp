@@ -21,7 +21,7 @@ void ColorModeTests::colorModesTest()
     QFETCH(ColorMode, colorMode);
     QFETCH(QString, name);
 
-    QVERIFY(colorModeNames[colorMode].name == name);
+    QCOMPARE(colorModeNames[colorMode].name, name);
 }
 
 void ColorModeTests::colorModeValidTest_data()
@@ -45,7 +45,7 @@ void ColorModeTests::colorModeValidTest()
     QFETCH(ColorMode, colorMode);
     QFETCH(bool, expectedResult);
 
-    QVERIFY(colorModeValid(colorMode) == expectedResult);
+    QCOMPARE(colorModeValid(colorMode), expectedResult);
 }
 
 
@@ -69,10 +69,10 @@ void ColorModeTests::colorToBytesTest()
     QFETCH(QColor, color);
     QFETCH(QByteArray, bytes);
 
-    QVERIFY(colorToBytes(colorMode, color) == bytes);
+    QCOMPARE(colorToBytes(colorMode, color), bytes);
 }
 
 void ColorModeTests::colorToBytesBadModeFailsTest()
 {
-    QVERIFY(colorToBytes(COLOR_MODE_COUNT, QColor(1,2,3)).length() == 0);
+    QCOMPARE(colorToBytes(COLOR_MODE_COUNT, QColor(1,2,3)).length(), 0);
 }

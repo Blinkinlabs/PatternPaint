@@ -13,7 +13,7 @@ void BlinkyTapeUploadDataTests::makePatternHeaderTableTest()
     expectedResponse.append('\x56');
     expectedResponse.append('\x34');
 
-    QVERIFY(makePatternTableHeader(18,13398) == expectedResponse);
+    QCOMPARE(makePatternTableHeader(18,13398), expectedResponse);
 }
 
 void BlinkyTapeUploadDataTests::makePatternTableEntryTest()
@@ -27,7 +27,7 @@ void BlinkyTapeUploadDataTests::makePatternTableEntryTest()
     expectedResponse.append('\xBC');
     expectedResponse.append('\x9A');
 
-    QVERIFY(makePatternTableEntry(PatternWriter::Encoding::RGB24, 4660, 22136, 39612) == expectedResponse);
+    QCOMPARE(makePatternTableEntry(PatternWriter::Encoding::RGB24, 4660, 22136, 39612), expectedResponse);
 }
 
 void BlinkyTapeUploadDataTests::makeBrightnessTest_data()
@@ -74,7 +74,7 @@ void BlinkyTapeUploadDataTests::makeBrightnessTest()
     QFETCH(int, brightness);
     QFETCH(QByteArray, expectedResponse);
 
-    QVERIFY(makeBrightnessTable(brightness) == expectedResponse);
+    QCOMPARE(makeBrightnessTable(brightness), expectedResponse);
 }
 
 
@@ -83,8 +83,8 @@ void BlinkyTapeUploadDataTests::badFirmwareNameTest()
     BlinkyTapeUploadData blinkyTapeUploadData;
     QList<PatternWriter> patternWriters;
 
-    QVERIFY(blinkyTapeUploadData.init("notagoodfirmwarename", patternWriters) == false);
-    QVERIFY(blinkyTapeUploadData.errorString == "Firmware read failed!");
+    QCOMPARE(blinkyTapeUploadData.init("notagoodfirmwarename", patternWriters), false);
+    QCOMPARE(blinkyTapeUploadData.errorString, QString("Firmware read failed!"));
 }
 
 void BlinkyTapeUploadDataTests::noPatternsFailsTest()
@@ -92,8 +92,8 @@ void BlinkyTapeUploadDataTests::noPatternsFailsTest()
     BlinkyTapeUploadData blinkyTapeUploadData;
     QList<PatternWriter> patternWriters;
 
-    QVERIFY(blinkyTapeUploadData.init(BLINKYTAPE_DEFAULT_FIRMWARE_NAME, patternWriters) == false);
-    QVERIFY(blinkyTapeUploadData.errorString == "No Patterns detected!");
+    QCOMPARE(blinkyTapeUploadData.init(BLINKYTAPE_DEFAULT_FIRMWARE_NAME, patternWriters), false);
+    QCOMPARE(blinkyTapeUploadData.errorString, QString("No Patterns detected!"));
 }
 
 void BlinkyTapeUploadDataTests::maxPatternsSucceedsTest()
@@ -109,7 +109,7 @@ void BlinkyTapeUploadDataTests::maxPatternsSucceedsTest()
     for(int i = 0; i < 16; i++)
         patternWriters.push_back(PatternWriter(pattern, fixture, encoding));
 
-    QVERIFY(blinkyTapeUploadData.init(BLINKYTAPE_DEFAULT_FIRMWARE_NAME, patternWriters) == true);
+    QCOMPARE(blinkyTapeUploadData.init(BLINKYTAPE_DEFAULT_FIRMWARE_NAME, patternWriters), true);
 }
 
 void BlinkyTapeUploadDataTests::tooManyPatternsFailsTest()
@@ -125,8 +125,8 @@ void BlinkyTapeUploadDataTests::tooManyPatternsFailsTest()
     for(int i = 0; i < 17; i++)
         patternWriters.push_back(PatternWriter(pattern, fixture, encoding));
 
-    QVERIFY(blinkyTapeUploadData.init(BLINKYTAPE_DEFAULT_FIRMWARE_NAME, patternWriters) == false);
-    QVERIFY(blinkyTapeUploadData.errorString == "Too many patterns, cannot fit in pattern table.");
+    QCOMPARE(blinkyTapeUploadData.init(BLINKYTAPE_DEFAULT_FIRMWARE_NAME, patternWriters), false);
+    QCOMPARE(blinkyTapeUploadData.errorString, QString("Too many patterns, cannot fit in pattern table."));
 }
 
 void BlinkyTapeUploadDataTests::padsFirmwareSectionTest()
@@ -141,11 +141,11 @@ void BlinkyTapeUploadDataTests::padsFirmwareSectionTest()
     PatternWriter::Encoding encoding = PatternWriter::Encoding::RGB24;
 
     patternWriters.push_back(PatternWriter(pattern, fixture, encoding));
-    QVERIFY(blinkyTapeUploadData.init(BLINKYTAPE_DEFAULT_FIRMWARE_NAME, patternWriters) == true);
+    QCOMPARE(blinkyTapeUploadData.init(BLINKYTAPE_DEFAULT_FIRMWARE_NAME, patternWriters), true);
     QVERIFY(blinkyTapeUploadData.flashData.length() > 0);
-    QVERIFY(blinkyTapeUploadData.flashData.at(0).name == firmwareSection.name);
+    QCOMPARE(blinkyTapeUploadData.flashData.at(0).name, firmwareSection.name);
 
     // Note: This doesn't prove anything if the original firmware was already bounded to a 128 barrier.
-    QVERIFY((blinkyTapeUploadData.flashData.at(0).data.length() % 128) == 0);
+    QCOMPARE((blinkyTapeUploadData.flashData.at(0).data.length() % 128), 0);
 }
 

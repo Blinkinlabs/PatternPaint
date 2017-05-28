@@ -28,7 +28,7 @@ void FirmwareReaderTests::parseHexLineBadFormatTest()
     unsigned int type;
     QByteArray data;
 
-    QVERIFY(parseHexLine(line, address, type, data) == false);
+    QCOMPARE(parseHexLine(line, address, type, data), false);
 }
 
 void FirmwareReaderTests::parseHexLineAddressTest_data()
@@ -50,8 +50,8 @@ void FirmwareReaderTests::parseHexLineAddressTest()
     unsigned int type;
     QByteArray data;
 
-    QVERIFY(parseHexLine(line, address, type, data));
-    QVERIFY(address == expectedAddress);
+    QCOMPARE(parseHexLine(line, address, type, data), true);
+    QCOMPARE(address, expectedAddress);
 }
 
 void FirmwareReaderTests::parseHexLineTypeTest_data()
@@ -73,8 +73,8 @@ void FirmwareReaderTests::parseHexLineTypeTest()
     unsigned int type;
     QByteArray data;
 
-    QVERIFY(parseHexLine(line, address, type, data));
-    QVERIFY(type == expectedType);
+    QCOMPARE(parseHexLine(line, address, type, data), true);
+    QCOMPARE(type, expectedType);
 }
 
 void FirmwareReaderTests::parseHexLineDataTest_data()
@@ -105,6 +105,6 @@ void FirmwareReaderTests::parseHexLineDataTest()
     unsigned int type;
     QByteArray data;
 
-    QVERIFY(parseHexLine(line, address, type, data));
-    QVERIFY(data == expectedData);
+    QCOMPARE(parseHexLine(line, address, type, data), true);
+    QCOMPARE(data, expectedData);
 }

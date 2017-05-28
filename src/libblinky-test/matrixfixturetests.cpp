@@ -7,9 +7,9 @@ void MatrixFixtureTests::constructorTest()
 {
     MatrixFixture matrixFixture(QSize(),MatrixFixture::MODE_ROWS);
 
-    QVERIFY(matrixFixture.getMode() == MatrixFixture::MODE_ROWS);
-    QVERIFY(matrixFixture.getSize() == QSize());
-    QVERIFY(matrixFixture.getCount() == 0);
+    QCOMPARE(matrixFixture.getMode(), MatrixFixture::MODE_ROWS);
+    QCOMPARE(matrixFixture.getSize(), QSize());
+    QCOMPARE(matrixFixture.getCount(), (unsigned int)0);
 }
 
 void MatrixFixtureTests::setSizeTest_data()
@@ -31,8 +31,8 @@ void MatrixFixtureTests::setSizeTest()
 
     matrixFixture.setSize(size);
 
-    QVERIFY(matrixFixture.getSize() == size);
-    QVERIFY(matrixFixture.getCount() == static_cast<unsigned int>(size.width()*size.height()));
+    QCOMPARE(matrixFixture.getSize(), size);
+    QCOMPARE(matrixFixture.getCount(), static_cast<unsigned int>(size.width()*size.height()));
 }
 
 void MatrixFixtureTests::setModeRowsTest_data()
@@ -54,12 +54,12 @@ void MatrixFixtureTests::setModeRowsTest()
 
     matrixFixture.setSize(size);
 
-    QVERIFY(matrixFixture.getSize() == size);
+    QCOMPARE(matrixFixture.getSize(), size);
 
     for(int x = 0; x < size.width(); x++) {
         for(int y = 0; y < size.height(); y++) {
             int offset = x*size.height() + y;
-            QVERIFY(matrixFixture.getLocations().at(offset) == QPoint(x,y));
+            QCOMPARE(matrixFixture.getLocations().at(offset), QPoint(x,y));
         }
     }
 }
@@ -83,18 +83,18 @@ void MatrixFixtureTests::setModeZigZagTest()
 
     matrixFixture.setSize(size);
 
-    QVERIFY(matrixFixture.getSize() == size);
-    QVERIFY(matrixFixture.getCount() == static_cast<unsigned int>(size.width()*size.height()));
+    QCOMPARE(matrixFixture.getSize(), size);
+    QCOMPARE(matrixFixture.getCount(), static_cast<unsigned int>(size.width()*size.height()));
 
     for(int x = 0; x < size.width(); x++) {
         for(int y = 0; y < size.height(); y++) {
             int offset = x*size.height() + y;
 
-            if((x % 2) == 0) {
-                QVERIFY(matrixFixture.getLocations().at(offset) == QPoint(x,y));
+            if((x % 2), 0) {
+                QCOMPARE(matrixFixture.getLocations().at(offset), QPoint(x,y));
             }
             else {
-                QVERIFY(matrixFixture.getLocations().at(offset) == QPoint(x, size.height() - 1 - y));
+                QCOMPARE(matrixFixture.getLocations().at(offset), QPoint(x, size.height() - 1 - y));
             }
         }
     }

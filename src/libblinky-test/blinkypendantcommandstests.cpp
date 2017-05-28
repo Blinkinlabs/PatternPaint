@@ -16,7 +16,7 @@ void BlinkyPendantCommandsTests::commandHeaderTest()
 {
     QByteArray expectedResponse(10, (char)0xFF);
 
-    QVERIFY(BlinkyPendantCommands::commandHeader() == expectedResponse);
+    QCOMPARE(BlinkyPendantCommands::commandHeader(), expectedResponse);
 }
 
 void BlinkyPendantCommandsTests::startWriteTest()
@@ -37,11 +37,11 @@ void BlinkyPendantCommandsTests::startWriteTest()
 
     SerialCommand command = BlinkyPendantCommands::startWrite();
 
-    QVERIFY(command.name == "startWrite");
-    QVERIFY(command.data == expectedData);
-    QVERIFY(command.expectedResponse == expectedResponse);
-    QVERIFY(command.expectedResponseMask == expectedResponseMask);
-    QVERIFY(command.timeout == 2000);
+    QCOMPARE(command.name, QString("startWrite"));
+    QCOMPARE(command.data, expectedData);
+    QCOMPARE(command.expectedResponse, expectedResponse);
+    QCOMPARE(command.expectedResponseMask, expectedResponseMask);
+    QCOMPARE(command.timeout, 2000);
 }
 
 void BlinkyPendantCommandsTests::stopWriteTest()
@@ -62,10 +62,10 @@ void BlinkyPendantCommandsTests::stopWriteTest()
 
     SerialCommand command = BlinkyPendantCommands::stopWrite();
 
-    QVERIFY(command.name == "stopWrite");
-    QVERIFY(command.data == expectedData);
-    QVERIFY(command.expectedResponse == expectedResponse);
-    QVERIFY(command.expectedResponseMask == expectedResponseMask);
+    QCOMPARE(command.name, QString("stopWrite"));
+    QCOMPARE(command.data, expectedData);
+    QCOMPARE(command.expectedResponse, expectedResponse);
+    QCOMPARE(command.expectedResponseMask, expectedResponseMask);
 }
 
 void BlinkyPendantCommandsTests::writeFlashChunkTest_data()
@@ -112,10 +112,10 @@ void BlinkyPendantCommandsTests::writeFlashChunkTest()
     expectedResponseMask.append((char)0xFF);
     expectedResponseMask.append((char)0x00);
 
-    QVERIFY(command.name == "writeFlashPage");
-    QVERIFY(command.data == expectedData);
-    QVERIFY(command.expectedResponse == expectedResponse);
-    QVERIFY(command.expectedResponseMask == expectedResponseMask);
+    QCOMPARE(command.name, QString("writeFlashPage"));
+    QCOMPARE(command.data, expectedData);
+    QCOMPARE(command.expectedResponse, expectedResponse);
+    QCOMPARE(command.expectedResponseMask, expectedResponseMask);
 }
 
 void BlinkyPendantCommandsTests::writeFlashTest_data()
@@ -148,12 +148,12 @@ void BlinkyPendantCommandsTests::writeFlashTest()
     qDebug() <<chunks.length() << commands.length();
 
     // There should be 1 writeFlashChunk instruction per chunk
-    QVERIFY(commands.length() == chunks.length());
+    QCOMPARE(commands.length(), chunks.length());
 
     // Verify each chunk is correct
     for(int chunkIndex = 0; chunkIndex < chunks.length(); chunkIndex++) {
         SerialCommand expectedWriteFlashChunkCommand = BlinkyPendantCommands::writeFlashChunk(chunks.at(chunkIndex));
 
-        QVERIFY(commands.at(chunkIndex) == expectedWriteFlashChunkCommand);
+        QCOMPARE(commands.at(chunkIndex), expectedWriteFlashChunkCommand);
     }
 }

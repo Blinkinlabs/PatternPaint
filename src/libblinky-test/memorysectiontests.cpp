@@ -21,9 +21,9 @@ void MemorySectionTests::FullConstructorTest()
 
     MemorySection testSection(name, address, data);
 
-    QVERIFY(testSection.name == name);
-    QVERIFY(testSection.address == address);
-    QVERIFY(testSection.data == data);
+    QCOMPARE(testSection.name, name);
+    QCOMPARE(testSection.address, address);
+    QCOMPARE(testSection.data, data);
 }
 
 void MemorySectionTests::extentTest_data()
@@ -43,7 +43,7 @@ void MemorySectionTests::extentTest()
     QFETCH(MemorySection, memorySection);
     QFETCH(unsigned int, extent);
 
-    QVERIFY(memorySection.extent() == extent);
+    QCOMPARE(memorySection.extent(), extent);
 }
 
 
@@ -97,5 +97,5 @@ void MemorySectionTests::overlapsTest()
     QFETCH(MemorySection, b);
     QFETCH(bool, result);
 
-    QVERIFY(a.overlaps(b) == result);
+    QCOMPARE(a.overlaps(b), result);
 }
