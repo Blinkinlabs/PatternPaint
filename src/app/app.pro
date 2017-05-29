@@ -43,7 +43,8 @@ CONFIG(debug, debug|release) {
 
 RESOURCES += \
     images.qrc \
-    examples.qrc
+    examples.qrc \
+    translations.qrc
 
 include(gui/gui.pri)
 include(instruments/instruments.pri)

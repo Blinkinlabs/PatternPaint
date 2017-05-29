@@ -60,6 +60,3 @@ macx {
     OBJECTIVE_SOURCES += \
         $$PWD/appnap.mm
 }
-
-RESOURCES += \
-    $$PWD/language/language.qrc
