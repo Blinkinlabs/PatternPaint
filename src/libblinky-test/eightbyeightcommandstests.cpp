@@ -323,3 +323,28 @@ void EightByEightCommandsTests::unlockFileAccessTest()
     QCOMPARE(command.expectedResponse, expectedResponse);
     QCOMPARE(command.expectedResponseMask, expectedResponseMask);
 }
+
+void EightByEightCommandsTests::getFirmwareVersionTest()
+{
+    QByteArray expectedData;
+    expectedData.append(EightByEightCommands::commandHeader());
+    expectedData.append((char)EightByEightCommands::Command_GetFirmwareVersion);
+    expectedData.append((char)0x00);
+
+    QByteArray expectedResponse;
+    expectedResponse.append((char)0x00);
+    expectedResponse.append((char)0x04);
+    expectedResponse.append(QByteArray(4,(char)0x00));
+
+    QByteArray expectedResponseMask;
+    expectedResponseMask.append((char)0xFF);
+    expectedResponseMask.append((char)0xFF);
+    expectedResponseMask.append(QByteArray(4,(char)0x00));
+
+    SerialCommand command = EightByEightCommands::getFirmwareVersion();
+
+    QCOMPARE(command.name, QString("getFirmwareVersion"));
+    QCOMPARE(command.data, expectedData);
+    QCOMPARE(command.expectedResponse, expectedResponse);
+    QCOMPARE(command.expectedResponseMask, expectedResponseMask);
+}

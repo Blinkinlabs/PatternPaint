@@ -58,12 +58,12 @@ bool EightByEightUploader::storePatterns(BlinkyController &controller,
         // Offset 27+: frame data
 
         data += "PAT";
-        data += ByteArrayCommands::uint32ToByteArray(1); // version
-        data += ByteArrayCommands::uint32ToByteArray(patternWriter.getEncoding());
-        data += ByteArrayCommands::uint32ToByteArray(patternWriter.getLedCount());
-        data += ByteArrayCommands::uint32ToByteArray(patternWriter.getFrameCount());
-        data += ByteArrayCommands::uint32ToByteArray(patternWriter.getFrameDelay());
-        data += ByteArrayCommands::uint32ToByteArray(patternWriter.getDataAsBinary().length());
+        data += ByteArrayCommands::uint32ToByteArrayBig(1); // version
+        data += ByteArrayCommands::uint32ToByteArrayBig(patternWriter.getEncoding());
+        data += ByteArrayCommands::uint32ToByteArrayBig(patternWriter.getLedCount());
+        data += ByteArrayCommands::uint32ToByteArrayBig(patternWriter.getFrameCount());
+        data += ByteArrayCommands::uint32ToByteArrayBig(patternWriter.getFrameDelay());
+        data += ByteArrayCommands::uint32ToByteArrayBig(patternWriter.getDataAsBinary().length());
         data += patternWriter.getDataAsBinary();
 
         qDebug() << "pattern length:" << data.length();
@@ -84,7 +84,7 @@ bool EightByEightUploader::storePatterns(BlinkyController &controller,
         controller.close();
 
     commandQueue.open(info);
-    state = State_lockFileAccess;
+    state = State_checkFirmwareVersion;
     doWork();
 
     return true;
@@ -108,6 +108,12 @@ void EightByEightUploader::doWork()
     // Continue the current state
     switch (state) {
     // TODO: Test that the patterns will fit before starting!
+    case State_checkFirmwareVersion:
+    {
+        commandQueue.enqueue(EightByEightCommands::getFirmwareVersion());
+        break;
+    }
+
     case State_lockFileAccess:
     {
         commandQueue.enqueue(EightByEightCommands::lockFileAccess());
@@ -194,6 +200,13 @@ void EightByEightUploader::handleLastCommandFinished()
 
     // TODO: Moveme to doWork() ?
     switch (state) {
+    case State_checkFirmwareVersion:
+        // Check version?
+
+        state = State_lockFileAccess;
+        doWork();
+        break;
+
     case State_lockFileAccess:
         state = State_erasePatterns;
         doWork();

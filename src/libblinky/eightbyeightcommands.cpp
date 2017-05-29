@@ -178,4 +178,24 @@ SerialCommand unlockFileAccess()
     return SerialCommand("unlockFileAccess", command, ret, mask);
 }
 
+SerialCommand getFirmwareVersion()
+{
+    QByteArray command;
+    command.append(commandHeader());
+    command.append((char)Command_GetFirmwareVersion);
+    command.append((char)0x00); // Data length
+
+    QByteArray ret;
+    ret.append((char)0x00);
+    ret.append((char)0x04);
+    ret.append(QByteArray(4,(char)0x00));
+
+    QByteArray mask;
+    mask.append((char)0xFF);
+    mask.append((char)0xFF);
+    mask.append(QByteArray(4,(char)0x00));  // version is unknown
+
+    return SerialCommand("getFirmwareVersion", command, ret, mask);
+}
+
 }

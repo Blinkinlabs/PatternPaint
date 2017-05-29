@@ -30,6 +30,8 @@ private slots:
 
     void lockFileAccessTest();
     void unlockFileAccessTest();
+
+    void getFirmwareVersionTest();
 };
 
 #endif // EIGHTBYEIGHTCOMMANDSTESTS_H

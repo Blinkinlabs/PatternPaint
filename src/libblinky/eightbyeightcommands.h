@@ -20,6 +20,7 @@ enum Command {
     Command_Close_File = 0x14,
     Command_Lock_File_Access = 0x20,
     Command_Unlock_File_Access = 0x21,
+    Command_GetFirmwareVersion = 0x30,
 };
 
 QByteArray commandHeader();
@@ -54,6 +55,9 @@ SerialCommand lockFileAccess();
 
 // Unlock file access - tell the EightByEight to resume accessing the filesystem
 SerialCommand unlockFileAccess();
+
+// Get firmware version
+SerialCommand getFirmwareVersion();
 
 }
 

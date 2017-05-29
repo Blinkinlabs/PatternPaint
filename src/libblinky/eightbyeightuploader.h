@@ -41,6 +41,7 @@ private:
     void setProgress(int newProgress);
 
     enum State {
+        State_checkFirmwareVersion,///< Check version
         State_lockFileAccess,      ///< Lock file access
         State_erasePatterns,       ///< Erase the patterns
         State_WriteFile,           ///< Write files
