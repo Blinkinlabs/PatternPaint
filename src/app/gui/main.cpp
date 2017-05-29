@@ -5,6 +5,9 @@
 #include <QSettings>
 #include <QString>
 #include <QTranslator>
+#include <QLibraryInfo>
+
+#include <QDebug>
 
 int main(int argc, char *argv[])
 {
@@ -16,14 +19,31 @@ int main(int argc, char *argv[])
 
     qSetMessagePattern("%{type} %{function}: %{message}");
 
-
     QSettings settings;
-    QString language = ":/" + settings.value("PatternPaint/language", DEFAULT_LANGUAGE).toString();
+    QString language = settings.value("PatternPaint/language", DEFAULT_LANGUAGE).toString();
 
-    QTranslator translator;
-    translator.load(language);
-    app.installTranslator(&translator);
+    QString locale;
 
+    if(language == "<System Language>") {
+        locale = QLocale::system().name();
+    }
+    else {
+        locale = language;
+    }
+
+    qDebug() << "Loading translators for locale:" << locale;
+
+    // Translator for the Qt library
+    QTranslator qtTranslator;
+    qtTranslator.load("qt_" + locale,
+            QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+    app.installTranslator(&qtTranslator);
+
+    // Translator for PatternPaint
+    QTranslator appTranslator;
+    appTranslator.load("patternpaint_" + locale,
+                       ":/translations");
+    app.installTranslator(&appTranslator);
 
     MainWindow w;
     w.show();

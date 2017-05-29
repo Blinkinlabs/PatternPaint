@@ -28,6 +28,6 @@
 
 #define CONNECTION_SCANNER_INTERVAL 1000                        /// Interval between controller connection scans, in ms
 
-#define DEFAULT_LANGUAGE "en"                                   /// Default language of Pattern Paint
+#define DEFAULT_LANGUAGE "<System Language>"                    /// Default language of Pattern Paint
 
 #endif // DEFAULTS

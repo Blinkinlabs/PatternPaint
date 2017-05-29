@@ -4,7 +4,7 @@
 
 #include <QSettings>
 #include <QDebug>
-#include <QFileDialog>
+#include <QDir>
 
 // TODO: This comes from avruploaddata.cpp
 #define BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT 36
@@ -35,9 +35,8 @@ Preferences::Preferences(QWidget *parent) :
     ui->blinkyPendantDisplayMode->addItem("Timed");
     ui->blinkyPendantDisplayMode->setCurrentText(settings.value("BlinkyPendant/displayMode", BLINKYPENDANT_DISPLAYMODE_DEFAULT).toString());
 
-
-    ui->setLanguage->addItems(listAvailableLanguages());
-    ui->setLanguage->setCurrentIndex(getSavedLanguageIndex());
+    ui->setLanguage->addItems(getLanguageMap().values());
+    ui->setLanguage->setCurrentText(getLanguageMap().value(settings.value("PatternPaint/language", DEFAULT_LANGUAGE).toString()));
 
     setUpdater(NULL);
 }
@@ -80,86 +79,33 @@ void Preferences::accept()
         settings.setValue("BlinkyTape/maxBrightness", ui->blinkyTapeMaxBrightness->value());
 
     if(ui->blinkyPendantDisplayMode->currentText() != settings.value("BlinkyPendant/displayMode", BLINKYPENDANT_DISPLAYMODE_DEFAULT).toString())
-        settings.setValue("BlinkyPendant/displayMode", (ui->blinkyPendantDisplayMode->currentText()));
+        settings.setValue("BlinkyPendant/displayMode", ui->blinkyPendantDisplayMode->currentText());
 
-    settings.setValue("PatternPaint/language", getSelectetLanguageFile());
+    QString locale = getLanguageMap().key(ui->setLanguage->currentText());
+    if(locale != settings.value("PatternPaint/language", DEFAULT_LANGUAGE).toString())
+        settings.setValue("PatternPaint/language", locale);
 
+    // TODO: Show warning dialog if restart required to apply settings
 }
 
-QStringList Preferences::listAvailableLanguages()
+QMap<QString, QString> Preferences::getLanguageMap()
 {
-    QDir directory(":/");
+    QMap<QString, QString> languageMap;
 
-    QStringList qmfilter;
-    qmfilter << "*.qm";
-    QStringList filename = directory.entryList(qmfilter);
+    // Stuff some defaults into the list
+    languageMap.insert("<System Language>", "<System Language>");
+    languageMap.insert("en", QLocale::languageToString(QLocale("en").language()));
 
-    QStringList languagesList;
-    languagesList << QLocale::languageToString(QLocale(DEFAULT_LANGUAGE).language());
-
-    for (int i = 0; i < filename.size(); ++i){
+    QDir directory(":/translations/");
+    for (QString filename : directory.entryList()) {
         // get locale extracted by filename
-        QString locale;
-        locale = filename[i]; // "patternpaint_de.qm"
-        locale.truncate(locale.lastIndexOf('.')); // "patternpaint_de"
-        locale.remove(0, QString::fromUtf8("patternpaint_").length()); // "de"
+        filename.truncate(filename.lastIndexOf('.')); // "patternpaint_de"
+        filename.remove(0, QString::fromUtf8("patternpaint_").length()); // "de"
 
-        languagesList << QLocale::languageToString(QLocale(locale).language());
-
+        languageMap.insert(filename, QLocale::languageToString(QLocale(filename).language()));
     }
 
-    return languagesList;
-}
-
-QStringList Preferences::listAvailableLanguagesFiles()
-{
-    QDir directory(":/");
-
-    QStringList qmfilter;
-    qmfilter << "*.qm";
-    QStringList filename = directory.entryList(qmfilter);
-
-    QStringList languagesList;
-    languagesList << QLocale::languageToString(QLocale(DEFAULT_LANGUAGE).language());
-
-    for (int i = 0; i < filename.size(); ++i){
-        languagesList << filename[i]; // "patternpaint_de.qm"
-    }
-
-    return languagesList;
-}
-
-QString Preferences::getSelectetLanguageFile()
-{
-    QString selectedLanguage;
-
-    QStringList languagesList;
-    languagesList = listAvailableLanguagesFiles();
-
-    selectedLanguage = languagesList[ui->setLanguage->currentIndex()];
-
-    return selectedLanguage;
-}
-
-int Preferences::getSavedLanguageIndex()
-{
-    QSettings settings;
-
-    QString languageFile = settings.value("PatternPaint/language", DEFAULT_LANGUAGE).toString();
-
-    QStringList languagesList;
-    languagesList = listAvailableLanguagesFiles();
-
-    int index = 0;
-
-    for (int i = 0; i < languagesList.size(); ++i){
-        if(languagesList[i] == languageFile){
-            index = i;
-            break;
-        }
-    }
-
-    return index;
+    return languageMap;
 }
 
 void Preferences::on_checkForUpdates_clicked()

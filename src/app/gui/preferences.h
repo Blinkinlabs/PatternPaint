@@ -32,16 +32,8 @@ private:
 
     void accept();
 
-    static QStringList listAvailableLanguages();
-
-    static QStringList listAvailableLanguagesFiles();
-
-    QString getSelectetLanguageFile();
-
-    int getSavedLanguageIndex();
-
-    QStringList languageFile;
-
+    // TODO: Move this to a language class
+    static QMap<QString, QString> getLanguageMap();
 };
 
 #endif // PREFERENCES_H

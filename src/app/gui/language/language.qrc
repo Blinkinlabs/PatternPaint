@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/">
+    <qresource prefix="/translations">
         <file>patternpaint_de.qm</file>
     </qresource>
 </RCC>
