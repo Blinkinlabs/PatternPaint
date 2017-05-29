@@ -27,6 +27,9 @@ private slots:
     void verifyTest();
 
     void closeFileTest();
+
+    void lockFileAccessTest();
+    void unlockFileAccessTest();
 };
 
 #endif // EIGHTBYEIGHTCOMMANDSTESTS_H

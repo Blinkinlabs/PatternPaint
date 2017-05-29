@@ -277,3 +277,49 @@ void EightByEightCommandsTests::closeFileTest()
     QCOMPARE(command.expectedResponse, expectedResponse);
     QCOMPARE(command.expectedResponseMask, expectedResponseMask);
 }
+
+void EightByEightCommandsTests::lockFileAccessTest()
+{
+    QByteArray expectedData;
+    expectedData.append(EightByEightCommands::commandHeader());
+    expectedData.append((char)EightByEightCommands::Command_Lock_File_Access);
+    expectedData.append((char)0x00);
+
+    QByteArray expectedResponse;
+    expectedResponse.append((char)0x00);
+    expectedResponse.append((char)0x00);
+
+    QByteArray expectedResponseMask;
+    expectedResponseMask.append((char)0xFF);
+    expectedResponseMask.append((char)0xFF);
+
+    SerialCommand command = EightByEightCommands::lockFileAccess();
+
+    QCOMPARE(command.name, QString("lockFileAccess"));
+    QCOMPARE(command.data, expectedData);
+    QCOMPARE(command.expectedResponse, expectedResponse);
+    QCOMPARE(command.expectedResponseMask, expectedResponseMask);
+}
+
+void EightByEightCommandsTests::unlockFileAccessTest()
+{
+    QByteArray expectedData;
+    expectedData.append(EightByEightCommands::commandHeader());
+    expectedData.append((char)EightByEightCommands::Command_Unlock_File_Access);
+    expectedData.append((char)0x00);
+
+    QByteArray expectedResponse;
+    expectedResponse.append((char)0x00);
+    expectedResponse.append((char)0x00);
+
+    QByteArray expectedResponseMask;
+    expectedResponseMask.append((char)0xFF);
+    expectedResponseMask.append((char)0xFF);
+
+    SerialCommand command = EightByEightCommands::unlockFileAccess();
+
+    QCOMPARE(command.name, QString("unlockFileAccess"));
+    QCOMPARE(command.data, expectedData);
+    QCOMPARE(command.expectedResponse, expectedResponse);
+    QCOMPARE(command.expectedResponseMask, expectedResponseMask);
+}

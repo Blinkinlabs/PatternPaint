@@ -142,4 +142,40 @@ SerialCommand closeFile()
     return SerialCommand("closeFile", command, ret, mask);
 }
 
+SerialCommand lockFileAccess()
+{
+    QByteArray command;
+    command.append(commandHeader());
+    command.append((char)Command_Lock_File_Access);
+    command.append((char)0x00); // Data length
+
+    QByteArray ret;
+    ret.append((char)0x00);
+    ret.append((char)0x00);
+
+    QByteArray mask;
+    mask.append((char)0xFF);
+    mask.append((char)0xFF);
+
+    return SerialCommand("lockFileAccess", command, ret, mask);
+}
+
+SerialCommand unlockFileAccess()
+{
+    QByteArray command;
+    command.append(commandHeader());
+    command.append((char)Command_Unlock_File_Access);
+    command.append((char)0x00); // Data length
+
+    QByteArray ret;
+    ret.append((char)0x00);
+    ret.append((char)0x00);
+
+    QByteArray mask;
+    mask.append((char)0xFF);
+    mask.append((char)0xFF);
+
+    return SerialCommand("unlockFileAccess", command, ret, mask);
+}
+
 }

@@ -18,6 +18,8 @@ enum Command {
     Command_Write = 0x12,
     Command_Read = 0x13,
     Command_Close_File = 0x14,
+    Command_Lock_File_Access = 0x20,
+    Command_Unlock_File_Access = 0x21,
 };
 
 QByteArray commandHeader();
@@ -46,6 +48,12 @@ QList<SerialCommand> verify(const QByteArray &data);
 
 // Close the open file
 SerialCommand closeFile();
+
+// Lock file access - tell the EightByEight to stop accessing the filesystem
+SerialCommand lockFileAccess();
+
+// Unlock file access - tell the EightByEight to resume accessing the filesystem
+SerialCommand unlockFileAccess();
 
 }
 
