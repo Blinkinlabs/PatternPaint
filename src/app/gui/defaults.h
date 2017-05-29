@@ -1,6 +1,11 @@
 #ifndef DEFAULTS
 #define DEFAULTS
 
+#define OSX_RELEASE_APPCAST_URL \
+    "https://software.blinkinlabs.com/patternpaint/patternpaint-osx.xml"
+#define WINDOWS_RELEASE_APPCAST_URL \
+    "https://software.blinkinlabs.com/patternpaint/patternpaint-windows.xml"
+
 #define COLOR_BACKGROUND_UNCHECKED  QColor(0x10, 0x10, 0x10, 0xFF)
 #define COLOR_BACKGROUND_CHECKED    QColor(0xA, 0x50, 0xCE, 0xFF)
 #define COLOR_FRAME_SELECTED        QColor(0xFE, 0xD7, 0x28, 255)

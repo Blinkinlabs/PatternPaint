@@ -6,12 +6,6 @@
 #include <QDebug>
 #include <QFileDialog>
 
-// TODO: These are redefined from MainWindow.cpp
-#define OSX_RELEASE_APPCAST_DEFAULT \
-    "http://software.blinkinlabs.com/patternpaint/patternpaint-osx.xml"
-#define WINDOWS_RELEASE_APPCAST_DEFAULT \
-    "http://software.blinkinlabs.com/patternpaint/patternpaint-windows.xml"
-
 // TODO: This comes from avruploaddata.cpp
 #define BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT 36
 

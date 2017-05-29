@@ -42,12 +42,6 @@
 #include <QStandardPaths>
 
 
-#define OSX_RELEASE_APPCAST_URL \
-    "https://software.blinkinlabs.com/patternpaint/patternpaint-osx.xml"
-#define WINDOWS_RELEASE_APPCAST_URL \
-    "https://software.blinkinlabs.com/patternpaint/patternpaint-windows.xml"
-
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     colorChooser(this),
