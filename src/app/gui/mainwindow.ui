@@ -145,8 +145,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>516</width>
-          <height>268</height>
+          <width>518</width>
+          <height>280</height>
          </rect>
         </property>
        </widget>
@@ -575,7 +575,7 @@
      <x>0</x>
      <y>0</y>
      <width>880</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -848,6 +848,9 @@
   <action name="actionRestore_firmware">
    <property name="text">
     <string>Restore Firmware</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+U</string>
    </property>
   </action>
   <action name="actionSave_to_Blinky">
