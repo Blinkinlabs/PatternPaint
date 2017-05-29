@@ -38,6 +38,7 @@ CompareResult SerialCommand::testResponse(const QByteArray &response)
             if (expectedResponseMask.at(i) != 0
                 && response.at(i) != expectedResponse.at(i)) {
                 qCritical() << "Got unexpected data back"
+                            << "name:" << name
                             << "position:" << i
                             << "expected:" << (int)expectedResponse.at(i)
                             << "received:" << (int)response.at(i)

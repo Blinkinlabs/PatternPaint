@@ -84,7 +84,7 @@ bool EightByEightUploader::storePatterns(BlinkyController &controller,
         controller.close();
 
     commandQueue.open(info);
-    state = State_erasePatterns;
+    state = State_lockFileAccess;
     doWork();
 
     return true;
@@ -92,20 +92,27 @@ bool EightByEightUploader::storePatterns(BlinkyController &controller,
 
 void EightByEightUploader::doWork()
 {
-    // 1. Erase the flash (slow! TODO: new firmware that's faster, or walk through the files to delete them)
-    // 2. For each pattern:
+    // 1. Lock file access on the EightByEight, to prevent it from interfering with the upload
+    // 2. Erase the flash (slow! TODO: new firmware that's faster, or walk through the files to delete them)
+    // 3. For each pattern:
     // a. create a new file
     // b. load data into the file
     // c. close the file
     // d. open the file in read mode
     // e. read the file back for verification
     // f. close the file
+    // 4. Unlock file access of the EightByEight, to allow it to reload the patterns and start playback
 
     qDebug() << "In doWork state=" << state;
 
     // Continue the current state
     switch (state) {
     // TODO: Test that the patterns will fit before starting!
+    case State_lockFileAccess:
+    {
+        commandQueue.enqueue(EightByEightCommands::lockFileAccess());
+        break;
+    }
 
     case State_erasePatterns:
     {
@@ -131,6 +138,13 @@ void EightByEightUploader::doWork()
         commandQueue.enqueue(EightByEightCommands::closeFile());
     }
         break;
+
+    case State_unlockFileAccess:
+    {
+        commandQueue.enqueue(EightByEightCommands::unlockFileAccess());
+        break;
+    }
+
     case State_Done:
         break;
     }
@@ -180,6 +194,11 @@ void EightByEightUploader::handleLastCommandFinished()
 
     // TODO: Moveme to doWork() ?
     switch (state) {
+    case State_lockFileAccess:
+        state = State_erasePatterns;
+        doWork();
+        break;
+
     case State_erasePatterns:
         state = State_WriteFile;
         patternIndex = 0;
@@ -200,10 +219,15 @@ void EightByEightUploader::handleLastCommandFinished()
 
         // Otherwise transition to finished
         else {
-            commandQueue.close();
-            state = State_Done;
-            emit(finished(true));
+            state = State_unlockFileAccess;
+            doWork();
         }
+        break;
+
+    case State_unlockFileAccess:
+        commandQueue.close();
+        state = State_Done;
+        emit(finished(true));
         break;
 
     default:

@@ -41,8 +41,10 @@ private:
     void setProgress(int newProgress);
 
     enum State {
+        State_lockFileAccess,      ///< Lock file access
         State_erasePatterns,       ///< Erase the patterns
         State_WriteFile,           ///< Write files
+        State_unlockFileAccess,    ///< Unlock file access
         State_Done                 ///< And we're done!
     };
 
