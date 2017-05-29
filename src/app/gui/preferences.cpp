@@ -1,5 +1,6 @@
 #include "preferences.h"
 #include "ui_preferences.h"
+#include "defaults.h"
 
 #include <QSettings>
 #include <QDebug>
@@ -13,6 +14,9 @@
 
 // TODO: This comes from avruploaddata.cpp
 #define BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT 36
+
+// TODO: This comes from blinkypendantuploader.cpp
+#define BLINKYPENDANT_DISPLAYMODE_DEFAULT "POV"
 
 Preferences::Preferences(QWidget *parent) :
     QDialog(parent),
@@ -32,6 +36,12 @@ Preferences::Preferences(QWidget *parent) :
     ui->blinkyTapeMaxBrightness->setMaximum(100);
     ui->blinkyTapeMaxBrightness->setMinimum(1);
     ui->blinkyTapeMaxBrightness->setValue(settings.value("BlinkyTape/maxBrightness", BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT).toInt());
+
+    ui->blinkyPendantDisplayMode->addItem("POV");
+    ui->blinkyPendantDisplayMode->addItem("Timed");
+    ui->blinkyPendantDisplayMode->setCurrentText(settings.value("BlinkyPendant/displayMode", BLINKYPENDANT_DISPLAYMODE_DEFAULT).toString());
+
+
     ui->setLanguage->addItems(listAvailableLanguages());
     ui->setLanguage->setCurrentIndex(getSavedLanguageIndex());
 
@@ -74,6 +84,9 @@ void Preferences::accept()
 
     if(ui->blinkyTapeMaxBrightness->value() != settings.value("BlinkyTape/maxBrightness", BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT).toInt())
         settings.setValue("BlinkyTape/maxBrightness", ui->blinkyTapeMaxBrightness->value());
+
+    if(ui->blinkyPendantDisplayMode->currentText() != settings.value("BlinkyPendant/displayMode", BLINKYPENDANT_DISPLAYMODE_DEFAULT).toString())
+        settings.setValue("BlinkyPendant/displayMode", (ui->blinkyPendantDisplayMode->currentText()));
 
     settings.setValue("PatternPaint/language", getSelectetLanguageFile());
 

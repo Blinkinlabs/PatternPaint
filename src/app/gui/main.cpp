@@ -8,23 +8,25 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
 
-    a.setOrganizationName(ORGANIZATION_NAME);
-    a.setOrganizationDomain(ORGANIZATION_DOMAIN);
-    a.setApplicationName(APPLICATION_NAME);
+    app.setOrganizationName(ORGANIZATION_NAME);
+    app.setOrganizationDomain(ORGANIZATION_DOMAIN);
+    app.setApplicationName(APPLICATION_NAME);
+
+    qSetMessagePattern("%{type} %{function}: %{message}");
+
 
     QSettings settings;
     QString language = ":/" + settings.value("PatternPaint/language", DEFAULT_LANGUAGE).toString();
 
     QTranslator translator;
     translator.load(language);
-    a.installTranslator(&translator);
+    app.installTranslator(&translator);
 
-    qSetMessagePattern("%{type} %{function}: %{message}");
 
     MainWindow w;
     w.show();
 
-    return a.exec();
+    return app.exec();
 }

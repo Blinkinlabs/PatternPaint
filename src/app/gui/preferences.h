@@ -2,7 +2,6 @@
 #define PREFERENCES_H
 
 #include "autoupdater.h"
-#include "defaults.h"
 
 #include <QDialog>
 
