@@ -21,7 +21,7 @@ QByteArray BlinkyPendantUploadData::makePatternTableEntry(uint32_t offset, uint1
 
     // Animation entry
     entry.append((char)0);             // Encoding type (1 byte) (RGB24, uncompressed) (TODO)
-    entry += ByteArrayCommands::uint32ToByteArray(offset);        // Data offset (4 bytes)
+    entry += ByteArrayCommands::uint32ToByteArrayBig(offset);        // Data offset (4 bytes)
     entry += ByteArrayCommands::uint16ToByteArrayBig(frameCount);  // Frame count (2 bytes)
     entry += ByteArrayCommands::uint16ToByteArrayBig(frameDelay);  // Frame delay (2 bytes)
 

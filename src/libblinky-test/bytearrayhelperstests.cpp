@@ -62,7 +62,7 @@ void ByteArrayHelpersTests::uint32ToByteArrayTest()
     QFETCH(uint32_t, value);
     QFETCH(QByteArray, result);
 
-    QCOMPARE(ByteArrayCommands::uint32ToByteArray(value), result);
+    QCOMPARE(ByteArrayCommands::uint32ToByteArrayBig(value), result);
 }
 
 void ByteArrayHelpersTests::byteArrayToUint32Test_data()
@@ -88,7 +88,7 @@ void ByteArrayHelpersTests::byteArrayToUint32Test()
     QFETCH(QByteArray, data);
     QFETCH(uint32_t, result);
 
-    QCOMPARE(ByteArrayCommands::byteArrayToUint32(data), result);
+    QCOMPARE(ByteArrayCommands::byteArrayToUint32Big(data), result);
 }
 
 void ByteArrayHelpersTests::chunkDataTest_data()

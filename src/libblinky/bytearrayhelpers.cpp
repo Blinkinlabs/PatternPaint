@@ -28,7 +28,7 @@ QByteArray uint16ToByteArrayBig(int value)
     return data;
 }
 
-QByteArray uint32ToByteArray(uint32_t value)
+QByteArray uint32ToByteArrayBig(uint32_t value)
 {
     QByteArray data;
 
@@ -40,7 +40,7 @@ QByteArray uint32ToByteArray(uint32_t value)
     return data;
 }
 
-uint32_t byteArrayToUint32(const QByteArray &data)
+uint32_t byteArrayToUint32Big(const QByteArray &data)
 {
     uint32_t value = 0;
 
