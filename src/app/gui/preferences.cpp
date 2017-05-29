@@ -3,6 +3,7 @@
 
 #include <QSettings>
 #include <QDebug>
+#include <QFileDialog>
 
 // TODO: These are redefined from MainWindow.cpp
 #define OSX_RELEASE_APPCAST_DEFAULT \
@@ -12,9 +13,6 @@
 
 // TODO: This comes from avruploaddata.cpp
 #define BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT 36
-
-// TODO: This comes from blinkypendantuploader.cpp
-#define BLINKYPENDANT_DISPLAYMODE_DEFAULT "POV"
 
 Preferences::Preferences(QWidget *parent) :
     QDialog(parent),
@@ -34,11 +32,8 @@ Preferences::Preferences(QWidget *parent) :
     ui->blinkyTapeMaxBrightness->setMaximum(100);
     ui->blinkyTapeMaxBrightness->setMinimum(1);
     ui->blinkyTapeMaxBrightness->setValue(settings.value("BlinkyTape/maxBrightness", BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT).toInt());
-
-    ui->blinkyPendantDisplayMode->addItem("POV");
-    ui->blinkyPendantDisplayMode->addItem("Timed");
-
-    ui->blinkyPendantDisplayMode->setCurrentText(settings.value("BlinkyPendant/displayMode", BLINKYPENDANT_DISPLAYMODE_DEFAULT).toString());
+    ui->setLanguage->addItems(listAvailableLanguages());
+    ui->setLanguage->setCurrentIndex(getSavedLanguageIndex());
 
     setUpdater(NULL);
 }
@@ -80,8 +75,84 @@ void Preferences::accept()
     if(ui->blinkyTapeMaxBrightness->value() != settings.value("BlinkyTape/maxBrightness", BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT).toInt())
         settings.setValue("BlinkyTape/maxBrightness", ui->blinkyTapeMaxBrightness->value());
 
-    if(ui->blinkyPendantDisplayMode->currentText() !=settings.value("BlinkyPendant/displayMode", BLINKYPENDANT_DISPLAYMODE_DEFAULT).toString())
-        settings.setValue("BlinkyPendant/displayMode", (ui->blinkyPendantDisplayMode->currentText()));
+    settings.setValue("PatternPaint/language", getSelectetLanguageFile());
+
+}
+
+QStringList Preferences::listAvailableLanguages()
+{
+    QDir directory(":/");
+
+    QStringList qmfilter;
+    qmfilter << "*.qm";
+    QStringList filename = directory.entryList(qmfilter);
+
+    QStringList languagesList;
+    languagesList << QLocale::languageToString(QLocale(DEFAULT_LANGUAGE).language());
+
+    for (int i = 0; i < filename.size(); ++i){
+        // get locale extracted by filename
+        QString locale;
+        locale = filename[i]; // "patternpaint_de.qm"
+        locale.truncate(locale.lastIndexOf('.')); // "patternpaint_de"
+        locale.remove(0, QString::fromUtf8("patternpaint_").length()); // "de"
+
+        languagesList << QLocale::languageToString(QLocale(locale).language());
+
+    }
+
+    return languagesList;
+}
+
+QStringList Preferences::listAvailableLanguagesFiles()
+{
+    QDir directory(":/");
+
+    QStringList qmfilter;
+    qmfilter << "*.qm";
+    QStringList filename = directory.entryList(qmfilter);
+
+    QStringList languagesList;
+    languagesList << QLocale::languageToString(QLocale(DEFAULT_LANGUAGE).language());
+
+    for (int i = 0; i < filename.size(); ++i){
+        languagesList << filename[i]; // "patternpaint_de.qm"
+    }
+
+    return languagesList;
+}
+
+QString Preferences::getSelectetLanguageFile()
+{
+    QString selectedLanguage;
+
+    QStringList languagesList;
+    languagesList = listAvailableLanguagesFiles();
+
+    selectedLanguage = languagesList[ui->setLanguage->currentIndex()];
+
+    return selectedLanguage;
+}
+
+int Preferences::getSavedLanguageIndex()
+{
+    QSettings settings;
+
+    QString languageFile = settings.value("PatternPaint/language", DEFAULT_LANGUAGE).toString();
+
+    QStringList languagesList;
+    languagesList = listAvailableLanguagesFiles();
+
+    int index = 0;
+
+    for (int i = 0; i < languagesList.size(); ++i){
+        if(languagesList[i] == languageFile){
+            index = i;
+            break;
+        }
+    }
+
+    return index;
 }
 
 void Preferences::on_checkForUpdates_clicked()

@@ -49,6 +49,9 @@ FORMS += \
     $$PWD/debuglog.ui \
     $$PWD/firmwaremanager.ui
 
+TRANSLATIONS += \
+    $$PWD/language/patternpaint_de.ts
+
 macx {
     # App nap, to prevent macOS from sleeping PatternPaint
     HEADERS  += \
@@ -57,3 +60,6 @@ macx {
     OBJECTIVE_SOURCES += \
         $$PWD/appnap.mm
 }
+
+RESOURCES += \
+    $$PWD/language/language.qrc

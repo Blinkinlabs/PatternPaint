@@ -2,6 +2,7 @@
 #define PREFERENCES_H
 
 #include "autoupdater.h"
+#include "defaults.h"
 
 #include <QDialog>
 
@@ -31,6 +32,17 @@ private:
     Ui::Preferences *ui;
 
     void accept();
+
+    static QStringList listAvailableLanguages();
+
+    static QStringList listAvailableLanguagesFiles();
+
+    QString getSelectetLanguageFile();
+
+    int getSavedLanguageIndex();
+
+    QStringList languageFile;
+
 };
 
 #endif // PREFERENCES_H
