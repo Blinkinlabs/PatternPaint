@@ -38,7 +38,8 @@ HEADERS += \
     memorymap.h \
     blinkypendantuploaddata.h \
     eightbyeightcommands.h \
-    eightbyeightuploader.h
+    eightbyeightuploader.h \
+    esp8266bootloadercommands.h
 
 SOURCES +=  \
     fixture.cpp \
@@ -71,7 +72,8 @@ SOURCES +=  \
     memorymap.cpp \
     blinkypendantuploaddata.cpp \
     eightbyeightcommands.cpp \
-    eightbyeightuploader.cpp
+    eightbyeightuploader.cpp \
+    esp8266bootloadercommands.cpp
 
 # For platforms that have serial ports
 # TODO: Pull hard-coded references to BlinkyTape from the gui, allowing this section to be switchable

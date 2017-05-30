@@ -43,7 +43,7 @@ void ByteArrayHelpersTests::uint16ToByteArrayBigTest()
     QCOMPARE(ByteArrayCommands::uint16ToByteArrayBig(value), result);
 }
 
-void ByteArrayHelpersTests::uint32ToByteArrayTest_data()
+void ByteArrayHelpersTests::uint32ToByteArrayBigTest_data()
 {
     QTest::addColumn<uint32_t>("value");
     QTest::addColumn<QByteArray>("result");
@@ -57,7 +57,7 @@ void ByteArrayHelpersTests::uint32ToByteArrayTest_data()
                                 << QByteArray().append('\xFF').append('\xFF').append('\xFF').append('\xFF');
 }
 
-void ByteArrayHelpersTests::uint32ToByteArrayTest()
+void ByteArrayHelpersTests::uint32ToByteArrayBigTest()
 {
     QFETCH(uint32_t, value);
     QFETCH(QByteArray, result);
@@ -65,7 +65,55 @@ void ByteArrayHelpersTests::uint32ToByteArrayTest()
     QCOMPARE(ByteArrayCommands::uint32ToByteArrayBig(value), result);
 }
 
-void ByteArrayHelpersTests::byteArrayToUint32Test_data()
+void ByteArrayHelpersTests::uint32ToByteArrayLittleTest_data()
+{
+    QTest::addColumn<uint32_t>("value");
+    QTest::addColumn<QByteArray>("result");
+
+    QTest::newRow("zero")       << 0u         << QByteArray().append('\x00').append('\x00').append('\x00').append('\x00');
+    QTest::newRow("one")        << 1u         << QByteArray().append('\x01').append('\x00').append('\x00').append('\x00');
+    QTest::newRow("small")      << 300u       << QByteArray().append('\x2C').append('\x01').append('\x00').append('\x00');
+    QTest::newRow("almost max") << (std::numeric_limits<uint32_t>::max() - 1)
+                                << QByteArray().append('\xFE').append('\xFF').append('\xFF').append('\xFF');
+    QTest::newRow("max")        << std::numeric_limits<uint32_t>::max()
+                                << QByteArray().append('\xFF').append('\xFF').append('\xFF').append('\xFF');
+}
+
+void ByteArrayHelpersTests::uint32ToByteArrayLittleTest()
+{
+    QFETCH(uint32_t, value);
+    QFETCH(QByteArray, result);
+
+    QCOMPARE(ByteArrayCommands::uint32ToByteArrayLittle(value), result);
+}
+
+void ByteArrayHelpersTests::byteArrayToUint32LittleTest_data()
+{
+    QTest::addColumn<QByteArray>("data");
+    QTest::addColumn<uint32_t>("result");
+
+    QTest::newRow("empty Byte Array")       << QByteArray() << 0u;
+    QTest::newRow("too small Byte Array")       << QByteArray(3, 'x') << 0u;
+    QTest::newRow("too big Byte Array")       << QByteArray(5, 'x') << 0u;
+
+    QTest::newRow("zero")       << QByteArray().append('\x00').append('\x00').append('\x00').append('\x00') << 0u;
+    QTest::newRow("one")        << QByteArray().append('\x01').append('\x00').append('\x00').append('\x00') << 1u;
+    QTest::newRow("small")      << QByteArray().append('\x2C').append('\x01').append('\x00').append('\x00') << 300u;
+    QTest::newRow("almost max") << QByteArray().append('\xFE').append('\xFF').append('\xFF').append('\xFF')
+                                << (std::numeric_limits<uint32_t>::max() - 1);
+    QTest::newRow("max")        << QByteArray().append('\xFF').append('\xFF').append('\xFF').append('\xFF')
+                                << std::numeric_limits<uint32_t>::max();
+}
+
+void ByteArrayHelpersTests::byteArrayToUint32LittleTest()
+{
+    QFETCH(QByteArray, data);
+    QFETCH(uint32_t, result);
+
+    QCOMPARE(ByteArrayCommands::byteArrayToUint32Little(data), result);
+}
+
+void ByteArrayHelpersTests::byteArrayToUint32BigTest_data()
 {
     QTest::addColumn<QByteArray>("data");
     QTest::addColumn<uint32_t>("result");
@@ -83,7 +131,7 @@ void ByteArrayHelpersTests::byteArrayToUint32Test_data()
                                 << std::numeric_limits<uint32_t>::max();
 }
 
-void ByteArrayHelpersTests::byteArrayToUint32Test()
+void ByteArrayHelpersTests::byteArrayToUint32BigTest()
 {
     QFETCH(QByteArray, data);
     QFETCH(uint32_t, result);

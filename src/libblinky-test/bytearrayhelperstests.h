@@ -13,11 +13,17 @@ private slots:
     void uint16ToByteArrayBigTest_data();
     void uint16ToByteArrayBigTest();
 
-    void uint32ToByteArrayTest_data();
-    void uint32ToByteArrayTest();
+    void uint32ToByteArrayLittleTest_data();
+    void uint32ToByteArrayLittleTest();
 
-    void byteArrayToUint32Test_data();
-    void byteArrayToUint32Test();
+    void uint32ToByteArrayBigTest_data();
+    void uint32ToByteArrayBigTest();
+
+    void byteArrayToUint32LittleTest_data();
+    void byteArrayToUint32LittleTest();
+
+    void byteArrayToUint32BigTest_data();
+    void byteArrayToUint32BigTest();
 
     void chunkDataTest_data();
     void chunkDataTest();

@@ -12,8 +12,14 @@ QByteArray uint16ToByteArrayLittle(uint16_t value);
 // Convert a uint16_t value to a byte array, big-endian
 QByteArray uint16ToByteArrayBig(int value);
 
+// Convert a uint32_t value to a byte array, little-endian
+QByteArray uint32ToByteArrayLittle(uint32_t value);
+
 // Convert a uint32_t value to a byte array, big-endian
 QByteArray uint32ToByteArrayBig(uint32_t value);
+
+// Convert a byte array to a uint32_t value, big-endian
+uint32_t byteArrayToUint32Little(const QByteArray& data);
 
 // Convert a byte array to a uint32_t value, big-endian
 uint32_t byteArrayToUint32Big(const QByteArray& data);

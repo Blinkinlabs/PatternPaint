@@ -28,6 +28,18 @@ QByteArray uint16ToByteArrayBig(int value)
     return data;
 }
 
+QByteArray uint32ToByteArrayLittle(uint32_t value)
+{
+    QByteArray data;
+
+    data.append((value >> 0) & 0xFF);
+    data.append((value >> 8) & 0xFF);
+    data.append((value >> 16) & 0xFF);
+    data.append((value >> 24) & 0xFF);
+
+    return data;
+}
+
 QByteArray uint32ToByteArrayBig(uint32_t value)
 {
     QByteArray data;
@@ -38,6 +50,21 @@ QByteArray uint32ToByteArrayBig(uint32_t value)
     data.append((value >> 0) & 0xFF);
 
     return data;
+}
+
+uint32_t byteArrayToUint32Little(const QByteArray &data)
+{
+    uint32_t value = 0;
+
+    if (data.count() != 4)
+        return 0;
+
+    value += (uint8_t)data[0];
+    value += (uint8_t)data[1] << 8;
+    value += (uint8_t)data[2] << 16;
+    value += (uint8_t)data[3] << 24;
+
+    return value;
 }
 
 uint32_t byteArrayToUint32Big(const QByteArray &data)
@@ -54,7 +81,6 @@ uint32_t byteArrayToUint32Big(const QByteArray &data)
 
     return value;
 }
-
 
 QList<QByteArray> chunkData(const QByteArray &data, unsigned int chunkSize)
 {
