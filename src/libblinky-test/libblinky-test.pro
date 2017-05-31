@@ -33,7 +33,8 @@ HEADERS += \
     blinkypendantuploaddatatests.h \
     patternframemodeltests.h \
     patternscrollmodeltests.h \
-    eightbyeightcommandstests.h
+    eightbyeightcommandstests.h \
+    esp8266bootloadercommandstests.h
 
 SOURCES += \
     avr109commandstests.cpp \
@@ -55,4 +56,5 @@ SOURCES += \
     blinkypendantuploaddatatests.cpp \
     patternframemodeltests.cpp \
     patternscrollmodeltests.cpp \
-    eightbyeightcommandstests.cpp
+    eightbyeightcommandstests.cpp \
+    esp8266bootloadercommandstests.cpp

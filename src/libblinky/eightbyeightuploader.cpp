@@ -160,6 +160,7 @@ bool EightByEightUploader::updateFirmware(BlinkyController &controller)
 {
     Q_UNUSED(controller);
 
+
     // TODO: Support firmware upload for the lightbuddy
     errorString = "Firmware update not currently supported for Lightbuddy!";
     return false;

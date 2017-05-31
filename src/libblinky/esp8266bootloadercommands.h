@@ -19,19 +19,21 @@ enum Opcode {
     Opcode_RamDownloadData = 0x07,
     Opcode_SyncFrame = 0x08,
     Opcode_WriteRegister = 0x09,
-    Opcode_ReadRegister = 0x01,
+    Opcode_ReadRegister = 0x0a,
     Opcode_ConfigureSPIParameters = 0x0b,
 };
 
-//QByteArray calculateChecksum(const QByteArray &data);
+char calculateChecksum(const QByteArray &data);
 
-//QByteArray slipEncode(const QByteArray &data);
-//QByteArray slipDeccode(const QByteArray &data);
+QByteArray slipEncode(const QByteArray &data);
+QByteArray slipDecode(const QByteArray &data);
 
 //SerialCommand flashDownloadStart(unsigned int size,
 //                                 unsigned int blockCount,
 //                                 unsigned int blockSize,
 //                                 unsigned int offset);
+
+SerialCommand readRegister(unsigned int address);
 
 }
 

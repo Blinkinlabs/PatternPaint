@@ -33,12 +33,12 @@ private slots:
     void handleLastCommandFinished();
 
 private:
+    /// Update any listeners with the latest progress
+    void setProgress(int newProgress);
+
     QString errorString;
 
     SerialCommandQueue commandQueue;
-
-    /// Update any listeners with the latest progress
-    void setProgress(int newProgress);
 
     enum State {
         State_checkFirmwareVersion,///< Check version

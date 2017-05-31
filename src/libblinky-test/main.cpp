@@ -19,6 +19,7 @@
 #include "blinkypendantuploaddatatests.h"
 #include "patternframemodeltests.h"
 #include "patternscrollmodeltests.h"
+#include "esp8266bootloadercommandstests.h"
 
 int main(int argc, char *argv[])
 {
@@ -83,6 +84,9 @@ int main(int argc, char *argv[])
 
     EightByEightCommandsTests eightByEightCommandsTests;
     result |= QTest::qExec(&eightByEightCommandsTests);
+
+    Esp8266BootloaderCommandsTests esp8266BootloaderCommandsTests;
+    result |= QTest::qExec(&esp8266BootloaderCommandsTests);
 
     return result;
 }
