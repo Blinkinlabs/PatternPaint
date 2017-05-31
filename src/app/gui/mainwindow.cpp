@@ -712,8 +712,10 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
     if (uploader.isNull())
         return;
 
-    if (uploader->getSupportedEncodings().count() == 0)
+    if (uploader->getSupportedEncodings().count() == 0) {
+        showError("Upload failed: Controller does not support any encodings.");
         return;
+    }
 
     QList<PatternWriter> patternWriters;
 
