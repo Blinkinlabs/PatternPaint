@@ -1,0 +1,57 @@
+#ifndef ESP8266FIRMWARELOADER_H
+#define ESP8266FIRMWARELOADER_H
+
+#include "blinkyuploader.h"
+#include "serialcommandqueue.h"
+
+#include <QObject>
+
+class Esp8266FirmwareLoader : public BlinkyUploader
+{
+    Q_OBJECT
+
+public:
+    Esp8266FirmwareLoader(QObject *parent = 0);
+
+    bool storePatterns(BlinkyController &controller, QList<PatternWriter> &patternWriters);
+    bool updateFirmware(BlinkyController &controller);
+    bool restoreFirmware(qint64 timeout);
+    QString getErrorString() const;
+
+    QList<PatternWriter::Encoding> getSupportedEncodings() const;
+
+public slots:
+    void cancel();
+
+private slots:
+    void doWork();  /// Handle the next section of work, whatever it is
+
+    void handleError(QString error);
+
+    void handleCommandFinished(QString command, QByteArray returnData);
+
+    void handleLastCommandFinished();
+
+private:
+    /// Update any listeners with the latest progress
+    void setProgress(int newProgress);
+
+    QString errorString;
+
+    SerialCommandQueue commandQueue;
+
+    enum State {
+        State_assertRTS,
+        State_assertDTR,
+        State_releaseBootPins,
+        State_checkForBootloader,
+        State_Done                 ///< And we're done!
+    };
+
+    State state;
+
+    int progress;
+    int maxProgress;
+};
+
+#endif // ESP8266FIRMWARELOADER_H

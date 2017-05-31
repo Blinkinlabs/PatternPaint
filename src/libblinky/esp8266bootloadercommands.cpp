@@ -21,7 +21,6 @@ char calculateChecksum(const QByteArray &data)
     return checksum;
 }
 
-
 QByteArray slipEncode(const QByteArray &data)
 {
     // From https://github.com/espressif/esptool/wiki/Serial-Protocol:
@@ -100,7 +99,6 @@ SerialCommand readRegister(unsigned int address)
     return SerialCommand("readRegister", command, expectedResponse, expectedResponseMask);
 }
 
-
 //SerialCommand flashDownloadStart(unsigned int size, unsigned int blockCount, unsigned int blockSize, unsigned int offset)
 //{
 //    QByteArray command;
@@ -115,7 +113,5 @@ SerialCommand readRegister(unsigned int address)
 
 //    return SerialCommand();
 //}
-
-
 
 }

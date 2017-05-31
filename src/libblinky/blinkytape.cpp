@@ -2,6 +2,7 @@
 #include "eightbyeightuploader.h"
 #include "blinkypendantuploader.h"
 #include "lightbuddyuploader.h"
+#include "esp8266firmwareloader.h"
 #include "blinkytape.h"
 
 #include <QDebug>
@@ -299,7 +300,8 @@ bool BlinkyTape::getUploader(QPointer<BlinkyUploader> &uploader)
         uploader = new LightBuddyUploader(parent());
     else if (serialInfo.vendorIdentifier() == EIGHTBYEIGHT_SKETCH_VID
              && serialInfo.productIdentifier() == EIGHTBYEIGHT_SKETCH_PID)
-        uploader = new EightByEightUploader(parent());
+//        uploader = new EightByEightUploader(parent());
+        uploader = new Esp8266FirmwareLoader(parent());
     else
         return false;
 
