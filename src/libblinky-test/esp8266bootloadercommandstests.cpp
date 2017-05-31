@@ -126,7 +126,5 @@ void Esp8266BootloaderCommandsTests::slipEncodeDecodeTest()
         message.append((char)(index % 0xFF));
     }
 
-    qDebug() << message;
-
     QCOMPARE(Esp8266BootloaderCommands::slipDecode(Esp8266BootloaderCommands::slipEncode(message)), message);
 }
