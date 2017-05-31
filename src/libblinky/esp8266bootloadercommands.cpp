@@ -77,7 +77,7 @@ SerialCommand readRegister(unsigned int address)
     command.append((char)0x00);
     command.append(Opcode_ReadRegister);
     command.append(ByteArrayHelpers::uint16ToByteArrayLittle(4));
-    // TODO: Checksum here?
+    command.append(QByteArray(4, 0x00));
     command.append(ByteArrayHelpers::uint32ToByteArrayLittle(address));
 
     QByteArray expectedResponse;
@@ -99,19 +99,45 @@ SerialCommand readRegister(unsigned int address)
     return SerialCommand("readRegister", command, expectedResponse, expectedResponseMask);
 }
 
-//SerialCommand flashDownloadStart(unsigned int size, unsigned int blockCount, unsigned int blockSize, unsigned int offset)
-//{
-//    QByteArray command;
-//    command.append(0x00); // direction
-//    command.append((char)Opcode_FlashDownloadStart);
-//    command.append(uint16ToByteArrayLittle(4*4)); // size, blockCount, blockSize, size
-//    //command.append(checksum); // TODO?
-//    command.append(uint32ToByteArrayLittle(size));
-//    command.append(uint32ToByteArrayLittle(blockCount));
-//    command.append(uint32ToByteArrayLittle(blockSize));
-//    command.append(uint32ToByteArrayLittle(offset));
+SerialCommand SyncFrame()
+{
+    QByteArray command;
+    command.append((char)0x00);
+    command.append(Opcode_SyncFrame);
+    command.append(ByteArrayHelpers::uint16ToByteArrayLittle(36));
+    command.append(QByteArray(4, 0x00));
+    command.append((char)0x07);
+    command.append((char)0x07);
+    command.append((char)0x12);
+    command.append((char)0x20);
+    command.append(QByteArray(32, 0x55));
 
-//    return SerialCommand();
-//}
+    QByteArray expectedResponse;
+    expectedResponse.append(0x01);
+    expectedResponse.append(Opcode_SyncFrame);
+    expectedResponse.append(ByteArrayHelpers::uint16ToByteArrayLittle(2));
+    expectedResponse.append((char)0x07);
+    expectedResponse.append((char)0x07);
+    expectedResponse.append((char)0x12);
+    expectedResponse.append((char)0x20);
+    expectedResponse.append((char)0x00);
+    expectedResponse.append((char)0x00);
+
+    qDebug() << command.toHex();
+    qDebug() << expectedResponse.toHex();
+
+    command = slipEncode(command);
+    expectedResponse = slipEncode(expectedResponse);
+    expectedResponse = expectedResponse
+            + expectedResponse
+            + expectedResponse
+            + expectedResponse
+            + expectedResponse
+            + expectedResponse
+            + expectedResponse
+            + expectedResponse;
+
+    return SerialCommand("SyncFrame", command, expectedResponse, 200);
+}
 
 }

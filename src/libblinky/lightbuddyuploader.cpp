@@ -169,6 +169,7 @@ QString LightBuddyUploader::getErrorString() const
 
 void LightBuddyUploader::handleError(QString error)
 {
+    errorString = error;
     qCritical() << error;
 
     commandQueue.close();

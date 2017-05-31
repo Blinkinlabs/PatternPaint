@@ -1,5 +1,12 @@
 #include "esp8266firmwareloader.h"
 
+#include "blinkycontroller.h"
+#include "esp8266bootloadercommands.h"
+
+#define BOOTLOADER_SYNC_FIRST_INTERVAL 500  // If this is low, we get an unexpected response to the sync command.
+#define BOOTLOADER_SYNC_INTERVAL 200  // If this is low, we get an unexpected response to the sync command.
+#define BOOTLOADER_SYNC_RETRIES 5
+
 Esp8266FirmwareLoader::Esp8266FirmwareLoader(QObject *parent) :
     BlinkyUploader(parent)
 {
@@ -19,18 +26,18 @@ bool Esp8266FirmwareLoader::storePatterns(BlinkyController &controller, QList<Pa
 
 bool Esp8266FirmwareLoader::updateFirmware(BlinkyController &controller)
 {
-    errorString = "Firmware update not currently supported for Esp8266!";
-    return false;
+    controller.getPortInfo(serialPortInfo);
 
-//    QSerialPortInfo info;
-//    controller.getPortInfo(info);
+    if (controller.isConnected())
+        controller.close();
 
-//    if (controller.isConnected())
-//        controller.close();
+    serialPort.setPort(serialPortInfo);
+    serialPort.open(QIODevice::ReadWrite);
 
-//    commandQueue.open(info);
-//    state = State_checkFirmwareVersion;
-//    doWork();
+    state = State_assertRTS;
+    doWork();
+
+    return true;
 }
 
 bool Esp8266FirmwareLoader::restoreFirmware(qint64 timeout)
@@ -52,27 +59,109 @@ QList<PatternWriter::Encoding> Esp8266FirmwareLoader::getSupportedEncodings() co
 
 void Esp8266FirmwareLoader::cancel()
 {
-    qDebug() << "Cancel signalled, but not supported";
+    handleError("Firmware update cancelled");
 }
 
 void Esp8266FirmwareLoader::doWork()
 {
-//QTimer::singleShot(0, this, SLOT(doWork()));
+    qDebug() << "In doWork state=" << state;
+
+    switch (state) {
+    case State_assertRTS:
+    {
+        serialPort.setRequestToSend(true);
+        serialPort.setDataTerminalReady(false);
+
+        state = State_assertDTR;
+//        QTimer::singleShot(0, this, SLOT(doWork()));
+        QMetaObject::invokeMethod(this, "doWork", Qt::QueuedConnection);
+
+
+        break;
+    }
+    case State_assertDTR:
+    {
+        serialPort.setRequestToSend(false);
+        serialPort.setDataTerminalReady(true);
+
+        state = State_releaseBootPins;
+//        QTimer::singleShot(0, this, SLOT(doWork()));
+        QMetaObject::invokeMethod(this, "doWork", Qt::QueuedConnection);
+
+        break;
+    }
+    case State_releaseBootPins:
+    {
+        serialPort.setRequestToSend(false);
+        serialPort.setDataTerminalReady(false);
+
+        state = State_connectCommandQueue;
+//        QTimer::singleShot(0, this, SLOT(doWork()));
+        QMetaObject::invokeMethod(this, "doWork", Qt::QueuedConnection);
+
+        break;
+    }
+    case State_connectCommandQueue:
+    {
+        serialPort.close();
+        commandQueue.open(serialPortInfo);
+
+        syncTriesRemaining = BOOTLOADER_SYNC_RETRIES;
+        state = State_startBootloaderSync;
+        QTimer::singleShot(BOOTLOADER_SYNC_FIRST_INTERVAL, this, SLOT(doWork()));
+
+        break;
+    }
+    case State_startBootloaderSync:
+    {
+        state = State_waitForBootloaderSync;
+        commandQueue.enqueue(Esp8266BootloaderCommands::SyncFrame());
+
+        break;
+    }
+    case State_waitForBootloaderSync:
+    case State_Done:
+    {
+        commandQueue.close();
+        emit(finished(true));
+
+        break;
+    }
+
+    }
 }
 
 void Esp8266FirmwareLoader::handleError(QString error)
 {
+    qCritical() << error;
+
+    if(state == State_waitForBootloaderSync) {
+        if(syncTriesRemaining > 1) {
+            syncTriesRemaining--;
+            state = State_startBootloaderSync;
+            QTimer::singleShot(BOOTLOADER_SYNC_INTERVAL, this, SLOT(doWork()));
+            return;
+        }
+    }
+
     errorString = error;
+
+    if(serialPort.isOpen())
+        serialPort.close();
+
+    if(commandQueue.isConnected())
+        commandQueue.close();
+
+    emit(finished(false));
 }
 
 void Esp8266FirmwareLoader::handleCommandFinished(QString command, QByteArray returnData)
 {
-
 }
 
 void Esp8266FirmwareLoader::handleLastCommandFinished()
 {
-
+    doWork();
 }
 
 void Esp8266FirmwareLoader::setProgress(int newProgress)

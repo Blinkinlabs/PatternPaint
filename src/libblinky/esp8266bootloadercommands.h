@@ -8,6 +8,9 @@
 // Based on this guide:
 // https://github.com/espressif/esptool/wiki/Serial-Protocol
 
+// With bitfields here:
+// https://gist.github.com/bvernoux/6ddc02ed157417a4df37861488357c5a
+
 namespace Esp8266BootloaderCommands {
 
 enum Opcode {
@@ -28,10 +31,7 @@ char calculateChecksum(const QByteArray &data);
 QByteArray slipEncode(const QByteArray &data);
 QByteArray slipDecode(const QByteArray &data);
 
-//SerialCommand flashDownloadStart(unsigned int size,
-//                                 unsigned int blockCount,
-//                                 unsigned int blockSize,
-//                                 unsigned int offset);
+SerialCommand SyncFrame();
 
 SerialCommand readRegister(unsigned int address);
 

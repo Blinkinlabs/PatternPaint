@@ -38,17 +38,23 @@ private:
 
     QString errorString;
 
+    QSerialPortInfo serialPortInfo;
+    QSerialPort serialPort;
+
     SerialCommandQueue commandQueue;
 
     enum State {
         State_assertRTS,
         State_assertDTR,
         State_releaseBootPins,
-        State_checkForBootloader,
+        State_connectCommandQueue,
+        State_startBootloaderSync,
+        State_waitForBootloaderSync,
         State_Done                 ///< And we're done!
     };
 
     State state;
+    int syncTriesRemaining;
 
     int progress;
     int maxProgress;

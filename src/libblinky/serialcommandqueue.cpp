@@ -206,10 +206,12 @@ void SerialCommandQueue::handleSerialError(QSerialPort::SerialPortError serialEr
 
 void SerialCommandQueue::handleCommandTimeout()
 {
-    qCritical() << "Command" << queue.front().name
-                << "timed out, disconnecting from programmer";
+    QString errorMessage = QString("Command %1 timed out").arg((queue.front().name));
 
-    emit(error("Command timed out, disconnecting from programmer"));
+    qCritical() << errorMessage;
 
-    close();
+    emit(error(errorMessage));
+
+    // TODO: Does skipping this break behavior anywhere?
+//    close();
 }
