@@ -77,14 +77,14 @@ SerialCommand readRegister(unsigned int address)
     QByteArray command;
     command.append((char)0x00);
     command.append(Opcode_ReadRegister);
-    command.append(ByteArrayCommands::uint16ToByteArrayLittle(4));
+    command.append(ByteArrayHelpers::uint16ToByteArrayLittle(4));
     // TODO: Checksum here?
-    command.append(ByteArrayCommands::uint32ToByteArrayLittle(address));
+    command.append(ByteArrayHelpers::uint32ToByteArrayLittle(address));
 
     QByteArray expectedResponse;
     expectedResponse.append(0x01);
     expectedResponse.append(Opcode_ReadRegister);
-    expectedResponse.append(ByteArrayCommands::uint16ToByteArrayLittle(6));
+    expectedResponse.append(ByteArrayHelpers::uint16ToByteArrayLittle(6));
     expectedResponse.append(QByteArray(4,0x00));  // register data
     expectedResponse.append((char)0x00);
     expectedResponse.append((char)0x00);

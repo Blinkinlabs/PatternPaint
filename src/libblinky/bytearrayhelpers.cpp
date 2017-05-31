@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-namespace ByteArrayCommands {
+namespace ByteArrayHelpers {
 
 QByteArray uint16ToByteArrayLittle(uint16_t value)
 {

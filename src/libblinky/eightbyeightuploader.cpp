@@ -58,12 +58,12 @@ bool EightByEightUploader::storePatterns(BlinkyController &controller,
         // Offset 27+: frame data
 
         data += "PAT";
-        data += ByteArrayCommands::uint32ToByteArrayBig(1); // version
-        data += ByteArrayCommands::uint32ToByteArrayBig(patternWriter.getEncoding());
-        data += ByteArrayCommands::uint32ToByteArrayBig(patternWriter.getLedCount());
-        data += ByteArrayCommands::uint32ToByteArrayBig(patternWriter.getFrameCount());
-        data += ByteArrayCommands::uint32ToByteArrayBig(patternWriter.getFrameDelay());
-        data += ByteArrayCommands::uint32ToByteArrayBig(patternWriter.getDataAsBinary().length());
+        data += ByteArrayHelpers::uint32ToByteArrayBig(1); // version
+        data += ByteArrayHelpers::uint32ToByteArrayBig(patternWriter.getEncoding());
+        data += ByteArrayHelpers::uint32ToByteArrayBig(patternWriter.getLedCount());
+        data += ByteArrayHelpers::uint32ToByteArrayBig(patternWriter.getFrameCount());
+        data += ByteArrayHelpers::uint32ToByteArrayBig(patternWriter.getFrameDelay());
+        data += ByteArrayHelpers::uint32ToByteArrayBig(patternWriter.getDataAsBinary().length());
         data += patternWriter.getDataAsBinary();
 
         qDebug() << "pattern length:" << data.length();

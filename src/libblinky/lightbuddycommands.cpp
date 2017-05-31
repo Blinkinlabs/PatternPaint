@@ -45,7 +45,7 @@ SerialCommand fileNew(uint32_t sizeBytes)
     command.append(commandHeader());
     command.append((char)COMMAND_NEW_FILE);   // New file
     command.append((char)0x12);   // filetype = animation
-    command.append(ByteArrayCommands::uint32ToByteArrayBig(sizeBytes));
+    command.append(ByteArrayHelpers::uint32ToByteArrayBig(sizeBytes));
 
     QByteArray ret;
     ret.append('P');
@@ -89,8 +89,8 @@ SerialCommand writePage(int sector, int offset, const QByteArray &data)
     command += commandHeader();
 
     command.append((char)0x19);     // Write page
-    command += ByteArrayCommands::uint32ToByteArrayBig(sector);
-    command += ByteArrayCommands::uint32ToByteArrayBig(offset);
+    command += ByteArrayHelpers::uint32ToByteArrayBig(sector);
+    command += ByteArrayHelpers::uint32ToByteArrayBig(offset);
     command += paddedData;
 
     QByteArray ret;

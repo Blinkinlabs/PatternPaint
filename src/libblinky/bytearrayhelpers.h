@@ -4,7 +4,7 @@
 #include <QByteArray>
 #include <QList>
 
-namespace ByteArrayCommands {
+namespace ByteArrayHelpers {
 
 // Convert a uint16_t value to a byte array, little-endian
 QByteArray uint16ToByteArrayLittle(uint16_t value);

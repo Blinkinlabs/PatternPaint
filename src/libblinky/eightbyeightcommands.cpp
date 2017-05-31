@@ -86,7 +86,7 @@ QList<SerialCommand> write(const QByteArray &data)
     QByteArray paddedData(data);
     QList<SerialCommand> commands;
 
-    for (QByteArray chunk : ByteArrayCommands::chunkData(paddedData, CHUNK_SIZE_BYTES))
+    for (QByteArray chunk : ByteArrayHelpers::chunkData(paddedData, CHUNK_SIZE_BYTES))
         commands.append(writeChunk(chunk));
 
     return commands;
@@ -118,7 +118,7 @@ QList<SerialCommand> verify(const QByteArray &data)
     QByteArray paddedData(data);
     QList<SerialCommand> commands;
 
-    for (QByteArray chunk : ByteArrayCommands::chunkData(paddedData, CHUNK_SIZE_BYTES))
+    for (QByteArray chunk : ByteArrayHelpers::chunkData(paddedData, CHUNK_SIZE_BYTES))
         commands.append(verifyChunk(chunk));
 
     return commands;

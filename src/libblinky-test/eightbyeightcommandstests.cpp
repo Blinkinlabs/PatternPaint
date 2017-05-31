@@ -164,7 +164,7 @@ void EightByEightCommandsTests::writeTest()
     QFETCH(QByteArray, data);
 
     // Build a list of expected output commands
-    QList<QByteArray> chunks = ByteArrayCommands::chunkData(data, CHUNK_SIZE_BYTES);
+    QList<QByteArray> chunks = ByteArrayHelpers::chunkData(data, CHUNK_SIZE_BYTES);
 
     QList<SerialCommand> commands = EightByEightCommands::write(data);
 
@@ -240,7 +240,7 @@ void EightByEightCommandsTests::verifyTest()
     QFETCH(QByteArray, data);
 
     // Build a list of expected output commands
-    QList<QByteArray> chunks = ByteArrayCommands::chunkData(data, CHUNK_SIZE_BYTES);
+    QList<QByteArray> chunks = ByteArrayHelpers::chunkData(data, CHUNK_SIZE_BYTES);
 
     QList<SerialCommand> commands = EightByEightCommands::verify(data);
 

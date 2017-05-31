@@ -19,7 +19,7 @@ void ByteArrayHelpersTests::uint16ToByteArrayLittleTest()
     QFETCH(int, value);
     QFETCH(QByteArray, result);
 
-    QCOMPARE(ByteArrayCommands::uint16ToByteArrayLittle(value), result);
+    QCOMPARE(ByteArrayHelpers::uint16ToByteArrayLittle(value), result);
 }
 
 void ByteArrayHelpersTests::uint16ToByteArrayBigTest_data()
@@ -40,7 +40,7 @@ void ByteArrayHelpersTests::uint16ToByteArrayBigTest()
     QFETCH(int, value);
     QFETCH(QByteArray, result);
 
-    QCOMPARE(ByteArrayCommands::uint16ToByteArrayBig(value), result);
+    QCOMPARE(ByteArrayHelpers::uint16ToByteArrayBig(value), result);
 }
 
 void ByteArrayHelpersTests::uint32ToByteArrayBigTest_data()
@@ -62,7 +62,7 @@ void ByteArrayHelpersTests::uint32ToByteArrayBigTest()
     QFETCH(uint32_t, value);
     QFETCH(QByteArray, result);
 
-    QCOMPARE(ByteArrayCommands::uint32ToByteArrayBig(value), result);
+    QCOMPARE(ByteArrayHelpers::uint32ToByteArrayBig(value), result);
 }
 
 void ByteArrayHelpersTests::uint32ToByteArrayLittleTest_data()
@@ -84,7 +84,7 @@ void ByteArrayHelpersTests::uint32ToByteArrayLittleTest()
     QFETCH(uint32_t, value);
     QFETCH(QByteArray, result);
 
-    QCOMPARE(ByteArrayCommands::uint32ToByteArrayLittle(value), result);
+    QCOMPARE(ByteArrayHelpers::uint32ToByteArrayLittle(value), result);
 }
 
 void ByteArrayHelpersTests::byteArrayToUint32LittleTest_data()
@@ -110,7 +110,7 @@ void ByteArrayHelpersTests::byteArrayToUint32LittleTest()
     QFETCH(QByteArray, data);
     QFETCH(uint32_t, result);
 
-    QCOMPARE(ByteArrayCommands::byteArrayToUint32Little(data), result);
+    QCOMPARE(ByteArrayHelpers::byteArrayToUint32Little(data), result);
 }
 
 void ByteArrayHelpersTests::byteArrayToUint32BigTest_data()
@@ -136,7 +136,7 @@ void ByteArrayHelpersTests::byteArrayToUint32BigTest()
     QFETCH(QByteArray, data);
     QFETCH(uint32_t, result);
 
-    QCOMPARE(ByteArrayCommands::byteArrayToUint32Big(data), result);
+    QCOMPARE(ByteArrayHelpers::byteArrayToUint32Big(data), result);
 }
 
 void ByteArrayHelpersTests::chunkDataTest_data()
@@ -189,7 +189,7 @@ void ByteArrayHelpersTests::chunkDataTest()
     QFETCH(unsigned int, chunkSize);
     QFETCH(QList<QByteArray>, expectedChunks);
 
-    QCOMPARE(ByteArrayCommands::chunkData(data, chunkSize), expectedChunks);
+    QCOMPARE(ByteArrayHelpers::chunkData(data, chunkSize), expectedChunks);
 }
 
 void ByteArrayHelpersTests::padToBoundaryTest_data()
@@ -224,6 +224,6 @@ void ByteArrayHelpersTests::padToBoundaryTest()
     QFETCH(unsigned int, boundarySize);
     QFETCH(QByteArray, expectedResult);
 
-    ByteArrayCommands::padToBoundary(data, boundarySize);
+    ByteArrayHelpers::padToBoundary(data, boundarySize);
     QCOMPARE(data, expectedResult);
 }
