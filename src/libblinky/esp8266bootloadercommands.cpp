@@ -21,13 +21,13 @@ unsigned char calculateChecksum(const QByteArray &data)
     return checksum;
 }
 
-QByteArray buildCommand(Opcode opcode, const QByteArray &data)
+QByteArray buildCommand(Opcode opcode, const QByteArray &data, unsigned char checksum)
 {
     QByteArray command;
     command.append((char)0x00);
     command.append(opcode);
     command.append(ByteArrayHelpers::uint16ToByteArrayLittle(data.length()));
-    command.append(ByteArrayHelpers::uint32ToByteArrayLittle(calculateChecksum(data)));
+    command.append(ByteArrayHelpers::uint32ToByteArrayLittle(checksum));
     command.append(data);
 
     return command;
@@ -94,7 +94,7 @@ SerialCommand flashDownloadStart(unsigned int totalSize,
     data.append(ByteArrayHelpers::uint32ToByteArrayLittle(blockSize));
     data.append(ByteArrayHelpers::uint32ToByteArrayLittle(offset));
 
-    QByteArray command = buildCommand(Opcode_FlashDownloadStart, data);
+    QByteArray command = buildCommand(Opcode_FlashDownloadStart, data, calculateChecksum(data));
 
     QByteArray expectedResponse;
     expectedResponse.append(0x01);
@@ -121,7 +121,7 @@ SerialCommand flashDownloadData(unsigned int sequence, QByteArray flashData)
     data.append(ByteArrayHelpers::uint32ToByteArrayLittle(0));  // Mystery value
     data.append(flashData);
 
-    QByteArray command = buildCommand(Opcode_FlashDownloadData, data);
+    QByteArray command = buildCommand(Opcode_FlashDownloadData, data, calculateChecksum(flashData));
 
     QByteArray expectedResponse;
     expectedResponse.append(0x01);
@@ -144,7 +144,7 @@ SerialCommand flashDownloadFinish(unsigned int rebootFlag)
     QByteArray data;
     data.append(ByteArrayHelpers::uint32ToByteArrayLittle(rebootFlag));
 
-    QByteArray command = buildCommand(Opcode_FlashDownloadFinish, data);
+    QByteArray command = buildCommand(Opcode_FlashDownloadFinish, data, calculateChecksum(data));
 
     QByteArray expectedResponse;
     expectedResponse.append(0x01);
@@ -157,7 +157,7 @@ SerialCommand flashDownloadFinish(unsigned int rebootFlag)
     expectedResponse.append((char)0x01);  // TODO: Can we count on these?
     expectedResponse.append((char)0x06);  // TODO: Can we count on these?
 
-    return SerialCommand("flashDownloadStart",
+    return SerialCommand("flashDownloadFinish",
                          slipEncode(command),
                          slipEncode(expectedResponse));
 }
@@ -171,7 +171,7 @@ SerialCommand SyncFrame()
     data.append((char)0x20);
     data.append(QByteArray(32, 0x55));
 
-    QByteArray command = buildCommand(Opcode_SyncFrame, data);
+    QByteArray command = buildCommand(Opcode_SyncFrame, data, calculateChecksum(data));
 
     QByteArray expectedResponse;
     expectedResponse.append(0x01);

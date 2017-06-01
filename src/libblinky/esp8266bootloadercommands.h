@@ -28,7 +28,7 @@ enum Opcode {
 
 unsigned char calculateChecksum(const QByteArray &data);
 
-QByteArray buildCommand(Opcode opcode, const QByteArray &data);
+QByteArray buildCommand(Opcode opcode, const QByteArray &data, unsigned char checksum);
 
 QByteArray slipEncode(const QByteArray &data);
 QByteArray slipDecode(const QByteArray &data);

@@ -2,10 +2,14 @@
 
 #include "blinkycontroller.h"
 #include "esp8266bootloadercommands.h"
+#include "bytearrayhelpers.h"
 
 #define BOOTLOADER_SYNC_FIRST_INTERVAL 500  // If this is low, we get an unexpected response to the sync command.
 #define BOOTLOADER_SYNC_INTERVAL 200  // If this is low, we get an unexpected response to the sync command.
 #define BOOTLOADER_SYNC_RETRIES 5
+
+
+#define ESP_BLOCK_SIZE 1024
 
 Esp8266FirmwareLoader::Esp8266FirmwareLoader(QObject *parent) :
     BlinkyUploader(parent)
@@ -122,13 +126,24 @@ void Esp8266FirmwareLoader::doWork()
     case State_waitForBootloaderSync:
     {
         state = State_doFlashDownload;
-        commandQueue.enqueue(Esp8266BootloaderCommands::flashDownloadStart(
-                                 217088, 274, 1024, 0));
 
-        QByteArray data(1024, (char)0xFF);
-        for(int sequence = 0; sequence < 274; sequence++) {
+        QFile file(":/firmware/eightbyeight/default/espfirmware.bin");
+        if (!file.open(QIODevice::ReadOnly)) return;
+        QByteArray data = file.readAll();
+
+        ByteArrayHelpers::padToBoundary(data, ESP_BLOCK_SIZE);
+        QList<QByteArray> chunks = ByteArrayHelpers::chunkData(data, ESP_BLOCK_SIZE);
+
+        unsigned int magicLength = 217088;  // TODO: Why this length and not the original data length?
+
+        commandQueue.enqueue(Esp8266BootloaderCommands::flashDownloadStart(
+                                 magicLength, chunks.length(), ESP_BLOCK_SIZE, 0));
+
+        unsigned int sequence = 0;
+        for(QByteArray chunk : chunks) {
             commandQueue.enqueue(Esp8266BootloaderCommands::flashDownloadData(
-                                     sequence, data));
+                                     sequence, chunk));
+            sequence++;
         }
 
         commandQueue.enqueue(Esp8266BootloaderCommands::flashDownloadFinish(
