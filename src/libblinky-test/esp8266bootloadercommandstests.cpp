@@ -11,11 +11,11 @@ void Esp8266BootloaderCommandsTests::calculateChecksumTest_data()
     QTest::addColumn<QByteArray>("data");
     QTest::addColumn<unsigned char>("expectedChecksum");
 
-    QTest::newRow("empty data") << QByteArray() << (char)0xEF;
-    QTest::newRow("lots of zeros") << QByteArray(100, (char)0) << (char)0xEF;
-    QTest::newRow("even # of 0xFF") << QByteArray(100, (char)0xFF) << (char)0xEF;
-    QTest::newRow("odd # of 0xFF") << QByteArray(101, (char)0xFF) << (char)0x10;
-    QTest::newRow("1 0x10") << QByteArray(1, (char)0x10) << (char)0xFF;
+    QTest::newRow("empty data") << QByteArray() << (unsigned char)0xEF;
+    QTest::newRow("lots of zeros") << QByteArray(100, (char)0) << (unsigned char)0xEF;
+    QTest::newRow("even # of 0xFF") << QByteArray(100, (char)0xFF) << (unsigned char)0xEF;
+    QTest::newRow("odd # of 0xFF") << QByteArray(101, (char)0xFF) << (unsigned char)0x10;
+    QTest::newRow("1 0x10") << QByteArray(1, (char)0x10) << (unsigned char)0xFF;
 }
 
 void Esp8266BootloaderCommandsTests::calculateChecksumTest()
