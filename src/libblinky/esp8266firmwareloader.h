@@ -44,6 +44,7 @@ private:
     SerialCommandQueue commandQueue;
 
     enum State {
+        State_startReset,
         State_assertRTS,
         State_assertDTR,
         State_releaseBootPins,
@@ -55,6 +56,7 @@ private:
     };
 
     State state;
+    int resetLoopsRemaining;
     int syncTriesRemaining;
 
     int progress;

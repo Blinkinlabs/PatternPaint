@@ -135,10 +135,12 @@ void SerialCommandQueue::handleReadData()
     if (queue.length() == 0) {
         // TODO: error, we got unexpected data.
         qCritical() << "Got data when we didn't expect it!";
+        responseData.clear();
         return;
     }
 
-    switch(queue.front().testResponse(responseData)) {
+    // TODO: Clean this up with some kind of stream, instead of passing byte arrays?
+    switch(queue.front().testResponse(responseData.left(queue.front().expectedResponse.length()))) {
     case RESPONSE_NOT_ENOUGH_DATA:
         qDebug() << "Didn't get enough data yet. Expecting:"
                  << queue.front().expectedResponse.length()
@@ -146,17 +148,25 @@ void SerialCommandQueue::handleReadData()
         break;
 
     case RESPONSE_TOO_MUCH_DATA:
+    {
         // TODO: error, we got unexpected data.
-        qCritical() << "Got more data than we expected"
-                    << "expected:" << queue.front().expectedResponse.length()
-                    << "received:" << responseData.length();
+        QString errorString = QString()
+                .append("Got more data than we expected")
+                .append(" expected: %1 ").arg(queue.front().expectedResponse.length())
+                .append(" received: %2").arg(responseData.length());
+        emit(error(errorString));
+    }
         break ;
 
     case RESPONSE_INVALID_MASK:
+    {
         // TODO: error, we got unexpected data.
-        qCritical() << "Invalid mask length- command formatted incorrectly."
-                    << "expectedResponse:" << queue.front().expectedResponse.length()
-                    << "expectedResponseMask:" << queue.front().expectedResponseMask.length();
+        QString errorString = QString()
+                .append("Invalid mask length- command formatted incorrectly.")
+                .append("expectedResponse: %1").arg(queue.front().expectedResponse.length())
+                .append("expectedResponseMask: %1").arg(queue.front().expectedResponseMask.length());
+        emit(error(errorString));
+    }
         break;
 
     case RESPONSE_MISMATCH:

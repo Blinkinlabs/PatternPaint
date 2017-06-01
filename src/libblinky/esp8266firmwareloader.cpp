@@ -6,7 +6,8 @@
 
 #define BOOTLOADER_SYNC_FIRST_INTERVAL 200  // If this is low, we get an unexpected response to the sync command.
 #define BOOTLOADER_SYNC_INTERVAL 200  // If this is low, we get an unexpected response to the sync command.
-#define BOOTLOADER_SYNC_RETRIES 5
+#define BOOTLOADER_RESET_LOOP_RETRIES 10
+#define BOOTLOADER_SYNC_RETRIES 2
 
 #define EIGHTBYEIGHT_DEFAULT_FIRMWARE_LOCATION ":/firmware/eightbyeight/default/espfirmware.bin"
 
@@ -52,10 +53,8 @@ bool Esp8266FirmwareLoader::updateFirmware(BlinkyController &controller)
     if (controller.isConnected())
         controller.close();
 
-    serialPort.setPort(serialPortInfo);
-    serialPort.open(QIODevice::ReadWrite);
-
-    state = State_assertRTS;
+    resetLoopsRemaining = BOOTLOADER_RESET_LOOP_RETRIES;
+    state = State_startReset;
     doWork();
 
     return true;
@@ -90,15 +89,27 @@ void Esp8266FirmwareLoader::doWork()
     qDebug() << "In doWork state=" << state;
 
     switch (state) {
+    case State_startReset:
+    {
+        if(commandQueue.isConnected())
+            commandQueue.close();
+
+        serialPort.setPort(serialPortInfo);
+        serialPort.open(QIODevice::ReadWrite);
+
+        state = State_assertRTS;
+        QTimer::singleShot(1, this, SLOT(doWork()));
+
+        break;
+    }
     case State_assertRTS:
     {
         serialPort.setRequestToSend(true);
         serialPort.setDataTerminalReady(false);
 
         state = State_assertDTR;
-//        QTimer::singleShot(0, this, SLOT(doWork()));
-        QMetaObject::invokeMethod(this, "doWork", Qt::QueuedConnection);
 
+        QTimer::singleShot(1, this, SLOT(doWork()));
 
         break;
     }
@@ -108,8 +119,7 @@ void Esp8266FirmwareLoader::doWork()
         serialPort.setDataTerminalReady(true);
 
         state = State_releaseBootPins;
-//        QTimer::singleShot(0, this, SLOT(doWork()));
-        QMetaObject::invokeMethod(this, "doWork", Qt::QueuedConnection);
+        QTimer::singleShot(100, this, SLOT(doWork()));
 
         break;
     }
@@ -118,9 +128,8 @@ void Esp8266FirmwareLoader::doWork()
         serialPort.setRequestToSend(false);
         serialPort.setDataTerminalReady(false);
 
-        state = State_connectCommandQueue;
-//        QTimer::singleShot(0, this, SLOT(doWork()));
-        QMetaObject::invokeMethod(this, "doWork", Qt::QueuedConnection);
+        state = State_connectCommandQueue;;
+        QTimer::singleShot(300, this, SLOT(doWork()));
 
         break;
     }
@@ -165,6 +174,7 @@ void Esp8266FirmwareLoader::doWork()
     case State_doFlashDownload:
     {
         state = State_Done;
+        QMetaObject::invokeMethod(this, "doWork", Qt::QueuedConnection);
 
         break;
     }
@@ -184,10 +194,17 @@ void Esp8266FirmwareLoader::handleError(QString error)
     qCritical() << error;
 
     if(state == State_waitForBootloaderSync) {
-        if(syncTriesRemaining > 1) {
+        if(syncTriesRemaining > 0) {
             syncTriesRemaining--;
             state = State_startBootloaderSync;
             QTimer::singleShot(BOOTLOADER_SYNC_INTERVAL, this, SLOT(doWork()));
+            return;
+        }
+        else if(resetLoopsRemaining > 0) {
+            resetLoopsRemaining--;
+
+            state = State_startReset;
+            QTimer::singleShot(0, this, SLOT(doWork()));
             return;
         }
     }

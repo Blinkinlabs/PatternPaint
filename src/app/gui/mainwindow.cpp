@@ -945,7 +945,7 @@ QProgressDialog* MainWindow::makeProgressDialog() {
             dialog, SLOT(setLabelText(QString)));
 
     connect(uploader, SIGNAL(finished(bool)),
-            dialog, SLOT(close()));
+            dialog, SLOT(accept()));
 
     return dialog;
 }
