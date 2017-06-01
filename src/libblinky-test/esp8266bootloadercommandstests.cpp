@@ -9,7 +9,7 @@
 void Esp8266BootloaderCommandsTests::calculateChecksumTest_data()
 {
     QTest::addColumn<QByteArray>("data");
-    QTest::addColumn<char>("expectedChecksum");
+    QTest::addColumn<unsigned char>("expectedChecksum");
 
     QTest::newRow("empty data") << QByteArray() << (char)0xEF;
     QTest::newRow("lots of zeros") << QByteArray(100, (char)0) << (char)0xEF;
@@ -21,7 +21,7 @@ void Esp8266BootloaderCommandsTests::calculateChecksumTest_data()
 void Esp8266BootloaderCommandsTests::calculateChecksumTest()
 {
     QFETCH(QByteArray, data);
-    QFETCH(char, expectedChecksum);
+    QFETCH(unsigned char, expectedChecksum);
 
     QCOMPARE(Esp8266BootloaderCommands::calculateChecksum(data), expectedChecksum);
 }

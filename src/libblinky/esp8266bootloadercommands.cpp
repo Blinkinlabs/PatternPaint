@@ -5,7 +5,7 @@
 
 namespace Esp8266BootloaderCommands {
 
-char calculateChecksum(const QByteArray &data)
+unsigned char calculateChecksum(const QByteArray &data)
 {
     // From https://github.com/espressif/esptool/wiki/Serial-Protocol:
     // Each byte in the payload is XOR'ed together, as well as the magic number
@@ -19,6 +19,18 @@ char calculateChecksum(const QByteArray &data)
     }
 
     return checksum;
+}
+
+QByteArray buildCommand(Opcode opcode, const QByteArray &data)
+{
+    QByteArray command;
+    command.append((char)0x00);
+    command.append(opcode);
+    command.append(ByteArrayHelpers::uint16ToByteArrayLittle(data.length()));
+    command.append(ByteArrayHelpers::uint32ToByteArrayLittle(calculateChecksum(data)));
+    command.append(data);
+
+    return command;
 }
 
 QByteArray slipEncode(const QByteArray &data)
@@ -71,46 +83,95 @@ QByteArray slipDecode(const QByteArray &data)
     return decoded;
 }
 
-SerialCommand readRegister(unsigned int address)
+SerialCommand flashDownloadStart(unsigned int totalSize,
+                                 unsigned int numberOfBlocks,
+                                 unsigned int blockSize,
+                                 unsigned int offset)
 {
-    QByteArray command;
-    command.append((char)0x00);
-    command.append(Opcode_ReadRegister);
-    command.append(ByteArrayHelpers::uint16ToByteArrayLittle(4));
-    command.append(QByteArray(4, 0x00));
-    command.append(ByteArrayHelpers::uint32ToByteArrayLittle(address));
+    QByteArray data;
+    data.append(ByteArrayHelpers::uint32ToByteArrayLittle(totalSize));
+    data.append(ByteArrayHelpers::uint32ToByteArrayLittle(numberOfBlocks));
+    data.append(ByteArrayHelpers::uint32ToByteArrayLittle(blockSize));
+    data.append(ByteArrayHelpers::uint32ToByteArrayLittle(offset));
+
+    QByteArray command = buildCommand(Opcode_FlashDownloadStart, data);
 
     QByteArray expectedResponse;
     expectedResponse.append(0x01);
-    expectedResponse.append(Opcode_ReadRegister);
-    expectedResponse.append(ByteArrayHelpers::uint16ToByteArrayLittle(6));
-    expectedResponse.append(QByteArray(4,0x00));  // register data
+    expectedResponse.append(Opcode_FlashDownloadStart);
+    expectedResponse.append(ByteArrayHelpers::uint16ToByteArrayLittle(2));
+    expectedResponse.append((char)0x07);
+    expectedResponse.append((char)0x07);
+    expectedResponse.append((char)0x12);
+    expectedResponse.append((char)0x20);
     expectedResponse.append((char)0x00);
     expectedResponse.append((char)0x00);
 
-    QByteArray expectedResponseMask;
-    expectedResponseMask.append((char)0xFF);
-    expectedResponseMask.append((char)0xFF);
-    expectedResponseMask.append(QByteArray(2, 0xFF));
-    expectedResponseMask.append(QByteArray(4,0x00));
-    expectedResponseMask.append((char)0xFF);
-    expectedResponseMask.append((char)0x00);
+    return SerialCommand("flashDownloadStart",
+                         slipEncode(command),
+                         slipEncode(expectedResponse));
+}
 
-    return SerialCommand("readRegister", command, expectedResponse, expectedResponseMask);
+SerialCommand flashDownloadData(unsigned int sequence, QByteArray flashData)
+{
+    QByteArray data;
+    data.append(ByteArrayHelpers::uint32ToByteArrayLittle(flashData.length()));
+    data.append(ByteArrayHelpers::uint32ToByteArrayLittle(sequence));
+    data.append(ByteArrayHelpers::uint32ToByteArrayLittle(0));  // Mystery value
+    data.append(ByteArrayHelpers::uint32ToByteArrayLittle(0));  // Mystery value
+    data.append(flashData);
+
+    QByteArray command = buildCommand(Opcode_FlashDownloadData, data);
+
+    QByteArray expectedResponse;
+    expectedResponse.append(0x01);
+    expectedResponse.append(Opcode_FlashDownloadData);
+    expectedResponse.append(ByteArrayHelpers::uint16ToByteArrayLittle(2));
+    expectedResponse.append((char)0x07);
+    expectedResponse.append((char)0x07);
+    expectedResponse.append((char)0x12);
+    expectedResponse.append((char)0x20);
+    expectedResponse.append((char)0x00);
+    expectedResponse.append((char)0x00);
+
+    return SerialCommand("flashDownloadData",
+                         slipEncode(command),
+                         slipEncode(expectedResponse));
+}
+
+SerialCommand flashDownloadFinish(unsigned int rebootFlag)
+{
+    QByteArray data;
+    data.append(ByteArrayHelpers::uint32ToByteArrayLittle(rebootFlag));
+
+    QByteArray command = buildCommand(Opcode_FlashDownloadFinish, data);
+
+    QByteArray expectedResponse;
+    expectedResponse.append(0x01);
+    expectedResponse.append(Opcode_FlashDownloadFinish);
+    expectedResponse.append(ByteArrayHelpers::uint16ToByteArrayLittle(2));
+    expectedResponse.append((char)0x07);
+    expectedResponse.append((char)0x07);
+    expectedResponse.append((char)0x12);
+    expectedResponse.append((char)0x20);
+    expectedResponse.append((char)0x01);  // TODO: Can we count on these?
+    expectedResponse.append((char)0x06);  // TODO: Can we count on these?
+
+    return SerialCommand("flashDownloadStart",
+                         slipEncode(command),
+                         slipEncode(expectedResponse));
 }
 
 SerialCommand SyncFrame()
 {
-    QByteArray command;
-    command.append((char)0x00);
-    command.append(Opcode_SyncFrame);
-    command.append(ByteArrayHelpers::uint16ToByteArrayLittle(36));
-    command.append(QByteArray(4, 0x00));
-    command.append((char)0x07);
-    command.append((char)0x07);
-    command.append((char)0x12);
-    command.append((char)0x20);
-    command.append(QByteArray(32, 0x55));
+    QByteArray data;
+    data.append((char)0x07);
+    data.append((char)0x07);
+    data.append((char)0x12);
+    data.append((char)0x20);
+    data.append(QByteArray(32, 0x55));
+
+    QByteArray command = buildCommand(Opcode_SyncFrame, data);
 
     QByteArray expectedResponse;
     expectedResponse.append(0x01);
@@ -123,10 +184,9 @@ SerialCommand SyncFrame()
     expectedResponse.append((char)0x00);
     expectedResponse.append((char)0x00);
 
-    qDebug() << command.toHex();
-    qDebug() << expectedResponse.toHex();
-
     command = slipEncode(command);
+
+    // TODO: Unclear why the esp responds with the same message repeated multiple times
     expectedResponse = slipEncode(expectedResponse);
     expectedResponse = expectedResponse
             + expectedResponse

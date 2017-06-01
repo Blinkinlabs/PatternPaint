@@ -120,6 +120,27 @@ void Esp8266FirmwareLoader::doWork()
         break;
     }
     case State_waitForBootloaderSync:
+    {
+        state = State_doFlashDownload;
+        commandQueue.enqueue(Esp8266BootloaderCommands::flashDownloadStart(
+                                 217088, 274, 1024, 0));
+
+        QByteArray data(1024, (char)0xFF);
+        for(int sequence = 0; sequence < 274; sequence++) {
+            commandQueue.enqueue(Esp8266BootloaderCommands::flashDownloadData(
+                                     sequence, data));
+        }
+
+        commandQueue.enqueue(Esp8266BootloaderCommands::flashDownloadFinish(
+                                 1));
+        break;
+    }
+    case State_doFlashDownload:
+    {
+        state = State_Done;
+
+        break;
+    }
     case State_Done:
     {
         commandQueue.close();

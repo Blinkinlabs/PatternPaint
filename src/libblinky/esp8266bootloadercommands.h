@@ -15,7 +15,7 @@ namespace Esp8266BootloaderCommands {
 
 enum Opcode {
     Opcode_FlashDownloadStart = 0x02,
-    Opcode_FlahsDownloadData = 0x03,
+    Opcode_FlashDownloadData = 0x03,
     Opcode_FlashDownloadFinish = 0x04,
     Opcode_RamDownloadStart = 0x05,
     Opcode_RamDownloadFinish = 0x06,
@@ -26,14 +26,23 @@ enum Opcode {
     Opcode_ConfigureSPIParameters = 0x0b,
 };
 
-char calculateChecksum(const QByteArray &data);
+unsigned char calculateChecksum(const QByteArray &data);
+
+QByteArray buildCommand(Opcode opcode, const QByteArray &data);
 
 QByteArray slipEncode(const QByteArray &data);
 QByteArray slipDecode(const QByteArray &data);
 
-SerialCommand SyncFrame();
+SerialCommand flashDownloadStart(unsigned int totalSize,
+                                 unsigned int numberOfBlocks,
+                                 unsigned int blockSize,
+                                 unsigned int offset);
 
-SerialCommand readRegister(unsigned int address);
+SerialCommand flashDownloadData(unsigned int sequence, QByteArray flashData);
+
+SerialCommand flashDownloadFinish(unsigned int rebootFlag);
+
+SerialCommand SyncFrame();
 
 }
 

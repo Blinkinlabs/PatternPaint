@@ -50,6 +50,7 @@ private:
         State_connectCommandQueue,
         State_startBootloaderSync,
         State_waitForBootloaderSync,
+        State_doFlashDownload,
         State_Done                 ///< And we're done!
     };
 
