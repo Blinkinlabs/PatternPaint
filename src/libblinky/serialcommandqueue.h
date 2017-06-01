@@ -22,7 +22,7 @@ public:
     bool open(QSerialPortInfo info);
     void close();
 
-    bool isConnected();
+    bool isOpen();
 
     // Queue a new command
     void enqueue(const SerialCommand &command);

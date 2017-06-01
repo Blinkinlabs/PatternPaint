@@ -86,12 +86,10 @@ void Esp8266FirmwareLoader::cancel()
 
 void Esp8266FirmwareLoader::doWork()
 {
-    qDebug() << "In doWork state=" << state;
-
     switch (state) {
     case State_startReset:
     {
-        if(commandQueue.isConnected())
+        if(commandQueue.isOpen())
             commandQueue.close();
 
         serialPort.setPort(serialPortInfo);
@@ -214,7 +212,7 @@ void Esp8266FirmwareLoader::handleError(QString error)
     if(serialPort.isOpen())
         serialPort.close();
 
-    if(commandQueue.isConnected())
+    if(commandQueue.isOpen())
         commandQueue.close();
 
     emit(finished(false));

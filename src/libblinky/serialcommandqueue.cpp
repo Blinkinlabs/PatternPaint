@@ -18,7 +18,7 @@ SerialCommandQueue::SerialCommandQueue(QObject *parent) :
 
 bool SerialCommandQueue::open(QSerialPortInfo info)
 {
-    if (isConnected()) {
+    if (isOpen()) {
         qCritical("Already connected to serial device");
         return false;
     }
@@ -54,7 +54,7 @@ void SerialCommandQueue::close()
     commandTimeoutTimer.stop();
 }
 
-bool SerialCommandQueue::isConnected()
+bool SerialCommandQueue::isOpen()
 {
     return (serial != NULL && serial->isOpen());
 }
@@ -102,7 +102,7 @@ void SerialCommandQueue::processQueue()
     if (commandTimeoutTimer.isActive())
         return;
 
-    if (!isConnected()) {
+    if (!isOpen()) {
         qCritical() << "Device disappeared, cannot run command";
         return;
     }
@@ -124,7 +124,7 @@ void SerialCommandQueue::processQueue()
 
 void SerialCommandQueue::handleReadData()
 {
-    if (!isConnected())
+    if (!isOpen())
         return;
 
     responseData.append(serial->readAll());
