@@ -12,6 +12,7 @@
 // https://gist.github.com/bvernoux/6ddc02ed157417a4df37861488357c5a
 
 namespace Esp8266BootloaderCommands {
+    Q_NAMESPACE
 
 enum Opcode {
     Opcode_FlashDownloadStart = 0x02,
@@ -25,6 +26,7 @@ enum Opcode {
     Opcode_ReadRegister = 0x0a,
     Opcode_ConfigureSPIParameters = 0x0b,
 };
+Q_ENUM_NS(Opcode)
 
 unsigned char calculateChecksum(const QByteArray &data);
 

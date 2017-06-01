@@ -5,6 +5,7 @@
 #include <QDebug>
 
 #include "esp8266bootloadercommands.h"
+#include "bytearrayhelpers.h"
 
 void Esp8266BootloaderCommandsTests::calculateChecksumTest_data()
 {
@@ -24,6 +25,43 @@ void Esp8266BootloaderCommandsTests::calculateChecksumTest()
     QFETCH(unsigned char, expectedChecksum);
 
     QCOMPARE(Esp8266BootloaderCommands::calculateChecksum(data), expectedChecksum);
+}
+
+void Esp8266BootloaderCommandsTests::buildCommandTest_data()
+{
+    QTest::addColumn<Esp8266BootloaderCommands::Opcode>("opcode");
+    QTest::addColumn<QByteArray>("data");
+    QTest::addColumn<unsigned char>("checksum");
+    QTest::addColumn<QByteArray>("expectedCommand");
+
+    QTest::newRow("empty data")
+            << Esp8266BootloaderCommands::Opcode_FlashDownloadStart
+            << QByteArray()
+            << (unsigned char) 0x12
+            << QByteArray().append((char)0x00)
+               .append(Esp8266BootloaderCommands::Opcode_FlashDownloadStart)
+               .append(ByteArrayHelpers::uint16ToByteArrayLittle(0))
+               .append(ByteArrayHelpers::uint32ToByteArrayLittle(0x12));
+
+    QTest::newRow("length 100")
+            << Esp8266BootloaderCommands::Opcode_SyncFrame
+            << QByteArray(100, (char)0xFF)
+            << (unsigned char) 0x34
+            << QByteArray().append((char)0x00)
+               .append(Esp8266BootloaderCommands::Opcode_SyncFrame)
+               .append(ByteArrayHelpers::uint16ToByteArrayLittle(100))
+               .append(ByteArrayHelpers::uint32ToByteArrayLittle(0x34))
+               .append(QByteArray(100, (char)0xFF));
+}
+
+void Esp8266BootloaderCommandsTests::buildCommandTest()
+{
+    QFETCH(Esp8266BootloaderCommands::Opcode, opcode);
+    QFETCH(QByteArray, data);
+    QFETCH(unsigned char, checksum);
+    QFETCH(QByteArray, expectedCommand);
+
+    QCOMPARE(Esp8266BootloaderCommands::buildCommand(opcode, data, checksum), expectedCommand);
 }
 
 void Esp8266BootloaderCommandsTests::slipEncodeTest_data()

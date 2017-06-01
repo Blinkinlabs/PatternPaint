@@ -11,6 +11,9 @@ private slots:
     void calculateChecksumTest_data();
     void calculateChecksumTest();
 
+    void buildCommandTest_data();
+    void buildCommandTest();
+
     void slipEncodeTest_data();
     void slipEncodeTest();
 
