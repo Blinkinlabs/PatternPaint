@@ -59,6 +59,8 @@ private:
 
     int progress;
     int maxProgress;
+
+    QList<QByteArray> flashData;
 };
 
 #endif // ESP8266FIRMWARELOADER_H

@@ -665,9 +665,9 @@ void MainWindow::on_actionRestore_firmware_triggered()
         dialog->show();
 
         if (!uploader->restoreFirmware(-1)) {
-            dialog->close();    // TODO: Does the dialog get deleted by this?
-
+            // TODO: this might show an error message twice if the upload fails.
             showError(uploader->getErrorString());
+            dialog->close();
             return;
         }
     }
@@ -686,9 +686,9 @@ void MainWindow::on_actionRestore_firmware_triggered()
         dialog->show();
 
         if (!uploader->updateFirmware(*controller)) {
-            dialog->close();    // TODO: Does the dialog get deleted by this?
-
+            // TODO: this might show an error message twice if the upload fails.
             showError(uploader->getErrorString());
+            dialog->close();
             return;
         }
     }

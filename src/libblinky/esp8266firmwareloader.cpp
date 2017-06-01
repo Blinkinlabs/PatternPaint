@@ -4,10 +4,11 @@
 #include "esp8266bootloadercommands.h"
 #include "bytearrayhelpers.h"
 
-#define BOOTLOADER_SYNC_FIRST_INTERVAL 500  // If this is low, we get an unexpected response to the sync command.
+#define BOOTLOADER_SYNC_FIRST_INTERVAL 200  // If this is low, we get an unexpected response to the sync command.
 #define BOOTLOADER_SYNC_INTERVAL 200  // If this is low, we get an unexpected response to the sync command.
 #define BOOTLOADER_SYNC_RETRIES 5
 
+#define EIGHTBYEIGHT_DEFAULT_FIRMWARE_LOCATION ":/firmware/eightbyeight/default/espfirmware.bin"
 
 #define ESP_BLOCK_SIZE 1024
 
@@ -24,12 +25,28 @@ Esp8266FirmwareLoader::Esp8266FirmwareLoader(QObject *parent) :
 
 bool Esp8266FirmwareLoader::storePatterns(BlinkyController &controller, QList<PatternWriter> &patternWriters)
 {
+    Q_UNUSED(controller);
+    Q_UNUSED(patternWriters);
+
     errorString = "Store patterns not supported for Esp8266!";
     return false;
 }
 
 bool Esp8266FirmwareLoader::updateFirmware(BlinkyController &controller)
 {
+    QFile file(EIGHTBYEIGHT_DEFAULT_FIRMWARE_LOCATION);
+    if (!file.open(QIODevice::ReadOnly)) {
+        errorString = "Cannot open firmware file";
+        return false;
+    }
+    QByteArray data = file.readAll();
+
+    ByteArrayHelpers::padToBoundary(data, ESP_BLOCK_SIZE);
+    flashData = ByteArrayHelpers::chunkData(data, ESP_BLOCK_SIZE);
+
+    progress = 0;
+    maxProgress = 2 + 2 + flashData.length();
+
     controller.getPortInfo(serialPortInfo);
 
     if (controller.isConnected())
@@ -46,6 +63,8 @@ bool Esp8266FirmwareLoader::updateFirmware(BlinkyController &controller)
 
 bool Esp8266FirmwareLoader::restoreFirmware(qint64 timeout)
 {
+    Q_UNUSED(timeout);
+
     errorString = "Firmware update not currently supported for Esp8266!";
     return false;
 }
@@ -127,27 +146,20 @@ void Esp8266FirmwareLoader::doWork()
     {
         state = State_doFlashDownload;
 
-        QFile file(":/firmware/eightbyeight/default/espfirmware.bin");
-        if (!file.open(QIODevice::ReadOnly)) return;
-        QByteArray data = file.readAll();
-
-        ByteArrayHelpers::padToBoundary(data, ESP_BLOCK_SIZE);
-        QList<QByteArray> chunks = ByteArrayHelpers::chunkData(data, ESP_BLOCK_SIZE);
-
         unsigned int magicLength = 217088;  // TODO: Why this length and not the original data length?
 
         commandQueue.enqueue(Esp8266BootloaderCommands::flashDownloadStart(
-                                 magicLength, chunks.length(), ESP_BLOCK_SIZE, 0));
+                                 magicLength, flashData.length(), ESP_BLOCK_SIZE, 0));
 
         unsigned int sequence = 0;
-        for(QByteArray chunk : chunks) {
+        for(QByteArray chunk : flashData) {
             commandQueue.enqueue(Esp8266BootloaderCommands::flashDownloadData(
                                      sequence, chunk));
             sequence++;
         }
 
         commandQueue.enqueue(Esp8266BootloaderCommands::flashDownloadFinish(
-                                 1));
+                                 0));
         break;
     }
     case State_doFlashDownload:
@@ -193,6 +205,10 @@ void Esp8266FirmwareLoader::handleError(QString error)
 
 void Esp8266FirmwareLoader::handleCommandFinished(QString command, QByteArray returnData)
 {
+    Q_UNUSED(command);
+    Q_UNUSED(returnData);
+
+    setProgress(progress + 1);
 }
 
 void Esp8266FirmwareLoader::handleLastCommandFinished()
