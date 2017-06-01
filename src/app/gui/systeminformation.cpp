@@ -49,8 +49,8 @@ void SystemInformation::on_refresh_clicked()
         report.append("  BlinkyTape:" + info.portName() + " (bootloader)\n");
 
     report.append("Detected Serial Ports: \n");
-    for (const QSerialPortInfo &info : getUsefulSerialPorts()) {
-        int version = getVersionForDevice(info.vendorIdentifier(), info.productIdentifier());
+    for (const QSerialPortInfo &info : usbUtils::getUsefulSerialPorts()) {
+        int version = usbUtils::getVersionForDevice(info.vendorIdentifier(), info.productIdentifier());
 
         report.append("  " + info.portName() + "\n");
         report.append("    Manufacturer: " + info.manufacturer() + "\n");

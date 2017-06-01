@@ -141,13 +141,13 @@ void SerialCommandQueue::handleReadData()
 
     // TODO: Clean this up with some kind of stream, instead of passing byte arrays?
     switch(queue.front().testResponse(responseData.left(queue.front().expectedResponse.length()))) {
-    case RESPONSE_NOT_ENOUGH_DATA:
+    case SerialCommand::RESPONSE_NOT_ENOUGH_DATA:
         qDebug() << "Didn't get enough data yet. Expecting:"
                  << queue.front().expectedResponse.length()
                  << "received:" << responseData.length();
         break;
 
-    case RESPONSE_TOO_MUCH_DATA:
+    case SerialCommand::RESPONSE_TOO_MUCH_DATA:
     {
         // TODO: error, we got unexpected data.
         QString errorString = QString()
@@ -158,7 +158,7 @@ void SerialCommandQueue::handleReadData()
     }
         break ;
 
-    case RESPONSE_INVALID_MASK:
+    case SerialCommand::RESPONSE_INVALID_MASK:
     {
         // TODO: error, we got unexpected data.
         QString errorString = QString()
@@ -169,11 +169,11 @@ void SerialCommandQueue::handleReadData()
     }
         break;
 
-    case RESPONSE_MISMATCH:
+    case SerialCommand::RESPONSE_MISMATCH:
         emit(error("Got unexpected data back"));
         break;
 
-    case RESPONSE_MATCH:
+    case SerialCommand::RESPONSE_MATCH:
 
         // qDebug() << "Command completed successfully: " << commandQueue.front().name;
 

@@ -6,19 +6,17 @@
 
 #define DEFAULT_COMMAND_TIMEOUT 5000 // Default command timeout, in ms
 
-enum CompareResult {
-    RESPONSE_INVALID_MASK,     // TODO: Don't allow this condition in the first place
-    RESPONSE_MISMATCH,         // Response did not match expected response
-    RESPONSE_NOT_ENOUGH_DATA,  // Not enough response data yet
-    RESPONSE_TOO_MUCH_DATA,     // Got too much data
-    RESPONSE_MATCH,             // Response matched expected response
-};
-
-Q_DECLARE_METATYPE(CompareResult)
-
 class SerialCommand
 {
 public:
+    enum CompareResult {
+        RESPONSE_INVALID_MASK,     // TODO: Don't allow this condition in the first place
+        RESPONSE_MISMATCH,         // Response did not match expected response
+        RESPONSE_NOT_ENOUGH_DATA,  // Not enough response data yet
+        RESPONSE_TOO_MUCH_DATA,     // Got too much data
+        RESPONSE_MATCH,             // Response matched expected response
+    };
+
     SerialCommand(QString name, const QByteArray &data, const QByteArray &expectedResponse,
                   int timeout = DEFAULT_COMMAND_TIMEOUT);
 
@@ -36,5 +34,7 @@ public:
 
     bool operator==(const SerialCommand& rhs) const;
 };
+
+Q_DECLARE_METATYPE(SerialCommand::CompareResult)
 
 #endif // SERIALCOMMAND_H

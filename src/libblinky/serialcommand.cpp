@@ -19,7 +19,7 @@ SerialCommand::SerialCommand(QString name, const QByteArray &data, const QByteAr
     this->expectedResponseMask = expectedResponseMask;
 }
 
-CompareResult SerialCommand::testResponse(const QByteArray &response)
+SerialCommand::CompareResult SerialCommand::testResponse(const QByteArray &response)
 {
     if(expectedResponse.length() > response.length()) {
         return RESPONSE_NOT_ENOUGH_DATA;

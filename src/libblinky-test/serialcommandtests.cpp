@@ -38,7 +38,7 @@ void SerialCommandTests::compareNoMaskTest_data()
 {
     QTest::addColumn<QByteArray>("expectedResponse");
     QTest::addColumn<QByteArray>("response");
-    QTest::addColumn<CompareResult>("result");
+    QTest::addColumn<SerialCommand::CompareResult>("result");
 
     QByteArray largeDataA;
     QByteArray largeDataB;
@@ -47,25 +47,25 @@ void SerialCommandTests::compareNoMaskTest_data()
         largeDataB.append(static_cast<unsigned char>(i*2 & 0xFF));
     }
 
-    QTest::newRow("not enough data, small")   << QByteArray(1,'x') << QByteArray() << CompareResult::RESPONSE_NOT_ENOUGH_DATA;
-    QTest::newRow("not enough data, large")   << largeDataA << largeDataB.mid(0, largeDataB.length()-1) << CompareResult::RESPONSE_NOT_ENOUGH_DATA;
+    QTest::newRow("not enough data, small")   << QByteArray(1,'x') << QByteArray() << SerialCommand::RESPONSE_NOT_ENOUGH_DATA;
+    QTest::newRow("not enough data, large")   << largeDataA << largeDataB.mid(0, largeDataB.length()-1) << SerialCommand::RESPONSE_NOT_ENOUGH_DATA;
 
-    QTest::newRow("too much data, small")   << QByteArray() << QByteArray(1,'x') << CompareResult::RESPONSE_TOO_MUCH_DATA;
-    QTest::newRow("too much data, large")   << largeDataA.mid(0, largeDataB.length()-1) << largeDataB << CompareResult::RESPONSE_TOO_MUCH_DATA;
+    QTest::newRow("too much data, small")   << QByteArray() << QByteArray(1,'x') << SerialCommand::RESPONSE_TOO_MUCH_DATA;
+    QTest::newRow("too much data, large")   << largeDataA.mid(0, largeDataB.length()-1) << largeDataB << SerialCommand::RESPONSE_TOO_MUCH_DATA;
 
-    QTest::newRow("mismatch, small")   << QByteArray(1,'x') << QByteArray(1,'y') << CompareResult::RESPONSE_MISMATCH;
-    QTest::newRow("mismatch, large")   << largeDataA << largeDataB << CompareResult::RESPONSE_MISMATCH;
+    QTest::newRow("mismatch, small")   << QByteArray(1,'x') << QByteArray(1,'y') << SerialCommand::RESPONSE_MISMATCH;
+    QTest::newRow("mismatch, large")   << largeDataA << largeDataB << SerialCommand::RESPONSE_MISMATCH;
 
-    QTest::newRow("match, 0 length")   << QByteArray() << QByteArray() << CompareResult::RESPONSE_MATCH;
-    QTest::newRow("match, small")   << QByteArray(1,'x') << QByteArray(1,'x') << CompareResult::RESPONSE_MATCH;
-    QTest::newRow("match, large")   << largeDataA << largeDataA << CompareResult::RESPONSE_MATCH;
+    QTest::newRow("match, 0 length")   << QByteArray() << QByteArray() << SerialCommand::RESPONSE_MATCH;
+    QTest::newRow("match, small")   << QByteArray(1,'x') << QByteArray(1,'x') << SerialCommand::RESPONSE_MATCH;
+    QTest::newRow("match, large")   << largeDataA << largeDataA << SerialCommand::RESPONSE_MATCH;
 }
 
 void SerialCommandTests::compareNoMaskTest()
 {
     QFETCH(QByteArray, expectedResponse);
     QFETCH(QByteArray, response);
-    QFETCH(CompareResult, result);
+    QFETCH(SerialCommand::CompareResult, result);
 
     SerialCommand command("",QByteArray(), expectedResponse);
 
@@ -77,7 +77,7 @@ void SerialCommandTests::compareMaskTest_data()
     QTest::addColumn<QByteArray>("expectedResponse");
     QTest::addColumn<QByteArray>("expectedResponseMask");
     QTest::addColumn<QByteArray>("response");
-    QTest::addColumn<CompareResult>("result");
+    QTest::addColumn<SerialCommand::CompareResult>("result");
 
     QByteArray largeDataA;
     QByteArray largeDataB;
@@ -96,14 +96,14 @@ void SerialCommandTests::compareMaskTest_data()
         }
     }
 
-    QTest::newRow("zero-length mask ignored")   << QByteArray(1,'x') << QByteArray() << QByteArray(1,'y') << CompareResult::RESPONSE_MISMATCH;
+    QTest::newRow("zero-length mask ignored")   << QByteArray(1,'x') << QByteArray() << QByteArray(1,'y') << SerialCommand::RESPONSE_MISMATCH;
 
-    QTest::newRow("too small mask, small")   << QByteArray(2,'x') << QByteArray(1,'\x00') << QByteArray(2,'x') << CompareResult::RESPONSE_INVALID_MASK;
-    QTest::newRow("too small mask, big")   << QByteArray(1000,'x') << QByteArray(999,'\x00') << QByteArray(1000,'x') << CompareResult::RESPONSE_INVALID_MASK;
+    QTest::newRow("too small mask, small")   << QByteArray(2,'x') << QByteArray(1,'\x00') << QByteArray(2,'x') << SerialCommand::RESPONSE_INVALID_MASK;
+    QTest::newRow("too small mask, big")   << QByteArray(1000,'x') << QByteArray(999,'\x00') << QByteArray(1000,'x') << SerialCommand::RESPONSE_INVALID_MASK;
 
-    QTest::newRow("mask, small")   << QByteArray(1,'x') << QByteArray(1,'\x00') << QByteArray(1, 'y') << CompareResult::RESPONSE_MATCH;
-    QTest::newRow("mask, large, verify different") << largeDataA << QByteArray() << largeDataB << CompareResult::RESPONSE_MISMATCH;
-    QTest::newRow("mask, large") << largeDataA << largeMask << largeDataB << CompareResult::RESPONSE_MATCH;
+    QTest::newRow("mask, small")   << QByteArray(1,'x') << QByteArray(1,'\x00') << QByteArray(1, 'y') << SerialCommand::RESPONSE_MATCH;
+    QTest::newRow("mask, large, verify different") << largeDataA << QByteArray() << largeDataB << SerialCommand::RESPONSE_MISMATCH;
+    QTest::newRow("mask, large") << largeDataA << largeMask << largeDataB << SerialCommand::RESPONSE_MATCH;
 }
 
 
@@ -112,7 +112,7 @@ void SerialCommandTests::compareMaskTest()
     QFETCH(QByteArray, expectedResponse);
     QFETCH(QByteArray, expectedResponseMask);
     QFETCH(QByteArray, response);
-    QFETCH(CompareResult, result);
+    QFETCH(SerialCommand::CompareResult, result);
 
     SerialCommand command("",QByteArray(), expectedResponse, expectedResponseMask);
 

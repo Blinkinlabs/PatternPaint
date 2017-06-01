@@ -19,7 +19,7 @@ void BlinkyController::close()
 // TODO: Support a method for loading these from preferences file
 QList<QPointer<ControllerInfo> > BlinkyController::probe()
 {
-    QList<QSerialPortInfo> serialPorts = getUsefulSerialPorts();
+    QList<QSerialPortInfo> serialPorts = usbUtils::getUsefulSerialPorts();
     QList<QPointer<ControllerInfo> > controllerInfos;
 
     for (const QSerialPortInfo &info : serialPorts) {

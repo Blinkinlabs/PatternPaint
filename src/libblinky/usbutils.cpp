@@ -6,6 +6,8 @@
 #include <QDebug>
 #include <libusb-1.0/libusb.h>
 
+namespace usbUtils {
+
 QList<QSerialPortInfo> getUsefulSerialPorts()
 {
     QList<QSerialPortInfo> usablePorts;
@@ -62,4 +64,6 @@ int getVersionForDevice(quint16 idVendor, quint16 idProduct)
 
     libusb_free_device_list(devs, 1);
     return version;
+}
+
 }

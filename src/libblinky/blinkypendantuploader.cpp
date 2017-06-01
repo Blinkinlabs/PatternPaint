@@ -36,8 +36,8 @@ bool BlinkyPendantUploader::storePatterns(BlinkyController &controller,
         return false;
     }
 
-    int version = getVersionForDevice(portInfo.vendorIdentifier(),
-                                      portInfo.productIdentifier());
+    int version = usbUtils::getVersionForDevice(portInfo.vendorIdentifier(),
+                                                portInfo.productIdentifier());
 
     if (version == BLINKY_PENDANT_VERSION_1) {
         qDebug() << "Using version 1 upload mechanism, please update firmware!";
