@@ -16,7 +16,9 @@ class Avr109FirmwareLoader : public FirmwareLoader
 public:
     Avr109FirmwareLoader(QObject *parent = 0);
 
-    bool updateFirmware(BlinkyController &blinky);
+    bool updateFirmware(BlinkyController &blinkyController, QList<MemorySection> flashData);
+
+    bool updateFirmware(BlinkyController &blinkyController);
     bool restoreFirmware(qint64 timeout);
     QString getErrorString() const;
 
@@ -32,6 +34,8 @@ private slots:
 
     void handleLastCommandFinished();
 
+    void reallyStartUpload();
+
 private:
     enum State {
         State_ProbeBootloaders,         ///< Waiting for the bootloader device to become available
@@ -41,12 +45,14 @@ private:
         State_SendingCommands,          ///< Ready for a command. TODO: Delete me
     };
 
+
+
     /// Start an upload, using the passed blinkytape as a launching point
     /// Note that the blinkytape will be disconnected during the upload process,
     /// and will need to be reconnected manually afterwards.
     bool startUpload(BlinkyController &controller);
 
-    bool startUpload(qint64 timeout);
+    bool checkFirmwareFits();
 
     /// Update any listeners with the latest progress
     void setProgress(int newProgress);

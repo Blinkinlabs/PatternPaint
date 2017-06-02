@@ -146,22 +146,6 @@ void LightBuddyUploader::doWork()
     }
 }
 
-bool LightBuddyUploader::updateFirmware(BlinkyController &controller)
-{
-    Q_UNUSED(controller);
-
-    // TODO: Support firmware upload for the lightbuddy
-    errorString = "Firmware update not currently supported for Lightbuddy!";
-    return false;
-}
-
-bool LightBuddyUploader::restoreFirmware(qint64)
-{
-    // TODO: Support firmware upload for the lightbuddy
-    errorString = "Firmware update not currently supported for Lightbuddy!";
-    return false;
-}
-
 QString LightBuddyUploader::getErrorString() const
 {
     return errorString;

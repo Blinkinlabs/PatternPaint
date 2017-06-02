@@ -10,6 +10,9 @@
 // TODO: Combine this with the definitions in avruploaddata.cpp
 #define EEPROM_TABLE_SIZE_BYTES         0x0010  // Amount of space available in the EEPROM
 
+/// How long to delay between resetting the blinkyController and probing for a bootloader
+#define BLINKY_RESET_DELAY 500
+
 /// Interval between polling the serial port list for new devices (milliseconds)
 #define BOOTLOADER_POLL_INTERVAL 200
 
@@ -82,6 +85,7 @@ void Avr109FirmwareLoader::setDialogText()
     emit(setText(textLabel));
 }
 
+// TODO: Remove this in favor of a global bootloader search utility.
 bool Avr109FirmwareLoader::restoreFirmware(qint64 timeout)
 {
     MemorySection sketch = FirmwareStore::getFirmwareData(BLINKYTAPE_FACTORY_FIRMWARE_NAME);
@@ -94,10 +98,18 @@ bool Avr109FirmwareLoader::restoreFirmware(qint64 timeout)
     // Put the sketch, pattern, and metadata into the programming queue.
     flashData.append(sketch);
 
-    return startUpload(timeout);
+    if(!checkFirmwareFits())
+        return false;
+
+    probeBootloaderTimeout = timeout;
+
+    reallyStartUpload();
+    return true;
 }
 
-bool Avr109FirmwareLoader::updateFirmware(BlinkyController &blinky)
+
+// TODO: Remove these, require the caller to provide the firmware image.
+bool Avr109FirmwareLoader::updateFirmware(BlinkyController &blinkyController)
 {
     MemorySection sketch = FirmwareStore::getFirmwareData(BLINKYTAPE_FACTORY_FIRMWARE_NAME);
 
@@ -106,11 +118,58 @@ bool Avr109FirmwareLoader::updateFirmware(BlinkyController &blinky)
         return false;
     }
 
-    // Put the sketch, pattern, and metadata into the programming queue.
-    flashData.append(sketch);
+    QList<MemorySection> firmware;
+    firmware.append(sketch);
 
-    return startUpload(blinky);
+    return updateFirmware(blinkyController, firmware);
 }
+
+bool Avr109FirmwareLoader::updateFirmware(BlinkyController &blinkyController, QList<MemorySection> firmware)
+{
+    flashData = firmware;
+
+    if(!checkFirmwareFits())
+        return false;
+
+    // Now, start the polling processes to detect a new bootloader
+    // We can't reset if we weren't already connected...
+    if (!blinkyController.isConnected()) {
+        errorString = "Not connected to a tape, cannot upload again";
+        return false;
+    }
+
+    probeBootloaderTimeout = BOOTLOADER_POLL_TIMEOUT;
+
+    // Next, tell the tape to reset.
+    blinkyController.reset();
+
+    // TODO: Add a new state to check that the reset actually happened, before continuing.
+    QTimer::singleShot(BLINKY_RESET_DELAY, this, SLOT(reallyStartUpload()));
+    return true;
+}
+
+
+void Avr109FirmwareLoader::reallyStartUpload() {
+
+    maxProgress = 1;    // checkDeviceSignature
+    maxProgress += 2;   // erase EEPROM
+    maxProgress += 1;   // reset
+
+    // There are 4 commands for each page-
+    // setaddress, writeflashpage, setaddress, verifyflashpage
+    for (MemorySection flashSection : flashData)
+        maxProgress += 4*flashSection.data.count()/FLASH_MEMORY_PAGE_SIZE_BYTES;
+
+    setProgress(0);
+
+    probeBootloaderStartTime = QDateTime::currentDateTime();
+
+    flashWriteRetriesRemaining = FLASH_WRITE_MAX_RETRIES;
+
+    state = State_ProbeBootloaders;
+    QTimer::singleShot(0, this, SLOT(doWork()));
+}
+
 
 void Avr109FirmwareLoader::handleError(QString error)
 {
@@ -174,7 +233,7 @@ void Avr109FirmwareLoader::handleLastCommandFinished()
     }
 }
 
-bool Avr109FirmwareLoader::startUpload(BlinkyController &controller)
+bool Avr109FirmwareLoader::checkFirmwareFits()
 {
     for (MemorySection& section : flashData) {
         qDebug() << "Flash Section:" << section.name
@@ -198,56 +257,6 @@ bool Avr109FirmwareLoader::startUpload(BlinkyController &controller)
         return false;
     }
 
-    // Now, start the polling processes to detect a new bootloader
-    // We can't reset if we weren't already connected...
-    if (!controller.isConnected()) {
-        errorString = "Not connected to a tape, cannot upload again";
-        return false;
-    }
-
-    // Next, tell the tape to reset.
-    controller.reset();
-
-    return startUpload(BOOTLOADER_POLL_TIMEOUT);
-}
-
-bool Avr109FirmwareLoader::startUpload(qint64 timeout)
-{
-    // TODO: This is duplicated in startUpload(Blinkycontroller &)
-    int flashUsed = 0;
-    for (MemorySection& section : flashData)
-        flashUsed += section.data.length();
-    int flashTotal = FLASH_MEMORY_AVAILABLE;
-
-    if (flashUsed > flashTotal) {
-        errorString = "Pattern data too large, cannot fit on device!\n";
-        errorString.append("Try removing some patterns, or making them shorter\n");
-        errorString.append("Pattern size: " + QString::number(flashUsed) + " bytes\n");
-        errorString.append("Available space: " + QString::number(flashTotal) + " bytes");
-
-        return false;
-    }
-
-    maxProgress = 1;    // checkDeviceSignature
-    maxProgress += 2;   // erase EEPROM
-    maxProgress += 1;   // reset
-
-    // There are 4 commands for each page-
-    // setaddress, writeflashpage, setaddress, verifyflashpage
-    for (MemorySection flashSection : flashData)
-        maxProgress += 4*flashSection.data.count()/FLASH_MEMORY_PAGE_SIZE_BYTES;
-
-    setProgress(0);
-
-    probeBootloaderTimeout = timeout;
-    probeBootloaderStartTime = QDateTime::currentDateTime();
-
-    flashWriteRetriesRemaining = FLASH_WRITE_MAX_RETRIES;
-
-    state = State_ProbeBootloaders;
-
-    QTimer::singleShot(0, this, SLOT(doWork()));
-
     return true;
 }
 
@@ -256,6 +265,7 @@ QString Avr109FirmwareLoader::getErrorString() const
     return errorString;
 }
 
+// TODO: Drop this, and put into a different class.
 bool Avr109FirmwareLoader::bootloaderAvailable() {
     return !BlinkyController::probeBootloaders().empty();
 }

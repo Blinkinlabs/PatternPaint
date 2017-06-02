@@ -14,8 +14,6 @@ public:
     LightBuddyUploader(QObject *parent = 0);
 
     bool storePatterns(BlinkyController &controller, QList<PatternWriter> &patternWriters);
-    bool updateFirmware(BlinkyController &controller);
-    bool restoreFirmware(qint64 timeout);
     QString getErrorString() const;
 
     QList<PatternWriter::Encoding> getSupportedEncodings() const;

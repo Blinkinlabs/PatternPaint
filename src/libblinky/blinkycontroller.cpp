@@ -30,7 +30,7 @@ QList<QPointer<ControllerInfo> > BlinkyController::probe()
 
 QList<QSerialPortInfo> BlinkyController::probeBootloaders()
 {
-    QList<QSerialPortInfo> serialPorts = QSerialPortInfo::availablePorts();
+    QList<QSerialPortInfo> serialPorts = usbUtils::getUsefulSerialPorts();
     QList<QSerialPortInfo> bootloaders;
 
     for (const QSerialPortInfo &info : serialPorts) {

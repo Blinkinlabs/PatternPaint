@@ -156,20 +156,6 @@ void EightByEightUploader::doWork()
     }
 }
 
-bool EightByEightUploader::updateFirmware(BlinkyController &controller)
-{
-    Q_UNUSED(controller);
-
-    errorString = "Firmware update not currently supported for Eight by Eight!";
-    return false;
-}
-
-bool EightByEightUploader::restoreFirmware(qint64)
-{
-    errorString = "Firmware update not currently supported for Eight by Eight!";
-    return false;
-}
-
 QString EightByEightUploader::getErrorString() const
 {
     return errorString;

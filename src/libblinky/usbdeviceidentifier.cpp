@@ -50,6 +50,10 @@ UsbDeviceIdentifier patternUploaders[] = {
 };
 
 UsbDeviceIdentifier firmwareLoaders[] = {
+    // TODO: make some intermediate loader here, that resets the Caterina-style device
+    {BLINKYTAPE_SKETCH_VID, BLINKYTAPE_SKETCH_PID, "Avr109FirmwareLoader"},
+    {LEONARDO_SKETCH_VID, LEONARDO_SKETCH_PID, "Avr109FirmwareLoader"},
+
     {BLINKYTAPE_BOOTLOADER_VID, BLINKYTAPE_BOOTLOADER_PID, "Avr109FirmwareLoader"},
     {LEONARDO_BOOTLOADER_VID, LEONARDO_BOOTLOADER_PID, "Avr109FirmwareLoader"},
     {ARDUINOMICRO_BOOTLOADER_VID, ARDUINOMICRO_BOOTLOADER_PID, "Avr109FirmwareLoader"},

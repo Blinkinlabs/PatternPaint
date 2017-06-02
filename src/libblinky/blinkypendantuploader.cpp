@@ -111,20 +111,6 @@ bool BlinkyPendantUploader::storePatterns(BlinkyController &controller,
     return true;
 }
 
-bool BlinkyPendantUploader::updateFirmware(BlinkyController &controller)
-{
-    Q_UNUSED(controller);
-
-    errorString = "Firmware update not currently supported for BlinkyPendant!";
-    return false;
-}
-
-bool BlinkyPendantUploader::restoreFirmware(qint64)
-{
-    errorString = "Firmware update not currently supported for BlinkyPendant!";
-    return false;
-}
-
 QString BlinkyPendantUploader::getErrorString() const
 {
     return errorString;

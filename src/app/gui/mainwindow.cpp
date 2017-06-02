@@ -12,8 +12,8 @@
 #include "firmwaremanager.h"
 #include "firmwarestore.h"
 
-#include "blinkytape.h"
-#include "blinkytapeuploader.h"
+#include "blinkycontroller.h"
+#include "avr109firmwareloader.h"
 #include "welcomescreen.h"
 
 #include "pencilinstrument.h"
@@ -650,10 +650,10 @@ void MainWindow::on_actionRestore_firmware_triggered()
     // If the controller doesn't exist, create a new uploader based on the blinkytape
     // TODO: Replace this with a generic 'bootloader' search
     if (controller.isNull()) {
-        QPointer<BlinkyUploader> uploader;
-        uploader = new BlinkyTapeUploader(this);
+        QPointer<FirmwareLoader> loader;
+        loader = new Avr109FirmwareLoader(this);
 
-        QProgressDialog* dialog = makeProgressDialog(uploader);
+        QProgressDialog* dialog = makeProgressDialog(loader);
 
         dialog->setWindowTitle("Firmware reset");
         dialog->setLabelText(
@@ -665,9 +665,9 @@ void MainWindow::on_actionRestore_firmware_triggered()
             "firmware will be restored.");
         dialog->show();
 
-        if (!uploader->restoreFirmware(-1)) {
+        if (!loader->restoreFirmware(-1)) {
             // TODO: this might show an error message twice if the upload fails.
-            showError(uploader->getErrorString());
+            showError(loader->getErrorString());
             dialog->close();
             return;
         }
@@ -681,9 +681,6 @@ void MainWindow::on_actionRestore_firmware_triggered()
             showError("Firmware update not supported for this controller type!");
             return;
         }
-
-//        if (loader.isNull())
-//            return;
 
         QProgressDialog* dialog = makeProgressDialog(loader);
 
@@ -716,9 +713,6 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
         showError("Upload failed: Upload to this controller type not (yet) supported.");
         return;
     }
-
-//    if (uploader.isNull())
-//        return;
 
     if (uploader->getSupportedEncodings().count() == 0) {
         showError("Upload failed: Controller does not support any encodings.");

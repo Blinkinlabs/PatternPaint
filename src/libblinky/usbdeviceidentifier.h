@@ -20,6 +20,6 @@ extern UsbDeviceIdentifier blinkyControllers[6];
 extern UsbDeviceIdentifier patternUploaders[6];
 
 // List of USB devices that we can associate with a FirmwareLoader
-extern UsbDeviceIdentifier firmwareLoaders[4];
+extern UsbDeviceIdentifier firmwareLoaders[6];
 
 #endif // USBDEVICEIDENTIFIER_H
