@@ -677,8 +677,10 @@ void MainWindow::on_actionRestore_firmware_triggered()
     else {
         QPointer<FirmwareLoader> loader;
 
-        if (!controller->getFirmwareLoader(loader))
+        if (!controller->getFirmwareLoader(loader)) {
+            showError("Firmware update not supported for this controller type!");
             return;
+        }
 
 //        if (loader.isNull())
 //            return;

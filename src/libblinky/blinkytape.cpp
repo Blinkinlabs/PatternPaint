@@ -1,10 +1,12 @@
-#include "firmwareloader.h"
+#include "blinkytape.h"
+
 #include "blinkytapeuploader.h"
 #include "eightbyeightuploader.h"
 #include "blinkypendantuploader.h"
 #include "lightbuddyuploader.h"
+
+#include "avr109firmwareloader.h"
 #include "esp8266firmwareloader.h"
-#include "blinkytape.h"
 
 #include <QDebug>
 #include <QtSerialPort>
@@ -313,13 +315,13 @@ bool BlinkyTape::getFirmwareLoader(QPointer<FirmwareLoader> &loader)
     if (!isConnected())
         return false;
 
-//    if (serialInfo.vendorIdentifier() == BLINKYTAPE_SKETCH_VID
-//        && serialInfo.productIdentifier() == BLINKYTAPE_SKETCH_PID)
-//        uploader = new BlinkyTapeUploader(parent());
-//    else if (serialInfo.vendorIdentifier() == ARDUINOMICRO_SKETCH_VID
-//             && serialInfo.productIdentifier() == ARDUINOMICRO_SKETCH_PID)
-//        uploader = new BlinkyTapeUploader(parent());
-        if (serialInfo.vendorIdentifier() == EIGHTBYEIGHT_SKETCH_VID
+    if (serialInfo.vendorIdentifier() == BLINKYTAPE_SKETCH_VID
+        && serialInfo.productIdentifier() == BLINKYTAPE_SKETCH_PID)
+        loader = new Avr109FirmwareLoader(parent());
+    else if (serialInfo.vendorIdentifier() == ARDUINOMICRO_SKETCH_VID
+             && serialInfo.productIdentifier() == ARDUINOMICRO_SKETCH_PID)
+        loader = new Avr109FirmwareLoader(parent());
+    else if (serialInfo.vendorIdentifier() == EIGHTBYEIGHT_SKETCH_VID
              && serialInfo.productIdentifier() == EIGHTBYEIGHT_SKETCH_PID)
         loader = new Esp8266FirmwareLoader(parent());
     else

@@ -41,7 +41,8 @@ HEADERS += \
     eightbyeightuploader.h \
     esp8266bootloadercommands.h \
     esp8266firmwareloader.h \
-    firmwareloader.h
+    firmwareloader.h \
+    avr109firmwareloader.h
 
 SOURCES +=  \
     fixture.cpp \
@@ -77,7 +78,8 @@ SOURCES +=  \
     eightbyeightuploader.cpp \
     esp8266bootloadercommands.cpp \
     esp8266firmwareloader.cpp \
-    firmwareloader.cpp
+    firmwareloader.cpp \
+    avr109firmwareloader.cpp
 
 # For platforms that have serial ports
 # TODO: Pull hard-coded references to BlinkyTape from the gui, allowing this section to be switchable
