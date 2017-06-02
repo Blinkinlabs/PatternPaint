@@ -7,6 +7,7 @@
 
 #include "avr109firmwareloader.h"
 #include "esp8266firmwareloader.h"
+#include "usbdeviceidentifier.h"
 
 #include <QDebug>
 #include <QtSerialPort>
@@ -27,6 +28,7 @@
 #define WRITE_BUSY_DELAY 2
 #define WRITE_CHUNK_DELAY 4
 #define CHUNK_SIZE 300
+
 
 BlinkyTape::BlinkyTape(QSerialPortInfo info, QObject *parent) :
     BlinkyController(parent),
@@ -230,11 +232,6 @@ void BlinkyTape::sendUpdate(QByteArray ledData)
         return;
     }
 
-    // If we have a blinkyPendant, fit the data to the output device
-    if (serialInfo.vendorIdentifier() == BLINKYPENDANT_SKETCH_VID
-        && serialInfo.productIdentifier() == BLINKYPENDANT_SKETCH_PID)
-        ledData = ledData.leftJustified(PENDANT_MAX_PIXELS*3, (char)0x00, true);
-
     // Trim anything that's 0xff
     for (int i = 0; i < ledData.length(); i++) {
         if (ledData[i] == (char)255)
@@ -286,28 +283,31 @@ bool BlinkyTape::getPatternUploader(QPointer<BlinkyUploader> &uploader)
     if (!isConnected())
         return false;
 
-    if (serialInfo.vendorIdentifier() == BLINKYTAPE_SKETCH_VID
-        && serialInfo.productIdentifier() == BLINKYTAPE_SKETCH_PID)
-        uploader = new BlinkyTapeUploader(parent());
-    else if (serialInfo.vendorIdentifier() == LEONARDO_SKETCH_VID
-             && serialInfo.productIdentifier() == LEONARDO_SKETCH_PID)
-        uploader = new BlinkyTapeUploader(parent());
-    else if (serialInfo.vendorIdentifier() == ARDUINOMICRO_SKETCH_VID
-             && serialInfo.productIdentifier() == ARDUINOMICRO_SKETCH_PID)
-        uploader = new BlinkyTapeUploader(parent());
-    else if (serialInfo.vendorIdentifier() == BLINKYPENDANT_SKETCH_VID
-             && serialInfo.productIdentifier() == BLINKYPENDANT_SKETCH_PID)
-        uploader = new BlinkyPendantUploader(parent());
-    else if (serialInfo.vendorIdentifier() == LIGHTBUDDY_SKETCH_VID
-             && serialInfo.productIdentifier() == LIGHTBUDDY_SKETCH_PID)
-        uploader = new LightBuddyUploader(parent());
-    else if (serialInfo.vendorIdentifier() == EIGHTBYEIGHT_SKETCH_VID
-             && serialInfo.productIdentifier() == EIGHTBYEIGHT_SKETCH_PID)
-        uploader = new EightByEightUploader(parent());
-    else
-        return false;
+    for(UsbDeviceIdentifier identifier : patternUploaders) {
+        if(identifier.matches(serialInfo)) {
+            if(identifier.name == "BlinkyTapeUploader") {
+                uploader = new BlinkyTapeUploader(parent());
+                return true;
+            }
+            else if(identifier.name == "BlinkyPendantUploader") {
+                uploader = new BlinkyPendantUploader(parent());
+                return true;
+            }
+            else if(identifier.name == "LightBuddyUploader") {
+                uploader = new LightBuddyUploader(parent());
+                return true;
+            }
+            else if(identifier.name == "EightByEightUploader") {
+                uploader = new EightByEightUploader(parent());
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
 
-   return true;
+    return false;
 }
 
 bool BlinkyTape::getFirmwareLoader(QPointer<FirmwareLoader> &loader)
@@ -315,19 +315,21 @@ bool BlinkyTape::getFirmwareLoader(QPointer<FirmwareLoader> &loader)
     if (!isConnected())
         return false;
 
-    if (serialInfo.vendorIdentifier() == BLINKYTAPE_SKETCH_VID
-        && serialInfo.productIdentifier() == BLINKYTAPE_SKETCH_PID)
-        loader = new Avr109FirmwareLoader(parent());
-    else if (serialInfo.vendorIdentifier() == ARDUINOMICRO_SKETCH_VID
-             && serialInfo.productIdentifier() == ARDUINOMICRO_SKETCH_PID)
-        loader = new Avr109FirmwareLoader(parent());
-    else if (serialInfo.vendorIdentifier() == EIGHTBYEIGHT_SKETCH_VID
-             && serialInfo.productIdentifier() == EIGHTBYEIGHT_SKETCH_PID)
-        loader = new Esp8266FirmwareLoader(parent());
-    else
-        return false;
+    for(UsbDeviceIdentifier identifier : firmwareLoaders) {
+        if(identifier.matches(serialInfo)) {
+            if(identifier.name == "Avr109FirmwareLoader") {
+                loader = new Avr109FirmwareLoader(parent());
+                return true;
+            }
+            else if(identifier.name == "Esp8266FirmwareLoader") {
+                loader = new Esp8266FirmwareLoader(parent());
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
 
-
-   return true;
-
+    return false;
 }

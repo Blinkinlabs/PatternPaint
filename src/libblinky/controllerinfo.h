@@ -11,13 +11,9 @@ class ControllerInfo : public QObject
     Q_OBJECT
 
 public:
-    ControllerInfo(QObject *parent = 0) : QObject(parent)
-    {
-    }
+    ControllerInfo(QObject *parent = 0);
 
-    virtual ~ControllerInfo()
-    {
-    }
+    virtual ~ControllerInfo();
 
     /// Get the resource name used to locate this device
     /// For example: Serial port location

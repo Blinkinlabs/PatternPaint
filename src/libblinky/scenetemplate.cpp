@@ -2,7 +2,7 @@
 
 // TODO: Put these in JSON, allow them to be saved/loaded externally
 
-const SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT] = {
+const SceneTemplate sceneTemplates[] = {
     {
         "BlinkyTape",
         ":/scenetemplates/images/scenetemplates/blinkytape.jpg",
