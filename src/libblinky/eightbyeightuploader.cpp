@@ -9,12 +9,12 @@
 EightByEightUploader::EightByEightUploader(QObject *parent) :
     BlinkyUploader(parent)
 {
-    connect(&commandQueue, SIGNAL(error(QString)),
-            this, SLOT(handleError(QString)));
-    connect(&commandQueue, SIGNAL(commandFinished(QString, QByteArray)),
-            this, SLOT(handleCommandFinished(QString, QByteArray)));
-    connect(&commandQueue, SIGNAL(lastCommandFinished()),
-            this, SLOT(handleLastCommandFinished()));
+    connect(&commandQueue, SerialCommandQueue::errorOccured,
+            this, EightByEightUploader::handleError);
+    connect(&commandQueue, SerialCommandQueue::commandFinished,
+            this, EightByEightUploader::handleCommandFinished);
+    connect(&commandQueue, SerialCommandQueue::lastCommandFinished,
+            this, EightByEightUploader::handleLastCommandFinished);
 }
 
 QList<PatternWriter::Encoding> EightByEightUploader::getSupportedEncodings() const

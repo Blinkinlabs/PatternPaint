@@ -6,14 +6,15 @@ SerialCommandQueue::SerialCommandQueue(QObject *parent) :
     serial = new QSerialPort(this);
     serial->setSettingsRestoredOnClose(false);
 
-    connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
-            this, SLOT(handleSerialError(QSerialPort::SerialPortError)));
-    connect(serial, SIGNAL(readyRead()), this, SLOT(handleReadData()));
+    connect(serial, &QSerialPort::errorOccurred,
+            this, &SerialCommandQueue::handleSerialError);
+
+    connect(serial, &QSerialPort::readyRead,
+            this, &SerialCommandQueue::handleReadData);
 
     commandTimeoutTimer.setSingleShot(true);
-
-    connect(&commandTimeoutTimer, SIGNAL(timeout()),
-            this, SLOT(handleCommandTimeout()));
+    connect(&commandTimeoutTimer, QTimer::timeout,
+            this, &SerialCommandQueue::handleCommandTimeout);
 }
 
 bool SerialCommandQueue::open(QSerialPortInfo info)
@@ -154,7 +155,7 @@ void SerialCommandQueue::handleReadData()
                 .append("Got more data than we expected")
                 .append(" expected: %1 ").arg(queue.front().expectedResponse.length())
                 .append(" received: %2").arg(responseData.length());
-        emit(error(errorString));
+        emit(errorOccured(errorString));
     }
         break ;
 
@@ -165,12 +166,12 @@ void SerialCommandQueue::handleReadData()
                 .append("Invalid mask length- command formatted incorrectly.")
                 .append("expectedResponse: %1").arg(queue.front().expectedResponse.length())
                 .append("expectedResponseMask: %1").arg(queue.front().expectedResponseMask.length());
-        emit(error(errorString));
+        emit(errorOccured(errorString));
     }
         break;
 
     case SerialCommand::RESPONSE_MISMATCH:
-        emit(error("Got unexpected data back"));
+        emit(errorOccured("Got unexpected data back"));
         break;
 
     case SerialCommand::RESPONSE_MATCH:
@@ -209,7 +210,7 @@ void SerialCommandQueue::handleSerialError(QSerialPort::SerialPortError serialEr
         return;
     }
 
-    emit(error(serial->errorString()));
+    emit(errorOccured(serial->errorString()));
 
     close();
 }
@@ -220,7 +221,7 @@ void SerialCommandQueue::handleCommandTimeout()
 
     qCritical() << errorMessage;
 
-    emit(error(errorMessage));
+    emit(errorOccured(errorMessage));
 
     // TODO: Does skipping this break behavior anywhere?
 //    close();

@@ -30,12 +30,12 @@
 Avr109FirmwareLoader::Avr109FirmwareLoader(QObject *parent) :
     FirmwareLoader(parent)
 {
-    connect(&commandQueue, SIGNAL(error(QString)),
-            this, SLOT(handleError(QString)));
-    connect(&commandQueue, SIGNAL(commandFinished(QString, QByteArray)),
-            this, SLOT(handleCommandFinished(QString, QByteArray)));
-    connect(&commandQueue, SIGNAL(lastCommandFinished()),
-            this, SLOT(handleLastCommandFinished()));
+    connect(&commandQueue, SerialCommandQueue::errorOccured,
+            this, Avr109FirmwareLoader::handleError);
+    connect(&commandQueue, SerialCommandQueue::commandFinished,
+            this, Avr109FirmwareLoader::handleCommandFinished);
+    connect(&commandQueue, SerialCommandQueue::lastCommandFinished,
+            this, Avr109FirmwareLoader::handleLastCommandFinished);
 }
 
 void Avr109FirmwareLoader::cancel()

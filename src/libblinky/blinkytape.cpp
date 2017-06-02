@@ -37,25 +37,29 @@ BlinkyTape::BlinkyTape(QSerialPortInfo info, QObject *parent) :
     serial = new QSerialPort(this);
     serial->setSettingsRestoredOnClose(false);
 
-    connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
-            this, SLOT(handleSerialError(QSerialPort::SerialPortError)));
+    connect(serial, &QSerialPort::errorOccurred,
+            this, &BlinkyTape::handleError);
 
-    connect(serial, SIGNAL(readyRead()), this, SLOT(handleSerialReadData()));
+    connect(serial, &QSerialPort::readyRead,
+            this, &BlinkyTape::handleReadData);
 
-    connect(serial, SIGNAL(baudRateChanged(qint32, QSerialPort::Directions)),
-            this, SLOT(handleBaudRateChanged(qint32, QSerialPort::Directions)));
+    connect(serial, &QSerialPort::baudRateChanged,
+            this, &BlinkyTape::handleBaudRateChanged);
 
     resetTimer.setSingleShot(true);
-    connect(&resetTimer, SIGNAL(timeout()), this, SLOT(resetTimer_timeout()));
+    connect(&resetTimer, QTimer::timeout,
+            this, &BlinkyTape::resetTimer_timeout);
 
+    // TODO: Consider spawning new timers for this instead of keeping a global one
     serialWriteTimer.setSingleShot(true);
-    connect(&serialWriteTimer, SIGNAL(timeout()), this, SLOT(sendChunk()));
+    connect(&serialWriteTimer, QTimer::timeout,
+            this, &BlinkyTape::sendChunk);
 
     // On Windows, we don't get notified if the tape was disconnected, so we have to check peroidically
 #if defined(Q_OS_WIN)
     connectionScannerTimer.setInterval(CONNECTION_SCANNER_INTERVAL);
-    connect(&connectionScannerTimer, SIGNAL(timeout()), this,
-            SLOT(connectionScannerTimer_timeout()));
+    connect(&connectionScannerTimer, QTimer::timeout,
+            this, &BlinkyTape::connectionScannerTimer_timeout);
 #endif
 }
 
@@ -64,7 +68,7 @@ QString BlinkyTape::getName() const
     return QString("BlinkyTape");
 }
 
-void BlinkyTape::handleSerialError(QSerialPort::SerialPortError error)
+void BlinkyTape::handleError(QSerialPort::SerialPortError error)
 {
     // The serial library appears to emit an extraneous SerialPortError
     // when open() is called. Just ignore it.
@@ -193,7 +197,7 @@ void BlinkyTape::close()
     emit(connectionStatusChanged(isConnected()));
 }
 
-void BlinkyTape::handleSerialReadData()
+void BlinkyTape::handleReadData()
 {
     // Discard any data we get back from the BlinkyTape
     serial->readAll();

@@ -65,9 +65,9 @@ signals:
     void connectionStatusChanged(bool status);
 
 private slots:
-    void handleSerialError(QSerialPort::SerialPortError error);
+    void handleError(QSerialPort::SerialPortError error);
 
-    void handleSerialReadData();
+    void handleReadData();
 
     void handleBaudRateChanged(qint32 baudRate, QSerialPort::Directions);
 

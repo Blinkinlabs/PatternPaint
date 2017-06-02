@@ -31,14 +31,14 @@ Qt::DropActions PatternCollectionModel::supportedDropActions() const
 
 void PatternCollectionModel::connectPattern(QPointer<Pattern> pattern)
 {
-    connect(pattern->getModel(), SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)),
-            this, SLOT(on_patternDataChanged(QModelIndex, QModelIndex, QVector<int>)));
+    connect(pattern->getModel(), PatternModel::dataChanged,
+            this, PatternCollectionModel::on_patternDataChanged);
 }
 
 void PatternCollectionModel::disconnectPattern(QPointer<Pattern> pattern)
 {
-    disconnect(pattern->getModel(), SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)),
-               this, SLOT(on_patternDataChanged(QModelIndex, QModelIndex, QVector<int>)));
+    disconnect(pattern->getModel(), PatternModel::dataChanged,
+               this, PatternCollectionModel::on_patternDataChanged);
 }
 
 void PatternCollectionModel::on_patternDataChanged(QModelIndex begin, QModelIndex, QVector<int>)

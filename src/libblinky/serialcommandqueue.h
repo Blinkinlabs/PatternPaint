@@ -33,7 +33,7 @@ public:
     int length();
 
 signals:
-    void error(QString error);
+    void errorOccured(QString error);
     void commandFinished(QString command, QByteArray returnData);
     void lastCommandFinished();
 
