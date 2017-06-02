@@ -61,9 +61,6 @@ private:
     QTimer serialWriteTimer;
     QList<QByteArray> chunks;
 
-signals:
-    void connectionStatusChanged(bool status);
-
 private slots:
     void handleError(QSerialPort::SerialPortError error);
 

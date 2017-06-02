@@ -98,13 +98,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // instruments
     ColorpickerInstrument *cpi = new ColorpickerInstrument(&instrumentConfiguration, this);
-    connect(cpi, SIGNAL(pickedColor(QColor)), SLOT(on_colorPicked(QColor)));
+    connect(cpi, ColorpickerInstrument::pickedColor, this, MainWindow::on_colorPicked);
 
-    connect(actionPen, SIGNAL(triggered(bool)), SLOT(on_instrumentSelected(bool)));
-    connect(actionLine, SIGNAL(triggered(bool)), SLOT(on_instrumentSelected(bool)));
-    connect(actionSpray, SIGNAL(triggered(bool)), SLOT(on_instrumentSelected(bool)));
-    connect(actionPipette, SIGNAL(triggered(bool)), SLOT(on_instrumentSelected(bool)));
-    connect(actionFill, SIGNAL(triggered(bool)), SLOT(on_instrumentSelected(bool)));
+    connect(actionPen, QAction::triggered, this, MainWindow::on_instrumentSelected);
+    connect(actionLine, QAction::triggered, this, MainWindow::on_instrumentSelected);
+    connect(actionSpray, QAction::triggered, this, MainWindow::on_instrumentSelected);
+    connect(actionPipette, QAction::triggered, this, MainWindow::on_instrumentSelected);
+    connect(actionFill, QAction::triggered, this, MainWindow::on_instrumentSelected);
 
     actionPen->setData(QVariant::fromValue(new PencilInstrument(&instrumentConfiguration, this)));
     actionLine->setData(QVariant::fromValue(new LineInstrument(&instrumentConfiguration, this)));
@@ -128,77 +128,65 @@ MainWindow::MainWindow(QWidget *parent) :
     frameIndexWidget.setValidator(new QIntValidator(1, std::numeric_limits<int>::max(), this));
     frameIndexWidget.setToolTip(tr("Current frame"));
     playbackToolbar->insertWidget(actionStepForward, &frameIndexWidget);
-    connect(&frameIndexWidget, SIGNAL(textEdited(QString)), this, SLOT(frameIndexWidget_valueChanged(QString)));
+    connect(&frameIndexWidget, QLineEdit::textEdited, this, MainWindow::frameIndexWidget_valueChanged);
 
     // Pattern info
     patternSpeed->setRange(PATTERN_SPEED_MINIMUM_VALUE, PATTERN_SPEED_MAXIMUM_VALUE);
 // patternSpeed->setValue(PATTERN_SPEED_MINIMUM_VALUE);
-    connect(patternSpeed, SIGNAL(valueChanged(int)), this, SLOT(patternSpeed_valueChanged(int)));
+    connect(patternSpeed, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, MainWindow::patternSpeed_valueChanged);
 
-    connect(this, SIGNAL(patternStatusChanged(bool)),
-            actionClose, SLOT(setEnabled(bool)));
-    connect(this, SIGNAL(patternStatusChanged(bool)),
-            actionFlip_Horizontal, SLOT(setEnabled(bool)));
-    connect(this, SIGNAL(patternStatusChanged(bool)),
-            actionFlip_Vertical, SLOT(setEnabled(bool)));
-    connect(this, SIGNAL(patternStatusChanged(bool)),
-            actionClear_Pattern, SLOT(setEnabled(bool)));
-    connect(this, SIGNAL(patternStatusChanged(bool)),
-            actionAddFrame, SLOT(setEnabled(bool)));
-    connect(this, SIGNAL(patternStatusChanged(bool)),
-            actionDeleteFrame, SLOT(setEnabled(bool)));
-    connect(this, SIGNAL(patternStatusChanged(bool)),
-            actionPlay, SLOT(setEnabled(bool)));
-    connect(this, SIGNAL(patternStatusChanged(bool)),
-            actionStepForward, SLOT(setEnabled(bool)));
-    connect(this, SIGNAL(patternStatusChanged(bool)),
-            actionStepBackward, SLOT(setEnabled(bool)));
-    connect(this, SIGNAL(patternStatusChanged(bool)),
-            patternSpeed, SLOT(setEnabled(bool)));
-    connect(this, SIGNAL(patternStatusChanged(bool)),
-            &frameIndexWidget, SLOT(setEnabled(bool)));
+    connect(this, MainWindow::patternStatusChanged, actionClose, QAction::setEnabled);
+    connect(this, MainWindow::patternStatusChanged, actionFlip_Horizontal, QAction::setEnabled);
+    connect(this, MainWindow::patternStatusChanged, actionFlip_Vertical, QAction::setEnabled);
+    connect(this, MainWindow::patternStatusChanged, actionClear_Pattern, QAction::setEnabled);
+    connect(this, MainWindow::patternStatusChanged, actionAddFrame, QAction::setEnabled);
+    connect(this, MainWindow::patternStatusChanged, actionDeleteFrame, QAction::setEnabled);
+    connect(this, MainWindow::patternStatusChanged, actionPlay, QAction::setEnabled);
+    connect(this, MainWindow::patternStatusChanged, actionStepForward, QAction::setEnabled);
+    connect(this, MainWindow::patternStatusChanged, actionStepBackward, QAction::setEnabled);
+    connect(this, MainWindow::patternStatusChanged, patternSpeed, QSpinBox::setEnabled);
+    connect(this, MainWindow::patternStatusChanged, &frameIndexWidget, QLineEdit::setEnabled);
 
     mode = Disconnected;
 
     // Our pattern editor wants to get some notifications
-    connect(&colorChooser, SIGNAL(sendColor(QColor)),
-            &instrumentConfiguration, SLOT(setToolColor(QColor)));
-    connect(penSizeSpin, SIGNAL(valueChanged(int)),
-            &instrumentConfiguration, SLOT(setToolSize(int)));
+    connect(&colorChooser, ColorChooser::sendColor,
+            &instrumentConfiguration, InstrumentConfiguration::setToolColor);
+    connect(penSizeSpin, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            &instrumentConfiguration, InstrumentConfiguration::setToolSize);
 
     instrumentConfiguration.setToolSize(DRAWING_SIZE_MINIMUM_VALUE);
 
-    connect(actionZoomIn, SIGNAL(triggered(bool)), frameEditor, SLOT(zoomIn()));
-    connect(actionZoomOut, SIGNAL(triggered(bool)), frameEditor, SLOT(zoomOut()));
+    connect(actionZoomIn, QAction::triggered, frameEditor, FrameEditor::zoomIn);
+    connect(actionZoomOut, QAction::triggered, frameEditor, FrameEditor::zoomOut);
 
-    connect(actionFitToHeight, SIGNAL(triggered(bool)), frameEditor, SLOT(setFitToHeight(bool)));
-    connect(actionFitToWidth, SIGNAL(triggered(bool)), frameEditor, SLOT(setFitToWidth(bool)));
-    connect(actionFitToScreen, SIGNAL(triggered(bool)), frameEditor, SLOT(setFitToScreen(bool)));
+    connect(actionFitToHeight, QAction::triggered, frameEditor, FrameEditor::setFitToHeight);
+    connect(actionFitToWidth, QAction::triggered, frameEditor, FrameEditor::setFitToWidth);
+    connect(actionFitToScreen, QAction::triggered, frameEditor, FrameEditor::setFitToScreen);
 
-    connect(frameEditor, SIGNAL(dataEdited(int, const QImage)), this, SLOT(on_frameDataEdited(int, const QImage)));
+    connect(frameEditor, FrameEditor::dataEdited, this, MainWindow::on_frameDataEdited);
 
-    connect(frameEditor, SIGNAL(fitToHeightChanged(bool)), actionFitToHeight, SLOT(setChecked(bool)));
-    connect(frameEditor, SIGNAL(fitToWidthChanged(bool)), actionFitToWidth, SLOT(setChecked(bool)));
-    connect(frameEditor, SIGNAL(fitToScreenChanged(bool)), actionFitToScreen, SLOT(setChecked(bool)));
+    connect(frameEditor, FrameEditor::fitToHeightChanged, actionFitToHeight, QAction::setChecked);
+    connect(frameEditor, FrameEditor::fitToWidthChanged, actionFitToWidth, QAction::setChecked);
+    connect(frameEditor, FrameEditor::fitToScreenChanged, actionFitToScreen, QAction::setChecked);
 
-    connect(this, SIGNAL(patternStatusChanged(bool)),
-            actionZoomIn, SLOT(setEnabled(bool)));
-    connect(this, SIGNAL(patternStatusChanged(bool)),
-            actionZoomOut, SLOT(setEnabled(bool)));
-    connect(this, SIGNAL(patternStatusChanged(bool)),
-            actionFitToHeight, SLOT(setEnabled(bool)));
-    connect(this, SIGNAL(patternStatusChanged(bool)),
-            actionFitToWidth, SLOT(setEnabled(bool)));
-    connect(this, SIGNAL(patternStatusChanged(bool)),
-            actionFitToScreen, SLOT(setEnabled(bool)));
+    connect(this, MainWindow::patternStatusChanged, actionZoomIn, QAction::setEnabled);
+    connect(this, MainWindow::patternStatusChanged, actionZoomOut, QAction::setEnabled);
+    connect(this, MainWindow::patternStatusChanged, actionFitToHeight, QAction::setEnabled);
+    connect(this, MainWindow::patternStatusChanged, actionFitToWidth, QAction::setEnabled);
+    connect(this, MainWindow::patternStatusChanged, actionFitToScreen, QAction::setEnabled);
 
     // The draw timer tells the pattern to advance
-    connect(&drawTimer, SIGNAL(timeout()), this, SLOT(drawTimer_timeout()));
+    connect(&drawTimer, QTimer::timeout, this, MainWindow::drawTimer_timeout);
+
+    // The connection scanner automatically connects to a blinky
+    connectionScannerTimer.setInterval(CONNECTION_SCANNER_INTERVAL);
+    connect(&connectionScannerTimer, QTimer::timeout,
+            this, MainWindow::connectionScannerTimer_timeout);
 
     // Start a scanner to connect to a Blinky automatically
-    connect(&connectionScannerTimer, SIGNAL(timeout()), this,
-            SLOT(connectionScannerTimer_timeout()));
-    connectionScannerTimer.setInterval(CONNECTION_SCANNER_INTERVAL);
+    // TODO: Delay this until the window is loaded?
     connectionScannerTimer.start();
 
     actionPen->setChecked(true);
@@ -230,28 +218,28 @@ MainWindow::MainWindow(QWidget *parent) :
     patternCollectionListView->setItemDelegate(new PatternCollectionDelegate(this));
     patternCollectionListView->setModel(patternCollection.getModel());
 
-    connect(patternCollectionListView->selectionModel(),
-            SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
-            this,
-            SLOT(on_patternCollectionCurrentChanged(const QModelIndex &, const QModelIndex &)));
+    connect(patternCollectionListView->selectionModel(), QItemSelectionModel::currentChanged,
+            this, MainWindow::on_patternCollectionCurrentChanged);
 
     timeline->setItemDelegate(new PatternDelegate(this));
 
-    connect(actionOutput_Preview,SIGNAL(triggered(bool)),outputPreviewFrame,SLOT(setVisible(bool)));
+    connect(actionOutput_Preview, QAction::triggered, outputPreviewFrame, QFrame::setVisible);
+
     this->actionOutput_Preview->setChecked(settings.value("MainWindow/outputPreview", true).toBool());
     outputPreviewFrame->setVisible(settings.value("MainWindow/outputPreview", true).toBool());
 
+    // Add the toolbars to the view menu, so they can be enabled/disabled
     QList<QToolBar *> toolbars = this->findChildren<QToolBar *>();
     for (QToolBar *toolbar : toolbars) {
         QAction *action = new QAction(this);
         action->setText(toolbar->windowTitle());
         action->setCheckable(true);
-        connect(action,SIGNAL(triggered(bool)),toolbar,SLOT(setVisible(bool)));
-        connect(toolbar,SIGNAL(visibilityChanged(bool)),action,SLOT(setChecked(bool)));
+        connect(action, QAction::triggered, toolbar, QToolBar::setVisible);
+        connect(toolbar, QToolBar::visibilityChanged, action, QAction::setChecked);
         this->menuToolbars->addAction(action);
     }
 
-    connect(this, SIGNAL(windowLoaded()), this, SLOT(on_windowLoaded()),
+    connect(this, MainWindow::windowLoaded, this, MainWindow::on_windowLoaded,
             Qt::ConnectionType(Qt::QueuedConnection));
 
     // Refresh the display for no pattern selected
@@ -299,8 +287,8 @@ void MainWindow::populateExamplesMenu(QString directory, QMenu *menu)
             QMenu *submenu = new QMenu(this);
             submenu->setTitle(fileInfo.fileName());
             menu->addMenu(submenu);
-            connect(submenu, SIGNAL(triggered(QAction *)),
-                    this, SLOT(on_ExampleSelected(QAction *)), Qt::UniqueConnection);
+            connect(submenu, QMenu::triggered,
+                    this, MainWindow::on_ExampleSelected);
 
             populateExamplesMenu(directory + "/" + fileInfo.fileName(), submenu);
         }
@@ -380,8 +368,8 @@ void MainWindow::connectionScannerTimer_timeout()
         controller = controllerInfos.front()->createController();
 
         // Modify our UI when the tape connection status changes
-        connect(controller, SIGNAL(connectionStatusChanged(bool)),
-                this, SLOT(on_blinkyConnectionStatusChanged(bool)));
+        connect(controller, BlinkyController::connectionStatusChanged,
+                this, MainWindow::on_blinkyConnectionStatusChanged);
 
         controller->open();
 
@@ -751,20 +739,11 @@ QProgressDialog* MainWindow::makeProgressDialog(BlinkyUploader *uploader) {
     dialog->setMaximum(100);
     dialog->setWindowModality(Qt::WindowModal);
 
-    connect(uploader, SIGNAL(finished(bool)),
-            this, SLOT(on_uploaderFinished(bool)));
-
-    connect(dialog, SIGNAL(canceled()),
-            uploader, SLOT(cancel()));
-
-    connect(uploader, SIGNAL(progressChanged(int)),
-            dialog, SLOT(setValue(int)));
-
-    connect(uploader, SIGNAL(setText(QString)),
-            dialog, SLOT(setLabelText(QString)));
-
-    connect(uploader, SIGNAL(finished(bool)),
-            dialog, SLOT(accept()));
+    connect(uploader, BlinkyUploader::finished, this, MainWindow::on_uploaderFinished);
+    connect(uploader, BlinkyUploader::progressChanged, dialog,  QProgressDialog::setValue);
+    connect(uploader, BlinkyUploader::setText, dialog,  QProgressDialog::setLabelText);
+    connect(uploader, BlinkyUploader::finished, dialog,  QProgressDialog::accept);
+    connect(dialog, QProgressDialog::canceled, uploader, BlinkyUploader::cancel);
 
     return dialog;
 }
@@ -777,20 +756,11 @@ QProgressDialog* MainWindow::makeProgressDialog(FirmwareLoader *uploader) {
     dialog->setMaximum(100);
     dialog->setWindowModality(Qt::WindowModal);
 
-    connect(uploader, SIGNAL(finished(bool)),
-            this, SLOT(on_uploaderFinished(bool)));
-
-    connect(dialog, SIGNAL(canceled()),
-            uploader, SLOT(cancel()));
-
-    connect(uploader, SIGNAL(progressChanged(int)),
-            dialog, SLOT(setValue(int)));
-
-    connect(uploader, SIGNAL(setText(QString)),
-            dialog, SLOT(setLabelText(QString)));
-
-    connect(uploader, SIGNAL(finished(bool)),
-            dialog, SLOT(accept()));
+    connect(uploader, FirmwareLoader::finished, this, MainWindow::on_uploaderFinished);
+    connect(uploader, FirmwareLoader::progressChanged, dialog,  QProgressDialog::setValue);
+    connect(uploader, FirmwareLoader::setText, dialog,  QProgressDialog::setLabelText);
+    connect(uploader, FirmwareLoader::finished, dialog,  QProgressDialog::accept);
+    connect(dialog, QProgressDialog::canceled, uploader, FirmwareLoader::cancel);
 
     return dialog;
 }
@@ -1102,16 +1072,12 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
 
 
     timelineSelectedChangedConnection =
-    connect(timeline->selectionModel(),
-            SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
-            this, SLOT(on_timelineSelectedChanged(const QModelIndex &, const QModelIndex &)));
+    connect(timeline->selectionModel(), QItemSelectionModel::currentChanged,
+            this, MainWindow::on_timelineSelectedChanged);
 
     patternDataChangedConnection =
-    connect(timeline->model(),
-            SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &, const QVector<int> &)),
-            this,
-            SLOT(on_PatternDataChanged(const QModelIndex &, const QModelIndex &,
-                                       const QVector<int> &)));
+    connect(timeline->model(), QAbstractItemModel::dataChanged,
+            this, MainWindow::on_PatternDataChanged);
 
     emit(patternStatusChanged(true));
 }
@@ -1324,8 +1290,7 @@ void MainWindow::on_actionWelcome_triggered()
 {
     WelcomeScreen *welcomeScreen = new WelcomeScreen(this);
 
-    connect(welcomeScreen, SIGNAL(sceneSelected(SceneTemplate)),
-            this, SLOT(applyScene(SceneTemplate)));
+    connect(welcomeScreen, WelcomeScreen::sceneSelected, this, MainWindow::applyScene);
 
     welcomeScreen->show();
 }

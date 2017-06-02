@@ -43,8 +43,8 @@ ColorChooser::ColorChooser(QWidget *parent) :
 
     colorDialog.setOptions(QColorDialog::NoButtons);
 
-    connect(&colorDialog, SIGNAL(currentColorChanged(const QColor &)),
-            this, SLOT(on_currentColorChanged(const QColor &)));
+    connect(&colorDialog, QColorDialog::currentColorChanged,
+            this, ColorChooser::on_currentColorChanged);
 }
 
 void ColorChooser::paintEvent(QPaintEvent *)
