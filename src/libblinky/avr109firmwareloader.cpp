@@ -1,4 +1,4 @@
-#include "Avr109FirmwareLoader.h"
+#include "avr109firmwareloader.h"
 
 #include "avr109commands.h"
 #include "blinkycontroller.h"
