@@ -14,7 +14,7 @@
 #define ESP_BLOCK_SIZE 1024
 
 Esp8266FirmwareLoader::Esp8266FirmwareLoader(QObject *parent) :
-    BlinkyUploader(parent)
+    FirmwareLoader(parent)
 {
     connect(&commandQueue, SIGNAL(error(QString)),
             this, SLOT(handleError(QString)));
@@ -22,15 +22,6 @@ Esp8266FirmwareLoader::Esp8266FirmwareLoader(QObject *parent) :
             this, SLOT(handleCommandFinished(QString, QByteArray)));
     connect(&commandQueue, SIGNAL(lastCommandFinished()),
             this, SLOT(handleLastCommandFinished()));
-}
-
-bool Esp8266FirmwareLoader::storePatterns(BlinkyController &controller, QList<PatternWriter> &patternWriters)
-{
-    Q_UNUSED(controller);
-    Q_UNUSED(patternWriters);
-
-    errorString = "Store patterns not supported for Esp8266!";
-    return false;
 }
 
 bool Esp8266FirmwareLoader::updateFirmware(BlinkyController &controller)
@@ -71,12 +62,6 @@ bool Esp8266FirmwareLoader::restoreFirmware(qint64 timeout)
 QString Esp8266FirmwareLoader::getErrorString() const
 {
     return errorString;
-}
-
-QList<PatternWriter::Encoding> Esp8266FirmwareLoader::getSupportedEncodings() const
-{
-    QList<PatternWriter::Encoding> encodings;
-    return encodings;
 }
 
 void Esp8266FirmwareLoader::cancel()

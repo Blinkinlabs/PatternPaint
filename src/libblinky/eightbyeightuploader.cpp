@@ -160,16 +160,13 @@ bool EightByEightUploader::updateFirmware(BlinkyController &controller)
 {
     Q_UNUSED(controller);
 
-
-    // TODO: Support firmware upload for the lightbuddy
-    errorString = "Firmware update not currently supported for Lightbuddy!";
+    errorString = "Firmware update not currently supported for Eight by Eight!";
     return false;
 }
 
 bool EightByEightUploader::restoreFirmware(qint64)
 {
-    // TODO: Support firmware upload for the lightbuddy
-    errorString = "Firmware update not currently supported for Lightbuddy!";
+    errorString = "Firmware update not currently supported for Eight by Eight!";
     return false;
 }
 

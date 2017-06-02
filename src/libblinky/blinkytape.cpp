@@ -1,3 +1,4 @@
+#include "firmwareloader.h"
 #include "blinkytapeuploader.h"
 #include "eightbyeightuploader.h"
 #include "blinkypendantuploader.h"
@@ -278,7 +279,7 @@ void BlinkyTape::reset()
     resetTimer_timeout();
 }
 
-bool BlinkyTape::getUploader(QPointer<BlinkyUploader> &uploader)
+bool BlinkyTape::getPatternUploader(QPointer<BlinkyUploader> &uploader)
 {
     if (!isConnected())
         return false;
@@ -300,8 +301,27 @@ bool BlinkyTape::getUploader(QPointer<BlinkyUploader> &uploader)
         uploader = new LightBuddyUploader(parent());
     else if (serialInfo.vendorIdentifier() == EIGHTBYEIGHT_SKETCH_VID
              && serialInfo.productIdentifier() == EIGHTBYEIGHT_SKETCH_PID)
-//        uploader = new EightByEightUploader(parent());
-        uploader = new Esp8266FirmwareLoader(parent());
+        uploader = new EightByEightUploader(parent());
+    else
+        return false;
+
+   return true;
+}
+
+bool BlinkyTape::getFirmwareLoader(QPointer<FirmwareLoader> &loader)
+{
+    if (!isConnected())
+        return false;
+
+//    if (serialInfo.vendorIdentifier() == BLINKYTAPE_SKETCH_VID
+//        && serialInfo.productIdentifier() == BLINKYTAPE_SKETCH_PID)
+//        uploader = new BlinkyTapeUploader(parent());
+//    else if (serialInfo.vendorIdentifier() == ARDUINOMICRO_SKETCH_VID
+//             && serialInfo.productIdentifier() == ARDUINOMICRO_SKETCH_PID)
+//        uploader = new BlinkyTapeUploader(parent());
+        if (serialInfo.vendorIdentifier() == EIGHTBYEIGHT_SKETCH_VID
+             && serialInfo.productIdentifier() == EIGHTBYEIGHT_SKETCH_PID)
+        loader = new Esp8266FirmwareLoader(parent());
     else
         return false;
 

@@ -1,24 +1,21 @@
 #ifndef ESP8266FIRMWARELOADER_H
 #define ESP8266FIRMWARELOADER_H
 
-#include "blinkyuploader.h"
+#include "firmwareloader.h"
 #include "serialcommandqueue.h"
 
 #include <QObject>
 
-class Esp8266FirmwareLoader : public BlinkyUploader
+class Esp8266FirmwareLoader : public FirmwareLoader
 {
     Q_OBJECT
 
 public:
     Esp8266FirmwareLoader(QObject *parent = 0);
 
-    bool storePatterns(BlinkyController &controller, QList<PatternWriter> &patternWriters);
     bool updateFirmware(BlinkyController &controller);
     bool restoreFirmware(qint64 timeout);
     QString getErrorString() const;
-
-    QList<PatternWriter::Encoding> getSupportedEncodings() const;
 
 public slots:
     void cancel();

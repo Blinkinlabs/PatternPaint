@@ -575,7 +575,6 @@ void MainWindow::on_actionSystem_Information_triggered()
 void MainWindow::on_uploaderFinished(bool result)
 {
     mode = Disconnected;
-    uploader.clear();
 
     qDebug() << "Uploader finished! Result:" << result;
     if (!result)
@@ -649,10 +648,12 @@ void MainWindow::on_actionFirmware_Manager_triggered()
 void MainWindow::on_actionRestore_firmware_triggered()
 {
     // If the controller doesn't exist, create a new uploader based on the blinkytape
+    // TODO: Replace this with a generic 'bootloader' search
     if (controller.isNull()) {
-        uploader = QPointer<BlinkyUploader>(new BlinkyTapeUploader(this));
+        QPointer<BlinkyUploader> uploader;
+        uploader = new BlinkyTapeUploader(this);
 
-        QProgressDialog* dialog = makeProgressDialog();
+        QProgressDialog* dialog = makeProgressDialog(uploader);
 
         dialog->setWindowTitle("Firmware reset");
         dialog->setLabelText(
@@ -671,23 +672,26 @@ void MainWindow::on_actionRestore_firmware_triggered()
             return;
         }
     }
-    // Otherwise just grab it
+
+    // Otherwise, create it from the controller
     else {
-        if (!controller->getUploader(uploader))
+        QPointer<FirmwareLoader> loader;
+
+        if (!controller->getFirmwareLoader(loader))
             return;
 
-        if (uploader.isNull())
-            return;
+//        if (loader.isNull())
+//            return;
 
-        QProgressDialog* dialog = makeProgressDialog();
+        QProgressDialog* dialog = makeProgressDialog(loader);
 
         dialog->setWindowTitle("Firmware reset");
         dialog->setLabelText("Loading new firmware onto Blinky");
         dialog->show();
 
-        if (!uploader->updateFirmware(*controller)) {
+        if (!loader->updateFirmware(*controller)) {
             // TODO: this might show an error message twice if the upload fails.
-            showError(uploader->getErrorString());
+            showError(loader->getErrorString());
             dialog->close();
             return;
         }
@@ -704,13 +708,15 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
     if (controller.isNull())
         return;
 
-    if (!controller->getUploader(uploader)) {
+    QPointer<BlinkyUploader> uploader;
+
+    if (!controller->getPatternUploader(uploader)) {
         showError("Upload failed: Upload to this controller type not (yet) supported.");
         return;
     }
 
-    if (uploader.isNull())
-        return;
+//    if (uploader.isNull())
+//        return;
 
     if (uploader->getSupportedEncodings().count() == 0) {
         showError("Upload failed: Controller does not support any encodings.");
@@ -726,7 +732,7 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
         patternWriters.append(patternWriter);
     }
 
-    QProgressDialog* dialog = makeProgressDialog();
+    QProgressDialog* dialog = makeProgressDialog(uploader);
 
     dialog->setWindowTitle(tr("Blinky exporter"));
     dialog->setLabelText(tr("Saving to Blinky..."));
@@ -740,6 +746,59 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
     }
     mode = Uploading;
 }
+
+QProgressDialog* MainWindow::makeProgressDialog(BlinkyUploader *uploader) {
+    QProgressDialog *dialog = new QProgressDialog(this);
+
+    // Pre-set the upload progress dialog
+    dialog->setMinimum(0);
+    dialog->setMaximum(100);
+    dialog->setWindowModality(Qt::WindowModal);
+
+    connect(uploader, SIGNAL(finished(bool)),
+            this, SLOT(on_uploaderFinished(bool)));
+
+    connect(dialog, SIGNAL(canceled()),
+            uploader, SLOT(cancel()));
+
+    connect(uploader, SIGNAL(progressChanged(int)),
+            dialog, SLOT(setValue(int)));
+
+    connect(uploader, SIGNAL(setText(QString)),
+            dialog, SLOT(setLabelText(QString)));
+
+    connect(uploader, SIGNAL(finished(bool)),
+            dialog, SLOT(accept()));
+
+    return dialog;
+}
+
+QProgressDialog* MainWindow::makeProgressDialog(FirmwareLoader *uploader) {
+    QProgressDialog *dialog = new QProgressDialog(this);
+
+    // Pre-set the upload progress dialog
+    dialog->setMinimum(0);
+    dialog->setMaximum(100);
+    dialog->setWindowModality(Qt::WindowModal);
+
+    connect(uploader, SIGNAL(finished(bool)),
+            this, SLOT(on_uploaderFinished(bool)));
+
+    connect(dialog, SIGNAL(canceled()),
+            uploader, SLOT(cancel()));
+
+    connect(uploader, SIGNAL(progressChanged(int)),
+            dialog, SLOT(setValue(int)));
+
+    connect(uploader, SIGNAL(setText(QString)),
+            dialog, SLOT(setLabelText(QString)));
+
+    connect(uploader, SIGNAL(finished(bool)),
+            dialog, SLOT(accept()));
+
+    return dialog;
+}
+
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -922,32 +981,6 @@ void MainWindow::applyScene(const SceneTemplate &scene)
     settings.setValue("Fixture/DisplaySize", scene.size);
     settings.setValue("Fixture/ColorOrder", scene.colorMode);
     settings.setValue("BlinkyTape/firmwareName", scene.firmwareName);
-}
-
-QProgressDialog* MainWindow::makeProgressDialog() {
-    QProgressDialog *dialog = new QProgressDialog(this);
-
-    // Pre-set the upload progress dialog
-    dialog->setMinimum(0);
-    dialog->setMaximum(100);
-    dialog->setWindowModality(Qt::WindowModal);
-
-    connect(uploader, SIGNAL(finished(bool)),
-            this, SLOT(on_uploaderFinished(bool)));
-
-    connect(dialog, SIGNAL(canceled()),
-            uploader, SLOT(cancel()));
-
-    connect(uploader, SIGNAL(progressChanged(int)),
-            dialog, SLOT(setValue(int)));
-
-    connect(uploader, SIGNAL(setText(QString)),
-            dialog, SLOT(setLabelText(QString)));
-
-    connect(uploader, SIGNAL(finished(bool)),
-            dialog, SLOT(accept()));
-
-    return dialog;
 }
 
 bool MainWindow::loadPattern(Pattern::PatternType type, const QString fileName)

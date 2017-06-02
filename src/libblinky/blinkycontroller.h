@@ -37,7 +37,9 @@
 #define EIGHTBYEIGHT_BOOTLOADER_VID    0x1d50
 #define EIGHTBYEIGHT_BOOTLOADER_PID    0x60f5
 
-class BlinkyUploader;
+#include "firmwareloader.h"
+#include "blinkyuploader.h"
+
 class QSerialPortInfo;
 
 /// Connect to an LED controller, and manage sending data to it.
@@ -60,7 +62,9 @@ public:
 
     virtual bool getPortInfo(QSerialPortInfo &info) = 0;
 
-    virtual bool getUploader(QPointer<BlinkyUploader> &uploader) = 0;
+    virtual bool getPatternUploader(QPointer<BlinkyUploader> &uploader) = 0;
+
+    virtual bool getFirmwareLoader(QPointer<FirmwareLoader> &loader) = 0;
 
     // Reset the controller
     virtual void reset() = 0;

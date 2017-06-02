@@ -1,7 +1,5 @@
-#ifndef BLINKYUPLOADER_H
-#define BLINKYUPLOADER_H
-
-#include "patternwriter.h"
+#ifndef FIRMWARELOADER_H
+#define FIRMWARELOADER_H
 
 #include <QObject>
 #include <QList>
@@ -15,22 +13,15 @@ class BlinkyController;
 ///
 /// While the upload process is underway, it will send periodic progress updates
 /// via the progressUpdate() signal.
-class BlinkyUploader : public QObject
+class FirmwareLoader : public QObject
 {
     Q_OBJECT
 
 public:
-    BlinkyUploader(QObject *parent = 0) :
+    FirmwareLoader(QObject *parent = 0) :
         QObject(parent)
     {
     }
-
-    /// Start an upload, using the passed blinkytape as a launching point
-    /// Note that the blinkytape will be disconnected during the upload process,
-    /// and will need to be reconnected manually afterwards.
-    /// @param tape BlinkyTape to upload to (must already be connected)
-    /// @param patternWriters Patterns to upload to the BlinkyTape
-    virtual bool storePatterns(BlinkyController &controller, QList<PatternWriter> &patternWriters) = 0;
 
     /// Update/restore the firmware on the specificed device
     /// @param tape BlinkyTape to upload to (must already be connected)
@@ -43,8 +34,6 @@ public:
 
     /// Get a string describing the last error, if any.
     virtual QString getErrorString() const = 0;
-
-    virtual QList<PatternWriter::Encoding> getSupportedEncodings() const = 0;
 
 signals:
     /// Sends an update about the upload progress, from 0 to 100
@@ -61,4 +50,4 @@ public slots:
     virtual void cancel() = 0;
 };
 
-#endif // BLINKYUPLOADER_H
+#endif // FIRMWARELOADER_H

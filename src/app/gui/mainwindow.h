@@ -154,7 +154,6 @@ private:
     QTimer connectionScannerTimer;
 
     QPointer<BlinkyController> controller;
-    QPointer<BlinkyUploader> uploader;
     QPointer<Fixture> fixture;
 
     PatternCollection patternCollection;
@@ -190,7 +189,8 @@ private:
     bool savePattern(Pattern *item);
     bool savePatternAs(Pattern *item);
 
-    QProgressDialog* makeProgressDialog();
+    QProgressDialog* makeProgressDialog(BlinkyUploader *uploader);
+    QProgressDialog* makeProgressDialog(FirmwareLoader *uploader);
 
     bool loadPattern(Pattern::PatternType type, const QString fileName);
 
