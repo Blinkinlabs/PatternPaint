@@ -198,13 +198,13 @@ void SerialCommandQueue::handleReadData()
     }
 }
 
-void SerialCommandQueue::handleSerialError(QSerialPort::SerialPortError serialError)
+void SerialCommandQueue::handleSerialError(QSerialPort::SerialPortError error)
 {
     // If we aren't supposed to be connected, discard resource errors
-    if (!serial->isOpen() && serialError == QSerialPort::ResourceError)
+    if (!serial->isOpen() && error == QSerialPort::ResourceError)
         return;
 
-    if (serialError == QSerialPort::NoError) {
+    if (error == QSerialPort::NoError) {
         // The serial library appears to emit an extraneous SerialPortError
         // when open() is called. Just ignore it.
         return;

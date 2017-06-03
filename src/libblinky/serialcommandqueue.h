@@ -42,7 +42,7 @@ public slots:
     void handleReadData();
 
     // Handle an error from the serial port
-    void handleSerialError(QSerialPort::SerialPortError serialError);
+    void handleSerialError(QSerialPort::SerialPortError error);
 
     // Self-enforced communications timeout
     void handleCommandTimeout();
