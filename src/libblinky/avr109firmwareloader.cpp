@@ -144,7 +144,7 @@ bool Avr109FirmwareLoader::updateFirmware(BlinkyController &blinkyController, QL
     blinkyController.reset();
 
     // TODO: Add a new state to check that the reset actually happened, before continuing.
-    QTimer::singleShot(BLINKY_RESET_DELAY, this, SLOT(reallyStartUpload()));
+    QTimer::singleShot(BLINKY_RESET_DELAY, this, &Avr109FirmwareLoader::reallyStartUpload);
     return true;
 }
 
@@ -167,7 +167,7 @@ void Avr109FirmwareLoader::reallyStartUpload() {
     flashWriteRetriesRemaining = FLASH_WRITE_MAX_RETRIES;
 
     state = State_ProbeBootloaders;
-    QTimer::singleShot(0, this, SLOT(doWork()));
+    QTimer::singleShot(0, this, &Avr109FirmwareLoader::doWork);
 }
 
 
@@ -300,13 +300,13 @@ void Avr109FirmwareLoader::doWork()
         // If we're still waiting for a bootloader, set a timer to look again
         // after a small interval
         if(!bootloaderAvailable()) {
-            QTimer::singleShot(BOOTLOADER_POLL_INTERVAL, this, SLOT(doWork()));
+            QTimer::singleShot(BOOTLOADER_POLL_INTERVAL, this, &Avr109FirmwareLoader::doWork);
             return;
         }
 
         // Otherwise we found a bootloader.
         // Don't connect immediately, the device might need a short time to settle down
-        QTimer::singleShot(BOOTLOADER_SETTLING_DELAY, this, SLOT(doWork()));
+        QTimer::singleShot(BOOTLOADER_SETTLING_DELAY, this, &Avr109FirmwareLoader::doWork);
         state = State_InitializeBootloader;
 
         break;

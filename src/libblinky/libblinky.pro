@@ -79,7 +79,6 @@ SOURCES +=  \
     eightbyeightuploader.cpp \
     esp8266bootloadercommands.cpp \
     esp8266firmwareloader.cpp \
-    firmwareloader.cpp \
     avr109firmwareloader.cpp \
     usbdeviceidentifier.cpp
 

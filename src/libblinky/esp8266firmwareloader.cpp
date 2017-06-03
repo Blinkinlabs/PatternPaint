@@ -81,7 +81,7 @@ void Esp8266FirmwareLoader::doWork()
         serialPort.open(QIODevice::ReadWrite);
 
         state = State_assertRTS;
-        QTimer::singleShot(1, this, SLOT(doWork()));
+        QTimer::singleShot(1, this, &Esp8266FirmwareLoader::doWork);
 
         break;
     }
@@ -92,7 +92,7 @@ void Esp8266FirmwareLoader::doWork()
 
         state = State_assertDTR;
 
-        QTimer::singleShot(1, this, SLOT(doWork()));
+        QTimer::singleShot(1, this, &Esp8266FirmwareLoader::doWork);
 
         break;
     }
@@ -102,7 +102,7 @@ void Esp8266FirmwareLoader::doWork()
         serialPort.setDataTerminalReady(true);
 
         state = State_releaseBootPins;
-        QTimer::singleShot(100, this, SLOT(doWork()));
+        QTimer::singleShot(100, this, &Esp8266FirmwareLoader::doWork);
 
         break;
     }
@@ -112,7 +112,7 @@ void Esp8266FirmwareLoader::doWork()
         serialPort.setDataTerminalReady(false);
 
         state = State_connectCommandQueue;;
-        QTimer::singleShot(300, this, SLOT(doWork()));
+        QTimer::singleShot(300, this, &Esp8266FirmwareLoader::doWork);
 
         break;
     }
@@ -123,7 +123,7 @@ void Esp8266FirmwareLoader::doWork()
 
         syncTriesRemaining = BOOTLOADER_SYNC_RETRIES;
         state = State_startBootloaderSync;
-        QTimer::singleShot(BOOTLOADER_SYNC_FIRST_INTERVAL, this, SLOT(doWork()));
+        QTimer::singleShot(BOOTLOADER_SYNC_FIRST_INTERVAL, this, &Esp8266FirmwareLoader::doWork);
 
         break;
     }
@@ -180,14 +180,14 @@ void Esp8266FirmwareLoader::handleError(QString error)
         if(syncTriesRemaining > 0) {
             syncTriesRemaining--;
             state = State_startBootloaderSync;
-            QTimer::singleShot(BOOTLOADER_SYNC_INTERVAL, this, SLOT(doWork()));
+            QTimer::singleShot(BOOTLOADER_SYNC_INTERVAL, this, &Esp8266FirmwareLoader::doWork);
             return;
         }
         else if(resetLoopsRemaining > 0) {
             resetLoopsRemaining--;
 
             state = State_startReset;
-            QTimer::singleShot(0, this, SLOT(doWork()));
+            QTimer::singleShot(0, this, &Esp8266FirmwareLoader::doWork);
             return;
         }
     }
