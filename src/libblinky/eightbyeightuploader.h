@@ -30,6 +30,8 @@ private slots:
 
     void handleLastCommandFinished();
 
+    void formatStillRunning();
+
 private:
     /// Update any listeners with the latest progress
     void setProgress(int newProgress);

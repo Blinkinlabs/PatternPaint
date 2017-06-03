@@ -157,7 +157,7 @@ void Esp8266FirmwareLoader::doWork()
     case State_doFlashDownload:
     {
         state = State_Done;
-        QMetaObject::invokeMethod(this, "doWork", Qt::QueuedConnection);
+        QTimer::singleShot(0, this, &Esp8266FirmwareLoader::doWork);
 
         break;
     }

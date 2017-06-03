@@ -177,7 +177,6 @@ void SerialCommandQueue::handleReadData()
     case SerialCommand::RESPONSE_MATCH:
 
         // qDebug() << "Command completed successfully: " << commandQueue.front().name;
-
         QMetaObject::invokeMethod(this, "commandFinished", Qt::QueuedConnection,
                                   Q_ARG(QString, queue.front().name), Q_ARG(QByteArray, responseData));
 

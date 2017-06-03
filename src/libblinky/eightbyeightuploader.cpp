@@ -6,6 +6,9 @@
 #include "bytearrayhelpers.h"
 
 
+// TODO: Duplicated in eightbyeightcommands.cpp
+#define CHUNK_SIZE_BYTES 64 // TODO: Small so we don't overflow the usb/serial converter?
+
 EightByEightUploader::EightByEightUploader(QObject *parent) :
     BlinkyUploader(parent)
 {
@@ -72,7 +75,7 @@ bool EightByEightUploader::storePatterns(BlinkyController &controller,
 
         // Calculate the number of serial transactions that will occur in this upload
         // TODO
-        maxProgress += data.count()/64;
+        maxProgress += 4 + 2*data.count()/CHUNK_SIZE_BYTES;
     }
 
     setProgress(0);
@@ -103,8 +106,6 @@ void EightByEightUploader::doWork()
     // f. close the file
     // 4. Unlock file access of the EightByEight, to allow it to reload the patterns and start playback
 
-    qDebug() << "In doWork state=" << state;
-
     // Continue the current state
     switch (state) {
     // TODO: Test that the patterns will fit before starting!
@@ -124,6 +125,11 @@ void EightByEightUploader::doWork()
     {
         // TODO: new command to just delete the patterns...
         commandQueue.enqueue(EightByEightCommands::formatFilesystem());
+
+        // Since this is a long-running command, also set a timer to update the status periodically
+        // so it doesn't appear to have frozen
+        formatStillRunning();
+
         break;
     }
     case State_WriteFile:
@@ -180,8 +186,6 @@ void EightByEightUploader::handleCommandFinished(QString command, QByteArray ret
 
 void EightByEightUploader::handleLastCommandFinished()
 {
-    qDebug() << "All commands finished! Transitioning to next state";
-
     // TODO: Moveme to doWork() ?
     switch (state) {
     case State_checkFirmwareVersion:
@@ -231,6 +235,19 @@ void EightByEightUploader::handleLastCommandFinished()
         qCritical() << "Got a last command finished signal when not expected";
         break;
     }
+}
+
+void EightByEightUploader::formatStillRunning()
+{
+    if(state != State_erasePatterns) {
+        return;
+    }
+
+    // TODO: Put this in serialCommandQueue, to enable it for all long-running tasks?
+    maxProgress++;
+    setProgress(progress + 1);
+
+    QTimer::singleShot(70, this, &EightByEightUploader::formatStillRunning);
 }
 
 void EightByEightUploader::setProgress(int newProgress)
