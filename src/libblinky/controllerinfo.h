@@ -20,7 +20,7 @@ public:
     virtual QString resourceName() const = 0;
 
     /// Attempt to create a controller based on this resource locater
-    virtual BlinkyController *createController() const = 0;
+    virtual BlinkyController *createController(QObject *parent) const = 0;
 };
 
 #endif // CONTROLLERINFO_H

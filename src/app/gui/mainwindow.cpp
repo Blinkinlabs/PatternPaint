@@ -365,7 +365,7 @@ void MainWindow::connectionScannerTimer_timeout()
         // TODO: Try another one if this one fails?
         qDebug() << "Attempting to connect to controller at:" << controllerInfos.front()->resourceName();
 
-        controller = controllerInfos.front()->createController();
+        controller = controllerInfos.front()->createController(this);
 
         // Modify our UI when the tape connection status changes
         connect(controller, &BlinkyController::connectionStatusChanged,

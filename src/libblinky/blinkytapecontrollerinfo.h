@@ -15,7 +15,7 @@ public:
 
     QString resourceName() const;
 
-    BlinkyController *createController() const;
+    BlinkyController *createController(QObject *parent = 0) const;
 
 private:
     QSerialPortInfo info;

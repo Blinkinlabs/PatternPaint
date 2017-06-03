@@ -14,9 +14,9 @@ QString BlinkyTapeControllerInfo::resourceName() const
     return info.portName();
 }
 
-BlinkyController *BlinkyTapeControllerInfo::createController() const
+BlinkyController *BlinkyTapeControllerInfo::createController(QObject *parent) const
 {
-    BlinkyController *controller = new BlinkyTape(info, NULL);
+    BlinkyController *controller = new BlinkyTape(info, parent);
 
     return controller;
 }

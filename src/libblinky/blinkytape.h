@@ -14,6 +14,7 @@
 class BlinkyTape : public BlinkyController
 {
     Q_OBJECT
+
 public:
     BlinkyTape(QSerialPortInfo info, QObject *parent);
 
