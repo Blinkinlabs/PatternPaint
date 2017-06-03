@@ -16,12 +16,12 @@
 Esp8266FirmwareLoader::Esp8266FirmwareLoader(QObject *parent) :
     FirmwareLoader(parent)
 {
-    connect(&commandQueue, SerialCommandQueue::errorOccured,
-            this, Esp8266FirmwareLoader::handleError);
-    connect(&commandQueue, SerialCommandQueue::commandFinished,
-            this, Esp8266FirmwareLoader::handleCommandFinished);
-    connect(&commandQueue, SerialCommandQueue::lastCommandFinished,
-            this, Esp8266FirmwareLoader::handleLastCommandFinished);
+    connect(&commandQueue, &SerialCommandQueue::errorOccured,
+            this, &Esp8266FirmwareLoader::handleError);
+    connect(&commandQueue, &SerialCommandQueue::commandFinished,
+            this, &Esp8266FirmwareLoader::handleCommandFinished);
+    connect(&commandQueue, &SerialCommandQueue::lastCommandFinished,
+            this, &Esp8266FirmwareLoader::handleLastCommandFinished);
 }
 
 bool Esp8266FirmwareLoader::updateFirmware(BlinkyController &controller)

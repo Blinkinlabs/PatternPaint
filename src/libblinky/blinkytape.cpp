@@ -47,12 +47,12 @@ BlinkyTape::BlinkyTape(QSerialPortInfo info, QObject *parent) :
             this, &BlinkyTape::handleBaudRateChanged);
 
     resetTimer.setSingleShot(true);
-    connect(&resetTimer, QTimer::timeout,
+    connect(&resetTimer, &QTimer::timeout,
             this, &BlinkyTape::resetTimer_timeout);
 
     // TODO: Consider spawning new timers for this instead of keeping a global one
     serialWriteTimer.setSingleShot(true);
-    connect(&serialWriteTimer, QTimer::timeout,
+    connect(&serialWriteTimer, &QTimer::timeout,
             this, &BlinkyTape::sendChunk);
 
     // On Windows, we don't get notified if the tape was disconnected, so we have to check peroidically

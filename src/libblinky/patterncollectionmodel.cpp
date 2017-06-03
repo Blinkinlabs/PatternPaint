@@ -31,23 +31,28 @@ Qt::DropActions PatternCollectionModel::supportedDropActions() const
 
 void PatternCollectionModel::connectPattern(QPointer<Pattern> pattern)
 {
-    connect(pattern->getModel(), PatternModel::dataChanged,
-            this, PatternCollectionModel::on_patternDataChanged);
+    connect(pattern->getModel(), &PatternModel::dataChanged,
+            this, &PatternCollectionModel::on_patternDataChanged);
 }
 
 void PatternCollectionModel::disconnectPattern(QPointer<Pattern> pattern)
 {
-    disconnect(pattern->getModel(), PatternModel::dataChanged,
-               this, PatternCollectionModel::on_patternDataChanged);
+    disconnect(pattern->getModel(), &PatternModel::dataChanged,
+               this, &PatternCollectionModel::on_patternDataChanged);
 }
 
-void PatternCollectionModel::on_patternDataChanged(QModelIndex begin, QModelIndex, QVector<int>)
+void PatternCollectionModel::on_patternDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
+    Q_UNUSED(bottomRight);
+    Q_UNUSED(roles);
+
+    // TODO: filter any events here?
+
     // If the first row was modified, emit a data changed notification so the views will know to redraw.
-    if (begin.row() == 0) {
-        QVector<int> roles;
-        roles.append(Qt::DisplayRole);
-        emit(dataChanged(index(0), index(patterns.count()-1), roles));
+    if (topLeft.row() == 0) {
+        QVector<int> emitRoles;
+        emitRoles.append(Qt::DisplayRole);
+        emit(dataChanged(index(0), index(patterns.count()-1), emitRoles));
     }
 }
 

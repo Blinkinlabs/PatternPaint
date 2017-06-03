@@ -44,7 +44,7 @@ public slots:
     virtual void close() = 0;
 
 signals:
-    virtual void connectionStatusChanged(bool status);
+    void connectionStatusChanged(bool status);
 };
 
 #endif // BLINKYCONTROLLER_H

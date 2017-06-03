@@ -39,13 +39,13 @@ public:
 
 signals:
     /// Sends an update about the upload progress, from 0 to 100
-    virtual void progressChanged(int progress);
+    void progressChanged(int progress);
 
     /// Send an update for the text
-    virtual void setText(QString textLabel);
+    void setText(QString textLabel);
 
     /// Sends a signal at end of upload to report the result.
-    virtual void finished(bool result);
+    void finished(bool result);
 
 public slots:
     /// Request that the upload process be stopped

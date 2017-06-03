@@ -17,10 +17,10 @@
 BlinkyPendantUploader::BlinkyPendantUploader(QObject *parent) :
     BlinkyUploader(parent)
 {
-    connect(&commandQueue, SerialCommandQueue::errorOccured,
-            this, BlinkyPendantUploader::handleError);
-    connect(&commandQueue, SerialCommandQueue::commandFinished,
-            this, BlinkyPendantUploader::handleCommandFinished);
+    connect(&commandQueue, &SerialCommandQueue::errorOccured,
+            this, &BlinkyPendantUploader::handleError);
+    connect(&commandQueue, &SerialCommandQueue::commandFinished,
+            this, &BlinkyPendantUploader::handleCommandFinished);
 }
 
 bool BlinkyPendantUploader::storePatterns(BlinkyController &controller,

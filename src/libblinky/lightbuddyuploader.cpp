@@ -11,10 +11,10 @@
 LightBuddyUploader::LightBuddyUploader(QObject *parent) :
     BlinkyUploader(parent)
 {
-    connect(&commandQueue, SerialCommandQueue::errorOccured,
-            this, LightBuddyUploader::handleError);
-    connect(&commandQueue, SerialCommandQueue::commandFinished,
-            this, LightBuddyUploader::handleCommandFinished);
+    connect(&commandQueue, &SerialCommandQueue::errorOccured,
+            this, &LightBuddyUploader::handleError);
+    connect(&commandQueue, &SerialCommandQueue::commandFinished,
+            this, &LightBuddyUploader::handleCommandFinished);
 }
 
 QList<PatternWriter::Encoding> LightBuddyUploader::getSupportedEncodings() const

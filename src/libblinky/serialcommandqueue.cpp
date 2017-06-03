@@ -13,7 +13,7 @@ SerialCommandQueue::SerialCommandQueue(QObject *parent) :
             this, &SerialCommandQueue::handleReadData);
 
     commandTimeoutTimer.setSingleShot(true);
-    connect(&commandTimeoutTimer, QTimer::timeout,
+    connect(&commandTimeoutTimer, &QTimer::timeout,
             this, &SerialCommandQueue::handleCommandTimeout);
 }
 
