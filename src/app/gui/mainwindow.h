@@ -161,10 +161,12 @@ private:
     QLineEdit frameIndexWidget;
     InstrumentConfiguration instrumentConfiguration;
 
-    enum Modes {
-        Disconnected, Connected, Uploading
+    enum State {
+        State_Disconnected,
+        State_Connected,
+        State_Uploading
     };
-    Modes mode;
+    State state;
 
     QUndoGroup undoGroup;
 

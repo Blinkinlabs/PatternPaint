@@ -148,7 +148,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, &MainWindow::patternStatusChanged, patternSpeed, &QSpinBox::setEnabled);
     connect(this, &MainWindow::patternStatusChanged, &frameIndexWidget, &QLineEdit::setEnabled);
 
-    mode = Disconnected;
+    state = State_Disconnected;
 
     // Our pattern editor wants to get some notifications
     connect(&colorChooser, &ColorChooser::sendColor,
@@ -355,7 +355,7 @@ void MainWindow::drawTimer_timeout()
 void MainWindow::connectionScannerTimer_timeout()
 {
     // If we are already connected, disregard.
-    if ((!controller.isNull()) || mode == Uploading)
+    if ((!controller.isNull()) || state == State_Uploading)
         return;
 
     // Look for controllers
@@ -517,7 +517,7 @@ void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
     qDebug() << "status changed, connected=" << connected;
 
     if (connected) {
-        mode = Connected;
+        state = State_Connected;
         startPlayback();
 
 #if defined(Q_OS_MACX)
@@ -527,7 +527,7 @@ void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
 
 #endif
     } else {
-        mode = Disconnected;
+        state = State_Disconnected;
         stopPlayback();
 
         // TODO: Does this delete the serial object reliably?
@@ -544,7 +544,7 @@ void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
 #endif
     }
 
-    actionSave_to_Blinky->setEnabled(mode == Connected && !patternCollection.isEmpty());
+    actionSave_to_Blinky->setEnabled(state == State_Connected && !patternCollection.isEmpty());
 }
 
 void MainWindow::on_actionAbout_triggered()
@@ -562,7 +562,7 @@ void MainWindow::on_actionSystem_Information_triggered()
 
 void MainWindow::on_uploaderFinished(bool result)
 {
-    mode = Disconnected;
+    state = State_Disconnected;
 
     qDebug() << "Uploader finished! Result:" << result;
     if (!result)
@@ -683,7 +683,7 @@ void MainWindow::on_actionRestore_firmware_triggered()
             return;
         }
     }
-    mode = Uploading;
+    state = State_Uploading;
 }
 
 void MainWindow::on_actionSave_to_Blinky_triggered()
@@ -728,7 +728,7 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
         showError(uploader->getErrorString());
         return;
     }
-    mode = Uploading;
+    state = State_Uploading;
 }
 
 QProgressDialog* MainWindow::makeProgressDialog(BlinkyUploader *uploader) {
@@ -1062,7 +1062,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
 
     patternSpeed->setValue(newpattern->getFrameSpeed());
 
-    actionSave_to_Blinky->setEnabled(mode == Connected);
+    actionSave_to_Blinky->setEnabled(state == State_Connected);
 
     if (timelineSelectedChangedConnection)
         QObject::disconnect(timelineSelectedChangedConnection);
