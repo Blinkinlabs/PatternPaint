@@ -19,9 +19,7 @@ HEADERS += \
     patterncollection.h \
     patterncollectionmodel.h \
     blinkycontroller.h \
-    controllerinfo.h \
     blinkyuploader.h \
-    blinkytapecontrollerinfo.h \
     avr109commands.h \
     serialcommand.h \
     lightbuddycommands.h \
@@ -43,7 +41,8 @@ HEADERS += \
     esp8266firmwareloader.h \
     firmwareloader.h \
     avr109firmwareloader.h \
-    usbdeviceidentifier.h
+    usbdeviceidentifier.h \
+    blinkycontrollerinfo.h
 
 SOURCES +=  \
     fixture.cpp \
@@ -58,8 +57,6 @@ SOURCES +=  \
     patterncollection.cpp \
     patterncollectionmodel.cpp \
     blinkycontroller.cpp \
-    controllerinfo.cpp \
-    blinkytapecontrollerinfo.cpp \
     avr109commands.cpp \
     serialcommand.cpp \
     lightbuddycommands.cpp \
@@ -80,7 +77,8 @@ SOURCES +=  \
     esp8266bootloadercommands.cpp \
     esp8266firmwareloader.cpp \
     avr109firmwareloader.cpp \
-    usbdeviceidentifier.cpp
+    usbdeviceidentifier.cpp \
+    blinkycontrollerinfo.cpp
 
 # For platforms that have serial ports
 # TODO: Pull hard-coded references to BlinkyTape from the gui, allowing this section to be switchable

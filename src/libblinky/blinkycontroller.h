@@ -1,23 +1,24 @@
 #ifndef BLINKYCONTROLLER_H
 #define BLINKYCONTROLLER_H
 
-#include "controllerinfo.h"
-
 #include <cstdint>
 #include <QObject>
 #include <QList>
+#include <QSerialPortInfo>
+#include <QPointer>
 
 #include "firmwareloader.h"
 #include "blinkyuploader.h"
 
-class QSerialPortInfo;
+class BlinkyControllerInfo;
 
 /// Connect to an LED controller, and manage sending data to it.
 class BlinkyController : public QObject
 {
     Q_OBJECT
 public:
-    static QList<QPointer<ControllerInfo> > probe();
+    static BlinkyController *create(const BlinkyControllerInfo &info, QObject *parent);
+
     static QList<QSerialPortInfo> probeBootloaders();
 
     BlinkyController(QObject *parent);

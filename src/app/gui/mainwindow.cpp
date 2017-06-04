@@ -13,6 +13,7 @@
 #include "firmwarestore.h"
 
 #include "blinkycontroller.h"
+#include "blinkycontrollerinfo.h"
 #include "avr109firmwareloader.h"
 #include "welcomescreen.h"
 
@@ -359,22 +360,21 @@ void MainWindow::connectionScannerTimer_timeout()
         return;
 
     // Look for controllers
-    QList<QPointer<ControllerInfo> > controllerInfos = BlinkyController::probe();
+    QList<BlinkyControllerInfo> controllerInfos = BlinkyControllerInfo::availableControllers();
 
-    if (controllerInfos.count() > 0) {
-        // TODO: Try another one if this one fails?
-        qDebug() << "Attempting to connect to controller at:" << controllerInfos.front()->resourceName();
-
-        controller = controllerInfos.front()->createController(this);
-
-        // Modify our UI when the tape connection status changes
-        connect(controller, &BlinkyController::connectionStatusChanged,
-                this, &MainWindow::on_blinkyConnectionStatusChanged);
-
-        controller->open();
-
+    if (controllerInfos.empty())
         return;
-    }
+
+    // TODO: Try another one if this one fails?
+    qDebug() << "Attempting to connect to controller at:" << controllerInfos.front().resourceName();
+
+    controller = BlinkyController::create(controllerInfos.front(), this);
+
+    // Modify our UI when the tape connection status changes
+    connect(controller, &BlinkyController::connectionStatusChanged,
+            this, &MainWindow::on_blinkyConnectionStatusChanged);
+
+    controller->open();
 }
 
 void MainWindow::patternSpeed_valueChanged(int value)

@@ -1,5 +1,6 @@
 #include "blinkytape.h"
 
+#include "blinkycontrollerinfo.h"
 #include "blinkytapeuploader.h"
 #include "eightbyeightuploader.h"
 #include "blinkypendantuploader.h"
@@ -141,21 +142,17 @@ void BlinkyTape::connectionScannerTimer_timeout()
         return;
     }
 
-    // Check if our serial port is on the list
-    QSerialPortInfo currentInfo = QSerialPortInfo(*serial);
-
-    QList<QPointer<ControllerInfo> > tapes = probe();
-    for (ControllerInfo *info : tapes) {
+    // Check if our serial port is still available.
+    for (BlinkyControllerInfo &info : BlinkyControllerInfo::availableControllers()) {
         // If we get a match, reset the timer and return.
-        // We consider it a match if the port is the same on both
-        if (info->resourceName() == currentInfo.portName())
+        // We consider it a match if the port is the same
+        if (info.resourceName() == serial->portName())
             return;
     }
 
     // We seem to have lost our port, bail
     close();
 }
-
 #endif
 
 bool BlinkyTape::open()

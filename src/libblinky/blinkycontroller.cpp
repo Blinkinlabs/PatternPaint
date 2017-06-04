@@ -1,31 +1,16 @@
 #include "blinkycontroller.h"
-#include "controllerinfo.h"
-#include "blinkytapecontrollerinfo.h"
+#include "blinkycontrollerinfo.h"
 #include "usbutils.h"
 #include "usbdeviceidentifier.h"
 
 #include <QList>
-#include <QSerialPortInfo>
-#include <QPointer>
 #include <QDebug>
 
-BlinkyController::BlinkyController(QObject *parent) : QObject(parent)
+#include "blinkytape.h"
+
+BlinkyController *BlinkyController::create(const BlinkyControllerInfo &info, QObject *parent)
 {
-}
-
-QList<QPointer<ControllerInfo> > BlinkyController::probe()
-{
-    QList<QSerialPortInfo> serialPorts = usbUtils::getUsefulSerialPorts();
-    QList<QPointer<ControllerInfo> > controllerInfos;
-
-    for (const QSerialPortInfo &info : serialPorts) {
-        for(UsbDeviceIdentifier identifier : blinkyControllers) {
-            if(identifier.matches(info))
-                controllerInfos.push_back(new BlinkyTapeControllerInfo(info));
-        }
-    }
-
-    return controllerInfos;
+    return new BlinkyTape(info.getInfo(), parent);
 }
 
 QList<QSerialPortInfo> BlinkyController::probeBootloaders()
@@ -41,4 +26,8 @@ QList<QSerialPortInfo> BlinkyController::probeBootloaders()
     }
 
     return bootloaders;
+}
+
+BlinkyController::BlinkyController(QObject *parent) : QObject(parent)
+{
 }

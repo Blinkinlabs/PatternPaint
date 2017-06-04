@@ -3,7 +3,7 @@
 
 #include "blinkytape.h"
 #include "usbutils.h"
-#include "blinkycontroller.h"
+#include "blinkycontrollerinfo.h"
 
 #include <QSysInfo>
 #include <QLibraryInfo>
@@ -43,8 +43,9 @@ void SystemInformation::on_refresh_clicked()
     report.append("Operating system: " + QSysInfo::prettyProductName() + "\n");
 
     report.append("Detected Blinkies: \n");
-    for (const QPointer<ControllerInfo> &info : BlinkyTape::probe())
-        report.append("  BlinkyTape:" + info->resourceName() + "\n");
+    for (const BlinkyControllerInfo &info : BlinkyControllerInfo::availableControllers())
+        report.append("  BlinkyTape:" + info.resourceName() + "\n");
+
     for (const QSerialPortInfo &info : BlinkyTape::probeBootloaders())
         report.append("  BlinkyTape:" + info.portName() + " (bootloader)\n");
 
