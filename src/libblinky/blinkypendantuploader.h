@@ -1,12 +1,14 @@
 #ifndef BLINKYPENDANTPATTERNUPLOADER_H
 #define BLINKYPENDANTPATTERNUPLOADER_H
 
+#include "libblinkyglobal.h"
+
 #include <QObject>
 
 #include "blinkyuploader.h"
 #include "serialcommandqueue.h"
 
-class BlinkyPendantUploader : public BlinkyUploader
+class LIBBLINKY_EXPORT BlinkyPendantUploader : public BlinkyUploader
 {
     Q_OBJECT
 

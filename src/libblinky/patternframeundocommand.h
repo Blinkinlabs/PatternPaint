@@ -26,6 +26,8 @@
 #ifndef UNDOCOMMAND_H
 #define UNDOCOMMAND_H
 
+#include "libblinkyglobal.h"
+
 #include "patternframemodel.h"
 
 #include <QUndoCommand>
@@ -38,7 +40,7 @@
  * @brief Class which provides undo/redo actions
  *
  */
-class PatternFrameUndoCommand : public QUndoCommand
+class LIBBLINKY_EXPORT PatternFrameUndoCommand : public QUndoCommand
 {
 public:
     PatternFrameUndoCommand(PatternFrameModel *item, QUndoCommand *parent = 0);

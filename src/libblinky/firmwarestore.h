@@ -1,6 +1,8 @@
 #ifndef FIRMWARESTORE_H
 #define FIRMWARESTORE_H
 
+#include "libblinkyglobal.h"
+
 #include <QString>
 
 #include "memorysection.h"
@@ -12,7 +14,7 @@
 #define BLINKYTAPE_FACTORY_FIRMWARE_NAME "factory"
 #define BLINKYTAPE_DEFAULT_FIRMWARE_NAME "default"
 
-class FirmwareStore
+class LIBBLINKY_EXPORT FirmwareStore
 {
 public:
     static QStringList listFirmwareSearchPaths();

@@ -1,6 +1,8 @@
 #ifndef AVR109FIRMWARELOADER_H
 #define AVR109FIRMWARELOADER_H
 
+#include "libblinkyglobal.h"
+
 #include "firmwareloader.h"
 #include "serialcommandqueue.h"
 #include "memorysection.h"
@@ -9,7 +11,7 @@
 #include <QTimer>
 #include <iostream>
 
-class Avr109FirmwareLoader : public FirmwareLoader
+class LIBBLINKY_EXPORT Avr109FirmwareLoader : public FirmwareLoader
 {
     Q_OBJECT
 

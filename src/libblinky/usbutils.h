@@ -1,6 +1,8 @@
 #ifndef USBUTILS
 #define USBUTILS
 
+#include "libblinkyglobal.h"
+
 #include <QList>
 #include <QSerialPortInfo>
 
@@ -8,9 +10,9 @@
 
 namespace usbUtils {
 
-QList<QSerialPortInfo> getUsefulSerialPorts();
+LIBBLINKY_EXPORT QList<QSerialPortInfo> getUsefulSerialPorts();
 
-int getVersionForDevice(quint16 idVendor, quint16 idProduct);
+LIBBLINKY_EXPORT int getVersionForDevice(quint16 idVendor, quint16 idProduct);
 
 }
 

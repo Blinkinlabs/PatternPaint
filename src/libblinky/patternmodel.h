@@ -1,6 +1,8 @@
 #ifndef PATTERNMODEL
 #define PATTERNMODEL
 
+#include "libblinkyglobal.h"
+
 #include <QAbstractListModel>
 #include <QObject>
 #include <QUndoStack>
@@ -9,7 +11,7 @@
 #define PATTERN_FRAME_SPEED_DEFAULT_VALUE 10.0
 
 /// Interface for accessing a pattern model.
-class PatternModel : public QAbstractListModel
+class LIBBLINKY_EXPORT PatternModel : public QAbstractListModel
 {
     Q_OBJECT
 

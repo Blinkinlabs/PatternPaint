@@ -1,6 +1,8 @@
 #ifndef BLINKYTAPEUPLOADER_H
 #define BLINKYTAPEUPLOADER_H
 
+#include "libblinkyglobal.h"
+
 #include "patternwriter.h"
 #include "blinkyuploader.h"
 #include "memorysection.h"
@@ -12,7 +14,7 @@
 
 // BlinkyTape pattern uploader. Assembles a firmware image that contains a player sketch, pattern table,
 // and pattern data, then uploads it using the Avr109 protocol.
-class BlinkyTapeUploader : public BlinkyUploader
+class LIBBLINKY_EXPORT BlinkyTapeUploader : public BlinkyUploader
 {
     Q_OBJECT
 

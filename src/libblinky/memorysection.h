@@ -1,13 +1,15 @@
 #ifndef MEMORYSECTION_H
 #define MEMORYSECTION_H
 
+#include "libblinkyglobal.h"
+
 #include <QMetaType>
 #include <QString>
 #include <QByteArray>
 #include <QList>
 
 // Single contiguous secton of memory, eg flash
-struct MemorySection {
+struct LIBBLINKY_EXPORT MemorySection {
     MemorySection();
 
     /// Create a new flash section

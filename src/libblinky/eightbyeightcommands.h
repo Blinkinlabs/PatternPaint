@@ -1,6 +1,8 @@
 #ifndef EIGHTBYEIGHTCOMMANDS_H
 #define EIGHTBYEIGHTCOMMANDS_H
 
+#include "libblinkyglobal.h"
+
 #include "serialcommand.h"
 
 #include <QByteArray>
@@ -23,41 +25,41 @@ enum Command {
     Command_GetFirmwareVersion = 0x30,
 };
 
-QByteArray commandHeader();
+LIBBLINKY_EXPORT QByteArray commandHeader();
 
 /// Format the SPIFFS partition
 // TODO: Replace this with a command that just erases the animations?
-SerialCommand formatFilesystem();
+LIBBLINKY_EXPORT SerialCommand formatFilesystem();
 
 // Open a file
 // Note: fileName less than ? characters
-SerialCommand openFile(const QString fileName, FileMode mode);
+LIBBLINKY_EXPORT SerialCommand openFile(const QString fileName, FileMode mode);
 
 // Write a block of data to the openend file (open in write mode first)
 // Note: data length less than 256 bytes
-SerialCommand writeChunk(const QByteArray &data);
+LIBBLINKY_EXPORT SerialCommand writeChunk(const QByteArray &data);
 
 // Write data to the opened file (can be arbitrary length)
-QList<SerialCommand> write(const QByteArray &data);
+LIBBLINKY_EXPORT QList<SerialCommand> write(const QByteArray &data);
 
 // Verify a block of data from the openend file (open in read mode first)
 // Note: data length less than 256 bytes
-SerialCommand verifyChunk(const QByteArray &data);
+LIBBLINKY_EXPORT SerialCommand verifyChunk(const QByteArray &data);
 
 // Verify a block of data from the openend file (open in read mode first)
-QList<SerialCommand> verify(const QByteArray &data);
+LIBBLINKY_EXPORT QList<SerialCommand> verify(const QByteArray &data);
 
 // Close the open file
-SerialCommand closeFile();
+LIBBLINKY_EXPORT SerialCommand closeFile();
 
 // Lock file access - tell the EightByEight to stop accessing the filesystem
-SerialCommand lockFileAccess();
+LIBBLINKY_EXPORT SerialCommand lockFileAccess();
 
 // Unlock file access - tell the EightByEight to resume accessing the filesystem
-SerialCommand unlockFileAccess();
+LIBBLINKY_EXPORT SerialCommand unlockFileAccess();
 
 // Get firmware version
-SerialCommand getFirmwareVersion();
+LIBBLINKY_EXPORT SerialCommand getFirmwareVersion();
 
 }
 

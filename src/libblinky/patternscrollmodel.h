@@ -1,6 +1,8 @@
 #ifndef PATTERNSCROLLMODEL_H
 #define PATTERNSCROLLMODEL_H
 
+#include "libblinkyglobal.h"
+
 #include <QAbstractListModel>
 #include <QFileInfo>
 #include <QImage>
@@ -10,7 +12,7 @@
 class PatternScrollUndoCommand;
 
 /// Model for a pattern made from a single QImage that the fixture scrolls across
-class PatternScrollModel : public PatternModel
+class LIBBLINKY_EXPORT PatternScrollModel : public PatternModel
 {
     Q_OBJECT
 public:
@@ -53,8 +55,8 @@ private:
 
     void applyUndoState(State newState);
 
-    friend QDataStream &operator<<(QDataStream &, const PatternScrollModel &);
-    friend QDataStream &operator>>(QDataStream &, PatternScrollModel &);
+    friend LIBBLINKY_EXPORT QDataStream &operator<<(QDataStream &, const PatternScrollModel &);
+    friend LIBBLINKY_EXPORT QDataStream &operator>>(QDataStream &, PatternScrollModel &);
 };
 
 #endif // PATTERNSCROLLMODEL_H

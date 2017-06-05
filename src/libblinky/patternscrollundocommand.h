@@ -1,6 +1,8 @@
 #ifndef PATTERNSCROLLUNDOCOMMAND_H
 #define PATTERNSCROLLUNDOCOMMAND_H
 
+#include "libblinkyglobal.h"
+
 #include "patternscrollmodel.h"
 
 #include <QUndoCommand>
@@ -13,7 +15,7 @@
  * @brief Class which provides undo/redo actions
  *
  */
-class PatternScrollUndoCommand : public QUndoCommand
+class LIBBLINKY_EXPORT PatternScrollUndoCommand : public QUndoCommand
 {
 public:
     PatternScrollUndoCommand(PatternScrollModel *item, QUndoCommand *parent = 0);

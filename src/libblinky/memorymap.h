@@ -1,11 +1,13 @@
 #ifndef MEMORYMAP_H
 #define MEMORYMAP_H
 
+#include "libblinkyglobal.h"
+
 #include "memorysection.h"
 
 // Collection of multiple blocks of memory, with checking to
 // ensure they are all in bounds and do not overlap
-class MemoryMap {
+class LIBBLINKY_EXPORT MemoryMap {
 public:
     MemoryMap(unsigned int start, unsigned int size);
 

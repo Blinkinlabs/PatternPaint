@@ -1,6 +1,8 @@
 #ifndef FIRMWARELOADER_H
 #define FIRMWARELOADER_H
 
+#include "libblinkyglobal.h"
+
 #include <QObject>
 #include <QList>
 
@@ -13,7 +15,7 @@ class BlinkyController;
 ///
 /// While the upload process is underway, it will send periodic progress updates
 /// via the progressUpdate() signal.
-class FirmwareLoader : public QObject
+class LIBBLINKY_EXPORT FirmwareLoader : public QObject
 {
     Q_OBJECT
 

@@ -1,11 +1,13 @@
 #ifndef MATRIXFIXTURE_H
 #define MATRIXFIXTURE_H
 
+#include "libblinkyglobal.h"
+
 #include <QObject>
 
 #include "fixture.h"
 
-class MatrixFixture : public Fixture
+class LIBBLINKY_EXPORT MatrixFixture : public Fixture
 {
     Q_OBJECT
 

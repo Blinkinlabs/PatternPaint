@@ -1,11 +1,13 @@
 #ifndef LINEARFIXTURE_H
 #define LINEARFIXTURE_H
 
+#include "libblinkyglobal.h"
+
 #include <QObject>
 
 #include "fixture.h"
 
-class LinearFixture : public Fixture
+class LIBBLINKY_EXPORT LinearFixture : public Fixture
 {
     Q_OBJECT
 

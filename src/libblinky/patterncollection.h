@@ -1,9 +1,11 @@
 #ifndef PATTERNCOLLECTION_H
 #define PATTERNCOLLECTION_H
 
+#include "libblinkyglobal.h"
+
 #include "patterncollectionmodel.h"
 
-class PatternCollection
+class LIBBLINKY_EXPORT PatternCollection
 {
 public:
     PatternCollection();

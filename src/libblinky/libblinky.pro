@@ -5,6 +5,8 @@ TEMPLATE = lib
 
 include(../libusb.pri)
 
+DEFINES += BUILD_LIBBLINKY_LIB
+
 HEADERS += \
     fixture.h \
     matrixfixture.h \
@@ -42,7 +44,8 @@ HEADERS += \
     firmwareloader.h \
     avr109firmwareloader.h \
     usbdeviceidentifier.h \
-    blinkycontrollerinfo.h
+    blinkycontrollerinfo.h \
+    libblinkyglobal.h
 
 SOURCES +=  \
     fixture.cpp \

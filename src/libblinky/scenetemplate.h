@@ -1,13 +1,15 @@
 #ifndef SCENETEMPLATE_H
 #define SCENETEMPLATE_H
 
+#include "libblinkyglobal.h"
+
 #include "colormode.h"
 
 #include <QString>
 #include <QSize>
 
 // TODO: Something more flexible
-struct SceneTemplate {
+struct LIBBLINKY_EXPORT SceneTemplate {
     QString name;
     QString photo;
     QString examples;
@@ -19,6 +21,6 @@ struct SceneTemplate {
 };
 
 #define SCENE_TEMPLATE_COUNT 6
-extern const SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT];
+LIBBLINKY_EXPORT extern const SceneTemplate sceneTemplates[SCENE_TEMPLATE_COUNT];
 
 #endif // SCENETEMPLATE_H

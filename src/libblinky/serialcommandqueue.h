@@ -1,6 +1,8 @@
 #ifndef SERIALCOMMANDQUEUE_H
 #define SERIALCOMMANDQUEUE_H
 
+#include "libblinkyglobal.h"
+
 #include "serialcommand.h"
 
 #include <QObject>
@@ -13,7 +15,7 @@
 // to have a response with a known length and value. A
 // command timeout handles devices that have become
 // unresponsive.
-class SerialCommandQueue : public QObject
+class LIBBLINKY_EXPORT SerialCommandQueue : public QObject
 {
     Q_OBJECT
 public:

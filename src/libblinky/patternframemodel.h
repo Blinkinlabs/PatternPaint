@@ -1,6 +1,8 @@
 #ifndef PATTERNFRAMEMODEL_H
 #define PATTERNFRAMEMODEL_H
 
+#include "libblinkyglobal.h"
+
 #include <QAbstractListModel>
 #include <QFileInfo>
 #include <QImage>
@@ -10,7 +12,7 @@
 class PatternFrameUndoCommand;
 
 /// Model for a pattern made from a list of QImage frames
-class PatternFrameModel : public PatternModel
+class LIBBLINKY_EXPORT PatternFrameModel : public PatternModel
 {
     Q_OBJECT
 public:
@@ -53,8 +55,8 @@ private:
 
     void applyUndoState(State newState);
 
-    friend QDataStream &operator<<(QDataStream &, const PatternFrameModel &);
-    friend QDataStream &operator>>(QDataStream &, PatternFrameModel &);
+    friend LIBBLINKY_EXPORT QDataStream &operator<<(QDataStream &, const PatternFrameModel &);
+    friend LIBBLINKY_EXPORT QDataStream &operator>>(QDataStream &, PatternFrameModel &);
 };
 
 

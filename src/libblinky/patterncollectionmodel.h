@@ -1,13 +1,15 @@
 #ifndef PATTERNCOLLECTIONMODEL_H
 #define PATTERNCOLLECTIONMODEL_H
 
+#include "libblinkyglobal.h"
+
 #include "pattern.h"
 
 #include <QAbstractListModel>
 #include <QObject>
 #include <QUndoGroup>
 
-class PatternCollectionModel : public QAbstractListModel
+class LIBBLINKY_EXPORT PatternCollectionModel : public QAbstractListModel
 {
     Q_OBJECT
 public:

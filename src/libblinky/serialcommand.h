@@ -1,12 +1,15 @@
 #ifndef SERIALCOMMAND_H
 #define SERIALCOMMAND_H
+
+#include "libblinkyglobal.h"
+
 #include <QMetaType>
 #include <QString>
 #include <QByteArray>
 
 #define DEFAULT_COMMAND_TIMEOUT 5000 // Default command timeout, in ms
 
-class SerialCommand
+class LIBBLINKY_EXPORT SerialCommand
 {
 public:
     enum CompareResult {

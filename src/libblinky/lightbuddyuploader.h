@@ -1,12 +1,14 @@
 #ifndef LIGHTBUDDYUPLOADER_H
 #define LIGHTBUDDYUPLOADER_H
 
+#include "libblinkyglobal.h"
+
 #include "blinkyuploader.h"
 #include "serialcommandqueue.h"
 
 #include <QObject>
 
-class LightBuddyUploader : public BlinkyUploader
+class LIBBLINKY_EXPORT LightBuddyUploader : public BlinkyUploader
 {
     Q_OBJECT
 

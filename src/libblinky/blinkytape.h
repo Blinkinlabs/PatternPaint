@@ -1,6 +1,8 @@
 #ifndef BLINKYTAPE_H
 #define BLINKYTAPE_H
 
+#include "libblinkyglobal.h"
+
 #include <QObject>
 #include <QList>
 #include <QTimer>
@@ -11,7 +13,7 @@
 #include "blinkycontroller.h"
 
 /// Connect to a BlinkyTape over a serial port, and manage sending data to it.
-class BlinkyTape : public BlinkyController
+class LIBBLINKY_EXPORT BlinkyTape : public BlinkyController
 {
     Q_OBJECT
 

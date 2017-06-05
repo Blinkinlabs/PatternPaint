@@ -1,12 +1,14 @@
 #ifndef EIGHTBYEIGHTUPLOADER_H
 #define EIGHTBYEIGHTUPLOADER_H
 
+#include "libblinkyglobal.h"
+
 #include "blinkyuploader.h"
 #include "serialcommandqueue.h"
 
 #include <QObject>
 
-class EightByEightUploader : public BlinkyUploader
+class LIBBLINKY_EXPORT EightByEightUploader : public BlinkyUploader
 {
     Q_OBJECT
 

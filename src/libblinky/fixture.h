@@ -1,6 +1,8 @@
 #ifndef FIXTURE_H
 #define FIXTURE_H
 
+#include "libblinkyglobal.h"
+
 #include <QObject>
 #include <QImage>
 #include <QList>
@@ -11,7 +13,7 @@
 #include "colormode.h"
 #include "brightnessmodel.h"
 
-class Fixture : public QObject
+class LIBBLINKY_EXPORT Fixture : public QObject
 {
     Q_OBJECT
 

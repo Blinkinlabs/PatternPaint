@@ -1,10 +1,12 @@
 #ifndef USBDEVICEIDENTIFIER_H
 #define USBDEVICEIDENTIFIER_H
 
+#include "libblinkyglobal.h"
+
 #include <QSerialPortInfo>
 #include <cstdint>
 
-class UsbDeviceIdentifier {
+class LIBBLINKY_EXPORT UsbDeviceIdentifier {
 public:
     uint16_t vid;
     uint16_t pid;

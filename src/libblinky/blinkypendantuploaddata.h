@@ -1,13 +1,15 @@
 #ifndef BLINKYPENDANTUPLOADDATA_H
 #define BLINKYPENDANTUPLOADDATA_H
 
+#include "libblinkyglobal.h"
+
 #include <QByteArray>
 #include <QDebug>
 #include "patternwriter.h"
 #include "memorysection.h"
 
 /// Utility class for assembling flash sections for the BlinkyPendant
-class BlinkyPendantUploadData
+class LIBBLINKY_EXPORT BlinkyPendantUploadData
 {
 public:
     enum DisplayMode {

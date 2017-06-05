@@ -1,12 +1,14 @@
 #ifndef EXPONENTIALBRIGHTNESS_H
 #define EXPONENTIALBRIGHTNESS_H
 
+#include "libblinkyglobal.h"
+
 #include "brightnessmodel.h"
 
 // TODO: Use an actual minimum float value
 #define ZERO_VALUE float(.000001)
 
-class ExponentialBrightness : public BrightnessModel
+class LIBBLINKY_EXPORT ExponentialBrightness : public BrightnessModel
 {
 public:
     ExponentialBrightness(float rFactor, float gFactor, float bFactor);

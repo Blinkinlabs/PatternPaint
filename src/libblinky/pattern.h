@@ -1,6 +1,8 @@
 #ifndef PATTERNITEM_H
 #define PATTERNITEM_H
 
+#include "libblinkyglobal.h"
+
 #include <QFileInfo>
 #include <QListWidgetItem>
 #include <QUndoStack>
@@ -9,7 +11,7 @@
 #include "patternmodel.h"
 
 /// Representation of a pattern based on a frame model.
-class Pattern : public QObject
+class LIBBLINKY_EXPORT Pattern : public QObject
 {
     Q_OBJECT
 

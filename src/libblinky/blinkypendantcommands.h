@@ -1,6 +1,8 @@
 #ifndef BLINKYPENDANTCOMMANDS_H
 #define BLINKYPENDANTCOMMANDS_H
 
+#include "libblinkyglobal.h"
+
 #include "serialcommand.h"
 
 #include <QByteArray>
@@ -8,15 +10,15 @@
 
 namespace BlinkyPendantCommands {
 
-QByteArray commandHeader();
+LIBBLINKY_EXPORT QByteArray commandHeader();
 
-SerialCommand startWrite();
+LIBBLINKY_EXPORT SerialCommand startWrite();
 
-SerialCommand writeFlashChunk(const QByteArray &data);
+LIBBLINKY_EXPORT SerialCommand writeFlashChunk(const QByteArray &data);
 
-QList<SerialCommand> writeFlash(const QByteArray &data);
+LIBBLINKY_EXPORT QList<SerialCommand> writeFlash(const QByteArray &data);
 
-SerialCommand stopWrite();
+LIBBLINKY_EXPORT SerialCommand stopWrite();
 
 }
 

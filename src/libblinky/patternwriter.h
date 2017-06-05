@@ -1,6 +1,8 @@
 #ifndef PATTERN_WRITER_H
 #define PATTERN_WRITER_H
 
+#include "libblinkyglobal.h"
+
 #include "pattern.h"
 #include "fixture.h"
 
@@ -9,7 +11,7 @@
 
 /// Container for a compressed pattern
 /// This class performs a 1-shot compression of an image from a QIMage.
-class PatternWriter
+class LIBBLINKY_EXPORT PatternWriter
 {
 public:
     enum Encoding {

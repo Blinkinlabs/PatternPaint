@@ -1,6 +1,8 @@
 #ifndef BLINKYCONTROLLER_H
 #define BLINKYCONTROLLER_H
 
+#include "libblinkyglobal.h"
+
 #include <cstdint>
 #include <QObject>
 #include <QList>
@@ -13,7 +15,7 @@
 class BlinkyControllerInfo;
 
 /// Connect to an LED controller, and manage sending data to it.
-class BlinkyController : public QObject
+class LIBBLINKY_EXPORT BlinkyController : public QObject
 {
     Q_OBJECT
 public:

@@ -1,10 +1,12 @@
 #ifndef BRIGHTNESSMODEL_H
 #define BRIGHTNESSMODEL_H
 
+#include "libblinkyglobal.h"
+
 #include <QColor>
 #include <QObject>
 
-class BrightnessModel : public QObject
+class LIBBLINKY_EXPORT BrightnessModel : public QObject
 {
     Q_OBJECT
 public:

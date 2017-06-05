@@ -1,7 +1,10 @@
 #ifndef ESPBOOTLOADERCOMMANDS_H
 #define ESPBOOTLOADERCOMMANDS_H
 
+#include "libblinkyglobal.h"
+
 #include <QByteArray>
+#include <QObject>
 
 #include "serialcommand.h"
 
@@ -12,7 +15,7 @@
 // https://gist.github.com/bvernoux/6ddc02ed157417a4df37861488357c5a
 
 namespace Esp8266BootloaderCommands {
-    Q_NAMESPACE
+//    Q_NAMESPACE
 
 enum Opcode {
     Opcode_FlashDownloadStart = 0x02,
@@ -24,28 +27,31 @@ enum Opcode {
     Opcode_SyncFrame = 0x08,
     Opcode_WriteRegister = 0x09,
     Opcode_ReadRegister = 0x0a,
-    Opcode_ConfigureSPIParameters = 0x0b,
+    Opcode_ConfigureSPIParameters = 0x0b
 };
-Q_ENUM_NS(Opcode)
 
-unsigned char calculateChecksum(const QByteArray &data);
+// TODO: This doesn't seem to work on Windows.
+//Q_ENUM_NS(Opcode)
 
-QByteArray buildCommand(Opcode opcode, const QByteArray &data, unsigned char checksum);
+LIBBLINKY_EXPORT unsigned char calculateChecksum(const QByteArray &data);
 
-QByteArray slipEncode(const QByteArray &data);
-QByteArray slipDecode(const QByteArray &data);
+LIBBLINKY_EXPORT QByteArray buildCommand(Opcode opcode, const QByteArray &data, unsigned char checksum);
 
-SerialCommand flashDownloadStart(unsigned int totalSize,
+LIBBLINKY_EXPORT QByteArray slipEncode(const QByteArray &data);
+LIBBLINKY_EXPORT QByteArray slipDecode(const QByteArray &data);
+
+LIBBLINKY_EXPORT SerialCommand flashDownloadStart(unsigned int totalSize,
                                  unsigned int numberOfBlocks,
                                  unsigned int blockSize,
                                  unsigned int offset);
 
-SerialCommand flashDownloadData(unsigned int sequence, QByteArray flashData);
+LIBBLINKY_EXPORT SerialCommand flashDownloadData(unsigned int sequence, QByteArray flashData);
 
-SerialCommand flashDownloadFinish(unsigned int rebootFlag);
+LIBBLINKY_EXPORT SerialCommand flashDownloadFinish(unsigned int rebootFlag);
 
-SerialCommand SyncFrame();
+LIBBLINKY_EXPORT SerialCommand SyncFrame();
 
 }
+Q_DECLARE_METATYPE(Esp8266BootloaderCommands::Opcode)
 
 #endif // ESPBOOTLOADERCOMMANDS_H

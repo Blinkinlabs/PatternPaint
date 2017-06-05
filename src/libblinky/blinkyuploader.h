@@ -1,6 +1,8 @@
 #ifndef BLINKYUPLOADER_H
 #define BLINKYUPLOADER_H
 
+#include "libblinkyglobal.h"
+
 #include "patternwriter.h"
 
 #include <QObject>
@@ -15,7 +17,7 @@ class BlinkyController;
 ///
 /// While the upload process is underway, it will send periodic progress updates
 /// via the progressUpdate() signal.
-class BlinkyUploader : public QObject
+class LIBBLINKY_EXPORT BlinkyUploader : public QObject
 {
     Q_OBJECT
 

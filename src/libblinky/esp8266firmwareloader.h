@@ -1,12 +1,14 @@
 #ifndef ESP8266FIRMWARELOADER_H
 #define ESP8266FIRMWARELOADER_H
 
+#include "libblinkyglobal.h"
+
 #include "firmwareloader.h"
 #include "serialcommandqueue.h"
 
 #include <QObject>
 
-class Esp8266FirmwareLoader : public FirmwareLoader
+class LIBBLINKY_EXPORT Esp8266FirmwareLoader : public FirmwareLoader
 {
     Q_OBJECT
 

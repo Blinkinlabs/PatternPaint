@@ -1,13 +1,15 @@
 #ifndef CONTROLLERINFO_H
 #define CONTROLLERINFO_H
 
+#include "libblinkyglobal.h"
+
 #include <QString>
 #include <QObject>
 #include <QList>
 
 #include "blinkycontroller.h"
 
-class BlinkyControllerInfo
+class LIBBLINKY_EXPORT BlinkyControllerInfo
 {
 public:
     static QList<BlinkyControllerInfo> availableControllers();
