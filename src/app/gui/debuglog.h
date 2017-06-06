@@ -13,7 +13,7 @@ class DebugLog : public QDialog
     Q_OBJECT
 
 private:
-    DebugLog(QWidget *parent = 0);
+    DebugLog(QWidget *parent);
 
     static QPointer<DebugLog> _instance;
 
@@ -24,7 +24,7 @@ public:
     DebugLog(const DebugLog &) = delete;
     void operator=(const DebugLog &) = delete;
 
-    static DebugLog & instance();
+    static DebugLog & instance(QWidget *parent = 0);
 
     void handleMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 

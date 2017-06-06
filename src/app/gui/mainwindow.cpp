@@ -1319,5 +1319,5 @@ void MainWindow::on_actionClose_All_triggered()
 
 void MainWindow::on_actionDebug_Log_triggered()
 {
-    DebugLog::instance().show();
+    DebugLog::instance(this).show();
 }

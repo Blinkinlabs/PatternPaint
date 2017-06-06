@@ -11,10 +11,10 @@ void DebugLog::messageHandler(QtMsgType type, const QMessageLogContext &context,
     _instance->handleMessage(type, context, msg);
 }
 
-DebugLog & DebugLog::instance() {
+DebugLog & DebugLog::instance(QWidget *parent) {
 
     if ( _instance.isNull() ) {
-        _instance = new DebugLog();
+        _instance = new DebugLog(parent);
     }
     return *_instance;
 }
