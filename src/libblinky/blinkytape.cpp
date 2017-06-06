@@ -57,7 +57,7 @@ BlinkyTape::BlinkyTape(QSerialPortInfo info, QObject *parent) :
             this, &BlinkyTape::sendChunk);
 
     // On Windows, we don't get notified if the tape was disconnected, so we have to check peroidically
-#if defined(Q_OS_WIN)
+#if defined(CONNECTION_SCANNER_TIMER)
     connectionScannerTimer.setInterval(CONNECTION_SCANNER_INTERVAL);
     connect(&connectionScannerTimer, QTimer::timeout,
             this, &BlinkyTape::connectionScannerTimer_timeout);
@@ -133,7 +133,7 @@ void BlinkyTape::sendChunk()
     }
 }
 
-#if defined(Q_OS_WIN)
+#if defined(CONNECTION_SCANNER_TIMER)
 void BlinkyTape::connectionScannerTimer_timeout()
 {
     // If we are already disconnected, disregard.
@@ -177,7 +177,7 @@ bool BlinkyTape::open()
 
     emit(connectionStatusChanged(true));
 
-#if defined(Q_OS_WIN)
+#if defined(CONNECTION_SCANNER_TIMER)
     // Schedule the connection scanner
     connectionScannerTimer.start();
 #endif

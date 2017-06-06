@@ -49,7 +49,7 @@ private:
 
     bool hasError;  // If true, reset will not be attempted on close.
 
-#if defined(Q_OS_WIN)
+#if defined(CONNECTION_SCANNER_TIMER)
     // Windows only: Timer that periodically checks if the serial device is
     // still present (it seems to disappear without sending an error?)
     // Handle this by periodically scanning for available BlinkyTapes, and
@@ -73,7 +73,7 @@ private slots:
 
     void resetTimer_timeout();
 
-#if defined(Q_OS_WIN)
+#if defined(CONNECTION_SCANNER_TIMER)
     void connectionScannerTimer_timeout();
 #endif
 
