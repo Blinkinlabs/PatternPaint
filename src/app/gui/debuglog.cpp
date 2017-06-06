@@ -1,37 +1,22 @@
 #include "debuglog.h"
 #include "ui_debuglog.h"
 
-#include <QPointer>
+QPointer<DebugLog> DebugLog::_instance;
 
-namespace logDialog {
-
-// TODO: Make this a proper singleton
-QPointer<DebugLog> activeDialog;
-
-// Redirector to the current active dialog
-void HandleMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
-    if(activeDialog.isNull())
+void DebugLog::messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    if(_instance.isNull())
         return;
 
-    activeDialog->handleMessage(type, context, msg);
+    _instance->handleMessage(type, context, msg);
 }
 
-void Register(QPointer<DebugLog> dialog) {
-    if(!activeDialog.isNull())
-        return;
+DebugLog & DebugLog::instance() {
 
-    activeDialog = dialog;
-    qInstallMessageHandler(&logDialog::HandleMessage);
-}
-
-void Unregister(QPointer<DebugLog> dialog) {
-    if(activeDialog != dialog)
-        return;
-
-    qInstallMessageHandler(0);
-    activeDialog.clear();
-}
-
+    if ( _instance.isNull() ) {
+        _instance = new DebugLog();
+    }
+    return *_instance;
 }
 
 DebugLog::DebugLog(QWidget *parent) :
@@ -44,17 +29,18 @@ DebugLog::DebugLog(QWidget *parent) :
     this->setAttribute(Qt::WA_DeleteOnClose, true);
 
     // And attemt to register to get messages
-    logDialog::Register(this);
+    qInstallMessageHandler(messageHandler);
+}
+
+DebugLog::~DebugLog()
+{
+    qInstallMessageHandler(0);
+
+    delete ui;
 }
 
 void DebugLog::handleMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     QString formattedMessage = qFormatLogMessage(type, context, msg);
     ui->textBrowser->append(formattedMessage);
-}
-
-DebugLog::~DebugLog()
-{
-    logDialog::Unregister(this);
-    delete ui;
 }
