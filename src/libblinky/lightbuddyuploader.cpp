@@ -13,6 +13,8 @@ LightBuddyUploader::LightBuddyUploader(QObject *parent) :
 {
     connect(&commandQueue, &SerialCommandQueue::errorOccured,
             this, &LightBuddyUploader::handleError);
+    connect(&commandQueue, &SerialCommandQueue::commandStillRunning,
+            this, &LightBuddyUploader::handleCommandStillRunning);
     connect(&commandQueue, &SerialCommandQueue::commandFinished,
             this, &LightBuddyUploader::handleCommandFinished);
 }
@@ -159,6 +161,14 @@ void LightBuddyUploader::handleError(QString error)
     commandQueue.close();
 
     emit(finished(false));
+}
+
+void LightBuddyUploader::handleCommandStillRunning(QString command)
+{
+    Q_UNUSED(command);
+
+    maxProgress++;
+    setProgress(progress + 1);
 }
 
 void LightBuddyUploader::handleCommandFinished(QString command, QByteArray returnData)

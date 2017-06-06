@@ -29,6 +29,8 @@ private slots:
 
     void handleCommandFinished(QString command, QByteArray returnData);
 
+    void handleCommandStillRunning(QString command);
+
     void handleLastCommandFinished();
 
 private:

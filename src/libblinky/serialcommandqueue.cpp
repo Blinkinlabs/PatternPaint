@@ -1,5 +1,7 @@
 #include "serialcommandqueue.h"
 
+#define COMMAND_STILL_RUNNING_INTERVAL_DEFAULT 100
+
 SerialCommandQueue::SerialCommandQueue(QObject *parent) :
     QObject(parent)
 {
@@ -14,7 +16,7 @@ SerialCommandQueue::SerialCommandQueue(QObject *parent) :
 
     commandTimeoutTimer.setSingleShot(true);
     connect(&commandTimeoutTimer, &QTimer::timeout,
-            this, &SerialCommandQueue::handleCommandTimeout);
+            this, &SerialCommandQueue::handleCommandTimerTimeout);
 }
 
 bool SerialCommandQueue::open(QSerialPortInfo info)
@@ -46,16 +48,13 @@ bool SerialCommandQueue::open(QSerialPortInfo info)
 
 void SerialCommandQueue::close()
 {
+    flushQueue();
+
     if (serial->isOpen())
         serial->close();
-
-    queue.clear();
-    responseData.clear();
-
-    commandTimeoutTimer.stop();
 }
 
-bool SerialCommandQueue::isOpen()
+bool SerialCommandQueue::isOpen() const
 {
     return (serial != NULL && serial->isOpen());
 }
@@ -68,16 +67,13 @@ void SerialCommandQueue::enqueue(const QList<SerialCommand> &commands)
 
 void SerialCommandQueue::flushQueue()
 {
-    // TODO: this is dangerous, if a command is already running it could
-    // put the device in a bad state. Switch to some version that only takes
-    // effect between command executions
     queue.clear();
     responseData.clear();
 
     commandTimeoutTimer.stop();
 }
 
-int SerialCommandQueue::length()
+int SerialCommandQueue::length() const
 {
     return queue.length();
 }
@@ -117,10 +113,12 @@ void SerialCommandQueue::processQueue()
         return;
     }
 
-    // Start the timer; the command must complete before it fires, or it
-    // is considered an error. This is to prevent a misbehaving device from hanging
-    // the programmer code.
-    commandTimeoutTimer.start(queue.front().timeout);
+    // Start a timer that will fire at a fixed interval, check if the command
+    // is still active, and emit a commandStillRunning signal if it is,
+    // or an error if it isn't.
+
+    commandTimeRemaining = queue.front().timeout;
+    commandTimeoutTimer.start(COMMAND_STILL_RUNNING_INTERVAL_DEFAULT);
 }
 
 void SerialCommandQueue::handleReadData()
@@ -195,6 +193,9 @@ void SerialCommandQueue::handleReadData()
 
         break;
     }
+
+    // TODO: Close the timer / other state here if the command did not
+    // complete successfully?
 }
 
 void SerialCommandQueue::handleSerialError(QSerialPort::SerialPortError error)
@@ -214,14 +215,21 @@ void SerialCommandQueue::handleSerialError(QSerialPort::SerialPortError error)
     close();
 }
 
-void SerialCommandQueue::handleCommandTimeout()
+void SerialCommandQueue::handleCommandTimerTimeout()
 {
-    QString errorMessage = QString("Command %1 timed out").arg((queue.front().name));
+    commandTimeRemaining -= commandTimeoutTimer.interval();
 
-    qCritical() << errorMessage;
+    if(commandTimeRemaining <= 0) {
+        QString errorMessage = QString("Command %1 timed out").arg((queue.front().name));
 
-    emit(errorOccured(errorMessage));
+        qCritical() << errorMessage;
+        emit(errorOccured(errorMessage));
 
-    // TODO: Does skipping this break behavior anywhere?
-//    close();
+        return;
+    }
+
+    commandTimeoutTimer.start(COMMAND_STILL_RUNNING_INTERVAL_DEFAULT);
+    emit(commandStillRunning(queue.front().name));
 }
+
+

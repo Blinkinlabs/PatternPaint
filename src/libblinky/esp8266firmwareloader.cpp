@@ -18,6 +18,8 @@ Esp8266FirmwareLoader::Esp8266FirmwareLoader(QObject *parent) :
 {
     connect(&commandQueue, &SerialCommandQueue::errorOccured,
             this, &Esp8266FirmwareLoader::handleError);
+    connect(&commandQueue, &SerialCommandQueue::commandStillRunning,
+            this, &Esp8266FirmwareLoader::handleCommandStillRunning);
     connect(&commandQueue, &SerialCommandQueue::commandFinished,
             this, &Esp8266FirmwareLoader::handleCommandFinished);
     connect(&commandQueue, &SerialCommandQueue::lastCommandFinished,
@@ -208,6 +210,14 @@ void Esp8266FirmwareLoader::handleCommandFinished(QString command, QByteArray re
     Q_UNUSED(command);
     Q_UNUSED(returnData);
 
+    setProgress(progress + 1);
+}
+
+void Esp8266FirmwareLoader::handleCommandStillRunning(QString command)
+{
+    Q_UNUSED(command);
+
+    maxProgress++;
     setProgress(progress + 1);
 }
 

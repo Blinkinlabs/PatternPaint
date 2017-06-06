@@ -30,9 +30,9 @@ private slots:
 
     void handleCommandFinished(QString command, QByteArray returnData);
 
-    void handleLastCommandFinished();
+    void handleCommandStillRunning(QString command);
 
-    void formatStillRunning();
+    void handleLastCommandFinished();
 
 private:
     /// Update any listeners with the latest progress

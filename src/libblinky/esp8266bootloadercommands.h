@@ -52,6 +52,7 @@ LIBBLINKY_EXPORT SerialCommand flashDownloadFinish(unsigned int rebootFlag);
 LIBBLINKY_EXPORT SerialCommand SyncFrame();
 
 }
+
 Q_DECLARE_METATYPE(Esp8266BootloaderCommands::Opcode)
 
 #endif // ESPBOOTLOADERCOMMANDS_H

@@ -14,6 +14,8 @@ EightByEightUploader::EightByEightUploader(QObject *parent) :
 {
     connect(&commandQueue, &SerialCommandQueue::errorOccured,
             this, &EightByEightUploader::handleError);
+    connect(&commandQueue, &SerialCommandQueue::commandStillRunning,
+            this, &EightByEightUploader::handleCommandStillRunning);
     connect(&commandQueue, &SerialCommandQueue::commandFinished,
             this, &EightByEightUploader::handleCommandFinished);
     connect(&commandQueue, &SerialCommandQueue::lastCommandFinished,
@@ -126,10 +128,6 @@ void EightByEightUploader::doWork()
         // TODO: new command to just delete the patterns...
         commandQueue.enqueue(EightByEightCommands::formatFilesystem());
 
-        // Since this is a long-running command, also set a timer to update the status periodically
-        // so it doesn't appear to have frozen
-        formatStillRunning();
-
         break;
     }
     case State_WriteFile:
@@ -174,6 +172,14 @@ void EightByEightUploader::handleError(QString error)
     commandQueue.close();
 
     emit(finished(false));
+}
+
+void EightByEightUploader::handleCommandStillRunning(QString command)
+{
+    Q_UNUSED(command);
+
+    maxProgress++;
+    setProgress(progress + 1);
 }
 
 void EightByEightUploader::handleCommandFinished(QString command, QByteArray returnData)
@@ -235,19 +241,6 @@ void EightByEightUploader::handleLastCommandFinished()
         qCritical() << "Got a last command finished signal when not expected";
         break;
     }
-}
-
-void EightByEightUploader::formatStillRunning()
-{
-    if(state != State_erasePatterns) {
-        return;
-    }
-
-    // TODO: Put this in serialCommandQueue, to enable it for all long-running tasks?
-    maxProgress++;
-    setProgress(progress + 1);
-
-    QTimer::singleShot(70, this, &EightByEightUploader::formatStillRunning);
 }
 
 void EightByEightUploader::setProgress(int newProgress)

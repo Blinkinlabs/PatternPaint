@@ -30,6 +30,8 @@ private slots:
 
     void handleCommandFinished(QString command, QByteArray returnData);
 
+    void handleCommandStillRunning(QString command);
+
 private:
     QString errorString;
 

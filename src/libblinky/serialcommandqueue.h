@@ -24,7 +24,7 @@ public:
     bool open(QSerialPortInfo info);
     void close();
 
-    bool isOpen();
+    bool isOpen() const;
 
     // Queue a new command
     void enqueue(const SerialCommand &command);
@@ -32,14 +32,23 @@ public:
 
     void flushQueue();
 
-    int length();
+    int length() const;
 
 signals:
-    void errorOccured(QString error);
+    // Called periodically during long-running commands.
+    void commandStillRunning(QString command);
+
+    // A specific command has finished. Signalled at the completion
+    // of every command
     void commandFinished(QString command, QByteArray returnData);
+
+    // All commands in the queue have finished
     void lastCommandFinished();
 
-public slots:
+    // An error has occured, and queue processing has stopped.
+    void errorOccured(QString error);
+
+private slots:
     // Handle receiving data from the serial port
     void handleReadData();
 
@@ -47,7 +56,7 @@ public slots:
     void handleSerialError(QSerialPort::SerialPortError error);
 
     // Self-enforced communications timeout
-    void handleCommandTimeout();
+    void handleCommandTimerTimeout();
 
 private:
     QPointer<QSerialPort> serial;   ///< Serial device the programmer is attached to
@@ -56,6 +65,7 @@ private:
     QByteArray responseData;        ///< Data received by the current command
 
     // Timer fires if a command has failed to complete quickly enough
+    int commandTimeRemaining;
     QTimer commandTimeoutTimer;
 
     // If there is another command in the queue, start processing it.
