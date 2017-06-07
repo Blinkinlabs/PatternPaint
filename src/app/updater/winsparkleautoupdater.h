@@ -1,8 +1,6 @@
 #ifndef WINSPARKLEAUTOUPDATER_H
 #define WINSPARKLEAUTOUPDATER_H
 
-#include <QString>
-
 #include "AutoUpdater.h"
 
 class WinSparkleAutoUpdater : public AutoUpdater
@@ -10,6 +8,8 @@ class WinSparkleAutoUpdater : public AutoUpdater
 public:
     WinSparkleAutoUpdater(const QString &url);
     ~WinSparkleAutoUpdater();
+
+    void setLanguage(const QString &language);
 
     void init();
 

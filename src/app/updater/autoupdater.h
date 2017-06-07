@@ -5,10 +5,15 @@
 #ifndef AUTOUPDATER_H
 #define AUTOUPDATER_H
 
+#include <QString>
+
 class AutoUpdater
 {
 public:
     virtual ~AutoUpdater();
+
+    /// Set the language that should be used to display update messages
+    virtual void setLanguage(const QString &language) = 0;
 
     /// Initialize the updater, and start checking for updates if auto-updates are enabled.
     virtual void init() = 0;

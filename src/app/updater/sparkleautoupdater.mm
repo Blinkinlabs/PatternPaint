@@ -15,7 +15,7 @@ class SparkleAutoUpdater::Private
         SUUpdater* updater;
 };
 
-SparkleAutoUpdater::SparkleAutoUpdater(const QString& aUrl)
+SparkleAutoUpdater::SparkleAutoUpdater(const QString &aUrl)
 {
     d = new Private;
 
@@ -31,6 +31,12 @@ SparkleAutoUpdater::~SparkleAutoUpdater()
 {
     [d->updater release];
     delete d;
+}
+
+
+SparkleAutoUpdater::setLanguage(const QString &language)
+{
+    // TODO: how to localize sparkle?
 }
 
 void SparkleAutoUpdater::init()

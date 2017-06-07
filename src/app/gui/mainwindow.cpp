@@ -262,6 +262,18 @@ MainWindow::MainWindow(QWidget *parent) :
     autoUpdater = new WinSparkleAutoUpdater(WINDOWS_RELEASE_APPCAST_URL);
 #endif // Q_OS_WIN
 
+    // TODO: Duplicated from main.cpp
+    QString language = settings.value("PatternPaint/language", DEFAULT_LANGUAGE).toString();
+    QString locale;
+
+    if(language == "<System Language>") {
+        locale = QLocale::system().name();
+    }
+    else {
+        locale = language;
+    }
+    autoUpdater->setLanguage(locale);
+
 #endif  // DISABLE_UPDATE_CHECKS
 }
 
