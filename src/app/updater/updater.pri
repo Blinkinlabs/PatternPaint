@@ -17,7 +17,7 @@ macx {
 
     LIBS += -framework AppKit
 
-    SPARKLE_PATH = $$PWD/../../../thirdparty/Sparkle-1.16.0/
+    SPARKLE_PATH = $$PWD/../../../thirdparty/Sparkle-1.17.0/
 
     QMAKE_LFLAGS += -F $$SPARKLE_PATH
     QMAKE_OBJECTIVE_CFLAGS += -F $$SPARKLE_PATH
