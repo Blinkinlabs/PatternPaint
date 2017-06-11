@@ -34,9 +34,12 @@ SparkleAutoUpdater::~SparkleAutoUpdater()
 }
 
 
-SparkleAutoUpdater::setLanguage(const QString &language)
+void SparkleAutoUpdater::setLanguage(const QString &language)
 {
-    // TODO: how to localize sparkle?
+    Q_UNUSED(language)
+
+    // TODO: Sparkle doesn't seem to allow for language overrides:
+    // https://github.com/sparkle-project/Sparkle/issues/477
 }
 
 void SparkleAutoUpdater::init()
