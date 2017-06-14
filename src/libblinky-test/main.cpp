@@ -1,2 +1,2 @@
 #include "multitests.h"
-MULTI_TESTS_MAIN
+MULTI_TESTS_MAIN_NOAPP
