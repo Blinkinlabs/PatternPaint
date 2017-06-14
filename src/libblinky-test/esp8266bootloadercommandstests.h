@@ -1,6 +1,8 @@
 #ifndef ESP8266BOOTLOADERCOMMANDSTESTS_H
 #define ESP8266BOOTLOADERCOMMANDSTESTS_H
 
+#include "multitests.h"
+
 #include <QObject>
 
 class Esp8266BootloaderCommandsTests : public QObject
@@ -22,5 +24,7 @@ private slots:
 
     void slipEncodeDecodeTest();
 };
+
+TEST_DECLARE(Esp8266BootloaderCommandsTests)
 
 #endif // ESP8266BOOTLOADERCOMMANDSTESTS_H

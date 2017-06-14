@@ -1,6 +1,8 @@
 #ifndef FIRMWARESTORETESTS_H
 #define FIRMWARESTORETESTS_H
 
+#include "multitests.h"
+
 #include <QObject>
 
 class FirmwareStoreTests : public QObject
@@ -28,5 +30,7 @@ private slots:
     void getFirmwareDataDoesntExistTest();
     void getFirmwareDataHasBlinkyTapeDefaultTest();
 };
+
+TEST_DECLARE(FirmwareStoreTests)
 
 #endif // FIRMWARESTORETESTS_H

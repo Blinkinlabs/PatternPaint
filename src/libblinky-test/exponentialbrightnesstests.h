@@ -1,6 +1,8 @@
 #ifndef EXPONENTIALBRIGHTNESSTESTS_H
 #define EXPONENTIALBRIGHTNESSTESTS_H
 
+#include "multitests.h"
+
 #include <QObject>
 
 class ExponentialBrightnessTests : public QObject
@@ -13,5 +15,7 @@ private slots:
     void correctTest_data();
     void correctTest();
 };
+
+TEST_DECLARE(ExponentialBrightnessTests)
 
 #endif // EXPONENTIALBRIGHTNESSTESTS_H

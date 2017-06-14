@@ -1,6 +1,8 @@
 #ifndef FLASHSECTIONTESTS_H
 #define FLASHSECTIONTESTS_H
 
+#include "multitests.h"
+
 #include <QObject>
 
 class MemorySectionTests : public QObject
@@ -16,5 +18,7 @@ private slots:
     void overlapsTest_data();
     void overlapsTest();
 };
+
+TEST_DECLARE(MemorySectionTests)
 
 #endif // FLASHSECTIONTESTS_H

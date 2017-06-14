@@ -1,6 +1,8 @@
 #ifndef BYTEARRAYHELPERSTESTS_H
 #define BYTEARRAYHELPERSTESTS_H
 
+#include "multitests.h"
+
 #include <QObject>
 
 class ByteArrayHelpersTests : public QObject
@@ -31,5 +33,7 @@ private slots:
     void padToBoundaryTest_data();
     void padToBoundaryTest();
 };
+
+TEST_DECLARE(ByteArrayHelpersTests)
 
 #endif // BYTEARRAYHELPERSTESTS_H

@@ -1,6 +1,8 @@
 #ifndef EIGHTBYEIGHTCOMMANDSTESTS_H
 #define EIGHTBYEIGHTCOMMANDSTESTS_H
 
+#include "multitests.h"
+
 #include <QObject>
 
 class EightByEightCommandsTests : public QObject
@@ -33,5 +35,7 @@ private slots:
 
     void getFirmwareVersionTest();
 };
+
+TEST_DECLARE(EightByEightCommandsTests)
 
 #endif // EIGHTBYEIGHTCOMMANDSTESTS_H

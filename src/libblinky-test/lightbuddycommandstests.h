@@ -1,6 +1,8 @@
 #ifndef LIGHTBUDDYCOMMANDSTESTS_H
 #define LIGHTBUDDYCOMMANDSTESTS_H
 
+#include "multitests.h"
+
 #include <QObject>
 
 class LightBuddyCommandsTests : public QObject
@@ -20,5 +22,7 @@ private slots:
 
     void reloadAnimationsTest();
 };
+
+TEST_DECLARE(LightBuddyCommandsTests)
 
 #endif // LIGHTBUDDYCOMMANDSTESTS_H

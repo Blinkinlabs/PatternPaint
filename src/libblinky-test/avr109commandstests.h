@@ -1,6 +1,8 @@
 #ifndef AVR109COMMANDSTESTS_H
 #define AVR109COMMANDSTESTS_H
 
+#include "multitests.h"
+
 #include <QObject>
 
 class Avr109CommandsTests: public QObject
@@ -31,5 +33,7 @@ private slots:
     void writeEepromTest_data();
     void writeEepromTest();
 };
+
+TEST_DECLARE(Avr109CommandsTests)
 
 #endif // AVR109COMMANDSTESTS_H

@@ -1,6 +1,8 @@
 #ifndef BLINKYPENDANTUPLOADDATATESTS_H
 #define BLINKYPENDANTUPLOADDATATESTS_H
 
+#include "multitests.h"
+
 #include <QObject>
 
 class BlinkyPendantUploadDataTests: public QObject
@@ -21,5 +23,7 @@ private slots:
 
     void uploadDataTest();
 };
+
+TEST_DECLARE(BlinkyPendantUploadDataTests)
 
 #endif // BLINKYPENDANTUPLOADDATATESTS_H

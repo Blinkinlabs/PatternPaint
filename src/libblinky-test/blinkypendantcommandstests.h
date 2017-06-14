@@ -1,6 +1,8 @@
 #ifndef BLINKYPENDANTCOMMANDSTESTS_H
 #define BLINKYPENDANTCOMMANDSTESTS_H
 
+#include "multitests.h"
+
 #include <QObject>
 
 class BlinkyPendantCommandsTests: public QObject
@@ -17,5 +19,7 @@ private slots:
     void writeFlashTest_data();
     void writeFlashTest();
 };
+
+TEST_DECLARE(BlinkyPendantCommandsTests)
 
 #endif // BLINKYPENDANTCOMMANDSTESTS_H

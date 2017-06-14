@@ -1,6 +1,8 @@
 #ifndef BLINKYTAPEUPLOADDATATESTS_H
 #define BLINKYTAPEUPLOADDATATESTS_H
 
+#include "multitests.h"
+
 #include <QObject>
 
 class BlinkyTapeUploadDataTests : public QObject
@@ -22,5 +24,7 @@ private slots:
 
     // TODO: Finish tests!
 };
+
+TEST_DECLARE(BlinkyTapeUploadDataTests)
 
 #endif // BLINKYTAPEUPLOADDATATESTS_H

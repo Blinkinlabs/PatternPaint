@@ -1,6 +1,8 @@
 #ifndef FIRMWAREREADERTEST_H
 #define FIRMWAREREADERTEST_H
 
+#include "multitests.h"
+
 #include <QObject>
 
 class FirmwareReaderTests : public QObject
@@ -19,5 +21,7 @@ private slots:
     void parseHexLineDataTest_data();
     void parseHexLineDataTest();
 };
+
+TEST_DECLARE(FirmwareReaderTests)
 
 #endif // FIRMWAREREADERTEST_H

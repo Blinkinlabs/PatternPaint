@@ -1,6 +1,8 @@
 #ifndef LINEARFIXTURETESTS_H
 #define LINEARFIXTURETESTS_H
 
+#include "multitests.h"
+
 #include <QObject>
 
 class LinearFixtureTests : public QObject
@@ -13,5 +15,7 @@ private slots:
     void setLengthTest();
 
 };
+
+TEST_DECLARE(LinearFixtureTests)
 
 #endif // LINEARFIXTURETESTS_H

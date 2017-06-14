@@ -1,6 +1,8 @@
 #ifndef MATRIXFIXTURETESTS_H
 #define MATRIXFIXTURETESTS_H
 
+#include "multitests.h"
+
 #include <QObject>
 
 class MatrixFixtureTests : public QObject
@@ -21,5 +23,7 @@ private slots:
     void setModeColsTest_data();
     void setModeColsTest();
 };
+
+TEST_DECLARE(MatrixFixtureTests)
 
 #endif // MATRIXFIXTURETESTS_H

@@ -1,6 +1,8 @@
 #ifndef SERIALCOMMANDTESTS_H
 #define SERIALCOMMANDTESTS_H
 
+#include "multitests.h"
+
 #include <QObject>
 
 class SerialCommandTests : public QObject
@@ -23,5 +25,7 @@ private slots:
     void equalsOperatorExpectedResponseMaskMismatchTest();
     void equalsOperatorTimeoutMismatchTest();
 };
+
+TEST_DECLARE(SerialCommandTests)
 
 #endif // SERIALCOMMANDTESTS_H

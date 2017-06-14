@@ -1,6 +1,8 @@
 #ifndef COLORMODETESTS_H
 #define COLORMODETESTS_H
 
+#include "multitests.h"
+
 #include <QObject>
 
 class ColorModeTests : public QObject
@@ -18,5 +20,7 @@ private slots:
 
     void colorToBytesBadModeFailsTest();
 };
+
+TEST_DECLARE(ColorModeTests)
 
 #endif // COLORMODETESTS_H
