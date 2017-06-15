@@ -3,15 +3,15 @@
 #define COMMAND_STILL_RUNNING_INTERVAL_DEFAULT 100
 
 SerialCommandQueue::SerialCommandQueue(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    serial(this)
 {
-    serial = new QSerialPort(this);
-    serial->setSettingsRestoredOnClose(false);
+    serial.setSettingsRestoredOnClose(false);
 
-    connect(serial, &QSerialPort::errorOccurred,
+    connect(&serial, &QSerialPort::errorOccurred,
             this, &SerialCommandQueue::handleSerialError);
 
-    connect(serial, &QSerialPort::readyRead,
+    connect(&serial, &QSerialPort::readyRead,
             this, &SerialCommandQueue::handleReadData);
 
     commandTimeoutTimer.setSingleShot(true);
@@ -31,15 +31,15 @@ bool SerialCommandQueue::open(QSerialPortInfo info)
 #if defined(Q_OS_OSX)
     // Note: This should be info.portName(). Changed here as a workaround for:
     // https://bugreports.qt.io/browse/QTBUG-45127
-    serial->setPortName(info.systemLocation());
+    serial.setPortName(info.systemLocation());
 #else
-    serial->setPortName(info.portName());
+    serial.setPortName(info.portName());
 #endif
-    serial->setBaudRate(QSerialPort::Baud115200);
+    serial.setBaudRate(QSerialPort::Baud115200);
 
-    if (!serial->open(QIODevice::ReadWrite)) {
-        qDebug() << "Could not connect to serial device. Error: " << serial->error()
-                 << serial->errorString();
+    if (!serial.open(QIODevice::ReadWrite)) {
+        qDebug() << "Could not connect to serial device. Error: " << serial.error()
+                 << serial.errorString();
         return false;
     }
 
@@ -50,13 +50,13 @@ void SerialCommandQueue::close()
 {
     flushQueue();
 
-    if (serial->isOpen())
-        serial->close();
+    if (serial.isOpen())
+        serial.close();
 }
 
 bool SerialCommandQueue::isOpen() const
 {
-    return (serial != NULL && serial->isOpen());
+    return (serial.isOpen());
 }
 
 void SerialCommandQueue::enqueue(const QList<SerialCommand> &commands)
@@ -107,7 +107,7 @@ void SerialCommandQueue::processQueue()
 //    qDebug() << "Starting Command:" << queue.front().name;
     responseData.clear();
 
-    if (serial->write(queue.front().data)
+    if (serial.write(queue.front().data)
         != queue.front().data.length()) {
         qCritical() << "Error writing to device";
         return;
@@ -126,7 +126,7 @@ void SerialCommandQueue::handleReadData()
     if (!isOpen())
         return;
 
-    responseData.append(serial->readAll());
+    responseData.append(serial.readAll());
 
 //    qDebug() << "Got data: length:" << responseData.length()
 //             << "data: " << responseData.toHex();
@@ -201,7 +201,7 @@ void SerialCommandQueue::handleReadData()
 void SerialCommandQueue::handleSerialError(QSerialPort::SerialPortError error)
 {
     // If we aren't supposed to be connected, discard resource errors
-    if (!serial->isOpen() && error == QSerialPort::ResourceError)
+    if (!serial.isOpen() && error == QSerialPort::ResourceError)
         return;
 
     if (error == QSerialPort::NoError) {
@@ -210,7 +210,7 @@ void SerialCommandQueue::handleSerialError(QSerialPort::SerialPortError error)
         return;
     }
 
-    emit(errorOccured(serial->errorString()));
+    emit(errorOccured(serial.errorString()));
 
     close();
 }

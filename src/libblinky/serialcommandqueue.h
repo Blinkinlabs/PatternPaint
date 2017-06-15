@@ -59,7 +59,7 @@ private slots:
     void handleCommandTimerTimeout();
 
 private:
-    QPointer<QSerialPort> serial;   ///< Serial device the programmer is attached to
+    QSerialPort serial;   ///< Serial device the programmer is attached to
 
     QQueue<SerialCommand> queue;   ///< Queue of commands to send
     QByteArray responseData;        ///< Data received by the current command
