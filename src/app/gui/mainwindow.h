@@ -154,6 +154,10 @@ private:
     QTimer connectionScannerTimer;
 
     QPointer<BlinkyController> controller;
+    QPointer<BlinkyUploader> uploader;  // Used in State_Uploading
+    QPointer<FirmwareLoader> loader;    // Used in State_RestoringFirmware
+    QPointer<QProgressDialog> dialog;   // Used in State_Uploading/State_RestoringFirmware
+
     QPointer<Fixture> fixture;
 
     PatternCollection patternCollection;
@@ -164,7 +168,8 @@ private:
     enum State {
         State_Disconnected,
         State_Connected,
-        State_Uploading
+        State_Uploading,
+        State_RestoringFirmware
     };
     State state;
 
