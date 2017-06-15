@@ -8,8 +8,7 @@
 #include "memorysection.h"
 
 #include <QObject>
-#include <QTimer>
-#include <iostream>
+#include <QDateTime>
 
 class LIBBLINKY_EXPORT Avr109FirmwareLoader : public FirmwareLoader
 {

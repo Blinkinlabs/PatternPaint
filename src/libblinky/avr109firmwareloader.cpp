@@ -4,7 +4,9 @@
 #include "blinkycontroller.h"
 #include "blinkytapeuploaddata.h"
 #include "firmwarestore.h"
+#include "serialcommandqueue.h"
 
+#include <QTimer>
 #include <QDebug>
 
 // TODO: Combine this with the definitions in avruploaddata.cpp
