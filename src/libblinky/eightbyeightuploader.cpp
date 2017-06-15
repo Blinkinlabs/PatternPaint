@@ -9,6 +9,9 @@
 // TODO: Duplicated in eightbyeightcommands.cpp
 #define CHUNK_SIZE_BYTES 64 // TODO: Small so we don't overflow the usb/serial converter?
 
+// TODO: This isn't exact, depends on filesystem
+#define FLASH_MEMORY_AVAILABLE (1048576) // 1MB
+
 EightByEightUploader::EightByEightUploader(QObject *parent) :
     BlinkyUploader(parent)
 {
@@ -81,6 +84,7 @@ bool EightByEightUploader::storePatterns(BlinkyController &controller,
     }
 
     setProgress(0);
+    setDialogText();
 
     QSerialPortInfo info;
     controller.getPortInfo(info);
@@ -256,4 +260,21 @@ void EightByEightUploader::setProgress(int newProgress)
     int progressPercent = (progress*100)/maxProgress;
 
     emit(progressChanged(progressPercent));
+}
+
+void EightByEightUploader::setDialogText()
+{
+    int flashUsed = 0;
+
+    QString textLabel;
+    textLabel.append("Saving to Blinky...\n");
+    textLabel.append("\n");
+
+    for (QByteArray& section : flashData)
+        flashUsed += section.length();
+
+    float flashUsedPercent = float(flashUsed)*100/FLASH_MEMORY_AVAILABLE;
+    textLabel.append(QString("Flash used: %1%").arg(QString::number(flashUsedPercent,'f', 1)));
+
+    emit(setText(textLabel));
 }

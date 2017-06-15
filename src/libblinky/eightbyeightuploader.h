@@ -38,6 +38,8 @@ private:
     /// Update any listeners with the latest progress
     void setProgress(int newProgress);
 
+    void setDialogText();
+
     QString errorString;
 
     SerialCommandQueue commandQueue;
