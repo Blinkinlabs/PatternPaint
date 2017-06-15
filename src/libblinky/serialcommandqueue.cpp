@@ -132,8 +132,7 @@ void SerialCommandQueue::handleReadData()
 //             << "data: " << responseData.toHex();
 
     if (queue.length() == 0) {
-        // TODO: error, we got unexpected data.
-        qCritical() << "Got data when we didn't expect it!";
+        qWarning() << "Got data when we didn't expect it, discarding!";
         responseData.clear();
         return;
     }
@@ -147,29 +146,15 @@ void SerialCommandQueue::handleReadData()
         break;
 
     case SerialCommand::RESPONSE_TOO_MUCH_DATA:
-    {
-        // TODO: error, we got unexpected data.
-        QString errorString = QString()
-                .append("Got more data than we expected")
-                .append(" expected: %1 ").arg(queue.front().expectedResponse.length())
-                .append(" received: %2").arg(responseData.length());
-        emit(errorOccured(errorString));
-    }
-        break ;
+        emit(errorOccured(queue.front().getErrorString()));
+        break;
 
     case SerialCommand::RESPONSE_INVALID_MASK:
-    {
-        // TODO: error, we got unexpected data.
-        QString errorString = QString()
-                .append("Invalid mask length- command formatted incorrectly.")
-                .append("expectedResponse: %1").arg(queue.front().expectedResponse.length())
-                .append("expectedResponseMask: %1").arg(queue.front().expectedResponseMask.length());
-        emit(errorOccured(errorString));
-    }
+        emit(errorOccured(queue.front().getErrorString()));
         break;
 
     case SerialCommand::RESPONSE_MISMATCH:
-        emit(errorOccured("Got unexpected data back"));
+        emit(errorOccured(queue.front().getErrorString()));
         break;
 
     case SerialCommand::RESPONSE_MATCH:

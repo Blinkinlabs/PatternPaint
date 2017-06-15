@@ -36,6 +36,11 @@ public:
     int timeout;
 
     bool operator==(const SerialCommand& rhs) const;
+
+    QString getErrorString() const;
+
+private:
+    QString errorString;
 };
 
 Q_DECLARE_METATYPE(SerialCommand::CompareResult)

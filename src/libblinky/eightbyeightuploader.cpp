@@ -168,6 +168,7 @@ QString EightByEightUploader::getErrorString() const
 void EightByEightUploader::handleError(QString error)
 {
     qCritical() << error;
+    errorString = error;
 
     commandQueue.close();
 
