@@ -576,6 +576,10 @@ void MainWindow::on_uploaderFinished(bool result)
 {
     qDebug() << "Uploader finished! Result:" << result;
 
+    // Note: Must delete the dialog before showing errors on macOS
+    if(!dialog.isNull())
+        delete dialog;
+
     if(state == State_Uploading) {
         if (!result) {
             QString message;
@@ -608,10 +612,6 @@ void MainWindow::on_uploaderFinished(bool result)
         // TODO: Make the class responsible for cleaning itself up?
         delete loader;
     }
-
-
-    if(!dialog.isNull())
-        delete dialog;
 
     state = State_Disconnected;
 }

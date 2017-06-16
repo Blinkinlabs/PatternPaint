@@ -51,9 +51,9 @@ SerialCommand::CompareResult SerialCommand::testResponse(const QByteArray &respo
                         .append("Got unexpected data back")
                         .append(" command name: %1").arg(name)
                         .append(" position: %1").arg(i)
-                        .append(" expected: %1").arg(expectedResponse.at(i),2,16)
-                        .append(" received: %1").arg(response.at(i),2,16)
-                        .append(" mask: %1").arg(expectedResponseMask.at(i),2,16);
+                        .append(" expected: %1").arg((int)expectedResponse.at(i),2,16)
+                        .append(" received: %1").arg((int)response.at(i),2,16)
+                        .append(" mask: %1").arg((int)expectedResponseMask.at(i),2,16);
 
                 return RESPONSE_MISMATCH;
             }
@@ -68,8 +68,8 @@ SerialCommand::CompareResult SerialCommand::testResponse(const QByteArray &respo
                     .append("Got unexpected data back")
                     .append(" name:").append(name)
                     .append(" position: %1").arg(i)
-                    .append(" expected: %1").arg(expectedResponse.at(i),2,16)
-                    .append(" received: %1").arg(response.at(i),2,16);
+                    .append(" expected: %1").arg((int)expectedResponse.at(i),2,16)
+                    .append(" received: %1").arg((int)response.at(i),2,16);
 
             return RESPONSE_MISMATCH;
         }
