@@ -196,11 +196,8 @@ void Esp8266FirmwareLoader::handleError(QString error)
 
     errorString = error;
 
-    if(serialPort.isOpen())
-        serialPort.close();
-
-    if(commandQueue.isOpen())
-        commandQueue.close();
+    serialPort.close();
+    commandQueue.close();
 
     emit(finished(false));
 }

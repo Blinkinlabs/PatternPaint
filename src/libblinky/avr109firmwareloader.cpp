@@ -175,8 +175,6 @@ void Avr109FirmwareLoader::reallyStartUpload() {
 
 void Avr109FirmwareLoader::handleError(QString error)
 {
-    qCritical() << error;
-
     // If we're in writeflashdata and the error was, try re-starting the upload process
     if(state == State_WriteFlashData) {
         if((error == "Got unexpected data back")
@@ -196,7 +194,10 @@ void Avr109FirmwareLoader::handleError(QString error)
     }
 
     // Otherwise we can't recover
+    errorString = error;
+
     commandQueue.close();
+
     emit(finished(false));
 }
 
