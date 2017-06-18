@@ -16,10 +16,21 @@ macx {
 
 win32 {
     LIBUSB_PATH = ../../thirdparty/libusb-1.0.20-win
-    LIBUSB_DLL = $$LIBUSB_PATH/MinGW32/dll/libusb-1.0.dll
+#    LIBUSB_PATH = ../../thirdparty/libusb-1.0.21-win
 
-    INCLUDEPATH += $$LIBUSB_PATH/include/
-    LIBS += $$LIBUSB_DLL
+    INCLUDEPATH += $$LIBUSB_PATH/include
+
+    win32-msvc* {
+        LIBUSB_DLL = $$LIBUSB_PATH/MS32/dll/libusb-1.0.dll
+        LIBUSB_LIB = $$LIBUSB_PATH/MS32/dll/libusb-1.0.lib
+
+        LIBS += $$LIBUSB_LIB
+    }
+    win32-g++ {
+        LIBUSB_DLL = $$LIBUSB_PATH/MinGW32/dll/libusb-1.0.dll
+
+        LIBS += $$LIBUSB_DLL
+    }
 
     # Copy the DLL into the build directory so that it can be used
     QMAKE_PRE_LINK += copy $$shell_path($$LIBUSB_DLL)  $$shell_path($$OUT_PWD) &

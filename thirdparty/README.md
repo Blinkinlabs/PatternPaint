@@ -46,7 +46,7 @@ Pattern paint uses [libusb](libusb.info) for gathering information about each in
 
 ### Obtaining
 
-We're using [libusb-1.0.20](http://sourceforge.net/projects/libusb/files/libusb-1.0/libusb-1.0.20/). Get the [release file](http://sourceforge.net/projects/libusb/files/libusb-1.0/libusb-1.0.20/libusb-1.0.20.7z/download), unzip it, then move it to thirdparty/libusb-1.0.20-win.
+We're using [libusb-1.0.21](http://sourceforge.net/projects/libusb/files/libusb-1.0/libusb-1.0.21/). Get the [release file](https://sourceforge.net/projects/libusb/files/libusb-1.0/libusb-1.0.21/libusb-1.0.21.7z/download), unzip it, then move it to thirdparty/libusb-1.0.20-win.
 
 ### Building
 

@@ -17,6 +17,8 @@
 #include <QMetaObject>
 #include <QMetaMethod>
 
+#include <ctime>
+
 #ifndef nullptr
 // If C++ is not C++11 compatible
 #define nullptr 0

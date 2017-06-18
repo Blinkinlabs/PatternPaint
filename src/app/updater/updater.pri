@@ -39,10 +39,20 @@ win32 {
     SOURCES += \
         $$PWD/winsparkleautoupdater.cpp
 
-    SPARKLE_DLL = $$PWD/../../../thirdparty/WinSparkle-0.5.3/Release/WinSparkle.dll
+    SPARKLE_PATH = ../../thirdparty/WinSparkle-0.5.3
+    INCLUDEPATH += $$SPARKLE_PATH/include
 
-    INCLUDEPATH += $$PWD/../../../thirdparty/WinSparkle-0.5.3/include/
-    LIBS += $$PWD/../../../thirdparty/WinSparkle-0.5.3/Release/WinSparkle.dll
+    win32-msvc* {
+        SPARKLE_DLL = $$SPARKLE_PATH/Release/WinSparkle.dll
+        SPARKLE_LIB = $$SPARKLE_PATH/Release/WinSparkle.lib
+
+        LIBS += $$SPARKLE_LIB
+    }
+    win32-g++ {
+        SPARKLE_DLL = $$SPARKLE_PATH/Release/WinSparkle.dll
+
+        LIBS += $$SPARKLE_DLL
+    }
 
     # Copy the Sparkle DLL into the build directory so that it can be used
     QMAKE_PRE_LINK += copy $$shell_path($$SPARKLE_DLL)  $$shell_path($$OUT_PWD) &

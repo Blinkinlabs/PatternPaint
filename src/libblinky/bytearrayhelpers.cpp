@@ -97,9 +97,9 @@ QList<QByteArray> chunkData(const QByteArray &data, unsigned int chunkSize)
     return chunks;
 }
 
-void padToBoundary(QByteArray &data, unsigned int boundary)
+void padToBoundary(QByteArray &data, int boundary)
 {
-    if(boundary == 0)
+    if(boundary <= 0)
         return;
 
     if(boundary > std::numeric_limits<int>::max())

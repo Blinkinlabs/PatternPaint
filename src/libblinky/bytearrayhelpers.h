@@ -30,7 +30,7 @@ LIBBLINKY_EXPORT uint32_t byteArrayToUint32Big(const QByteArray& data);
 LIBBLINKY_EXPORT QList<QByteArray> chunkData(const QByteArray &data, unsigned int chunkSize);
 
 // Pad a byte array to a multile of the given boundary size
-LIBBLINKY_EXPORT void padToBoundary(QByteArray &data, unsigned int boundary);
+LIBBLINKY_EXPORT void padToBoundary(QByteArray &data, int boundary);
 
 }
 

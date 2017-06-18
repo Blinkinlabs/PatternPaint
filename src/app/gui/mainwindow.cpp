@@ -250,7 +250,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 #if defined(DISABLE_UPDATE_CHECKS)
 
-#warning Debug mode detected, update checking mechanism disabled
+// TODO: #warning not supported for MSVC
+//#warning Debug mode detected, update checking mechanism disabled
 
 #else
 
