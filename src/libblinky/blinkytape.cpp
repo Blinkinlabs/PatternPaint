@@ -236,11 +236,11 @@ void BlinkyTape::sendUpdate(QByteArray ledData)
     // Trim anything that's 0xff
     for (int i = 0; i < ledData.length(); i++) {
         if (ledData[i] == (char)255)
-            ledData[i] = 254;
+            ledData[i] = (char)254;
     }
 
     // Append an 0xFF to signal the flip command
-    ledData.append(0xFF);
+    ledData.append((char)0xFF);
 
     for (int chunk = 0; chunk *CHUNK_SIZE < ledData.length(); chunk++) {
         int chunkLength = CHUNK_SIZE;

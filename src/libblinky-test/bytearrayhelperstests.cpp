@@ -204,8 +204,8 @@ void ByteArrayHelpersTests::padToBoundaryTest_data()
                                       << static_cast<unsigned int>(std::numeric_limits<int>::max()) + 1 << QByteArray(1, 'x');
 
     QTest::newRow("1 byte pad size, 1 byte data") << QByteArray(1, 'x') << 1u << QByteArray(1,'x');
-    QTest::newRow("2 byte pad size, 1 byte data") << QByteArray(1, 'x') << 2u << QByteArray(1,'x').append(0xFF);
-    QTest::newRow("2 byte pad size, 3 byte data") << QByteArray(3, 'x') << 2u << QByteArray(3,'x').append(0xFF);
+    QTest::newRow("2 byte pad size, 1 byte data") << QByteArray(1, 'x') << 2u << QByteArray(1,'x').append((char)0xFF);
+    QTest::newRow("2 byte pad size, 3 byte data") << QByteArray(3, 'x') << 2u << QByteArray(3,'x').append((char)0xFF);
 
     // Create a largeish dataset
     QByteArray largeData;
@@ -214,8 +214,8 @@ void ByteArrayHelpersTests::padToBoundaryTest_data()
 
     // Test that a pad size of 1 works correctly
     QTest::newRow("1 byte pad size, 1234 data")   << largeData << 1u << largeData;
-    QTest::newRow("1400 byte pad size, 1234 data")   << largeData << 1400u << QByteArray(largeData).append(166, 0xFF);
-    QTest::newRow("1000 byte pad size, 1234 data")   << largeData << 1000u << QByteArray(largeData).append(766, 0xFF);
+    QTest::newRow("1400 byte pad size, 1234 data")   << largeData << 1400u << QByteArray(largeData).append(166, (char)0xFF);
+    QTest::newRow("1000 byte pad size, 1234 data")   << largeData << 1000u << QByteArray(largeData).append(766, (char)0xFF);
 }
 
 void ByteArrayHelpersTests::padToBoundaryTest()

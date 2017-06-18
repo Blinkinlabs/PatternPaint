@@ -74,11 +74,11 @@ QByteArray slipDecode(const QByteArray &data)
 
     QByteArray decoded = data.mid(1, data.length() - 2);
 
-    decoded.replace(QByteArray().append(0xDB).append(0xDC),
-                    QByteArray().append(0xC0));
+    decoded.replace(QByteArray().append((char)0xDB).append((char)0xDC),
+                    QByteArray().append((char)0xC0));
 
-    decoded.replace(QByteArray().append(0xDB).append(0xDD),
-                    QByteArray().append(0xDB));
+    decoded.replace(QByteArray().append((char)0xDB).append((char)0xDD),
+                    QByteArray().append((char)0xDB));
 
     return decoded;
 }

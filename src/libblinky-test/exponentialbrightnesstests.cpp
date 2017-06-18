@@ -7,9 +7,9 @@
 
 void ExponentialBrightnessTests::constructorTest()
 {
-    float rFactor = .1;
-    float gFactor = .2;
-    float bFactor = .3;
+    float rFactor = .1f;
+    float gFactor = .2f;
+    float bFactor = .3f;
 
     ExponentialBrightness brightness(rFactor,gFactor,bFactor);
 

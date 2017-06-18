@@ -554,7 +554,7 @@ void PatternFrameModelTests::readFromStreamTest()
     // Build some data for the read test
     QSize frameSize(10,11);
     QString fileName("filename");
-    float frameSpeed = 1.234;
+    float frameSpeed = 1.234f;
     QList<QImage> frames;
 
     QImage redImage(frameSize, QImage::Format_ARGB32_Premultiplied);
@@ -600,7 +600,7 @@ void PatternFrameModelTests::writeToStreamTest()
     // Build some data for the write test
     QSize frameSize(10,11);
     QString fileName("filename");
-    float frameSpeed = 1.234;
+    float frameSpeed = 1.234f;
 
     QImage redImage(frameSize, QImage::Format_ARGB32_Premultiplied);
     redImage.fill(Qt::GlobalColor::red);

@@ -106,7 +106,7 @@ void padToBoundary(QByteArray &data, int boundary)
         return;
 
     if (data.size() % boundary != 0)
-        data.append(boundary - (data.size()%boundary), 0xFF);
+        data.append(boundary - (data.size()%boundary), (char)0xFF);
 }
 
 }

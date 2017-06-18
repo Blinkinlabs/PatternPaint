@@ -248,12 +248,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     autoUpdater = NULL;
 
-#if defined(DISABLE_UPDATE_CHECKS)
-
-// TODO: #warning not supported for MSVC
-//#warning Debug mode detected, update checking mechanism disabled
-
-#else
+#if !defined(DISABLE_UPDATE_CHECKS)
 
 #if defined(Q_OS_MACX)
     autoUpdater = new SparkleAutoUpdater(OSX_RELEASE_APPCAST_URL);
@@ -961,7 +956,7 @@ void MainWindow::applyScene(const SceneTemplate &scene)
     fixture = Fixture::makeFixture(scene.fixtureType, scene.size);
 
     fixture->setColorMode(scene.colorMode);
-    fixture->setBrightnessModel(new ExponentialBrightness(1.8,1.8,2.1));
+    fixture->setBrightnessModel(new ExponentialBrightness(1.8f,1.8f,2.1f));
 
     // Wire in the fixture
     frameEditor->setFixture(fixture);

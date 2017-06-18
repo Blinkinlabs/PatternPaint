@@ -555,7 +555,7 @@ void PatternScrollModelTests::readFromStreamTest()
     // Build some data for the read test
     QSize frameSize(10,11);
     QString fileName("filename");
-    float frameSpeed = 1.234;
+    float frameSpeed = 1.234f;
 
     QImage image(frameSize, QImage::Format_ARGB32_Premultiplied);
     image.fill(Qt::GlobalColor::red);
@@ -593,7 +593,7 @@ void PatternScrollModelTests::writeToStreamTest()
     // Build some data for the write test
     QSize frameSize(10,11);
     QString fileName("filename");
-    float frameSpeed = 1.234;
+    float frameSpeed = 1.234f;
 
     QImage image(QSize(2,11), QImage::Format_ARGB32_Premultiplied);
     image.fill(Qt::GlobalColor::red);

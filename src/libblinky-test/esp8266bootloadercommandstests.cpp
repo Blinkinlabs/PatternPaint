@@ -74,8 +74,8 @@ void Esp8266BootloaderCommandsTests::slipEncodeTest_data()
             << QByteArray().append((char)0xC0).append((char)0xC0);
 
     QTest::newRow("10 0xFF")
-            << QByteArray(10, 0xFF)
-            << QByteArray().append((char)0xC0).append(QByteArray(10, 0xFF)).append((char)0xC0);
+            << QByteArray(10, (char)0xFF)
+            << QByteArray().append((char)0xC0).append(QByteArray(10, (char)0xFF)).append((char)0xC0);
 
     QTest::newRow("1 0xC0")
             << QByteArray().append((char)0xC0)
@@ -128,7 +128,7 @@ void Esp8266BootloaderCommandsTests::slipDecodeTest_data()
             << QByteArray();
 
     QTest::newRow("10 0xFF")
-            << QByteArray().append((char)0xC0).append(QByteArray(10, 0xFF)).append((char)0xC0)
+            << QByteArray().append((char)0xC0).append(QByteArray(10, (char)0xFF)).append((char)0xC0)
             << QByteArray(10, (char)0xFF);
 
     QTest::newRow("1 0xC0")
