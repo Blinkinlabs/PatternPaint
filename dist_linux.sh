@@ -29,7 +29,6 @@ mkdir -p ${BUILDDIR}
 pushd ${BUILDDIR}
 
 ${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
-    -r \
     -spec linux-g++
 
 #${MAKE} clean
