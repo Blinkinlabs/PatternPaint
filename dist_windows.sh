@@ -76,7 +76,6 @@ mkdir -p ${BUILDDIR}
 pushd ${BUILDDIR}
 
 ${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
-	-r \
 	-spec win32-g++
 	
 #${MAKE} clean
