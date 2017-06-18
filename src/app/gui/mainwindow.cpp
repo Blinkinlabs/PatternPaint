@@ -323,6 +323,9 @@ MainWindow::~MainWindow()
         appNap = NULL;
     }
 #endif
+
+    if (autoUpdater)
+        delete autoUpdater;
 }
 
 int MainWindow::getCurrentPatternIndex()
