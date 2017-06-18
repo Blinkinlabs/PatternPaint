@@ -63,7 +63,7 @@ EIGHTBYEIGHT=${DRIVERS}/EightByEight
 WINSPARKLE=${BASEDIR}/thirdparty/WinSparkle-0.5.3
 
 # libusb library release
-LIBUSB=${BASEDIR}/thirdparty/libusb-1.0.20-win
+LIBUSB=${BASEDIR}/thirdparty/libusb-1.0.21-win
 
 
 

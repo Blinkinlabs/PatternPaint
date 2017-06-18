@@ -15,8 +15,7 @@ macx {
 }
 
 win32 {
-    LIBUSB_PATH = ../../thirdparty/libusb-1.0.20-win
-#    LIBUSB_PATH = ../../thirdparty/libusb-1.0.21-win
+    LIBUSB_PATH = ../../thirdparty/libusb-1.0.21-win
 
     INCLUDEPATH += $$LIBUSB_PATH/include
 
