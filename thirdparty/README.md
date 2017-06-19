@@ -7,22 +7,23 @@ This directory contains third-party libraries that are distributed along with th
 Pattern Paint integrates [Sparkle](http://sparkle-project.org/) for automatic app updates on OS X.
 
 ### Obtaining
-Grab version 1.14:
-[https://github.com/sparkle-project/Sparkle/releases/download/1.14.0/Sparkle-1.14.0.tar.bz2](https://github.com/sparkle-project/Sparkle/releases/download/1.14.0/Sparkle-1.14.0.tar.bz2)
+Grab version 1.17:
+[Sparkle](https://github.com/sparkle-project/Sparkle/releases/download/1.17.0/Sparkle-1.17.0.tar.bz2)
 
 ### Building
-TODO: Instructions for how to update the rpath of the framework (?)
+No special steps need to be performed to use Sparkle. The download contains a dylib that can be used directly. The file '../src/app/updater/updater.pri' will need to be updated if the version number changes.
 
 ## LibUSB
-Pattern paint uses 
 
 ### Obtaining
+Grab version 1.0.21:
+[libusb source](https://downloads.sourceforge.net/project/libusb/libusb-1.0/libusb-1.0.21/libusb-1.0.21.tar.bz2)
 
 ### Building
 
 For simplicity, the compiled binaries are included in the github repo. These were the steps taken to produce them:
 
-	cd libusb-1.0.20
+	cd libusb-1.0.21
 	./configure --prefix $PWD/osx-install
 	make
 	make install
@@ -34,8 +35,8 @@ For simplicity, the compiled binaries are included in the github repo. These wer
 [WinSparkle](http://winsparkle.org) is used for automatic app updates on the Windows platform.
 
 ### Obtaining
-Grab WinSparkle:
-[https://github.com/vslavik/winsparkle/releases](https://github.com/vslavik/winsparkle/releases/)
+Grab WinSparkle 0.5.3:
+[Winsparkle release](https://github.com/vslavik/winsparkle/releases/)
 
 ### Building
 No special steps need to be performed to use WinSparkle. The download contains a .dll that can be used directly. The file '../src/app/updater/updater.pri' will need to be updated if the version number changes.

@@ -1,5 +1,5 @@
 macx {
-    LIBUSB_PATH = ../../thirdparty/libusb-1.0.20/osx-install
+    LIBUSB_PATH = ../../thirdparty/libusb-1.0.21/osx-install
 
     INCLUDEPATH += $$LIBUSB_PATH/include
     QMAKE_LFLAGS += -L $$LIBUSB_PATH/lib
