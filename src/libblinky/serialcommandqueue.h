@@ -46,6 +46,7 @@ signals:
     void lastCommandFinished();
 
     // An error has occured, and queue processing has stopped.
+    // TODO: Make this return an error type, strings are brittle?
     void errorOccured(QString error);
 
 private slots:

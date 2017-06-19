@@ -177,7 +177,7 @@ void Avr109FirmwareLoader::handleError(QString error)
 {
     // If we're in writeflashdata and the error was, try re-starting the upload process
     if(state == State_WriteFlashData) {
-        if((error == "Got unexpected data back")
+        if((error.startsWith("Got unexpected data back"))
                 && (flashWriteRetriesRemaining > 0)) {
             qCritical() << "Unexpected data error- re-starting firmware upload process";
 
