@@ -5,6 +5,28 @@
     <link>https://software.blinkinlabs.com/patternpaint/patternpaint-windows.xml</link>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
+
+    <item>
+      <title>PatternPaint 2.4.1</title>
+      <pubDate>Mon, 20 Jun 2017 12:00:00 +0000</pubDate>
+      <description>
+        <![CDATA[
+<b>Introducing PatternPaint 2.4.1<b>
+<br>Changelog:<br>
+<ul>
+<li>Add support for firmware updates to EightByEight blinky</li>
+<li>Add memory usage notices to EighyByEight and BlinkyTile uploaders</li>
+<li>Improve stability when uploads are interrupted</li>
+</ul>
+          ]]>
+        </description>
+      <enclosure url="https://github.com/Blinkinlabs/PatternPaint/releases/download/2.4.1/PatternPaint_Installer_2.4.1.exe"
+        sparkle:version="2.4.1"
+        length="17686400"
+        type="application/octet-stream"
+        />
+    </item>
+
     <item>
       <title>PatternPaint 2.2.0</title>
       <pubDate>Mon, 03 Mar 2017 12:00:00 +0000</pubDate>
@@ -51,6 +73,7 @@
         type="application/octet-stream"
         />
     </item>
+
       <item>
         <title>PatternPaint 2.0.3</title>
         <pubDate>Tue, 22 Dec 2015 12:00:00 +0000</pubDate>
