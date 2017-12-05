@@ -121,10 +121,10 @@ void MatrixFixtureTests::setModeColsTest()
 
     QCOMPARE(matrixFixture.getSize(), size);
 
-    for(int x = 0; x < size.width(); x++) {
-        for(int y = 0; y < size.height(); y++) {
-            int offset = x*size.height() + y;
-            QCOMPARE(matrixFixture.getLocations().at(offset), QPoint(y,x));
+    for(int y = 0; y < size.height(); y++) {
+        for(int x = 0; x < size.width(); x++) {
+            int offset = y*size.width() + x;
+            QCOMPARE(matrixFixture.getLocations().at(offset), QPoint(x,y));
         }
     }
 }

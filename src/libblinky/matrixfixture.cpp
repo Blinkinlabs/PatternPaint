@@ -48,25 +48,30 @@ void MatrixFixture::recalculateLocations()
 {
     QList<QPoint> newLocations;
 
-    for (int x = 0; x < size.width(); x++) {
-        for (int y = 0; y < size.height(); y++) {
-            QPoint point;
-
-            switch(matrixMode) {
-            case MODE_ZIGZAG:
-                point = QPoint(x, x%2 ? size.height()-1-y : y);
-                break;
-            case MODE_COLS:
-                point = QPoint(y, x);
-                break;
-            case MODE_ROWS:
-                point = QPoint(x, y);
-                break;
+    if (matrixMode == MODE_ROWS) {
+        for (int x = 0; x < size.width(); x++) {
+            for (int y = 0; y < size.height(); y++) {
+                newLocations.append(QPoint(x, y));
             }
-
-            newLocations.append(point);
         }
     }
+
+    else if(matrixMode == MODE_COLS) {
+        for (int y = 0; y < size.height(); y++) {
+            for (int x = 0; x < size.width(); x++) {
+                newLocations.append(QPoint(x, y));
+            }
+        }
+    }
+
+    else if(matrixMode == MODE_ZIGZAG) {
+        for (int x = 0; x < size.width(); x++) {
+            for (int y = 0; y < size.height(); y++) {
+                newLocations.append(QPoint(x, x%2 ? size.height()-1-y : y));
+            }
+         }
+     }
+
 
     setLocations(newLocations);
 }
