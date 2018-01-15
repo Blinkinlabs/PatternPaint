@@ -16,7 +16,8 @@ install:
   - sudo update-alternatives --set gcc /usr/bin/gcc-5
   - sudo update-alternatives --set g++ /usr/bin/g++-5
 
-  - wget -c https://github.com/probonopd/linuxdeployqt/releases/download/2/linuxdeployqt-2-x86_64.AppImage -O linuxdeployqt
+#  - wget -c https://github.com/probonopd/linuxdeployqt/releases/download/2/linuxdeployqt-2-x86_64.AppImage -O linuxdeployqt
+  - wget -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage -O linuxdeployqt
   - chmod a+x linuxdeployqt
 
   - export QTDIR=/opt/qt58
