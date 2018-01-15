@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
 #if defined(Q_OS_MACX)
     CocoaInitializer cocoaInitiarizer;  // TODO: We only need to call this temporarily, right?
 
-    appNap = NULL;
+    appNap = Q_NULLPTR;
 #endif
 
 #if defined(Q_OS_LINUX)
@@ -246,7 +246,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Refresh the display for no pattern selected
     on_patternCollectionCurrentChanged(QModelIndex(), QModelIndex());
 
-    autoUpdater = NULL;
+    autoUpdater = Q_NULLPTR;
 
 #if !defined(DISABLE_UPDATE_CHECKS)
 
@@ -258,18 +258,18 @@ MainWindow::MainWindow(QWidget *parent) :
     autoUpdater = new WinSparkleAutoUpdater(WINDOWS_RELEASE_APPCAST_URL);
 #endif // Q_OS_WIN
 
-    // TODO: Duplicated from main.cpp
-    QString language = settings.value("PatternPaint/language", DEFAULT_LANGUAGE).toString();
-    QString locale;
+    if(autoUpdater != Q_NULLPTR) {
+        // TODO: Duplicated from main.cpp
+        QString language = settings.value("PatternPaint/language", DEFAULT_LANGUAGE).toString();
+        QString locale;
 
-    if(language == "<System Language>") {
-        locale = QLocale::system().name();
-    }
-    else {
-        locale = language;
-    }
-    autoUpdater->setLanguage(locale);
+        if(language == "<System Language>")
+            locale = QLocale::system().name();
+        else
+            locale = language;
 
+        autoUpdater->setLanguage(locale);
+    }
 #endif  // DISABLE_UPDATE_CHECKS
 }
 
@@ -314,9 +314,9 @@ MainWindow::~MainWindow()
 {
 #if defined(Q_OS_MACX)
     // stop the app nap inhibitor
-    if (appNap != NULL) {
+    if (appNap != Q_NULLPTR) {
         delete appNap;
-        appNap = NULL;
+        appNap = Q_NULLPTR;
     }
 #endif
 
@@ -334,7 +334,7 @@ int MainWindow::getCurrentPatternIndex()
 
 int MainWindow::getPatternCount()
 {
-    if (patternCollectionListView->model() == NULL)
+    if (patternCollectionListView->model() == Q_NULLPTR)
         return 0;
 
     return patternCollectionListView->model()->rowCount();
@@ -350,7 +350,7 @@ int MainWindow::getCurrentFrameIndex()
 
 int MainWindow::getFrameCount()
 {
-    if (timeline->model() == NULL)
+    if (timeline->model() == Q_NULLPTR)
         return 0;
 
     return timeline->model()->rowCount();
@@ -533,7 +533,7 @@ void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
 
 #if defined(Q_OS_MACX)
         // start the app nap inhibitor
-        if (appNap == NULL)
+        if (appNap == Q_NULLPTR)
             appNap = new CAppNapInhibitor("Interaction with hardware");
 
 #endif
@@ -548,9 +548,9 @@ void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
 
 #if defined(Q_OS_MACX)
         // start the app nap inhibitor
-        if (appNap != NULL) {
+        if (appNap != Q_NULLPTR) {
             delete appNap;
-            appNap = NULL;
+            appNap = Q_NULLPTR;
         }
 #endif
     }
@@ -860,7 +860,7 @@ void MainWindow::showEvent(QShowEvent *event)
 void MainWindow::on_instrumentSelected(bool)
 {
     QAction *act = static_cast<QAction *>(sender());
-    Q_ASSERT(act != NULL);
+    Q_ASSERT(act != Q_NULLPTR);
     for (QAction *a : instrumentToolbar->actions())
         a->setChecked(false);
 
@@ -1066,10 +1066,10 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
     // TODO: we're going to have to unload our references, but for now skip that.
     if (!current.isValid()) {
 
-        timeline->setModel(NULL);
+        timeline->setModel(Q_NULLPTR);
         timeline->setVisible(false);
 
-        undoGroup.setActiveStack(NULL);
+        undoGroup.setActiveStack(Q_NULLPTR);
 
         setPatternName("()");
         setPatternModified(false);
