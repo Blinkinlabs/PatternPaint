@@ -508,7 +508,7 @@ void MainWindow::on_actionExport_pattern_for_Arduino_triggered()
 
     PatternWriter patternWriter(*(patternCollection.at(getCurrentPatternIndex())),
                                 *fixture,
-                                PatternWriter::RGB565_RLE);
+                                PatternWriter::RGB24);
 
     // Attempt to open the specified file
     QFile file(fileName);

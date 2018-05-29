@@ -57,9 +57,9 @@ int PatternWriter::QRgbTo565(const QColor &color, ColorMode colorMode)
     QByteArray bytes = colorToBytes(colorMode, color);
 
     // TODO: is the cast necessicary here?
-    return   (((static_cast<unsigned int>(bytes.at(0)) >> 3) & 0x1F) << 11)
-           | (((static_cast<unsigned int>(bytes.at(1)) >> 2) & 0x3F) <<  5)
-           | (((static_cast<unsigned int>(bytes.at(2)) >> 3) & 0x1F));
+    return   (((static_cast<uint8_t>(bytes.at(0)) >> 3) & 0x1F) << 11)
+           | (((static_cast<uint8_t>(bytes.at(1)) >> 2) & 0x3F) <<  5)
+           | (((static_cast<uint8_t>(bytes.at(2)) >> 3) & 0x1F));
 }
 
 void PatternWriter::encodeImageRGB565_RLE(const Pattern &pattern, const Fixture &fixture)
@@ -151,9 +151,9 @@ void PatternWriter::encodeImageRGB24(const Pattern &pattern, const Fixture &fixt
         for (int pixel = 0; pixel < colorStream.count(); pixel++) {
             QByteArray bytes = colorToBytes(fixture.getColorMode(), colorStream.at(pixel));
             header.append(QString("    %1, %2, %3, // %4\n")
-                          .arg(static_cast<unsigned int>(bytes.at(0)), 3)
-                          .arg(static_cast<unsigned int>(bytes.at(1)), 3)
-                          .arg(static_cast<unsigned int>(bytes.at(2)), 3)
+                          .arg(static_cast<uint8_t>(bytes.at(0)), 3)
+                          .arg(static_cast<uint8_t>(bytes.at(1)), 3)
+                          .arg(static_cast<uint8_t>(bytes.at(2)), 3)
                           .arg(pixel));
         }
     }
