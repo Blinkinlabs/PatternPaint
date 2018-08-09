@@ -294,33 +294,44 @@ bool PatternScrollModel::removeRows(int position, int rows, const QModelIndex &)
     return true;
 }
 
-QDataStream &operator<<(QDataStream &stream, const PatternScrollModel &model)
+QDataStream &operator<<(QDataStream &out, const PatternScrollModel &model)
 {
-    stream << model.state.frameSize;
-    stream << model.state.fileName;
-    stream << model.state.frameSpeed;
-    stream << model.state.image;
+    out << (qint32)1;
 
-    return stream;
+    out << model.state.frameSize;
+    out << model.state.fileName;
+    out << model.state.frameSpeed;
+    out << model.state.image;
+
+    return out;
 }
 
-QDataStream &operator>>(QDataStream &stream, PatternScrollModel &model)
+QDataStream &operator>>(QDataStream &in, PatternScrollModel &model)
 {
-    PatternScrollModel::State newState;
+    qint32 version;
+    in >> version;
 
-    // TODO: Version first?
-    stream >> newState.frameSize;
-    stream >> newState.fileName;
-    stream >> newState.frameSpeed;
-    stream >> newState.image;
+    if(version == 1) {
+        PatternScrollModel::State newState;
 
-    // TODO: Data validation?
+        in >> newState.frameSize;
+        in >> newState.fileName;
+        in >> newState.frameSpeed;
+        in >> newState.image;
 
-    // TODO: Not clear if the format actually makes a difference
-    newState.image = newState.image.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+        // TODO: Data validation?
 
-    model.state = newState;
-    // TODO: Be noisy with messages, since our state just changed?
+        // TODO: Not clear if the format actually makes a difference
+        newState.image = newState.image.convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
-    return stream;
+        model.state = newState;
+        // TODO: Be noisy with messages, since our state just changed?
+    }
+    else {
+        // Mark the data stream as corrupted, so that the array read will
+        // unwind correctly.
+        in.setStatus(QDataStream::ReadCorruptData);
+    }
+
+    return in;
 }

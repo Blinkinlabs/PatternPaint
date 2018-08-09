@@ -2,12 +2,12 @@
 #define PATTERNCOLLECTIONMODEL_H
 
 #include "libblinkyglobal.h"
-
 #include "pattern.h"
 
 #include <QAbstractListModel>
 #include <QObject>
 #include <QUndoGroup>
+#include <QDataStream>
 
 class LIBBLINKY_EXPORT PatternCollectionModel : public QAbstractListModel
 {
@@ -32,6 +32,9 @@ public:
     bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex());
     bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex());
 
+    friend QDataStream &operator<<(QDataStream &out, const PatternCollectionModel &patternCollectionModel);
+    friend QDataStream &operator>>(QDataStream &in, PatternCollectionModel &patternCollectionModel);
+
 private:
     QList<QPointer<Pattern> > patterns;
     void disconnectPattern(QPointer<Pattern> pattern);
@@ -40,5 +43,8 @@ private:
 private slots:
     void on_patternDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
 };
+
+LIBBLINKY_EXPORT QDataStream &operator<<(QDataStream &out, const PatternCollectionModel &patternCollectionModel);
+LIBBLINKY_EXPORT QDataStream &operator>>(QDataStream &in, PatternCollectionModel &patternCollectionModel);
 
 #endif // PATTERNCOLLECTIONMODEL_H

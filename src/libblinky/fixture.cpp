@@ -10,13 +10,13 @@ Fixture *Fixture::makeFixture(QString type, QSize size)
     Fixture *fixture;
 
     if(type == "Matrix-Zigzag") {
-        fixture = new MatrixFixture(size, MatrixFixture::MODE_ZIGZAG);
+        fixture = new MatrixFixture(size, MatrixFixture::Mode::MODE_ZIGZAG);
     }
     else if(type == "Matrix-Rows") {
-        fixture = new MatrixFixture(size, MatrixFixture::MODE_ROWS);
+        fixture = new MatrixFixture(size, MatrixFixture::Mode::MODE_ROWS);
     }
     else if(type == "Matrix-Cols") {
-        fixture = new MatrixFixture(size, MatrixFixture::MODE_COLS);
+        fixture = new MatrixFixture(size, MatrixFixture::Mode::MODE_COLS);
     }
     else if(type == "Linear") {
         fixture = new LinearFixture(size.height());
@@ -35,8 +35,9 @@ Fixture::Fixture(QObject *parent) :
 
 }
 
-Fixture::~Fixture()
+Fixture::Type Fixture::getType() const
 {
+    return Type::CUSTOM;
 }
 
 void Fixture::setName(const QString &newName)
@@ -123,4 +124,21 @@ QSharedPointer<BrightnessModel> Fixture::getBrightnessModel() const
 void Fixture::setBrightnessModel(BrightnessModel *newBrightnessModel)
 {
     brightnessModel = QSharedPointer<BrightnessModel>(newBrightnessModel);
+}
+
+QDataStream &operator<<(QDataStream &out, const Fixture::Type &type)
+{
+    out << static_cast<qint32>(type);
+
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, Fixture::Type &type)
+{
+    qint32 value;
+
+    in >> value;
+    type = static_cast<Fixture::Type>(value);
+
+    return in;
 }

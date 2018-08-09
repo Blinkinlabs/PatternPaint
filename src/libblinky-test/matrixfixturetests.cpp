@@ -5,9 +5,9 @@
 
 void MatrixFixtureTests::constructorTest()
 {
-    MatrixFixture matrixFixture(QSize(),MatrixFixture::MODE_ROWS);
+    MatrixFixture matrixFixture(QSize(),MatrixFixture::Mode::MODE_ROWS);
 
-    QCOMPARE(matrixFixture.getMode(), MatrixFixture::MODE_ROWS);
+    QCOMPARE(matrixFixture.getMode(), MatrixFixture::Mode::MODE_ROWS);
     QCOMPARE(matrixFixture.getSize(), QSize());
     QCOMPARE(matrixFixture.getCount(), (unsigned int)0);
 }
@@ -27,7 +27,7 @@ void MatrixFixtureTests::setSizeTest()
 {
     QFETCH(QSize, size);
 
-    MatrixFixture matrixFixture(QSize(),MatrixFixture::MODE_ROWS);
+    MatrixFixture matrixFixture(QSize(),MatrixFixture::Mode::MODE_ROWS);
 
     matrixFixture.setSize(size);
 
@@ -50,7 +50,7 @@ void MatrixFixtureTests::setModeZigZagTest()
 {
     QFETCH(QSize, size);
 
-    MatrixFixture matrixFixture(QSize(),MatrixFixture::MODE_ZIGZAG);
+    MatrixFixture matrixFixture(QSize(),MatrixFixture::Mode::MODE_ZIGZAG);
 
     matrixFixture.setSize(size);
 
@@ -86,7 +86,7 @@ void MatrixFixtureTests::setModeRowsTest()
 {
     QFETCH(QSize, size);
 
-    MatrixFixture matrixFixture(QSize(),MatrixFixture::MODE_ROWS);
+    MatrixFixture matrixFixture(QSize(),MatrixFixture::Mode::MODE_ROWS);
 
     matrixFixture.setSize(size);
 
@@ -115,7 +115,7 @@ void MatrixFixtureTests::setModeColsTest()
 {
     QFETCH(QSize, size);
 
-    MatrixFixture matrixFixture(QSize(),MatrixFixture::MODE_COLS);
+    MatrixFixture matrixFixture(QSize(),MatrixFixture::Mode::MODE_COLS);
 
     matrixFixture.setSize(size);
 

@@ -18,33 +18,39 @@ class LIBBLINKY_EXPORT Fixture : public QObject
     Q_OBJECT
 
 public:
+    enum class Type {
+        CUSTOM,     // Custom list of points
+        LINEAR,     // Linear array of points
+        MATRIX      // Rectangular matrix of points
+    };
+
     // TODO: The 'size' bit won't make sense for arbitrary fixtures.
     static Fixture *makeFixture(QString type, QSize size);
 
     Fixture(QObject *parent = 0);
 
-    virtual ~Fixture();
+    virtual Fixture::Type getType() const;
 
-    virtual QString getName() const;
-    virtual void setName(const QString &newName);
+    QString getName() const;
+    void setName(const QString &newName);
 
-    virtual ColorMode getColorMode() const;
-    virtual void setColorMode(const ColorMode &newColorMode);
+    ColorMode getColorMode() const;
+    void setColorMode(const ColorMode &newColorMode);
 
-    virtual QSharedPointer<BrightnessModel> getBrightnessModel() const;
-    virtual void setBrightnessModel(BrightnessModel *BrightnessModel);
+    QSharedPointer<BrightnessModel> getBrightnessModel() const;
+    void setBrightnessModel(BrightnessModel *BrightnessModel);
 
-    virtual void setLocations(const QList<QPoint> &newLocations);
-    virtual const QList<QPoint> & getLocations() const;
+    void setLocations(const QList<QPoint> &newLocations);
+    const QList<QPoint> & getLocations() const;
 
     // Get the number of LEDs in this fixture
-    virtual unsigned int getCount() const;
+    unsigned int getCount() const;
 
     // Get the extents of this fixture in drawing pixel coordinates
     // TODO: Make float, handle negative coordinates
-    virtual QRect getExtents() const;
+    QRect getExtents() const;
 
-    virtual QList<QColor> getColorStream(const QImage &frame) const;
+    QList<QColor> getColorStream(const QImage &frame) const;
 
 private:
     QString name;
@@ -55,5 +61,8 @@ private:
     QList<QPoint> locations;
     QRect extents;
 };
+
+LIBBLINKY_EXPORT QDataStream &operator<<(QDataStream &out, const Fixture::Type &type);
+LIBBLINKY_EXPORT QDataStream &operator>>(QDataStream &in, Fixture::Type &type);
 
 #endif // FIXTURE_H

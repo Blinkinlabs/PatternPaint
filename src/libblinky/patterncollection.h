@@ -2,8 +2,9 @@
 #define PATTERNCOLLECTION_H
 
 #include "libblinkyglobal.h"
-
 #include "patterncollectionmodel.h"
+
+#include <QDataStream>
 
 class LIBBLINKY_EXPORT PatternCollection
 {
@@ -27,8 +28,14 @@ public:
 
     bool isEmpty() const;
 
+    friend QDataStream &operator<<(QDataStream &out, const PatternCollection &patternCollection);
+    friend QDataStream &operator>>(QDataStream &in, PatternCollection &patternCollection);
+
 private:
     PatternCollectionModel model;
 };
+
+LIBBLINKY_EXPORT QDataStream &operator<<(QDataStream &out, const PatternCollection &patternCollection);
+LIBBLINKY_EXPORT QDataStream &operator>>(QDataStream &in, PatternCollection &patternCollection);
 
 #endif // PATTERNCOLLECTION_H

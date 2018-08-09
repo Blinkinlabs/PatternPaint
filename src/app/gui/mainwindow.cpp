@@ -41,6 +41,8 @@
 #include <QDesktopServices>
 #include <QtWidgets>
 #include <QStandardPaths>
+#include <linearfixture.h>
+#include <matrixfixture.h>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -149,7 +151,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, &MainWindow::patternStatusChanged, patternSpeed, &QSpinBox::setEnabled);
     connect(this, &MainWindow::patternStatusChanged, &frameIndexWidget, &QLineEdit::setEnabled);
 
-    state = State_Disconnected;
+    state = State::Disconnected;
 
     // Our pattern editor wants to get some notifications
     connect(&colorChooser, &ColorChooser::sendColor,
@@ -367,7 +369,7 @@ void MainWindow::drawTimer_timeout()
 void MainWindow::connectionScannerTimer_timeout()
 {
     // If we are already connected, disregard.
-    if (state != State_Disconnected)
+    if (state != State::Disconnected)
         return;
 
     // Look for controllers
@@ -528,7 +530,7 @@ void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
     qDebug() << "status changed, connected=" << connected;
 
     if (connected) {
-        state = State_Connected;
+        state = State::Connected;
         startPlayback();
 
 #if defined(Q_OS_MACX)
@@ -538,7 +540,7 @@ void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
 
 #endif
     } else {
-        state = State_Disconnected;
+        state = State::Disconnected;
         stopPlayback();
 
         // TODO: Does this delete the serial object reliably?
@@ -555,7 +557,7 @@ void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
 #endif
     }
 
-    actionSave_to_Blinky->setEnabled(state == State_Connected && !patternCollection.isEmpty());
+    actionSave_to_Blinky->setEnabled(state == State::Connected && !patternCollection.isEmpty());
 }
 
 void MainWindow::on_actionAbout_triggered()
@@ -579,7 +581,7 @@ void MainWindow::on_uploaderFinished(bool result)
     if(!dialog.isNull())
         delete dialog;
 
-    if(state == State_Uploading) {
+    if(state == State::Uploading) {
         if (!result) {
             QString message;
             message.append("Error updating blinky- please try again.");
@@ -595,7 +597,7 @@ void MainWindow::on_uploaderFinished(bool result)
         // TODO: Make the class responsible for cleaning itself up?
         delete uploader;
     }
-    else if(state == State_RestoringFirmware) {
+    else if(state == State::RestoringFirmware) {
         if (!result) {
             QString message;
             message.append("Error restoring firmware- please try again.");
@@ -612,7 +614,7 @@ void MainWindow::on_uploaderFinished(bool result)
         delete loader;
     }
 
-    state = State_Disconnected;
+    state = State::Disconnected;
 }
 
 void MainWindow::on_actionVisit_the_Blinkinlabs_forum_triggered()
@@ -726,7 +728,7 @@ void MainWindow::on_actionRestore_firmware_triggered()
             return;
         }
     }
-    state = State_RestoringFirmware;
+    state = State::RestoringFirmware;
 }
 
 void MainWindow::on_actionSave_to_Blinky_triggered()
@@ -769,7 +771,7 @@ void MainWindow::on_actionSave_to_Blinky_triggered()
         showError(uploader->getErrorString());
         return;
     }
-    state = State_Uploading;
+    state = State::Uploading;
 }
 
 QProgressDialog* MainWindow::makeProgressDialog(BlinkyUploader *uploader) {
@@ -970,9 +972,9 @@ void MainWindow::applyScene(const SceneTemplate &scene)
 
         for (QFileInfo fileinfo : examplesList) {
             if (!fileinfo.isDir()) {
-                Pattern::PatternType type = Pattern::Scrolling;
+                Pattern::Type type = Pattern::Type::Scrolling;
                 if (fileinfo.fileName().endsWith(".frames.png"))
-                    type = Pattern::FrameBased;
+                    type = Pattern::Type::FrameBased;
 
                 loadPattern(type,
                             scene.examples + "/" + fileinfo.fileName());
@@ -990,7 +992,7 @@ void MainWindow::applyScene(const SceneTemplate &scene)
     settings.setValue("BlinkyTape/firmwareName", scene.firmwareName);
 }
 
-bool MainWindow::loadPattern(Pattern::PatternType type, const QString fileName)
+bool MainWindow::loadPattern(Pattern::Type type, const QString fileName)
 {
     QSettings settings;
     int frameCount = settings.value("Options/FrameCount", DEFAULT_FRAME_COUNT).toUInt();
@@ -1103,7 +1105,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
 
     patternSpeed->setValue(newpattern->getFrameSpeed());
 
-    actionSave_to_Blinky->setEnabled(state == State_Connected);
+    actionSave_to_Blinky->setEnabled(state == State::Connected);
 
     if (timelineSelectedChangedConnection)
         QObject::disconnect(timelineSelectedChangedConnection);
@@ -1227,9 +1229,9 @@ void MainWindow::setPatternModified(bool modified)
 
 void MainWindow::on_ExampleSelected(QAction *action)
 {
-    Pattern::PatternType type = Pattern::Scrolling;
+    Pattern::Type type = Pattern::Type::Scrolling;
     if (action->objectName().endsWith(".frames.png"))
-        type = Pattern::FrameBased;
+        type = Pattern::Type::FrameBased;
 
     if (!loadPattern(type, action->objectName())) {
         showError("Could not open file "
@@ -1241,12 +1243,12 @@ void MainWindow::on_ExampleSelected(QAction *action)
 
 void MainWindow::on_actionNew_ScrollingPattern_triggered()
 {
-    loadPattern(Pattern::Scrolling, QString());
+    loadPattern(Pattern::Type::Scrolling, QString());
 }
 
 void MainWindow::on_actionNew_FramePattern_triggered()
 {
-    loadPattern(Pattern::FrameBased, QString());
+    loadPattern(Pattern::Type::FrameBased, QString());
 }
 
 void MainWindow::on_actionConfigure_Scene_triggered()
@@ -1282,7 +1284,7 @@ void MainWindow::on_actionConfigure_Scene_triggered()
     applyScene(sceneConfiguration.getSceneTemplate());
 }
 
-void MainWindow::openPattern(Pattern::PatternType type)
+void MainWindow::openPattern(Pattern::Type type)
 {
     QSettings settings;
     QString lastDirectory = settings.value("File/LoadDirectory").toString();
@@ -1310,12 +1312,12 @@ void MainWindow::openPattern(Pattern::PatternType type)
 
 void MainWindow::on_actionOpen_Scrolling_Pattern_triggered()
 {
-    openPattern(Pattern::Scrolling);
+    openPattern(Pattern::Type::Scrolling);
 }
 
 void MainWindow::on_actionOpen_Frame_based_Pattern_triggered()
 {
-    openPattern(Pattern::FrameBased);
+    openPattern(Pattern::Type::FrameBased);
 }
 
 void MainWindow::on_actionPreferences_triggered()
@@ -1361,4 +1363,153 @@ void MainWindow::on_actionClose_All_triggered()
 void MainWindow::on_actionDebug_Log_triggered()
 {
     DebugLog::instance(this).show();
+}
+
+//////// MOVE ME INTO SERIALIZER NAMESPACE
+
+#define MAGIC_STRING "PatternPaint"
+
+bool SaveProject(const QString &fileName,
+        const Fixture &fixture,
+        const PatternCollection &patternCollection)
+{
+    // Attempt to open the specified file
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        return false;
+
+    QDataStream out(&file);
+
+    out << QString(MAGIC_STRING);
+    out << (qint32) 1;
+    out.setVersion(QDataStream::Qt_5_6);
+
+    out << fixture.getType();
+    if(fixture.getType() == Fixture::Type::LINEAR) {
+        out << dynamic_cast<const LinearFixture &>(fixture);
+    }
+    else if(fixture.getType() == Fixture::Type::MATRIX) {
+        out << dynamic_cast<const MatrixFixture &>(fixture);
+    }
+
+    out << patternCollection;
+
+    file.close();
+    return true;
+}
+
+bool LoadProject(QString &fileName,
+        Fixture **fixture,
+        PatternCollection &patternCollection)
+{
+    // TODO: do this as a binary operation
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly))
+        return false;
+
+    QDataStream in(&file);
+
+    QString magic;
+    in >> magic;
+    if (magic != MAGIC_STRING)
+        return false;
+
+    qint32 version;
+    in >> version;
+    if (version == 1) {
+        in.setVersion(QDataStream::Qt_5_6);
+
+        Fixture::Type fixtureType;
+        in >> fixtureType;
+
+        if(fixtureType == Fixture::Type::LINEAR) {
+            LinearFixture *linearFixture = new LinearFixture(1);
+            in >> *linearFixture;
+
+            linearFixture->setBrightnessModel(new ExponentialBrightness(1.8f,1.8f,2.1f));
+
+            *fixture = linearFixture;
+        }
+        else if(fixtureType == Fixture::Type::MATRIX) {
+            MatrixFixture *matrixFixture = new MatrixFixture(QSize(1,1),MatrixFixture::Mode::MODE_COLS);
+            in >> *matrixFixture;
+
+            matrixFixture->setBrightnessModel(new ExponentialBrightness(1.8f,1.8f,2.1f));
+
+            *fixture = matrixFixture;
+        }
+        else {
+            return false;
+        }
+
+        in >> patternCollection;
+        if(in.status() != QDataStream::Ok)
+            return false;
+
+    } else {
+        return false;
+    }
+
+    return true;
+}
+
+////////////////////////////////////////////////////
+
+void MainWindow::on_actionSave_Project_triggered()
+{
+    QSettings settings;
+    QString lastDirectory = settings.value("File/SaveDirectory").toString();
+
+    QDir dir(lastDirectory);
+    if (!dir.isReadable())
+        lastDirectory = QDir::homePath();
+
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    tr("Save Project"),
+                                                    lastDirectory,
+                                                    tr("Project Files (*.patternpaint)"));
+
+    if (fileName.length() == 0)
+        return;
+
+    QFileInfo fileInfo(fileName);
+    settings.setValue("File/SaveDirectory", fileInfo.absolutePath());
+
+    if (!SaveProject(fileName, *fixture, patternCollection))
+        showError(tr("Error saving project to %1. Try saving it somewhere else?")
+                  .arg(fileInfo.absolutePath()));
+}
+
+void MainWindow::on_actionOpen_Project_triggered()
+{
+    QSettings settings;
+    QString lastDirectory = settings.value("File/SaveDirectory").toString();
+
+    QDir dir(lastDirectory);
+    if (!dir.isReadable())
+        lastDirectory = QDir::homePath();
+
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Load Project"),
+                                                    lastDirectory,
+                                                    tr("Project Files (*.patternpaint)"));
+
+    if (fileName.length() == 0)
+        return;
+
+    QFileInfo fileInfo(fileName);
+    settings.setValue("File/SaveDirectory", fileInfo.absolutePath());
+
+    Fixture *newFixture;
+
+    if (!LoadProject(fileName, &newFixture, patternCollection)) {
+        showError(tr("Error loading project %1")
+                  .arg(fileInfo.absolutePath()));
+        return;
+    }
+
+    fixture = newFixture;
+    frameEditor->setFixture(fixture);
+    outputPreview->setFixture(fixture);
 }

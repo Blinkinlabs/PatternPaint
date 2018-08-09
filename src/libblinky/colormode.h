@@ -6,6 +6,7 @@
 #include <QMetaType>
 #include <QString>
 #include <QColor>
+#include <QDataStream>
 
 enum ColorMode {
     RGB,
@@ -23,6 +24,9 @@ struct LIBBLINKY_EXPORT ColorModeNames {
     ColorMode colorMode;
     QString name;
 };
+
+LIBBLINKY_EXPORT QDataStream &operator<<(QDataStream &out, const ColorMode &mode);
+LIBBLINKY_EXPORT QDataStream &operator>>(QDataStream &in, ColorMode &mode);
 
 
 LIBBLINKY_EXPORT QByteArray colorToBytes(ColorMode colorMode, const QColor &color);

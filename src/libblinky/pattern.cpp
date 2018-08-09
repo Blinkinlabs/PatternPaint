@@ -5,23 +5,19 @@
 #include <QDebug>
 #include <QPainter>
 
-Pattern::Pattern(PatternType type, QSize patternSize, int frameCount, QListWidget *parent) :
+Pattern::Pattern(Type type, QSize patternSize, int frameCount, QListWidget *parent) :
     QObject(parent),
-    type(type)
+    m_type(type)
 {
     uuid = QUuid::createUuid();
 
     // TODO: Choose a pattern type!
     switch (type) {
-    case FrameBased:
+    case Type::FrameBased:
         model = new PatternFrameModel(patternSize, this);
-        playbackIndicator = false;
-        timeline = true;
         break;
-    case Scrolling:
+    case Type::Scrolling:
         model = new PatternScrollModel(patternSize, this);
-        playbackIndicator = true;
-        timeline = false;
         break;
     default:
         // ??
@@ -72,8 +68,8 @@ bool Pattern::load(const QString &newFileName)
         return false;
 
 
-    switch (type) {
-    case FrameBased:
+    switch (m_type) {
+    case Type::FrameBased:
     {
         QSize frameSize = model->data(model->index(0), PatternModel::FrameSize).toSize();
 
@@ -105,7 +101,7 @@ bool Pattern::load(const QString &newFileName)
 
         break;
     }
-    case Scrolling:
+    case Type::Scrolling:
     {
         QSize frameSize = model->data(model->index(0), PatternModel::FrameSize).toSize();
 
@@ -143,8 +139,8 @@ bool Pattern::saveAs(const QString newFileName)
     QSize frameSize = model->data(model->index(0), PatternModel::FrameSize).toSize();
     QImage output;
 
-    switch (type) {
-    case FrameBased:
+    switch (m_type) {
+    case Type::FrameBased:
     {
         // Create a big image consisting of all the frames side-by-side
         output = QImage(frameSize.width()*getFrameCount(), frameSize.height(),
@@ -161,7 +157,7 @@ bool Pattern::saveAs(const QString newFileName)
         painter.end();
         break;
     }
-    case Scrolling:
+    case Type::Scrolling:
     {
         // Just grab the edit image.
         output = model->data(model->index(0), PatternModel::EditImage).value<QImage>();
@@ -225,6 +221,22 @@ PatternModel * Pattern::getModel() const
     return model;
 }
 
+bool Pattern::hasPlaybackIndicator() const
+{
+    if(m_type == Type::Scrolling)
+        return true;
+
+    return false;
+}
+
+bool Pattern::hasTimeline() const
+{
+    if(m_type == Type::FrameBased)
+        return true;
+
+    return false;
+}
+
 int Pattern::getFrameCount() const
 {
     return model->rowCount();
@@ -251,4 +263,64 @@ void Pattern::deleteFrame(int index)
 void Pattern::addFrame(int index)
 {
     model->insertRow(index);
+}
+
+QDataStream &operator<<(QDataStream &out, const Pattern &pattern)
+{
+    out << (qint32)1;
+    out << pattern.m_type;
+
+    if(pattern.m_type == Pattern::Type::Scrolling)
+        out << *(dynamic_cast<PatternScrollModel *>(pattern.model.data()));
+    else if(pattern.m_type == Pattern::Type::FrameBased)
+        out << *(dynamic_cast<PatternFrameModel *>(pattern.model.data()));
+
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, Pattern &pattern)
+{
+    qint32 version;
+    in >> version;
+
+    if(version == 1) {
+        in >> pattern.m_type;
+        if(pattern.m_type == Pattern::Type::Scrolling) {
+            PatternScrollModel *model = new PatternScrollModel(QSize(1,1));
+            in >> *model;
+            pattern.model = model;
+        }
+        else if(pattern.m_type == Pattern::Type::FrameBased) {
+            PatternFrameModel *model = new PatternFrameModel(QSize(1,1));
+            in >> *model;
+            pattern.model = model;
+         }
+         else {
+            in.setStatus(QDataStream::ReadCorruptData);
+         }
+    }
+    else {
+        // Mark the data stream as corrupted, so that the array read will
+        // unwind correctly.
+        in.setStatus(QDataStream::ReadCorruptData);
+    }
+
+    return in;
+}
+
+QDataStream &operator <<(QDataStream &out, const Pattern::Type &type)
+{
+    out << static_cast<qint32>(type);
+
+    return out;
+}
+
+QDataStream &operator >>(QDataStream &in, Pattern::Type &type)
+{
+    qint32 value;
+
+    in >> value;
+    type = static_cast<Pattern::Type>(value);
+
+    return in;
 }

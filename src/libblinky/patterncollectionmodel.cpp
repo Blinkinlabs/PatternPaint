@@ -130,7 +130,7 @@ bool PatternCollectionModel::insertRows(int position, int rows, const QModelInde
 
     for (int row = 0; row < rows; ++row) {
         // TODO: Add the size to PatternCollectionModel model, so we don't have to make fake values here.
-        patterns.insert(position, new Pattern(Pattern::Scrolling, QSize(1, 1), 1));
+        patterns.insert(position, new Pattern(Pattern::Type::Scrolling, QSize(1, 1), 1));
         connectPattern(patterns.at(position));
     }
 
@@ -150,4 +150,45 @@ bool PatternCollectionModel::removeRows(int position, int rows, const QModelInde
 
     endRemoveRows();
     return true;
+}
+
+QDataStream &operator<<(QDataStream &out, const PatternCollectionModel &patternCollectionModel)
+{
+    out << (qint32)1;
+
+    out << (qint32)patternCollectionModel.patterns.count();
+    for(const Pattern *pattern : patternCollectionModel.patterns)
+        out << *pattern;
+
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, PatternCollectionModel &patternCollectionModel)
+{
+    qint32 version;
+    in >> version;
+
+    if(version == 1) {
+        patternCollectionModel.beginResetModel();
+
+        patternCollectionModel.patterns.clear();
+
+        qint32 count;
+        in >> count;
+
+        for(int i = 0; i < count; i++) {
+            Pattern *pattern = new Pattern(Pattern::Type::Scrolling,QSize(1,1),1);
+            in >> *pattern;
+            patternCollectionModel.patterns.append(pattern);
+        }
+
+        patternCollectionModel.endResetModel();
+    }
+    else {
+        // Mark the data stream as corrupted, so that the array read will
+        // unwind correctly.
+        in.setStatus(QDataStream::ReadCorruptData);
+    }
+
+    return in;
 }

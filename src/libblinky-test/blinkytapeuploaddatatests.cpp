@@ -101,7 +101,7 @@ void BlinkyTapeUploadDataTests::maxPatternsSucceedsTest()
     BlinkyTapeUploadData blinkyTapeUploadData;
     QList<PatternWriter> patternWriters;
 
-    Pattern pattern(Pattern::PatternType::Scrolling, QSize(1,1), 1);
+    Pattern pattern(Pattern::Type::Scrolling, QSize(1,1), 1);
     LinearFixture fixture(0);
     PatternWriter::Encoding encoding = PatternWriter::Encoding::RGB24;
 
@@ -117,7 +117,7 @@ void BlinkyTapeUploadDataTests::tooManyPatternsFailsTest()
     BlinkyTapeUploadData blinkyTapeUploadData;
     QList<PatternWriter> patternWriters;
 
-    Pattern pattern(Pattern::PatternType::Scrolling, QSize(1,1), 1);
+    Pattern pattern(Pattern::Type::Scrolling, QSize(1,1), 1);
     LinearFixture fixture(0);
     PatternWriter::Encoding encoding = PatternWriter::Encoding::RGB24;
 
@@ -136,7 +136,7 @@ void BlinkyTapeUploadDataTests::padsFirmwareSectionTest()
     BlinkyTapeUploadData blinkyTapeUploadData;
     QList<PatternWriter> patternWriters;
 
-    Pattern pattern(Pattern::PatternType::Scrolling, QSize(1,1), 1);
+    Pattern pattern(Pattern::Type::Scrolling, QSize(1,1), 1);
     LinearFixture fixture(0);
     PatternWriter::Encoding encoding = PatternWriter::Encoding::RGB24;
 

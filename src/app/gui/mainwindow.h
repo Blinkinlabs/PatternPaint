@@ -131,6 +131,10 @@ private slots:
 
     void on_actionDebug_Log_triggered();
 
+    void on_actionSave_Project_triggered();
+
+    void on_actionOpen_Project_triggered();
+
 signals:
 
     /// Signalled when an editable pattern is selected in the editor
@@ -140,6 +144,13 @@ signals:
     void windowLoaded();
 
 private:
+    enum class State {
+        Disconnected,
+        Connected,
+        Uploading,
+        RestoringFirmware
+    };
+
     AutoUpdater *autoUpdater;
 
     ColorChooser colorChooser;
@@ -165,12 +176,6 @@ private:
     QLineEdit frameIndexWidget;
     InstrumentConfiguration instrumentConfiguration;
 
-    enum State {
-        State_Disconnected,
-        State_Connected,
-        State_Uploading,
-        State_RestoringFirmware
-    };
     State state;
 
     QUndoGroup undoGroup;
@@ -199,7 +204,7 @@ private:
     QProgressDialog* makeProgressDialog(BlinkyUploader *uploader);
     QProgressDialog* makeProgressDialog(FirmwareLoader *uploader);
 
-    bool loadPattern(Pattern::PatternType type, const QString fileName);
+    bool loadPattern(Pattern::Type type, const QString fileName);
 
     void setPatternName(QString name);
 
@@ -222,7 +227,7 @@ private:
     int getFrameCount();
     int getCurrentPatternIndex();
     int getPatternCount();
-    void openPattern(Pattern::PatternType type);
+    void openPattern(Pattern::Type type);
 };
 
 #endif // MAINWINDOW_H

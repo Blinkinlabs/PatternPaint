@@ -2,13 +2,15 @@
 #define PATTERNITEM_H
 
 #include "libblinkyglobal.h"
+#include "patternmodel.h"
 
 #include <QFileInfo>
 #include <QListWidgetItem>
 #include <QUndoStack>
 #include <QPointer>
 #include <QUuid>
-#include "patternmodel.h"
+#include <QDataStream>
+
 
 /// Representation of a pattern based on a frame model.
 class LIBBLINKY_EXPORT Pattern : public QObject
@@ -16,7 +18,7 @@ class LIBBLINKY_EXPORT Pattern : public QObject
     Q_OBJECT
 
 public:
-    enum PatternType {
+    enum class Type {
         Scrolling,
         FrameBased
     };
@@ -24,7 +26,7 @@ public:
     /// Constructor for an empty pattern item
     /// @param size Size of the display, in pixels
     /// @param frameCount Length of the pattern, in frames
-    Pattern(PatternType type, QSize size, int frameCount, QListWidget *parent = 0);
+    Pattern(Type m_type, QSize size, int frameCount, QListWidget *parent = 0);
 
     /// Set the pattern image directly without resizing or setting an undo state. This
     /// is used by the undocommand and should probably be refactored.
@@ -111,28 +113,27 @@ public:
     /// True if the pattern editor should show a playback indicator for ths
     /// pattern type
     /// TODO: Delete this
-    bool hasPlaybackIndicator() const
-    {
-        return playbackIndicator;
-    }
+    bool hasPlaybackIndicator() const;
 
-    bool hasTimeline() const
-    {
-        return timeline;
-    }
+    bool hasTimeline() const;
+
+    friend QDataStream &operator<<(QDataStream &out, const Pattern &pattern);
+    friend QDataStream &operator>>(QDataStream &in, Pattern &pattern);
 
 private:
     QPointer<PatternModel> model;   ///< Storage container for the images
-
-    // TODO: Push these into the model?
-    PatternType type;
-    bool playbackIndicator;
-    bool timeline;
+    Type m_type;
 
     // TODO: Figure out a better way to store/copy patterns?
     // Difficult to do so now because they have to be tied into
     // the undo and event notification stacks.
     QUuid uuid;
 };
+
+LIBBLINKY_EXPORT QDataStream &operator<<(QDataStream &out, const Pattern &pattern);
+LIBBLINKY_EXPORT QDataStream &operator>>(QDataStream &in, Pattern &pattern);
+
+LIBBLINKY_EXPORT QDataStream &operator<<(QDataStream &out, const Pattern::Type &type);
+LIBBLINKY_EXPORT QDataStream &operator>>(QDataStream &in, Pattern::Type &type);
 
 #endif // PATTERNITEM_H

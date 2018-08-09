@@ -52,7 +52,7 @@ void BlinkyPendantUploadDataTests::maxPatternsSucceedsTest()
     BlinkyPendantUploadData::DisplayMode displayMode = BlinkyPendantUploadData::DisplayMode::POV;
     QList<PatternWriter> patternWriters;
 
-    Pattern pattern(Pattern::PatternType::Scrolling, QSize(1,1), 1);
+    Pattern pattern(Pattern::Type::Scrolling, QSize(1,1), 1);
     LinearFixture fixture(10);
     PatternWriter::Encoding encoding = PatternWriter::Encoding::RGB24;
 
@@ -68,7 +68,7 @@ void BlinkyPendantUploadDataTests::tooManyPatternsFailsTest()
     BlinkyPendantUploadData::DisplayMode displayMode = BlinkyPendantUploadData::DisplayMode::POV;
     QList<PatternWriter> patternWriters;
 
-    Pattern pattern(Pattern::PatternType::Scrolling, QSize(1,1), 1);
+    Pattern pattern(Pattern::Type::Scrolling, QSize(1,1), 1);
     LinearFixture fixture(10);
     PatternWriter::Encoding encoding = PatternWriter::Encoding::RGB24;
 
@@ -86,7 +86,7 @@ void BlinkyPendantUploadDataTests::wrongEncodingFails()
     BlinkyPendantUploadData::DisplayMode displayMode = BlinkyPendantUploadData::DisplayMode::POV;
     QList<PatternWriter> patternWriters;
 
-    Pattern pattern(Pattern::PatternType::Scrolling, QSize(1,1), 1);
+    Pattern pattern(Pattern::Type::Scrolling, QSize(1,1), 1);
     LinearFixture fixture(10);
     PatternWriter::Encoding encoding = PatternWriter::Encoding::RGB565_RLE;
 
@@ -102,7 +102,7 @@ void BlinkyPendantUploadDataTests::wrongLEDCountFails()
     BlinkyPendantUploadData::DisplayMode displayMode = BlinkyPendantUploadData::DisplayMode::POV;
     QList<PatternWriter> patternWriters;
 
-    Pattern pattern(Pattern::PatternType::Scrolling, QSize(1,1), 1);
+    Pattern pattern(Pattern::Type::Scrolling, QSize(1,1), 1);
     LinearFixture fixture(9);
     PatternWriter::Encoding encoding = PatternWriter::Encoding::RGB24;
 
@@ -119,10 +119,10 @@ void BlinkyPendantUploadDataTests::uploadDataTest() {
 
     PatternWriter::Encoding encoding = PatternWriter::Encoding::RGB24;
 
-    Pattern patternA(Pattern::PatternType::Scrolling, QSize(1,10), 1);
+    Pattern patternA(Pattern::Type::Scrolling, QSize(1,10), 1);
     patternA.setFrameSpeed(12);
 
-    Pattern patternB(Pattern::PatternType::Scrolling, QSize(20,10), 1);
+    Pattern patternB(Pattern::Type::Scrolling, QSize(20,10), 1);
     patternB.setFrameSpeed(34);
 
     QList<PatternWriter> patternWriters;

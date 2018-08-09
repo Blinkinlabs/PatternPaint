@@ -69,3 +69,20 @@ bool colorModeValid(ColorMode colorMode) {
         break;
     }
 }
+
+QDataStream &operator<<(QDataStream &out, const ColorMode &mode)
+{
+    out << static_cast<qint32>(mode);
+
+    return out;
+}
+
+QDataStream &operator >>(QDataStream &in, ColorMode &mode)
+{
+    qint32 value;
+
+    in >> value;
+    mode = static_cast<ColorMode>(value);
+
+    return in;
+}

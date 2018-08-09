@@ -57,3 +57,29 @@ bool PatternCollection::isEmpty() const
 {
     return count() == 0;
 }
+
+QDataStream &operator<<(QDataStream &out, const PatternCollection &patternCollection)
+{
+    out << (qint32)1;
+
+    out << patternCollection.model;
+
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, PatternCollection &patternCollection)
+{
+    qint32 version;
+    in >> version;
+
+    if(version == 1) {
+        in >> patternCollection.model;
+    }
+    else {
+        // Mark the data stream as corrupted, so that the array read will
+        // unwind correctly.
+        in.setStatus(QDataStream::ReadCorruptData);
+    }
+
+    return in;
+}

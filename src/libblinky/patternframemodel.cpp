@@ -221,35 +221,46 @@ bool PatternFrameModel::removeRows(int position, int rows, const QModelIndex &)
     return true;
 }
 
-QDataStream &operator<<(QDataStream &stream, const PatternFrameModel &model)
+QDataStream &operator<<(QDataStream &out, const PatternFrameModel &model)
 {
-    stream << model.state.frameSize;
-    stream << model.state.fileName;
-    stream << model.state.frameSpeed;
-    stream << model.state.frames;
+    out << (qint32)1;
 
-    return stream;
+    out << model.state.frameSize;
+    out << model.state.fileName;
+    out << model.state.frameSpeed;
+    out << model.state.frames;
+
+    return out;
 }
 
 
-QDataStream &operator>>(QDataStream &stream, PatternFrameModel &model)
+QDataStream &operator>>(QDataStream &in, PatternFrameModel &model)
 {
-    PatternFrameModel::State newState;
+    qint32 version;
+    in >> version;
 
-    // TODO: Version first?
-    stream >> newState.frameSize;
-    stream >> newState.fileName;
-    stream >> newState.frameSpeed;
-    stream >> newState.frames;
+    if(version == 1) {
+        PatternFrameModel::State newState;
 
-    // TODO: Data validation?
+        in >> newState.frameSize;
+        in >> newState.fileName;
+        in >> newState.frameSpeed;
+        in >> newState.frames;
 
-    // TODO: Not clear if the format actually makes a difference
-    for(QImage &frame : newState.frames)
-        frame = frame.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+        // TODO: Data validation?
 
-    model.state = newState;
-    // TODO: Be noisy with messages, since our state just changed?
+        // TODO: Not clear if the format actually makes a difference
+        for(QImage &frame : newState.frames)
+            frame = frame.convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
-    return stream;
+        model.state = newState;
+        // TODO: Be noisy with messages, since our state just changed?
+    }
+    else {
+        // Mark the data stream as corrupted, so that the array read will
+        // unwind correctly.
+        in.setStatus(QDataStream::ReadCorruptData);
+    }
+
+    return in;
 }
