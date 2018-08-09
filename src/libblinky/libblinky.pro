@@ -45,7 +45,10 @@ HEADERS += \
     avr109firmwareloader.h \
     usbdeviceidentifier.h \
     blinkycontrollerinfo.h \
-    libblinkyglobal.h
+    libblinkyglobal.h \
+    leoblinky.h \
+    leoblinkycommands.h \
+    leoblinkyuploader.h
 
 SOURCES +=  \
     fixture.cpp \
@@ -81,7 +84,10 @@ SOURCES +=  \
     esp8266firmwareloader.cpp \
     avr109firmwareloader.cpp \
     usbdeviceidentifier.cpp \
-    blinkycontrollerinfo.cpp
+    blinkycontrollerinfo.cpp \
+    leoblinky.cpp \
+    leoblinkycommands.cpp \
+    leoblinkyuploader.cpp
 
 # For platforms that have serial ports
 # TODO: Pull hard-coded references to BlinkyTape from the gui, allowing this section to be switchable

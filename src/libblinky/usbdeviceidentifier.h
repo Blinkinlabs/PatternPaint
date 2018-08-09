@@ -16,10 +16,10 @@ public:
 };
 
 // List of USB devices that we can associate with a BlinkyController
-extern UsbDeviceIdentifier blinkyControllers[6];
+extern UsbDeviceIdentifier blinkyControllers[7];
 
 // List of USB devices that we can associate with a PatternUploader
-extern UsbDeviceIdentifier patternUploaders[6];
+extern UsbDeviceIdentifier patternUploaders[7];
 
 // List of USB devices that we can associate with a FirmwareLoader
 extern UsbDeviceIdentifier firmwareLoaders[6];

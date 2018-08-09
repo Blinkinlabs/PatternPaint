@@ -31,6 +31,9 @@
 #define EIGHTBYEIGHT_BOOTLOADER_VID     (uint16_t)0x1d50
 #define EIGHTBYEIGHT_BOOTLOADER_PID     (uint16_t)0x60f5
 
+#define LEOBLINKY2018_VID               (uint16_t)0x1a86
+#define LEOBLINKY2018_PID               (uint16_t)0x8888
+
 UsbDeviceIdentifier blinkyControllers[] = {
     {BLINKYTAPE_SKETCH_VID, BLINKYTAPE_SKETCH_PID, "BlinkyTape"},
     {LEONARDO_SKETCH_VID, LEONARDO_SKETCH_PID, "BlinkyTape"},
@@ -38,6 +41,8 @@ UsbDeviceIdentifier blinkyControllers[] = {
     {BLINKYPENDANT_SKETCH_VID, BLINKYPENDANT_SKETCH_PID, "BlinkyTape"},
     {LIGHTBUDDY_SKETCH_VID, LIGHTBUDDY_SKETCH_PID, "BlinkyTape"},
     {EIGHTBYEIGHT_SKETCH_VID, EIGHTBYEIGHT_SKETCH_PID, "BlinkyTape"},
+
+    {LEOBLINKY2018_VID, LEOBLINKY2018_PID, "LeoBlinky"},
 };
 
 UsbDeviceIdentifier patternUploaders[] = {
@@ -47,16 +52,18 @@ UsbDeviceIdentifier patternUploaders[] = {
     {BLINKYPENDANT_SKETCH_VID, BLINKYPENDANT_SKETCH_PID, "BlinkyPendantUploader"},
     {LIGHTBUDDY_SKETCH_VID, LIGHTBUDDY_SKETCH_PID, "LightBuddyUploader"},
     {EIGHTBYEIGHT_SKETCH_VID, EIGHTBYEIGHT_SKETCH_PID, "EightByEightUploader"},
+
+    {LEOBLINKY2018_VID, LEOBLINKY2018_PID, "LeoBlinkyUploader"},
 };
 
 UsbDeviceIdentifier firmwareLoaders[] = {
     // TODO: make some intermediate loader here, that resets the Caterina-style device
     {BLINKYTAPE_SKETCH_VID, BLINKYTAPE_SKETCH_PID, "Avr109FirmwareLoader"},
     {LEONARDO_SKETCH_VID, LEONARDO_SKETCH_PID, "Avr109FirmwareLoader"},
-
+    {ARDUINOMICRO_BOOTLOADER_VID, ARDUINOMICRO_BOOTLOADER_PID, "Avr109FirmwareLoader"},
     {BLINKYTAPE_BOOTLOADER_VID, BLINKYTAPE_BOOTLOADER_PID, "Avr109FirmwareLoader"},
     {LEONARDO_BOOTLOADER_VID, LEONARDO_BOOTLOADER_PID, "Avr109FirmwareLoader"},
-    {ARDUINOMICRO_BOOTLOADER_VID, ARDUINOMICRO_BOOTLOADER_PID, "Avr109FirmwareLoader"},
+
     {EIGHTBYEIGHT_SKETCH_VID, EIGHTBYEIGHT_SKETCH_PID, "Esp8266FirmwareLoader"},
 };
 

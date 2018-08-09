@@ -7,10 +7,15 @@
 #include <QDebug>
 
 #include "blinkytape.h"
+#include "leoblinky.h"
 
 BlinkyController *BlinkyController::create(const BlinkyControllerInfo &info, QObject *parent)
 {
-    return new BlinkyTape(info.getInfo(), parent);
+    // TODO: Why is this not being set based on the descriptor list???
+
+    return new LeoBlinky(info.getInfo(), parent);
+
+//    return new BlinkyTape(info.getInfo(), parent);
 }
 
 QList<QSerialPortInfo> BlinkyController::probeBootloaders()
