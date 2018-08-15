@@ -2,6 +2,7 @@
 #include "usbutils.h"
 #include "blinkycontroller.h"
 #include "leoblinkycommands.h"
+#include "bytearrayhelpers.h"
 
 #include <vector>
 
@@ -10,21 +11,6 @@
 
 #define PAGE_SIZE_BYTES     256    // Size unit for writes to flash
 
-
-namespace {
-
-// TODO: Make the protocol MSB first
-QByteArray encodeInt(int data)
-{
-    QByteArray output;
-    output.append((char)((data) & 0xFF));
-    output.append((char)((data >>  8) & 0xFF));
-    output.append((char)((data >> 16) & 0xFF));
-    output.append((char)((data >> 24) & 0xFF));
-    return output;
-}
-
-}
 
 LeoBlinkyUploader::LeoBlinkyUploader(QObject *parent) :
     BlinkyUploader(parent)
@@ -96,16 +82,17 @@ bool LeoBlinkyUploader::storePatterns(BlinkyController &controller,
     /// Build the animation table
     QByteArray header;
 
-    header += encodeInt(0x12345679);  // header (4 bytes, MSB first)
-    header += encodeInt(patternWriters.size()); // Animation count (4 bytes, MSB first)
+    header += ByteArrayHelpers::uint32ToByteArrayLittle(0x12345678);  // header (4 bytes)
+    header += ByteArrayHelpers::uint32ToByteArrayLittle(patternWriters.size()); // Animation count (4 bytes)
 
 
     // Then add an entry for each animation
     int animationAddress = PAGE_SIZE_BYTES;   // Animation data starts on page 1
     for(int i = 0; i < patternWriters.length(); i++) {
-        header += encodeInt(patternWriters[i].getFrameCount());
-        header += encodeInt(patternWriters[i].getFrameDelay()); // TODO: Speed or delay?
-        header += encodeInt(animationAddress);
+        header += ByteArrayHelpers::uint16ToByteArrayLittle(patternWriters[i].getFrameCount());
+        header += ByteArrayHelpers::uint16ToByteArrayLittle(patternWriters[i].getLedCount());
+        header += ByteArrayHelpers::uint16ToByteArrayLittle(patternWriters[i].getFrameDelay()); // TODO: Speed or delay?
+        header += ByteArrayHelpers::uint32ToByteArrayLittle(animationAddress);
         animationAddress += patternDatas[i].length();
     }
 
