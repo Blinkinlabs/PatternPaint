@@ -21,13 +21,11 @@ LeoBlinky::LeoBlinky(QSerialPortInfo info, QObject *parent) :
     serial = new QSerialPort(this);
     serial->setSettingsRestoredOnClose(false);
 
-    connect(serial, SIGNAL(error(QSerialPort::SerialPortError)),
-            this, SLOT(handleError(QSerialPort::SerialPortError)));
+    connect(serial, &QSerialPort::errorOccurred,
+            this, &LeoBlinky::handleError);
 
-    connect(serial, SIGNAL(readyRead()), this, SLOT(handleReadData()));
-
-    connect(serial, SIGNAL(baudRateChanged(qint32, QSerialPort::Directions)),
-            this, SLOT(handleBaudRateChanged(qint32, QSerialPort::Directions)));
+    connect(serial, &QSerialPort::readyRead,
+            this, &LeoBlinky::handleReadData);
 
     serialWriteTimer.setSingleShot(true);
     connect(&serialWriteTimer, SIGNAL(timeout()), this, SLOT(sendChunk()));
@@ -152,14 +150,6 @@ void LeoBlinky::handleReadData()
 {
     // Discard any data we get back from the LeoBlinky
     serial->readAll();
-}
-
-void LeoBlinky::handleBaudRateChanged(qint32 baudRate, QSerialPort::Directions)
-{
-    if (baudRate == QSerialPort::Baud115200)
-        qDebug() << "Baud rate updated to 115200!";
-    else
-        qDebug() << "Baud rate changed to ???";
 }
 
 bool LeoBlinky::isConnected()

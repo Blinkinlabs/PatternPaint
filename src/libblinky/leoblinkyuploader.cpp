@@ -5,6 +5,12 @@
 
 #include <vector>
 
+// TODO: push the image conversions into here so they are less awkward.
+#define PIXEL_COUNT (7*2)
+
+#define PAGE_SIZE_BYTES     256    // Size unit for writes to flash
+
+
 namespace {
 
 // TODO: Make the protocol MSB first
@@ -23,22 +29,25 @@ QByteArray encodeInt(int data)
 LeoBlinkyUploader::LeoBlinkyUploader(QObject *parent) :
     BlinkyUploader(parent)
 {
-    connect(&commandQueue, SIGNAL(error(QString)),
-            this, SLOT(handleError(QString)));
-    connect(&commandQueue, SIGNAL(commandFinished(QString, QByteArray)),
-            this, SLOT(handleCommandFinished(QString, QByteArray)));
+    connect(&commandQueue, &SerialCommandQueue::errorOccured,
+            this, &LeoBlinkyUploader::handleError);
+    connect(&commandQueue, &SerialCommandQueue::commandFinished,
+            this, &LeoBlinkyUploader::handleCommandFinished);
 }
 
 bool LeoBlinkyUploader::storePatterns(BlinkyController &controller,
                                         QList<PatternWriter> &patternWriters)
 {
-    // TODO: push the image conversions into here so they are less awkward.
-    #define PIXEL_COUNT (7*2)
+    // Probe for the blinkypendant version
+    // TODO: Update the firmware first!
+    QSerialPortInfo portInfo;
+    if (!controller.getPortInfo(portInfo)) {
+        errorString = "Couln't get port information!";
+        return false;
+    }
 
-    #define PAGE_SIZE_BYTES     256    // Size unit for writes to flash
 
     /// Convert the patterns to page data
-
     QList<QByteArray> patternDatas;
 
     foreach (PatternWriter pattern, patternWriters) {
@@ -141,13 +150,10 @@ bool LeoBlinkyUploader::storePatterns(BlinkyController &controller,
     // TODO: Check if the data can fit in the device memory
 
     // Set up the commandQueue using the serial descriptor, and close the tape connection
-    setProgress(0);
-
-    QSerialPortInfo info;
-    controller.getPortInfo(info);
-
     controller.close();
-    commandQueue.open(info);
+    commandQueue.open(portInfo);
+
+    setProgress(0);
 
     // Queue the following commands:
     // 1. Erase flash
@@ -156,8 +162,10 @@ bool LeoBlinkyUploader::storePatterns(BlinkyController &controller,
     // 2-n. write data (aligned to 256-byte sectors)
     commandQueue.enqueue(LeoBlinkyCommands::writeData(data));
 
-    // n. Reset device (TODO)
+    // n. Reset device
     commandQueue.enqueue(LeoBlinkyCommands::reloadAnimations());
+
+    maxProgress = commandQueue.length();
 
     return true;
 }
@@ -206,5 +214,13 @@ void LeoBlinkyUploader::handleCommandFinished(QString command, QByteArray return
 void LeoBlinkyUploader::setProgress(int newProgress)
 {
     progress = newProgress;
-    emit(progressChanged(static_cast<float>(progress)/10));
+
+    // Clip the progress so that it never reaches 100%.
+    // It will be closed by the finished() signal.
+    if (progress >= maxProgress)
+        maxProgress = progress + 1;
+
+    int progressPercent = (progress*100)/maxProgress;
+
+    emit(progressChanged(progressPercent));
 }

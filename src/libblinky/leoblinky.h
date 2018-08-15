@@ -62,8 +62,6 @@ private slots:
 
     void handleReadData();
 
-    void handleBaudRateChanged(qint32 baudRate, QSerialPort::Directions);
-
 #if defined(CONNECTION_SCANNER_TIMER)
     void connectionScannerTimer_timeout();
 #endif
