@@ -149,7 +149,7 @@
           <x>0</x>
           <y>0</y>
           <width>518</width>
-          <height>277</height>
+          <height>280</height>
          </rect>
         </property>
        </widget>
@@ -578,7 +578,7 @@
      <x>0</x>
      <y>0</y>
      <width>880</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -607,6 +607,8 @@
     <addaction name="menuNew"/>
     <addaction name="menuOpen"/>
     <addaction name="menuExamples"/>
+    <addaction name="separator"/>
+    <addaction name="actionImport_images_as_Pattern_Frames"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
     <addaction name="actionClose_All"/>
@@ -1237,6 +1239,14 @@
   <action name="actionOpen_Project">
    <property name="text">
     <string>Open Project...</string>
+   </property>
+  </action>
+  <action name="actionImport_images_as_Pattern_Frames">
+   <property name="text">
+    <string>Import images as Pattern Frames</string>
+   </property>
+   <property name="toolTip">
+    <string>Import images as Pattern Frames</string>
    </property>
   </action>
  </widget>

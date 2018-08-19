@@ -20,7 +20,7 @@ class LIBBLINKY_EXPORT Pattern : public QObject
 public:
     enum class Type {
         Scrolling,
-        FrameBased
+        FrameBased,
     };
 
     /// Constructor for an empty pattern item

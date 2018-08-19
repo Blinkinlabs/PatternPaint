@@ -135,6 +135,8 @@ private slots:
 
     void on_actionOpen_Project_triggered();
 
+    void on_actionImport_images_as_Pattern_Frames_triggered();
+
 signals:
 
     /// Signalled when an editable pattern is selected in the editor

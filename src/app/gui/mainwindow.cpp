@@ -1513,3 +1513,46 @@ void MainWindow::on_actionOpen_Project_triggered()
     frameEditor->setFixture(fixture);
     outputPreview->setFixture(fixture);
 }
+
+void MainWindow::on_actionImport_images_as_Pattern_Frames_triggered()
+{
+    QSettings settings;
+    QString lastDirectory = settings.value("File/LoadDirectory").toString();
+
+    QDir dir(lastDirectory);
+    if (!dir.isReadable())
+        lastDirectory = QDir::homePath();
+
+    QStringList fileNames = QFileDialog::getOpenFileNames(this,
+                                                     tr("Import Images"), lastDirectory,
+                                                     tr("Pattern Files (*.png *.jpg *.bmp *.gif)"));
+
+    if (fileNames.count() == 0)
+        return;
+
+    QFileInfo fileInfo(fileNames.at(0));
+    settings.setValue("File/LoadDirectory", fileInfo.absolutePath());
+
+    QImage firstImage(fileNames.at(0));
+
+    Pattern *pattern = new Pattern(Pattern::Type::FrameBased,
+                                   firstImage.size(),
+                                   fileNames.count());
+
+    int index = 0;
+    for(const QString fileName : fileNames) {
+        QImage image(fileName);
+
+        qDebug() << fileName << index << image.size();
+
+        pattern->setEditImage(index++, image);
+    }
+
+    int newPosition = 0;
+    if (getPatternCount() > 0)
+        newPosition = getCurrentPatternIndex()+1;
+
+    patternCollection.add(pattern, newPosition);
+    patternCollectionListView->setCurrentIndex(patternCollectionListView->model()->index(newPosition,
+                                                                                         0));
+}
