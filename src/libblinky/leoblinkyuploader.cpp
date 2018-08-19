@@ -40,10 +40,10 @@ bool LeoBlinkyUploader::storePatterns(BlinkyController &controller,
         QByteArray patternData;
 
         // Make sure we have an image compatible with the BlinkyPendant
-        if (pattern.getLedCount() != PIXEL_COUNT) {
-            errorString = "Wrong pattern size- must be n pixels!";
-            return false;
-        }
+//        if (pattern.getLedCount() != PIXEL_COUNT) {
+//            errorString = "Wrong pattern size- must be n pixels!";
+//            return false;
+//        }
         if (pattern.getEncoding() != PatternWriter::RGB24) {
             errorString = "Wrong encoding type- must be RGB24!";
             return false;
