@@ -38,7 +38,7 @@ Preferences::Preferences(QWidget *parent) :
     ui->setLanguage->addItems(getLanguageMap().values());
     ui->setLanguage->setCurrentText(getLanguageMap().value(settings.value("PatternPaint/language", DEFAULT_LANGUAGE).toString()));
 
-    setUpdater(NULL);
+    setUpdater(nullptr);
 }
 
 Preferences::~Preferences()
@@ -50,7 +50,7 @@ void Preferences::setUpdater(AutoUpdater *newAutoUpdater)
 {
     autoUpdater = newAutoUpdater;
 
-    if(autoUpdater == NULL) {
+    if(autoUpdater == nullptr) {
         ui->automaticUpdateCheck->setEnabled(false);
         ui->checkForUpdates->setEnabled(false);
     }
@@ -70,7 +70,7 @@ void Preferences::accept()
 
     settings.setValue("WelcomeScreen/showAtStartup", ui->showWelcomeScreen->isChecked());
 
-    if(autoUpdater != NULL) {
+    if(autoUpdater != nullptr) {
         // TODO: Does the updater store this on or behalf, or should we restore it at program start?
         autoUpdater->setAutomatic(ui->automaticUpdateCheck->isChecked());
     }
@@ -110,7 +110,7 @@ QMap<QString, QString> Preferences::getLanguageMap()
 
 void Preferences::on_checkForUpdates_clicked()
 {
-    if(autoUpdater == NULL)
+    if(autoUpdater == nullptr)
         return;
 
     autoUpdater->checkForUpdates();

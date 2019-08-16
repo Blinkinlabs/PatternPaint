@@ -30,8 +30,8 @@ public:
     MatrixFixture::Mode getMode() const;
     void setMode(MatrixFixture::Mode newMode);
 
-    friend QDataStream &operator<<(QDataStream &out, const MatrixFixture &fixture);
-    friend QDataStream &operator>>(QDataStream &in, MatrixFixture &fixture);
+    LIBBLINKY_EXPORT friend QDataStream &operator<<(QDataStream &out, const MatrixFixture &fixture);
+    LIBBLINKY_EXPORT friend QDataStream &operator>>(QDataStream &in, MatrixFixture &fixture);
 
 private:
     QSize size;

@@ -32,8 +32,8 @@ public:
     bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex());
     bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex());
 
-    friend QDataStream &operator<<(QDataStream &out, const PatternCollectionModel &patternCollectionModel);
-    friend QDataStream &operator>>(QDataStream &in, PatternCollectionModel &patternCollectionModel);
+    LIBBLINKY_EXPORT friend QDataStream &operator<<(QDataStream &out, const PatternCollectionModel &patternCollectionModel);
+    LIBBLINKY_EXPORT friend QDataStream &operator>>(QDataStream &in, PatternCollectionModel &patternCollectionModel);
 
 private:
     QList<QPointer<Pattern> > patterns;

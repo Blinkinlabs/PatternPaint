@@ -1,4 +1,4 @@
-#include "LeoBlinky.h"
+#include "leoblinky.h"
 #include "leoblinkyuploader.h"
 
 #include <QDebug>

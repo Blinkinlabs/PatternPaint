@@ -35,12 +35,12 @@ int getVersionForDevice(quint16 idVendor, quint16 idProduct)
     int r;
     ssize_t cnt;
 
-    r = libusb_init(NULL);
+    r = libusb_init(nullptr);
 
     if (r < 0)
         return -1;
 
-    cnt = libusb_get_device_list(NULL, &devs);
+    cnt = libusb_get_device_list(nullptr, &devs);
     if (cnt < 0)
         return -2;
 
@@ -49,7 +49,7 @@ int getVersionForDevice(quint16 idVendor, quint16 idProduct)
     libusb_device *dev;
     int i = 0;
 
-    while ((dev = devs[i++]) != NULL) {
+    while ((dev = devs[i++]) != nullptr) {
         struct libusb_device_descriptor desc;
         int r = libusb_get_device_descriptor(dev, &desc);
         if (r < 0) {

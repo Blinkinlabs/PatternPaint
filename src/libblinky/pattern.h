@@ -117,8 +117,8 @@ public:
 
     bool hasTimeline() const;
 
-    friend QDataStream &operator<<(QDataStream &out, const Pattern &pattern);
-    friend QDataStream &operator>>(QDataStream &in, Pattern &pattern);
+    LIBBLINKY_EXPORT friend QDataStream &operator<<(QDataStream &out, const Pattern &pattern);
+    LIBBLINKY_EXPORT friend QDataStream &operator>>(QDataStream &in, Pattern &pattern);
 
 private:
     QPointer<PatternModel> model;   ///< Storage container for the images

@@ -58,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent) :
 #if defined(Q_OS_MACX)
     CocoaInitializer cocoaInitiarizer;  // TODO: We only need to call this temporarily, right?
 
-    appNap = Q_NULLPTR;
+    appNap = nullptr;
 #endif
 
 #if defined(Q_OS_LINUX)
@@ -213,7 +213,7 @@ MainWindow::MainWindow(QWidget *parent) :
     scene.firmwareName = settings.value("BlinkyTape/firmwareName", BLINKYTAPE_DEFAULT_FIRMWARE_NAME).toString();
 
     scene.fixtureType = settings.value("Fixture/Type", DEFAULT_FIXTURE_TYPE).toString();
-    scene.colorMode = (ColorMode)settings.value("Fixture/ColorOrder", RGB).toInt();
+    scene.colorMode = static_cast<ColorMode>(settings.value("Fixture/ColorOrder", RGB).toInt());
     scene.size = fixtureSize;
 
     applyScene(scene);
@@ -248,7 +248,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Refresh the display for no pattern selected
     on_patternCollectionCurrentChanged(QModelIndex(), QModelIndex());
 
-    autoUpdater = Q_NULLPTR;
+    autoUpdater = nullptr;
 
 #if !defined(DISABLE_UPDATE_CHECKS)
 
@@ -260,7 +260,7 @@ MainWindow::MainWindow(QWidget *parent) :
     autoUpdater = new WinSparkleAutoUpdater(WINDOWS_RELEASE_APPCAST_URL);
 #endif // Q_OS_WIN
 
-    if(autoUpdater != Q_NULLPTR) {
+    if(autoUpdater != nullptr) {
         // TODO: Duplicated from main.cpp
         QString language = settings.value("PatternPaint/language", DEFAULT_LANGUAGE).toString();
         QString locale;
@@ -316,9 +316,9 @@ MainWindow::~MainWindow()
 {
 #if defined(Q_OS_MACX)
     // stop the app nap inhibitor
-    if (appNap != Q_NULLPTR) {
+    if (appNap != nullptr) {
         delete appNap;
-        appNap = Q_NULLPTR;
+        appNap = nullptr;
     }
 #endif
 
@@ -336,7 +336,7 @@ int MainWindow::getCurrentPatternIndex()
 
 int MainWindow::getPatternCount()
 {
-    if (patternCollectionListView->model() == Q_NULLPTR)
+    if (patternCollectionListView->model() == nullptr)
         return 0;
 
     return patternCollectionListView->model()->rowCount();
@@ -352,7 +352,7 @@ int MainWindow::getCurrentFrameIndex()
 
 int MainWindow::getFrameCount()
 {
-    if (timeline->model() == Q_NULLPTR)
+    if (timeline->model() == nullptr)
         return 0;
 
     return timeline->model()->rowCount();
@@ -392,7 +392,7 @@ void MainWindow::connectionScannerTimer_timeout()
 
 void MainWindow::patternSpeed_valueChanged(int value)
 {
-    if(patternCollection.at(getCurrentPatternIndex())->getFrameSpeed() != value)
+    if(static_cast<int>(patternCollection.at(getCurrentPatternIndex())->getFrameSpeed()) != value)
         patternCollection.at(getCurrentPatternIndex())->setFrameSpeed(value);
 
     drawTimer.setInterval(1000/value);
@@ -535,7 +535,7 @@ void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
 
 #if defined(Q_OS_MACX)
         // start the app nap inhibitor
-        if (appNap == Q_NULLPTR)
+        if (appNap == nullptr)
             appNap = new CAppNapInhibitor("Interaction with hardware");
 
 #endif
@@ -550,9 +550,9 @@ void MainWindow::on_blinkyConnectionStatusChanged(bool connected)
 
 #if defined(Q_OS_MACX)
         // start the app nap inhibitor
-        if (appNap != Q_NULLPTR) {
+        if (appNap != nullptr) {
             delete appNap;
-            appNap = Q_NULLPTR;
+            appNap = nullptr;
         }
 #endif
     }
@@ -862,7 +862,7 @@ void MainWindow::showEvent(QShowEvent *event)
 void MainWindow::on_instrumentSelected(bool)
 {
     QAction *act = static_cast<QAction *>(sender());
-    Q_ASSERT(act != Q_NULLPTR);
+    Q_ASSERT(act != nullptr);
     for (QAction *a : instrumentToolbar->actions())
         a->setChecked(false);
 
@@ -995,7 +995,7 @@ void MainWindow::applyScene(const SceneTemplate &scene)
 bool MainWindow::loadPattern(Pattern::Type type, const QString fileName)
 {
     QSettings settings;
-    int frameCount = settings.value("Options/FrameCount", DEFAULT_FRAME_COUNT).toUInt();
+    int frameCount = static_cast<int>(settings.value("Options/FrameCount", DEFAULT_FRAME_COUNT).toUInt());
 
     QSize displaySize(fixture->getExtents().width(), fixture->getExtents().height());
 
@@ -1068,10 +1068,10 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
     // TODO: we're going to have to unload our references, but for now skip that.
     if (!current.isValid()) {
 
-        timeline->setModel(Q_NULLPTR);
+        timeline->setModel(nullptr);
         timeline->setVisible(false);
 
-        undoGroup.setActiveStack(Q_NULLPTR);
+        undoGroup.setActiveStack(nullptr);
 
         setPatternName("()");
         setPatternModified(false);
@@ -1103,7 +1103,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
     frameImageChanged(newpattern->getFrameImage(getCurrentFrameIndex()));
     frameEditor->setShowPlaybakIndicator(newpattern->hasPlaybackIndicator());
 
-    patternSpeed->setValue(newpattern->getFrameSpeed());
+    patternSpeed->setValue(static_cast<int>(newpattern->getFrameSpeed()));
 
     actionSave_to_Blinky->setEnabled(state == State::Connected);
 
@@ -1158,7 +1158,7 @@ void MainWindow::on_PatternDataChanged(const QModelIndex &topLeft, const QModelI
                                getCurrentFrameIndex()));
         }
         else if (role == PatternModel::FrameSpeed) {
-            patternSpeed->setValue(patternCollection.at(getCurrentPatternIndex())->getFrameSpeed());
+            patternSpeed->setValue(static_cast<int>(patternCollection.at(getCurrentPatternIndex())->getFrameSpeed()));
         }
     }
 }
@@ -1381,7 +1381,7 @@ bool SaveProject(const QString &fileName,
     QDataStream out(&file);
 
     out << QString(MAGIC_STRING);
-    out << (qint32) 1;
+    out << static_cast<qint32>(1);
     out.setVersion(QDataStream::Qt_5_6);
 
     out << fixture.getType();
@@ -1540,7 +1540,7 @@ void MainWindow::on_actionImport_images_as_Pattern_Frames_triggered()
                                    fileNames.count());
 
     int index = 0;
-    for(const QString fileName : fileNames) {
+    for(const QString & fileName : fileNames) {
         QImage image(fileName);
 
         qDebug() << fileName << index << image.size();

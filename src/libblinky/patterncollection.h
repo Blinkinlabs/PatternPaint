@@ -28,8 +28,8 @@ public:
 
     bool isEmpty() const;
 
-    friend QDataStream &operator<<(QDataStream &out, const PatternCollection &patternCollection);
-    friend QDataStream &operator>>(QDataStream &in, PatternCollection &patternCollection);
+    LIBBLINKY_EXPORT friend QDataStream &operator<<(QDataStream &out, const PatternCollection &patternCollection);
+    LIBBLINKY_EXPORT friend QDataStream &operator>>(QDataStream &in, PatternCollection &patternCollection);
 
 private:
     PatternCollectionModel model;

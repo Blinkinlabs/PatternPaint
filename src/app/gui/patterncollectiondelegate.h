@@ -9,11 +9,11 @@ class PatternCollectionDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
-    PatternCollectionDelegate(QObject *parent = 0);
+    PatternCollectionDelegate(QObject *parent = nullptr);
 
     QWidget *createEditor(QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const
     {
-        return NULL;
+        return nullptr;
     }
 
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option,

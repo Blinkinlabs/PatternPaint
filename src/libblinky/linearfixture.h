@@ -20,8 +20,8 @@ public:
     unsigned int getLength() const;
     void setLength(unsigned int newLength);
 
-    friend QDataStream &operator<<(QDataStream &out, const LinearFixture &fixture);
-    friend QDataStream &operator>>(QDataStream &in, LinearFixture &fixture);
+    LIBBLINKY_EXPORT friend QDataStream &operator<<(QDataStream &out, const LinearFixture &fixture);
+    LIBBLINKY_EXPORT friend QDataStream &operator>>(QDataStream &in, LinearFixture &fixture);
 
 private:
     unsigned int length;
