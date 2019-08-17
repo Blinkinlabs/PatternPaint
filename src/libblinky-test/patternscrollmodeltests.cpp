@@ -567,6 +567,7 @@ void PatternScrollModelTests::readFromStreamTest()
     QDataStream stream;
     stream.setDevice(&buffer);
 
+    stream << static_cast<qint32>(1);
     stream << frameSize;
     stream << fileName;
     stream << frameSpeed;
@@ -618,11 +619,13 @@ void PatternScrollModelTests::writeToStreamTest()
     buffer.reset();
 
     // Then read the data out from the stream
+    qint32 readVersion;
     QSize readFrameSize;
     QString readFileName;
     float readFrameSpeed;
     QImage readImage;
 
+    stream >> readVersion;
     stream >> readFrameSize;
     stream >> readFileName;
     stream >> readFrameSpeed;
@@ -630,6 +633,7 @@ void PatternScrollModelTests::writeToStreamTest()
 
     readImage = readImage.convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
+    QCOMPARE(readVersion, 1);
     QCOMPARE(model.data(model.index(0), PatternScrollModel::FrameSize).toSize(), readFrameSize);
     QCOMPARE(model.data(model.index(0), PatternScrollModel::FileName).toString(), readFileName);
     QCOMPARE(model.data(model.index(0), PatternScrollModel::FrameSpeed).toFloat(), readFrameSpeed);

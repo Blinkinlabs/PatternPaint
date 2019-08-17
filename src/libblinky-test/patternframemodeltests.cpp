@@ -573,6 +573,7 @@ void PatternFrameModelTests::readFromStreamTest()
     QDataStream stream;
     stream.setDevice(&buffer);
 
+    stream << static_cast<qint32>(1);
     stream << frameSize;
     stream << fileName;
     stream << frameSpeed;
@@ -629,11 +630,13 @@ void PatternFrameModelTests::writeToStreamTest()
     buffer.reset();
 
     // Then read the data out from the stream
+    qint32 readVersion;
     QSize readFrameSize;
     QString readFileName;
     float readFrameSpeed;
     QList<QImage> readFrames;
 
+    stream >> readVersion;
     stream >> readFrameSize;
     stream >> readFileName;
     stream >> readFrameSpeed;
@@ -642,6 +645,7 @@ void PatternFrameModelTests::writeToStreamTest()
     for(QImage &frame : readFrames)
         frame = frame.convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
+    QCOMPARE(readVersion, 1);
     QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameSize).toSize(), readFrameSize);
     QCOMPARE(model.data(model.index(0), PatternFrameModel::FileName).toString(), readFileName);
     QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameSpeed).toFloat(), readFrameSpeed);

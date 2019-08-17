@@ -223,7 +223,7 @@ bool PatternFrameModel::removeRows(int position, int rows, const QModelIndex &)
 
 QDataStream &operator<<(QDataStream &out, const PatternFrameModel &model)
 {
-    out << (qint32)1;
+    out << static_cast<qint32>(1);
 
     out << model.state.frameSize;
     out << model.state.fileName;

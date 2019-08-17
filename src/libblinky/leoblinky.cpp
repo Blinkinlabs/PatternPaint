@@ -181,7 +181,9 @@ void LeoBlinky::sendUpdate(QByteArray ledData)
     // TODO: Duplicated in LeoBlinkyUploader::StartUpload()
     for(int i = 0; i < ledData.length()/3; i++) {
         // ITU BT.709 RGB to luma conversion:
-        int val = (0.2126*uint8_t(ledData[i*3]) + 0.7152*uint8_t(ledData[i*3+1]) + 0.0722*uint8_t(ledData[i*3+2]));
+        int val = static_cast<int>((0.2126*uint8_t(ledData[i*3])
+                                   + 0.7152*uint8_t(ledData[i*3+1])
+                                   + 0.0722*uint8_t(ledData[i*3+2])));
 
         outputData.append(char(val));    // Just use the red channel for now
     }
@@ -227,7 +229,7 @@ bool LeoBlinky::getPatternUploader(QPointer<BlinkyUploader> &uploader)
     return true;
 }
 
-bool LeoBlinky::getFirmwareLoader(QPointer<FirmwareLoader> &loader)
+bool LeoBlinky::getFirmwareLoader(QPointer<FirmwareLoader> & /*loader*/)
 {
     return false;
 }
