@@ -6,7 +6,7 @@ set -e
 # Location of the QT tools
 if [ -z ${QTDIR+x} ]; then
 	echo "QTDIR not defined- please set it to the location containing the Qt version to build against. For example:"
-        echo "  export QTDIR=~/Qt/5.11.2/clang_64/"
+        echo "  export QTDIR=~/Qt/5.13.0/clang_64/"
 	exit 1
 fi
 
