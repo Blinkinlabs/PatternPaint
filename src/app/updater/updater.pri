@@ -39,7 +39,7 @@ win32 {
     SOURCES += \
         $$PWD/winsparkleautoupdater.cpp
 
-    SPARKLE_PATH = ../../thirdparty/WinSparkle-0.5.3
+    SPARKLE_PATH = ../../thirdparty/WinSparkle-0.6.0
     INCLUDEPATH += $$SPARKLE_PATH/include
 
     win32-msvc* {
