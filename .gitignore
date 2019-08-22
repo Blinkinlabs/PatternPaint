@@ -10,3 +10,4 @@ build-*
 PatternPaint/*.user
 windows-drivers/*
 firmware/*
+*-pre1
