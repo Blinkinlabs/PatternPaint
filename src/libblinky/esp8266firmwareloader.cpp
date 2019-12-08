@@ -9,7 +9,7 @@
 #define BOOTLOADER_RESET_LOOP_RETRIES 10
 #define BOOTLOADER_SYNC_RETRIES 2
 
-#define EIGHTBYEIGHT_DEFAULT_FIRMWARE_LOCATION ":/firmware/eightbyeight/default/espfirmware.bin"
+#define EIGHTBYEIGHT_DEFAULT_FIRMWARE_LOCATION ":/firmware/eightbyeight/default/espfirmware-leo.bin"
 
 #define ESP_BLOCK_SIZE 1024
 
