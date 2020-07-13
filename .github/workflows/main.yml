@@ -20,7 +20,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
     - name: Set qtdir
-      run: echo ::set-env name=QTDIR::$(Qt5_Dir)
+      run: echo ::set-env name=QTDIR::$(echo $Qt5_Dir)
     - name: build linux
       run: ./dist_linux.sh
       #working-directory: firmware
