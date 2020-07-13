@@ -34,4 +34,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Appimage
-        path: build-dist-linux/PatternPaint-*-x86-64.tar.bz2
+        path: build-dist-linux/PatternPaint-*-x86_64.tar.bz2
