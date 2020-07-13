@@ -12,7 +12,7 @@ fi
 
 QMAKE=${QTDIR}/bin/qmake
 MAKE=make
-LINUXDEPLOYQT=`pwd`/linuxdeployqt
+LINUXDEPLOYQT=`pwd`/linuxdeployqt-continuous-x86_64.AppImage
 
 # Location of the source tree
 SOURCEDIR=`pwd`/src
@@ -61,9 +61,10 @@ cp libblinky/libblinky.so.1 app/lib
 
 unset LD_LIBRARY_PATH # Remove too old Qt from the search path; TODO: Move inside the linuxdeployqt AppImage
 
-PATH=${QTDIR}/bin:${PATH} ${LINUXDEPLOYQT} app/PatternPaint -bundle-non-qt-libs
-PATH=${QTDIR}/bin:${PATH} ${LINUXDEPLOYQT} app/PatternPaint -appimage
+#LINUXDEPLOYQT_OPTS=-unsupported-allow-new-glibc
+PATH=${QTDIR}/bin:${PATH} ${LINUXDEPLOYQT} app/PatternPaint -bundle-non-qt-libs ${LINUXDEPLOYQT_OPTS}
+PATH=${QTDIR}/bin:${PATH} ${LINUXDEPLOYQT} app/PatternPaint -appimage ${LINUXDEPLOYQT_OPTS}
 
-tar -cjf PatternPaint-x86_64_${VERSION}.tar.bz2 PatternPaint-x86_64.AppImage
+tar -cjf PatternPaint-${VERSION}-x86_64.tar.bz2 PatternPaint-${VERSION}-x86_64.AppImage
 
 popd

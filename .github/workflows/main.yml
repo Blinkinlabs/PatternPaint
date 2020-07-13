@@ -1,0 +1,37 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches:
+      - master
+      - github-actions
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    # Run on an older Ubuntu to make flatpack happy
+    runs-on: ubuntu-16.04
+
+    steps:
+    - name: Check out
+      uses: actions/checkout@v2
+    - name: Install deps
+      run: sudo apt-get install libusb-1.0-0-dev icnsutils
+    - name: Get linuxdeployqt
+      run:  wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+    - name: Make linuxdeployqt executable
+      run: chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+    - name: Set qtdir
+      run: echo ::set-env name=QTDIR::$(echo $Qt5_Dir)
+    - name: build linux
+      run: ./dist_linux.sh
+      #working-directory: firmware
+    - name: Save artificat
+      uses: actions/upload-artifact@v2
+      with:
+        name: Appimage
+        path: build-dist-linux/PatternPaint-*-x86_64.tar.bz2
