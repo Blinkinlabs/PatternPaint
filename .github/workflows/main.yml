@@ -31,7 +31,6 @@ jobs:
       run: ./dist_linux.sh
       #working-directory: firmware
     - name: Save artificat
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
-        name: PatternPaint.AppImage
         path: build-dist-linux/*.AppImage
