@@ -20,7 +20,9 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
     - name: build linux
-      run: dist_linux.sh
+      env:
+        QTDIR=${Qt5_Dir}
+      run: ./dist_linux.sh
       #working-directory: firmware
     - name: Save artificat
       uses: actions/upload-artifact@v1
