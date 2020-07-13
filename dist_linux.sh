@@ -12,7 +12,7 @@ fi
 
 QMAKE=${QTDIR}/bin/qmake
 MAKE=make
-LINUXDEPLOYQT=`pwd`/linuxdeployqt
+LINUXDEPLOYQT=`pwd`/linuxdeployqt-continuous-x86_64.AppImage
 
 # Location of the source tree
 SOURCEDIR=`pwd`/src
