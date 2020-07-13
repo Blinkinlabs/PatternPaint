@@ -17,6 +17,8 @@ jobs:
     steps:
     - name: Check out
       uses: actions/checkout@v2
+    - name: Install deps
+      run: apt-get install libusb-1.0-0-dev icnsutils
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
     - name: Set qtdir
