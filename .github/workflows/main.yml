@@ -33,4 +33,5 @@ jobs:
     - name: Save artificat
       uses: actions/upload-artifact@v2
       with:
-        path: build-dist-linux/*.AppImage
+        name: Appimage
+        path: build-dist-linux/PatternPaint-*-x86-64.tar.bz2
