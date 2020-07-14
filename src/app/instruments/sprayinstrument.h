@@ -29,6 +29,7 @@
 #include "abstractinstrument.h"
 
 #include <QObject>
+#include <QRandomGenerator>
 
 /**
  * @brief Spray instrument class.
@@ -46,6 +47,8 @@ public:
 
 private:
     void paint(const QPoint &newPoint);
+
+    QRandomGenerator prng;
 };
 
 #endif // SPRAYINSTRUMENT_H

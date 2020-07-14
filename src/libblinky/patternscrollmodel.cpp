@@ -36,7 +36,7 @@ Qt::ItemFlags PatternScrollModel::flags(const QModelIndex &index) const
 
 Qt::DropActions PatternScrollModel::supportedDropActions() const
 {
-    return 0;
+    return QFlags<Qt::DropAction>();
 }
 
 void PatternScrollModel::pushUndoState()

@@ -17,39 +17,9 @@ PatternPaint is a cross-platform application, targetting macOS, Windows, and Lin
 
 We use [Github Issues](https://github.com/Blinkinlabs/PatternPaint/issues) for bug tracking and feature implementation.
 
-PatternPaint is written in C++ with QT (5.8.0) libraries. The easiest way to get started is to download QT Creator, and run the project through there.
+PatternPaint is written in C++ with QT (5.15.0) libraries. The easiest way to get started is to download QT Creator, and run the project through there.
 
 PatternPaint is licensed under the GPL version 2
-
-## Notes on older versions of Qt
-
-We recommend using the specified version of Qt, however here are some notes if you do need to backport.
-
-### Qt5.7
-macOS, Linux: The released version has a bug in the QSerial:
-https://github.com/Blinkinlabs/PatternPaint/issues/148
-
-For macOS, download a patched version of qtSerialPort, to fix a critical bug affecting serial disconnects. For more information, see: https://codereview.qt-project.org/#/c/170601/
-
-	git clone git://code.qt.io/qt/qtserialport.git
-	cd qtserialport/
-	git checkout dee818e7
-	~/Qt5.7.0/5.7/clang_64/bin/qmake
-	make
-	rm -R ~/Qt5.7.0/5.7/clang_64/lib/QtSerialPort.framework/
-	mv lib/QtSerialPort.framework/ ~/Qt5.7.0/5.7/clang_64/lib/
-
-macOS: You'll need to modify a qt build script to fix compatibility with Xcode 8. Following these instructions: https://forum.qt.io/topic/71119/project-error-xcode-not-set-up-properly/7
-
-	vi ~/Qt5.7.0/5.7/clang_64/mkspecs/features/mac/default_pre.prf
-	:%s/xcrun\ 2/xcodebuild\ 2/gc
-
-### Qt 5.2-5.4
-
-all platforms: The line drawing function had a bug and needed to be worked around, see:
-https://github.com/Blinkinlabs/PatternPaint/issues/66
-
-
 
 ## macOS Prerequsites
 
@@ -102,7 +72,6 @@ Note: be sure to check 'Run Git from the Windows Command Prompt', 'Checkout Wind
     https://download.qt.io/archive/qt/5.8/5.8.0/qt-opensource-windows-x86-mingw530-5.8.0.exe
     
 Note: When installing, make sure to select the 'Tools' 'MinGW 5.3.0' option.
-
 
 
 ### Windows SDK (version 10) (for signtool):
@@ -162,8 +131,6 @@ First, clone the PatternPaint repository:
 Next, open QT creator, then open the project file PatternPaint.pro, which should be located in the PatternPaint subdirectory of the repository.
 
 That's all you should need to do to build and make changes to PatternPaint. If you come up with a cool new feature or add support for a new device, please send a pull request!
-
-
 
 
 # Deployment instructions

@@ -3,6 +3,7 @@
 #include <QPen>
 #include <QPainter>
 #include <math.h>
+#include <QDebug>
 
 SprayInstrument::SprayInstrument(InstrumentConfiguration *instrumentConfiguration, QObject *parent) :
     AbstractInstrument(":/instruments/images/instruments-icons/cursor_spray.png",
@@ -61,33 +62,33 @@ void SprayInstrument::paint(const QPoint &newPoint)
         case 1:
         case 2:
         case 3:
-            x = (qrand() % 5 - 2)
+            x = (prng.generate() % 5 - 2)
                 * sqrt(instrumentConfiguration->getPenSize());
-            y = (qrand() % 5 - 2)
+            y = (prng.generate() % 5 - 2)
                 * sqrt(instrumentConfiguration->getPenSize());
             break;
         case 4:
         case 5:
         case 6:
         case 7:
-            x = (qrand() % 10 - 4)
+            x = (prng.generate() % 10 - 4)
                 * sqrt(instrumentConfiguration->getPenSize());
-            y = (qrand() % 10 - 4)
+            y = (prng.generate() % 10 - 4)
                 * sqrt(instrumentConfiguration->getPenSize());
             break;
         case 8:
         case 9:
         case 10:
         case 11:
-            x = (qrand() % 15 - 7)
+            x = (prng.generate() % 15 - 7)
                 * sqrt(instrumentConfiguration->getPenSize());
-            y = (qrand() % 15 - 7)
+            y = (prng.generate() % 15 - 7)
                 * sqrt(instrumentConfiguration->getPenSize());
             break;
         default:
             return;
         }
-
+        qDebug() << x << y;
         painter.drawPoint(newPoint.x() + x, newPoint.y() + y);
     }
 }
