@@ -1,4 +1,4 @@
-# PatternPaint [![Build Status](https://travis-ci.org/Blinkinlabs/PatternPaint.svg?branch=master)](https://travis-ci.org/Blinkinlabs/PatternPaint)
+# PatternPaint ![Linux build](https://github.com/blinkinlabs/patternpaint/workflows/Linux%20build/badge.svg)
 
 ![image](https://cloud.githubusercontent.com/assets/44493/11913712/7bc560c8-a6a8-11e5-8309-70cd170a7b9e.png)
 
