@@ -273,7 +273,7 @@
        <string notr="true">background:none</string>
       </property>
       <property name="text">
-       <string>Copyright 2017 Blinkinlabs, LLC</string>
+       <string>Copyright 2020 Blinkinlabs, LLC</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

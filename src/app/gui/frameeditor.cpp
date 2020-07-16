@@ -456,7 +456,7 @@ bool FrameEditor::event(QEvent *event)
     if(event->type() == QEvent::Wheel) {
         QWheelEvent *wheelEvent = static_cast<QWheelEvent*>(event);
         if(wheelEvent->modifiers().testFlag(Qt::ControlModifier)) {
-            setScale(scale*(1+(wheelEvent->delta())/1200.0));
+            setScale(scale*(1+(wheelEvent->angleDelta().y())/1200.0));
 
             wheelEvent->accept();
             return true;
