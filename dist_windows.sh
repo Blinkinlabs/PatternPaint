@@ -3,7 +3,6 @@
 #Stop on any error
 set -e
 
-
 ################# Signature #####################################
 
 # Note that these are GlobalSign specific- if you want to use a
@@ -21,7 +20,7 @@ if [ -z ${QTDIR+x} ]; then
 fi
 
 # Location of the MINGW libraries (Installed as part of Qt)
-MINGW_BIN=${QTDIR}/../../Tools/mingw530_32/bin
+MINGW_BIN=${QTDIR}/../../Tools/mingw810_32/bin
 
 QMAKE=${QTDIR}/bin/qmake
 MAKE=${MINGW_BIN}/mingw32-make
@@ -70,12 +69,11 @@ LIBUSB=${BASEDIR}/thirdparty/libusb-1.0.23-win
 ################### Extract the version info ###################
 source ./gitversion.sh
 
-
 ################## Build PatternPaint ###################
 mkdir -p ${BUILDDIR}
 pushd ${BUILDDIR}
 
-${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
+PATH=${MINGW_BIN}:${PATH} ${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
 	-spec win32-g++
 	
 #${MAKE} clean
