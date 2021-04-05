@@ -2,11 +2,8 @@
 // Designed to work with PatternPaint and the BlinkyTape controller
 //
 // Tested with the following software:
-// Arduino 1.6.12 (https://www.arduino.cc/en/Main/Software)
-// FastLED 3.1.3 (https://github.com/FastLED/FastLED/releases/tag/v3.1.3)
-// BlinkyTape 2.1.0 (https://github.com/Blinkinlabs/BlinkyTape_Arduino/releases/tag/2.1.0)
-
-#include <animation.h>
+// Arduino 1.8.13 (https://www.arduino.cc/en/Main/Software)
+// FastLED 3.4.0 (https://github.com/FastLED/FastLED/releases/tag/v3.1.3)
 
 #include <EEPROM.h>
 #include <FastLED.h>
@@ -14,6 +11,7 @@
 
 #include "BlinkyTape.h"
 #include "SerialLoop.h"
+#include "animation.h"
 
 // Pattern table definitions
 #define PATTERN_TABLE_ADDRESS  (0x7000 - 0x80)   // Location of the pattern table in the flash memory
@@ -205,4 +203,3 @@ void loop()
   // TODO: More sophisticated wait loop to get constant framerate.
   delay(pattern.getFrameDelay());
 }
-
