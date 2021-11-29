@@ -9,6 +9,7 @@
 
 #define FRAME_COLOR_DEFAULT    QColor(0, 0, 0, 255)
 #define PATTERN_FRAME_SPEED_DEFAULT_VALUE 10.0
+#define PATTERN_REPEAT_COUNT_DEFAULT_VALUE 1
 
 /// Interface for accessing a pattern model.
 class LIBBLINKY_EXPORT PatternModel : public QAbstractListModel
@@ -20,6 +21,7 @@ public:
         FrameImage = Qt::UserRole,      // Image data for the given frame
         FrameSize,                      // Size of a frame image
         FrameSpeed,                     // Speed to play back the frame
+        PatternRepeatCount,             // Number of times to repeat pattern before advancing
         FileName,                       // File location for this pattern
         Modified,                       // Whether the pattern has unsaved data
         EditImage,                      // Image data for editing

@@ -60,6 +60,8 @@ private slots:
 
     void patternSpeed_valueChanged(int value);
 
+    void patternRepeatCount_valueChanged(int value);
+
     void frameIndexWidget_valueChanged(QString value);
 
     void on_actionPlay_triggered();

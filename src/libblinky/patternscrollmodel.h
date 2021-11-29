@@ -21,6 +21,7 @@ public:
         QImage image;
         QSize frameSize;            ///< Resolution of this pattern, in pixels
         float frameSpeed;           ///< Speed to play back the pattern
+        int patternRepeatCount;     ///< Number of times to repeat pattern before advancing
         QString fileName;           ///< Filename for the pattern
         bool modified;              ///< True if the pattern has been changed since last save
     };

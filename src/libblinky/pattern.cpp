@@ -240,6 +240,16 @@ void Pattern::setFrameSpeed(float speed)
     model->setData(model->index(0), speed, PatternModel::FrameSpeed);
 }
 
+int Pattern::getPatternRepeatCount() const
+{
+    return model->index(0).data(PatternModel::PatternRepeatCount).toFloat();
+}
+
+void Pattern::setPatternRepeatCount(int speed)
+{
+    model->setData(model->index(0), speed, PatternModel::PatternRepeatCount);
+}
+
 void Pattern::deleteFrame(int index)
 {
     if (getFrameCount() == 1)

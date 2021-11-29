@@ -29,6 +29,7 @@ public:
     int getFrameCount() const;
     int getLedCount() const;
     int getFrameDelay() const;
+    int getRepeatCount() const;
 
 private:
 
@@ -39,6 +40,7 @@ private:
     int frameCount;     /// Number of frames in this pattern
     int ledCount;       /// Number of LEDs attached to this blinky
     int frameDelay;     /// Length of time between frames of data, in ms
+    int repeatCount;    /// Number of times to repeat pattern before advancing
 
     // Compress an RGB color to the 565 color space
     // TODO: Improve this conversion using a lookup table, instead of

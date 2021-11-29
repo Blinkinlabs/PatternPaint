@@ -27,7 +27,7 @@ void BlinkyTapeUploadDataTests::makePatternTableEntryTest()
     expectedResponse.append('\xBC');
     expectedResponse.append('\x9A');
 
-    QCOMPARE(makePatternTableEntry(PatternWriter::Encoding::RGB24, 4660, 22136, 39612), expectedResponse);
+    QCOMPARE(makePatternTableEntry(PatternWriter::Encoding::RGB24, 4660, 22136, 39612, 45000), expectedResponse);
 }
 
 void BlinkyTapeUploadDataTests::makeBrightnessTest_data()

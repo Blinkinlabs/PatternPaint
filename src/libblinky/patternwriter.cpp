@@ -10,6 +10,7 @@ PatternWriter::PatternWriter(const Pattern &pattern, const Fixture &fixture, Enc
     frameCount = pattern.getFrameCount();
     frameDelay = 1000/pattern.getFrameSpeed();
     ledCount = fixture.getCount();
+    repeatCount = pattern.getPatternRepeatCount();
 
     // Create a new encoder
     switch (encoding) {
@@ -50,6 +51,11 @@ int PatternWriter::getLedCount() const
 int PatternWriter::getFrameDelay() const
 {
     return frameDelay;
+}
+
+int PatternWriter::getRepeatCount() const
+{
+    return repeatCount;
 }
 
 int PatternWriter::QRgbTo565(const QColor &color, ColorMode colorMode)

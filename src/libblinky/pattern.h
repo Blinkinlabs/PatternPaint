@@ -73,6 +73,10 @@ public:
 
     void setFrameSpeed(float speed);
 
+    int getPatternRepeatCount() const;
+
+    void setPatternRepeatCount(int count);
+
     /// Get an image representing the current frame
     /// @return an NxN QImage reperesenting the current frame data
     const QImage getFrameImage(int index) const;

@@ -14,6 +14,9 @@
 #define PATTERN_SPEED_MINIMUM_VALUE 1                           /// Minimum pattern speed, in FPS
 #define PATTERN_SPEED_MAXIMUM_VALUE 100                         /// Maximum pattern speed, in FPS
 
+#define PATTERN_REPEAT_COUNT_MINIMUM_VALUE 1                    /// Minimum number of times a pattern can repeat before advancing
+#define PATTERN_REPEAT_COUNT_MAXIMUM_VALUE 65535                /// Maximum number of times a pattern can repeat before advancing
+
 #define DRAWING_SIZE_MINIMUM_VALUE 1                            /// Minimum drawing tool size, in pixels
 #define DRAWING_SIZE_MAXIMUM_VALUE 20                           /// Maximum drawing tool size, in pixels
 #define DRAWING_SIZE_DEFAULT_VALUE 1                            /// Default drawing tool size

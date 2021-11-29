@@ -15,6 +15,12 @@ class Animation {
 #endif
   } Encoding;
 
+  typedef enum {
+    MANUAL = 0,       // Load next pattern only when user presses button
+    LOOP_COUNT = 1,   // 
+    TIME = 2,
+  } AdvanceMode;
+
   // Initialize the animation with no data. This is intended for the case
   // where the animation will be re-initialized from a memory structure in ROM
   // after the sketch starts.
@@ -26,11 +32,13 @@ class Animation {
   // @param encoding Method used to encode the animation data
   // @param ledCount Number of LEDs in the strip
   // @param frameDelay Number of milliseconds to wait between frames
+  // @param repeatCount Number of times to repeat pattern before advancing
   Animation(uint16_t frameCount,
             PGM_P frameData,
             Encoding encoding,
             uint16_t ledCount,
-            uint16_t frameDelay);
+            uint16_t frameDelay,
+            uint16_t repeatCount);
 
   // Re-initialize the animation with new information
   // @param frameCount Number of frames in this animation
@@ -38,11 +46,13 @@ class Animation {
   // @param encoding Method used to encode the animation data
   // @param ledCount Number of LEDs in the strip
   // @param frameDelay Number of milliseconds to wait between frames
+  // @param repeatCount Number of times to repeat pattern before advancing
   void init(uint16_t frameCount,
             PGM_P frameData,
             Encoding encoding,
             uint16_t ledCount,
-            uint16_t frameDelay);
+            uint16_t frameDelay,
+            uint16_t repeatCount);
  
   // Reset the animation, causing it to start over from frame 0.
   void reset();
@@ -54,11 +64,13 @@ class Animation {
   uint16_t getLedCount() const;
   uint16_t getFrameCount() const;
   uint16_t getFrameDelay() const;
+  uint16_t getRepeatCount() const;
 
  private:
   uint16_t ledCount;              // Number of LEDs in the strip
   uint16_t frameCount;            // Number of frames in this animation
   uint16_t frameDelay;            // Milliseconds to wait between frames
+  uint16_t repeatCount;           // Number of times to repeat pattern before advancing
 
   Encoding encoding;              // Encoding type
   PGM_P frameData;           // Pointer to the begining of the frame data

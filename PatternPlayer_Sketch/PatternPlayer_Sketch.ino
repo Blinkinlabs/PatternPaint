@@ -16,7 +16,7 @@
 // Pattern table definitions
 #define PATTERN_EEPROM_TABLE_ADDRESS (0x100)     // Location of the pattern table in EEPROM memory
 #define PATTERN_TABLE_HEADER_LENGTH     11       // Length of the header, in bytes
-#define PATTERN_TABLE_ENTRY_LENGTH      7        // Length of each entry, in bytes
+#define PATTERN_TABLE_ENTRY_LENGTH      9        // Length of each entry, in bytes
 
 // Header data sections
 #define PATTERN_COUNT_OFFSET    0    // Number of patterns in the pattern table (1 byte)
@@ -28,6 +28,7 @@
 #define FRAME_DATA_OFFSET       1    // Memory location (2 bytes)
 #define FRAME_COUNT_OFFSET      3    // Frame count (2 bytes)
 #define FRAME_DELAY_OFFSET      5    // Frame delay (2 bytes)
+#define FRAME_REPEAT_COUNT_OFFSET   7    // Repeat count (2 bytes)
 
 
 // LED data array
@@ -75,8 +76,9 @@ void setPattern(uint8_t newPattern) {
   PGM_P frameData =  (PGM_P)eeprom_read_word(patternEntryAddress + FRAME_DATA_OFFSET);
   const uint16_t frameCount = eeprom_read_word(patternEntryAddress + FRAME_COUNT_OFFSET);
   const uint16_t frameDelay = eeprom_read_word(patternEntryAddress + FRAME_DELAY_OFFSET);
+  const uint16_t repeatCount = eeprom_read_word(patternEntryAddress + FRAME_REPEAT_COUNT_OFFSET);
 
-  pattern.init(frameCount, frameData, encodingType, ledCount, frameDelay);
+  pattern.init(frameCount, frameData, encodingType, ledCount, frameDelay, repeatCount);
 }
 
 void setBrightness(uint8_t newBrightness) {
@@ -181,6 +183,10 @@ void loop()
   }
 
   pattern.draw(leds);
+
+  if(pattern.getRepeatCount() == 0) {
+    setPattern(currentPattern+1);
+  }
 
   // TODO: More sophisticated wait loop to get constant framerate.
   delay(pattern.getFrameDelay());

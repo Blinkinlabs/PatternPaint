@@ -14,7 +14,7 @@
 //TODO: Why are these global? Either put in namespace or make static functions.
 LIBBLINKY_EXPORT QByteArray makePatternTableHeader(uint8_t patternCount, uint16_t ledCount);
 
-LIBBLINKY_EXPORT QByteArray makePatternTableEntry(PatternWriter::Encoding encodig, uint16_t offset, uint16_t frameCount, uint16_t frameDelay);
+LIBBLINKY_EXPORT QByteArray makePatternTableEntry(PatternWriter::Encoding encodig, uint16_t offset, uint16_t frameCount, uint16_t frameDelay, uint16_t repeatCount);
 
 LIBBLINKY_EXPORT QByteArray makeBrightnessTable(int maxBrightnessPercent);
 

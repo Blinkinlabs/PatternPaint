@@ -38,13 +38,14 @@ QByteArray makePatternTableHeader(uint8_t patternCount, uint16_t ledCount) {
     return header;
 }
 
-QByteArray makePatternTableEntry(PatternWriter::Encoding encoding, uint16_t offset, uint16_t frameCount, uint16_t frameDelay) {
+QByteArray makePatternTableEntry(PatternWriter::Encoding encoding, uint16_t offset, uint16_t frameCount, uint16_t frameDelay, uint16_t repeatCount) {
     QByteArray entry;
 
     entry.append((char)((encoding) & 0xFF));            // Offset 0: encoding (1 byte)
     entry.append(ByteArrayHelpers::uint16ToByteArrayLittle(offset));      // Offset 1: memory location (2 bytes)
     entry.append(ByteArrayHelpers::uint16ToByteArrayLittle(frameCount));  // Offset 3: frame count (2 bytes)
     entry.append(ByteArrayHelpers::uint16ToByteArrayLittle(frameDelay));  // Offset 5: frame delay (2 bytes)
+    entry.append(ByteArrayHelpers::uint16ToByteArrayLittle(repeatCount));  // Offset 7: repeat count (2 bytes)
 
     return entry;
 }
@@ -128,7 +129,8 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, const QList<Pattern
         patternTable.append(makePatternTableEntry(pattern.getEncoding(),
                                                   patternDataAddress + patternData.count(),
                                                   pattern.getFrameCount(),
-                                                  pattern.getFrameDelay()));
+                                                  pattern.getFrameDelay(),
+                                                  pattern.getRepeatCount()));
 
         // and append the image data
         patternData += pattern.getDataAsBinary();

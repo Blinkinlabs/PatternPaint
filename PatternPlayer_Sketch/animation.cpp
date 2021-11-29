@@ -2,16 +2,18 @@
 
 Animation::Animation()
 {
-  init(0, NULL, RGB24, 0, 0);
+  init(0, NULL, RGB24, 0, 0, 0);
 }
 
 Animation::Animation(uint16_t frameCount_,
                      PGM_P frameData_,
                      Encoding encoding_,
                      uint16_t ledCount_,
-                     uint16_t frameDelay_)
+                     uint16_t frameDelay_,
+                     uint16_t repeatCount_
+                     )
 {
-  init(frameCount_, frameData_, encoding_, ledCount_, frameDelay_);
+  init(frameCount_, frameData_, encoding_, ledCount_, frameDelay_, repeatCount_);
   reset();
 }
 
@@ -19,13 +21,15 @@ void Animation::init(uint16_t frameCount_,
                      PGM_P frameData_,
                      Encoding encoding_,
                      uint16_t ledCount_,
-                     uint16_t frameDelay_)
+                     uint16_t frameDelay_,
+                     uint16_t repeatCount_)
 {
   frameCount = frameCount_;
   frameData = frameData_;
   encoding = encoding_;
   ledCount = ledCount_;
   frameDelay = frameDelay_;
+  repeatCount = repeatCount_;
 
   switch(encoding) {
     case RGB24:
@@ -74,6 +78,11 @@ void Animation::draw(struct CRGB strip[]) {
   LEDS.show();
   
   frameIndex = (frameIndex + 1)%frameCount;
+  if(frameIndex == 0) {
+    if(repeatCount > 0) {
+      repeatCount--;
+    }
+  }
 };
 
 uint16_t Animation::getLedCount() const {
@@ -86,6 +95,10 @@ uint16_t Animation::getFrameCount() const {
 
 uint16_t Animation::getFrameDelay() const {
   return frameDelay;
+}
+
+uint16_t Animation::getRepeatCount() const {
+  return repeatCount;
 }
 
 void Animation::drawRgb24(struct CRGB strip[]) {

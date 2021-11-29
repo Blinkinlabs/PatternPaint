@@ -11,6 +11,7 @@ PatternScrollModel::PatternScrollModel(QSize size, QObject *parent) :
 {
     state.frameSize = size;
     state.frameSpeed = PATTERN_FRAME_SPEED_DEFAULT_VALUE;
+    state.patternRepeatCount = PATTERN_REPEAT_COUNT_DEFAULT_VALUE;
     state.modified = false;
 
     undoStack.setUndoLimit(50);
@@ -63,6 +64,8 @@ void PatternScrollModel::applyUndoState(State newState)
         roles.append(FrameSize);
     if(state.frameSpeed != newState.frameSpeed)
         roles.append(FrameSpeed);
+    if(state.patternRepeatCount != newState.patternRepeatCount)
+        roles.append(PatternRepeatCount);
     if(state.fileName != newState.fileName)
         roles.append(FileName);
     if(state.modified != newState.modified)
@@ -114,6 +117,9 @@ QVariant PatternScrollModel::data(const QModelIndex &index, int role) const
 
     if (role == FrameSpeed)
         return state.frameSpeed;
+
+    if (role == PatternRepeatCount)
+        return state.patternRepeatCount;
 
     if (role == FileName)
         return state.fileName;
@@ -182,6 +188,15 @@ bool PatternScrollModel::setData(const QModelIndex &index, const QVariant &value
 
         QVector<int> roles;
         roles.append(FrameSpeed);
+        emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
+        return true;
+    }
+
+    if (role == PatternRepeatCount) {
+        state.patternRepeatCount = value.toInt();
+
+        QVector<int> roles;
+        roles.append(PatternRepeatCount);
         emit dataChanged(this->index(0), this->index(rowCount()-1), roles);
         return true;
     }
@@ -299,6 +314,7 @@ QDataStream &operator<<(QDataStream &stream, const PatternScrollModel &model)
     stream << model.state.frameSize;
     stream << model.state.fileName;
     stream << model.state.frameSpeed;
+    stream << model.state.patternRepeatCount;
     stream << model.state.image;
 
     return stream;
@@ -312,6 +328,7 @@ QDataStream &operator>>(QDataStream &stream, PatternScrollModel &model)
     stream >> newState.frameSize;
     stream >> newState.fileName;
     stream >> newState.frameSpeed;
+    stream >> newState.patternRepeatCount;
     stream >> newState.image;
 
     // TODO: Data validation?

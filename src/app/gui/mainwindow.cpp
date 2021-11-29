@@ -133,9 +133,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Pattern info
     patternSpeed->setRange(PATTERN_SPEED_MINIMUM_VALUE, PATTERN_SPEED_MAXIMUM_VALUE);
-// patternSpeed->setValue(PATTERN_SPEED_MINIMUM_VALUE);
     connect(patternSpeed, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &MainWindow::patternSpeed_valueChanged);
+
+    patternRepeatCount->setRange(PATTERN_REPEAT_COUNT_MINIMUM_VALUE, PATTERN_REPEAT_COUNT_MAXIMUM_VALUE);
+    connect(patternRepeatCount, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &MainWindow::patternRepeatCount_valueChanged);
 
     connect(this, &MainWindow::patternStatusChanged, actionClose, &QAction::setEnabled);
     connect(this, &MainWindow::patternStatusChanged, actionFlip_Horizontal, &QAction::setEnabled);
@@ -147,6 +150,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, &MainWindow::patternStatusChanged, actionStepForward, &QAction::setEnabled);
     connect(this, &MainWindow::patternStatusChanged, actionStepBackward, &QAction::setEnabled);
     connect(this, &MainWindow::patternStatusChanged, patternSpeed, &QSpinBox::setEnabled);
+    connect(this, &MainWindow::patternStatusChanged, patternRepeatCount, &QSpinBox::setEnabled);
     connect(this, &MainWindow::patternStatusChanged, &frameIndexWidget, &QLineEdit::setEnabled);
 
     state = State_Disconnected;
@@ -394,6 +398,12 @@ void MainWindow::patternSpeed_valueChanged(int value)
         patternCollection.at(getCurrentPatternIndex())->setFrameSpeed(value);
 
     drawTimer.setInterval(1000/value);
+}
+
+void MainWindow::patternRepeatCount_valueChanged(int value)
+{
+    if(patternCollection.at(getCurrentPatternIndex())->getPatternRepeatCount() != value)
+        patternCollection.at(getCurrentPatternIndex())->setPatternRepeatCount(value);
 }
 
 void MainWindow::frameIndexWidget_valueChanged(QString value)
@@ -1080,6 +1090,8 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
         patternSpeed->setValue(1);
         frameIndexWidget.setText("");
 
+        patternRepeatCount->setValue(1);
+
         actionSave_to_Blinky->setEnabled(false);
 
         emit(patternStatusChanged(false));
@@ -1102,6 +1114,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
     frameEditor->setShowPlaybakIndicator(newpattern->hasPlaybackIndicator());
 
     patternSpeed->setValue(newpattern->getFrameSpeed());
+    patternRepeatCount->setValue(newpattern->getPatternRepeatCount());
 
     actionSave_to_Blinky->setEnabled(state == State_Connected);
 
@@ -1157,6 +1170,9 @@ void MainWindow::on_PatternDataChanged(const QModelIndex &topLeft, const QModelI
         }
         else if (role == PatternModel::FrameSpeed) {
             patternSpeed->setValue(patternCollection.at(getCurrentPatternIndex())->getFrameSpeed());
+        }
+        else if (role == PatternModel::PatternRepeatCount) {
+            patternRepeatCount->setValue(patternCollection.at(getCurrentPatternIndex())->getPatternRepeatCount());
         }
     }
 }
