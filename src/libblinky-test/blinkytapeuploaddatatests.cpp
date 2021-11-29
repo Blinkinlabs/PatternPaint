@@ -105,8 +105,8 @@ void BlinkyTapeUploadDataTests::maxPatternsSucceedsTest()
     LinearFixture fixture(0);
     PatternWriter::Encoding encoding = PatternWriter::Encoding::RGB24;
 
-    // (128 - 3 - 8) / 7
-    for(int i = 0; i < 16; i++)
+    // blinkytapeuploaddata.c 'MAX_PATTERN_COUNT'
+    for(int i = 0; i < 50; i++)
         patternWriters.push_back(PatternWriter(pattern, fixture, encoding));
 
     QCOMPARE(blinkyTapeUploadData.init(BLINKYTAPE_DEFAULT_FIRMWARE_NAME, patternWriters), true);
@@ -121,8 +121,8 @@ void BlinkyTapeUploadDataTests::tooManyPatternsFailsTest()
     LinearFixture fixture(0);
     PatternWriter::Encoding encoding = PatternWriter::Encoding::RGB24;
 
-    // (128 - 3 - 8) / 7
-    for(int i = 0; i < 17; i++)
+    // blinkytapeuploaddata.c 'MAX_PATTERN_COUNT'
+    for(int i = 0; i < 51; i++)
         patternWriters.push_back(PatternWriter(pattern, fixture, encoding));
 
     QCOMPARE(blinkyTapeUploadData.init(BLINKYTAPE_DEFAULT_FIRMWARE_NAME, patternWriters), false);

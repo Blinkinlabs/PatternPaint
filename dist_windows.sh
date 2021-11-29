@@ -35,10 +35,12 @@ SOURCEDIR=${BASEDIR}/src
 BUILDDIR=${BASEDIR}/build-dist-windows
 
 # Location of the Windows SDK and WDK
+# Note: Both WDK 8.1 and WDK 10 are needed. 8.1 is the last WDK that contains
+#       dpinst, which is used to install the DLL files.
 WIN_KIT_SIGNTOOL='/c/Program Files (x86)/Windows Kits/10'
 WIN_KIT_DPINST='/c/Program Files (x86)/Windows Kits/8.1'
 
-# Location of NSIS
+# Location of NSIS. NSIS 3.08 seems to work.
 NSIS='/c/Program Files (x86)/NSIS'
 
 # Staging directory for assembling the installer
