@@ -5,16 +5,16 @@
 // Arduino 1.8.13 (https://www.arduino.cc/en/Main/Software)
 // FastLED 3.4.0 (https://github.com/FastLED/FastLED/releases/tag/v3.1.3)
 
-#include <EEPROM.h>
 #include <FastLED.h>
 #include <avr/pgmspace.h>
+#include <avr/eeprom.h>
 
 #include "BlinkyTape.h"
 #include "SerialLoop.h"
 #include "animation.h"
 
 // Pattern table definitions
-#define PATTERN_TABLE_ADDRESS  (0x7000 - 0x80)   // Location of the pattern table in the flash memory
+#define PATTERN_EEPROM_TABLE_ADDRESS (0x100)     // Location of the pattern table in EEPROM memory
 #define PATTERN_TABLE_HEADER_LENGTH     11       // Length of the header, in bytes
 #define PATTERN_TABLE_ENTRY_LENGTH      7        // Length of each entry, in bytes
 
@@ -57,40 +57,31 @@ long buttonPressTime = 0;
 #define BUTTON_PATTERN_SWITCH_TIME    1000   // Time to hold the button down to switch patterns
 
 #define EEPROM_START_ADDRESS  0
-#define EEPROM_MAGIG_BYTE_0   0x12
-#define EEPROM_MAGIC_BYTE_1   0x34
-#define PATTERN_EEPROM_ADDRESS EEPROM_START_ADDRESS + 2
-#define BRIGHTNESS_EEPROM_ADDRESS EEPROM_START_ADDRESS + 3
+#define PATTERN_EEPROM_ADDRESS EEPROM_START_ADDRESS + 0
+#define BRIGHTNESS_EEPROM_ADDRESS EEPROM_START_ADDRESS + 1
 
 // Read the pattern data from the end of the program memory, and construct a new Pattern from it.
 void setPattern(uint8_t newPattern) {
   currentPattern = newPattern % patternCount;
-
-  if (EEPROM.read(PATTERN_EEPROM_ADDRESS) != newPattern) {
-    EEPROM.write(PATTERN_EEPROM_ADDRESS, newPattern);
-  }
-
-  uint16_t patternEntryAddress =
-    PATTERN_TABLE_ADDRESS
+  eeprom_write_byte(PATTERN_EEPROM_ADDRESS, newPattern);
+  
+  const uint16_t patternEntryAddress =
+    PATTERN_EEPROM_TABLE_ADDRESS
     + PATTERN_TABLE_HEADER_LENGTH
     + currentPattern * PATTERN_TABLE_ENTRY_LENGTH;
 
+  const Animation::Encoding encodingType = (Animation::Encoding)eeprom_read_byte(patternEntryAddress + ENCODING_TYPE_OFFSET);
 
-  Animation::Encoding encodingType = (Animation::Encoding)pgm_read_byte(patternEntryAddress + ENCODING_TYPE_OFFSET);
-
-  PGM_P frameData =  (PGM_P)pgm_read_word(patternEntryAddress + FRAME_DATA_OFFSET);
-  uint16_t frameCount = pgm_read_word(patternEntryAddress + FRAME_COUNT_OFFSET);
-  uint16_t frameDelay = pgm_read_word(patternEntryAddress + FRAME_DELAY_OFFSET);
+  PGM_P frameData =  (PGM_P)eeprom_read_word(patternEntryAddress + FRAME_DATA_OFFSET);
+  const uint16_t frameCount = eeprom_read_word(patternEntryAddress + FRAME_COUNT_OFFSET);
+  const uint16_t frameDelay = eeprom_read_word(patternEntryAddress + FRAME_DELAY_OFFSET);
 
   pattern.init(frameCount, frameData, encodingType, ledCount, frameDelay);
 }
 
 void setBrightness(uint8_t newBrightness) {
   currentBrightness = newBrightness % brightnessCount;
-
-  if (EEPROM.read(BRIGHTNESS_EEPROM_ADDRESS) != currentBrightness) {
-    EEPROM.write(BRIGHTNESS_EEPROM_ADDRESS, currentBrightness);
-  }
+  eeprom_write_byte(BRIGHTNESS_EEPROM_ADDRESS, currentBrightness);
 
   LEDS.setBrightness(brightnesSteps[currentBrightness]);
 }
@@ -154,12 +145,12 @@ void setup()
   PCICR  |= (1 << PCIE0);  // Enable interrupt
 
   // First, load the pattern count and LED geometry from the pattern table
-  patternCount = pgm_read_byte(PATTERN_TABLE_ADDRESS + PATTERN_COUNT_OFFSET);
-  ledCount     = pgm_read_word(PATTERN_TABLE_ADDRESS + LED_COUNT_OFFSET);
+  patternCount = eeprom_read_byte(PATTERN_EEPROM_TABLE_ADDRESS + PATTERN_COUNT_OFFSET);
+  ledCount     = eeprom_read_word(PATTERN_EEPROM_TABLE_ADDRESS + LED_COUNT_OFFSET);
 
   // Next, read the brightness table.
   for (uint8_t i = 0; i < brightnessCount; i++) {
-    brightnesSteps[i] = pgm_read_byte(PATTERN_TABLE_ADDRESS + BRIGHTNESS_OFFSET + i);
+    brightnesSteps[i] = eeprom_read_byte(PATTERN_EEPROM_TABLE_ADDRESS + BRIGHTNESS_OFFSET + i);
   }
 
   // Bounds check for the LED count
@@ -168,18 +159,9 @@ void setup()
     ledCount = MAX_LEDS;
   }
 
-  // If the EEPROM hasn't been initialized, do so now
-  if ((EEPROM.read(EEPROM_START_ADDRESS) != EEPROM_MAGIG_BYTE_0)
-      || (EEPROM.read(EEPROM_START_ADDRESS + 1) != EEPROM_MAGIC_BYTE_1)) {
-    EEPROM.write(EEPROM_START_ADDRESS, EEPROM_MAGIG_BYTE_0);
-    EEPROM.write(EEPROM_START_ADDRESS + 1, EEPROM_MAGIC_BYTE_1);
-    EEPROM.write(PATTERN_EEPROM_ADDRESS, 0);
-    EEPROM.write(BRIGHTNESS_EEPROM_ADDRESS, 0);
-  }
-
   // Read in the last-used pattern and brightness
-  currentPattern = EEPROM.read(PATTERN_EEPROM_ADDRESS);
-  currentBrightness = EEPROM.read(BRIGHTNESS_EEPROM_ADDRESS);
+  currentPattern = eeprom_read_byte(PATTERN_EEPROM_ADDRESS);
+  currentBrightness = eeprom_read_byte(BRIGHTNESS_EEPROM_ADDRESS);
 
   // Now, read the first pattern from the table
   setPattern(currentPattern);

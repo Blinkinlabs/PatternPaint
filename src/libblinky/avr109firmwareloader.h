@@ -17,7 +17,9 @@ class LIBBLINKY_EXPORT Avr109FirmwareLoader : public FirmwareLoader
 public:
     Avr109FirmwareLoader(QObject *parent = 0);
 
-    bool updateFirmware(BlinkyController &blinkyController, QList<MemorySection> flashData);
+    bool updateFirmware(BlinkyController &blinkyController,
+                        QList<MemorySection> flashData,
+                        QList<MemorySection> eepromData);
 
     bool updateFirmware(BlinkyController &blinkyController);
     bool restoreFirmware(qint64 timeout);
@@ -42,6 +44,7 @@ private:
         State_ProbeBootloaders,         ///< Waiting for the bootloader device to become available
         State_InitializeBootloader,     ///< Sending initialization commands to bootloader
         State_WriteFlashData,           ///< Writing flash data sections
+        State_WriteEepromData,          ///< Writing eeprom data sections
         State_ResetBootloader,          ///< Resetting bootloader
         State_SendingCommands,          ///< Ready for a command. TODO: Delete me
     };
@@ -82,7 +85,8 @@ private:
     int flashWriteRetriesRemaining;      ///< Number of times we can re-try writing the flash before giving up
 
     SerialCommandQueue commandQueue;
-    QList<MemorySection> flashData;     ///< Queue of memory sections to write
+    QList<MemorySection> flashData;     ///< Queue of memory sections to write to flash
+    QList<MemorySection> eepromData;    ///< Queue of memory sections to write to EEPROM
 };
 
 #endif // AVR109FIRMWARELOADER_H

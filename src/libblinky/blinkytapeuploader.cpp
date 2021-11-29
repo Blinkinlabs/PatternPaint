@@ -44,7 +44,7 @@ bool BlinkyTapeUploader::storePatterns(BlinkyController &blinky, QList<PatternWr
         return false;
     }
 
-    return firmwareLoader.updateFirmware(blinky, data.flashData);
+    return firmwareLoader.updateFirmware(blinky, data.flashData, data.eepromData);
 }
 
 

@@ -25,6 +25,7 @@ public:
     bool init(const QString &firmwareName, const QList<PatternWriter> &patterns);
 
     QList<MemorySection> flashData;
+    QList<MemorySection> eepromData;
 
     QString errorString;
 };

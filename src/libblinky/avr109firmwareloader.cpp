@@ -122,13 +122,17 @@ bool Avr109FirmwareLoader::updateFirmware(BlinkyController &blinkyController)
 
     QList<MemorySection> firmware;
     firmware.append(sketch);
+    QList<MemorySection> eeprom;
 
-    return updateFirmware(blinkyController, firmware);
+    return updateFirmware(blinkyController, firmware, eeprom);
 }
 
-bool Avr109FirmwareLoader::updateFirmware(BlinkyController &blinkyController, QList<MemorySection> firmware)
+bool Avr109FirmwareLoader::updateFirmware(BlinkyController &blinkyController,
+                                          QList<MemorySection> firmware,
+                                          QList<MemorySection> eeprom)
 {
     flashData = firmware;
+    eepromData = eeprom;
 
     if(!checkFirmwareFits())
         return false;
@@ -154,13 +158,16 @@ bool Avr109FirmwareLoader::updateFirmware(BlinkyController &blinkyController, QL
 void Avr109FirmwareLoader::reallyStartUpload() {
 
     maxProgress = 1;    // checkDeviceSignature
-    maxProgress += 2;   // erase EEPROM
     maxProgress += 1;   // reset
 
     // There are 4 commands for each page-
     // setaddress, writeflashpage, setaddress, verifyflashpage
     for (MemorySection flashSection : flashData)
         maxProgress += 4*flashSection.data.count()/FLASH_MEMORY_PAGE_SIZE_BYTES;
+
+    // There are two commands for each EEPROM section-
+    // setaddress, write eeprom data
+    maxProgress += eepromData.length()*2;
 
     setProgress(0);
 
@@ -221,6 +228,11 @@ void Avr109FirmwareLoader::handleLastCommandFinished()
         break;
 
     case State_WriteFlashData:
+        state = State_WriteEepromData;
+        doWork();
+        break;
+
+    case State_WriteEepromData:
         state = State_ResetBootloader;
         doWork();
         break;
@@ -341,12 +353,6 @@ void Avr109FirmwareLoader::doWork()
         // Send Check Device Signature command
         commandQueue.enqueue(Avr109Commands::checkDeviceSignature());
 
-        // Queue an EEPROM clear
-        QByteArray eepromBytes(EEPROM_TABLE_SIZE_BYTES, char(255));
-        commandQueue.enqueue(Avr109Commands::writeEeprom(eepromBytes,0));
-
-        // TODO: Verify EEPROM?
-
         break;
     }
 
@@ -360,6 +366,13 @@ void Avr109FirmwareLoader::doWork()
         }
 
         break;
+    }
+    case State_WriteEepromData:
+    {
+        for(MemorySection& section : eepromData) {
+            commandQueue.enqueue(Avr109Commands::writeEeprom(section.data, section.address));
+            // TODO: Verify EEPROM?
+        }
     }
 
     case State_ResetBootloader:

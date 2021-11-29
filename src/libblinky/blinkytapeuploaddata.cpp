@@ -17,10 +17,14 @@
 #define PATTERN_TABLE_ENTRY_LENGTH_BYTES      7
 
 // Note: This is limited by the 1-byte header field to 255, max.
-#define MAX_PATTERN_COUNT ((FLASH_MEMORY_PAGE_SIZE_BYTES - PATTERN_TABLE_HEADER_LENGTH_BYTES - BRIGHTNESS_TABLE_LENGTH_BYTES) / PATTERN_TABLE_ENTRY_LENGTH_BYTES)
+// It is further limited by the pattern size table in the EEPROM
+#define MAX_PATTERN_COUNT 50
 
 #define FLASH_MEMORY_PATTERN_TABLE_ADDRESS (FLASH_MEMORY_AVAILABLE - FLASH_MEMORY_PAGE_SIZE_BYTES) // Location of pattern table
 
+#define EEPROM_CURRENT_SETTINGS_SIZE (2)
+#define EEPROM_CURRENT_SETTINGS_ADDRESS (0x0)
+#define EEPROM_PATTERN_TABLE_ADDRESS (0x100)
 
 #define BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT 36
 
@@ -134,12 +138,25 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, const QList<Pattern
     flashData.append(MemorySection("PatternData",
                                    patternDataAddress,
                                    patternData));
-    flashData.append(MemorySection("PatternTable",
-                                   FLASH_MEMORY_PATTERN_TABLE_ADDRESS,
+
+    // TODO: Zero out the beginning of the EEPROM, to set the default pattern/brightness settings
+    const QByteArray eepromBytes(EEPROM_CURRENT_SETTINGS_SIZE, char(255));
+    eepromData.append(MemorySection("currentSettings",
+                                   EEPROM_CURRENT_SETTINGS_ADDRESS,
+                                   eepromBytes));
+
+    eepromData.append(MemorySection("PatternTable",
+                                   EEPROM_PATTERN_TABLE_ADDRESS,
                                    patternTable));
 
     for(MemorySection &section : flashData)
-        qDebug() << "Section"
+        qDebug() << "Flash Section"
+                 << "name:" << section.name
+                 << "address:" << section.address
+                 << "size:" << section.data.count();
+
+    for(MemorySection &section : eepromData)
+        qDebug() << "EEPROM Section"
                  << "name:" << section.name
                  << "address:" << section.address
                  << "size:" << section.data.count();
