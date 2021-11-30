@@ -555,6 +555,7 @@ void PatternFrameModelTests::readFromStreamTest()
     QSize frameSize(10,11);
     QString fileName("filename");
     float frameSpeed = 1.234f;
+    int repeatCount = 65534;
     QList<QImage> frames;
 
     QImage redImage(frameSize, QImage::Format_ARGB32_Premultiplied);
@@ -576,6 +577,7 @@ void PatternFrameModelTests::readFromStreamTest()
     stream << frameSize;
     stream << fileName;
     stream << frameSpeed;
+    stream << repeatCount;
     stream << frames;
     stream << QString("endOfStream");
     buffer.reset();
@@ -587,6 +589,7 @@ void PatternFrameModelTests::readFromStreamTest()
     QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameSize).toSize(), frameSize);
     QCOMPARE(model.data(model.index(0), PatternFrameModel::FileName).toString(), fileName);
     QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameSpeed).toFloat(), frameSpeed);
+    QCOMPARE(model.data(model.index(0), PatternFrameModel::PatternRepeatCount).toInt(), repeatCount);
     QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>(), redImage);
     QCOMPARE(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>(), greenImage);
 
@@ -601,6 +604,7 @@ void PatternFrameModelTests::writeToStreamTest()
     QSize frameSize(10,11);
     QString fileName("filename");
     float frameSpeed = 1.234f;
+    int repeatCount = 65534;
 
     QImage redImage(frameSize, QImage::Format_ARGB32_Premultiplied);
     redImage.fill(Qt::GlobalColor::red);
@@ -614,6 +618,7 @@ void PatternFrameModelTests::writeToStreamTest()
     model.setData(model.index(0), frameSize, PatternFrameModel::FrameSize);
     model.setData(model.index(0), fileName, PatternFrameModel::FileName);
     model.setData(model.index(0), frameSpeed, PatternFrameModel::FrameSpeed);
+    model.setData(model.index(0), repeatCount, PatternFrameModel::PatternRepeatCount);
     model.setData(model.index(0), redImage, PatternFrameModel::FrameImage);
     model.setData(model.index(1), redImage, PatternFrameModel::FrameImage);
 
@@ -632,11 +637,13 @@ void PatternFrameModelTests::writeToStreamTest()
     QSize readFrameSize;
     QString readFileName;
     float readFrameSpeed;
+    int readRepeatCount;
     QList<QImage> readFrames;
 
     stream >> readFrameSize;
     stream >> readFileName;
     stream >> readFrameSpeed;
+    stream >> readRepeatCount;
     stream >> readFrames;
 
     for(QImage &frame : readFrames)
@@ -645,6 +652,7 @@ void PatternFrameModelTests::writeToStreamTest()
     QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameSize).toSize(), readFrameSize);
     QCOMPARE(model.data(model.index(0), PatternFrameModel::FileName).toString(), readFileName);
     QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameSpeed).toFloat(), readFrameSpeed);
+    QCOMPARE(model.data(model.index(0), PatternFrameModel::PatternRepeatCount).toFloat(), readRepeatCount);
     QCOMPARE(model.data(model.index(0), PatternFrameModel::FrameImage).value<QImage>(), readFrames.at(0));
     QCOMPARE(model.data(model.index(1), PatternFrameModel::FrameImage).value<QImage>(), readFrames.at(1));
 

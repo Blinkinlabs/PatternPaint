@@ -32,7 +32,7 @@ class Animation {
   // @param encoding Method used to encode the animation data
   // @param ledCount Number of LEDs in the strip
   // @param frameDelay Number of milliseconds to wait between frames
-  // @param repeatCount Number of times to repeat pattern before advancing
+  // @param repeatCount Number of times to repeat pattern before advancing (0 to disable auto-advance)
   Animation(uint16_t frameCount,
             PGM_P frameData,
             Encoding encoding,
@@ -46,7 +46,7 @@ class Animation {
   // @param encoding Method used to encode the animation data
   // @param ledCount Number of LEDs in the strip
   // @param frameDelay Number of milliseconds to wait between frames
-  // @param repeatCount Number of times to repeat pattern before advancing
+  // @param repeatCount Number of times to repeat pattern before advancing (0 to disable auto-advance)
   void init(uint16_t frameCount,
             PGM_P frameData,
             Encoding encoding,
@@ -65,12 +65,14 @@ class Animation {
   uint16_t getFrameCount() const;
   uint16_t getFrameDelay() const;
   uint16_t getRepeatCount() const;
+  bool getDone() const;
 
  private:
   uint16_t ledCount;              // Number of LEDs in the strip
   uint16_t frameCount;            // Number of frames in this animation
   uint16_t frameDelay;            // Milliseconds to wait between frames
   uint16_t repeatCount;           // Number of times to repeat pattern before advancing
+  bool autoAdvance;               // If true, advance to next pattern after repeat count is reached
 
   Encoding encoding;              // Encoding type
   PGM_P frameData;           // Pointer to the begining of the frame data

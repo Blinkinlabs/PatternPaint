@@ -62,6 +62,8 @@ private slots:
 
     void patternRepeatCount_valueChanged(int value);
 
+    void patternAdvanceMode_activated(int index);
+
     void frameIndexWidget_valueChanged(QString value);
 
     void on_actionPlay_triggered();

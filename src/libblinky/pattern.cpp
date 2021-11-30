@@ -242,7 +242,7 @@ void Pattern::setFrameSpeed(float speed)
 
 int Pattern::getPatternRepeatCount() const
 {
-    return model->index(0).data(PatternModel::PatternRepeatCount).toFloat();
+    return model->index(0).data(PatternModel::PatternRepeatCount).toInt();
 }
 
 void Pattern::setPatternRepeatCount(int speed)

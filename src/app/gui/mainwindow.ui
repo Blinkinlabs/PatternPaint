@@ -457,7 +457,7 @@
           <item row="0" column="1">
            <widget class="QSpinBox" name="patternRepeatCount">
             <property name="enabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>

@@ -30,6 +30,12 @@ void Animation::init(uint16_t frameCount_,
   ledCount = ledCount_;
   frameDelay = frameDelay_;
   repeatCount = repeatCount_;
+  if(repeatCount > 0) {
+    autoAdvance = true;
+  }
+  else {
+    autoAdvance = false;
+  }
 
   switch(encoding) {
     case RGB24:
@@ -79,7 +85,7 @@ void Animation::draw(struct CRGB strip[]) {
   
   frameIndex = (frameIndex + 1)%frameCount;
   if(frameIndex == 0) {
-    if(repeatCount > 0) {
+    if(autoAdvance && (repeatCount > 0)) {
       repeatCount--;
     }
   }
@@ -99,6 +105,10 @@ uint16_t Animation::getFrameDelay() const {
 
 uint16_t Animation::getRepeatCount() const {
   return repeatCount;
+}
+
+bool Animation::getDone() const {
+  return (autoAdvance && (repeatCount == 0));
 }
 
 void Animation::drawRgb24(struct CRGB strip[]) {

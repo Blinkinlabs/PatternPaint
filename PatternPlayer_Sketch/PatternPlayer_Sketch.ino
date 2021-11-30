@@ -184,7 +184,7 @@ void loop()
 
   pattern.draw(leds);
 
-  if(pattern.getRepeatCount() == 0) {
+  if(pattern.getDone()) {
     setPattern(currentPattern+1);
   }
 

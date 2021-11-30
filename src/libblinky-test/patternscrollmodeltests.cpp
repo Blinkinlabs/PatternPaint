@@ -556,6 +556,7 @@ void PatternScrollModelTests::readFromStreamTest()
     QSize frameSize(10,11);
     QString fileName("filename");
     float frameSpeed = 1.234f;
+    int repeatCount = 65534;
 
     QImage image(frameSize, QImage::Format_ARGB32_Premultiplied);
     image.fill(Qt::GlobalColor::red);
@@ -570,6 +571,7 @@ void PatternScrollModelTests::readFromStreamTest()
     stream << frameSize;
     stream << fileName;
     stream << frameSpeed;
+    stream << repeatCount;
     stream << image;
     stream << QString("endOfStream");
     buffer.reset();
@@ -581,6 +583,7 @@ void PatternScrollModelTests::readFromStreamTest()
     QCOMPARE(model.data(model.index(0), PatternScrollModel::FrameSize).toSize(), frameSize);
     QCOMPARE(model.data(model.index(0), PatternScrollModel::FileName).toString(), fileName);
     QCOMPARE(model.data(model.index(0), PatternScrollModel::FrameSpeed).toFloat(), frameSpeed);
+    QCOMPARE(model.data(model.index(0), PatternScrollModel::PatternRepeatCount).toInt(), repeatCount);
     QCOMPARE(model.data(model.index(0), PatternScrollModel::EditImage).value<QImage>(), image);
 
     QString endOfStreamMarker;
@@ -594,6 +597,7 @@ void PatternScrollModelTests::writeToStreamTest()
     QSize frameSize(10,11);
     QString fileName("filename");
     float frameSpeed = 1.234f;
+    int repeatCount = 65534;
 
     QImage image(QSize(2,11), QImage::Format_ARGB32_Premultiplied);
     image.fill(Qt::GlobalColor::red);
@@ -604,6 +608,7 @@ void PatternScrollModelTests::writeToStreamTest()
     model.setData(model.index(0), frameSize, PatternScrollModel::FrameSize);
     model.setData(model.index(0), fileName, PatternScrollModel::FileName);
     model.setData(model.index(0), frameSpeed, PatternScrollModel::FrameSpeed);
+    model.setData(model.index(0), repeatCount, PatternScrollModel::PatternRepeatCount);
     model.setData(model.index(0), image, PatternScrollModel::EditImage);
 
     // Pack the model into a stream
@@ -621,11 +626,13 @@ void PatternScrollModelTests::writeToStreamTest()
     QSize readFrameSize;
     QString readFileName;
     float readFrameSpeed;
+    int readRepeatCount;
     QImage readImage;
 
     stream >> readFrameSize;
     stream >> readFileName;
     stream >> readFrameSpeed;
+    stream >> readRepeatCount;
     stream >> readImage;
 
     readImage = readImage.convertToFormat(QImage::Format_ARGB32_Premultiplied);
@@ -633,6 +640,7 @@ void PatternScrollModelTests::writeToStreamTest()
     QCOMPARE(model.data(model.index(0), PatternScrollModel::FrameSize).toSize(), readFrameSize);
     QCOMPARE(model.data(model.index(0), PatternScrollModel::FileName).toString(), readFileName);
     QCOMPARE(model.data(model.index(0), PatternScrollModel::FrameSpeed).toFloat(), readFrameSpeed);
+    QCOMPARE(model.data(model.index(0), PatternScrollModel::PatternRepeatCount).toFloat(), readRepeatCount);
     QCOMPARE(model.data(model.index(0), PatternScrollModel::EditImage).value<QImage>(), readImage);
 
     QString endOfStreamMarker;
