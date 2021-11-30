@@ -3,6 +3,14 @@
 # Stop at any error
 set -e
 
+# For Github actions: install-qt-action sets the Qt5_DIR environment variable
+if [[ -z "${Qt5_DIR}" ]]; then
+	echo "Qt5_DIR not detected, skipping"
+else
+	QTDIR=${Qt5_DIR}
+	echo "Using Qt tools from ${QTDIR}"
+fi
+
 # Location of the QT tools
 if [ -z ${QTDIR+x} ]; then
 	echo "QTDIR not defined- please set it to the location containing the Qt version to build against. For example:"
