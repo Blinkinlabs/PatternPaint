@@ -27,6 +27,7 @@
 #define EEPROM_PATTERN_TABLE_ADDRESS (0x100)
 
 #define BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT 36
+#define BLINKTAPE_FIXED_BRIGHTNESS_DEFAULT false
 
 
 QByteArray makePatternTableHeader(uint8_t patternCount, uint16_t ledCount) {
@@ -50,7 +51,7 @@ QByteArray makePatternTableEntry(PatternWriter::Encoding encoding, uint16_t offs
     return entry;
 }
 
-QByteArray makeBrightnessTable(int maxBrightnessPercent) {
+QByteArray makeBrightnessTable(int maxBrightnessPercent, bool fixedBrightness) {
     QByteArray brightnessTable;
 
     if (maxBrightnessPercent < 0)
@@ -60,7 +61,13 @@ QByteArray makeBrightnessTable(int maxBrightnessPercent) {
         maxBrightnessPercent = 100;
 
     float maxBrightness = maxBrightnessPercent/100.0;
-    QList<int> brightnessStepModifiers = {255,191,114,41,20,41,114,191};
+    QList<int> brightnessStepModifiers;
+
+    // To make a fixed brightness, just assign all brightness steps to the maximum value
+    if(fixedBrightness)
+        brightnessStepModifiers.append(QList<int>{255,255,255,255,255,255,255,255});
+    else
+        brightnessStepModifiers.append(QList<int>{255,191,114,41,20,41,114,191});
 
     for(int brightnessStepModifier : brightnessStepModifiers)
         brightnessTable.append(static_cast<char>(round(brightnessStepModifier*maxBrightness)));
@@ -72,7 +79,8 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, const QList<Pattern
 {
     // TODO: Pass this in somehow.
     QSettings settings;
-    int maxBrightness = settings.value("BlinkyTape/maxBrightness", BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT).toInt();
+    const int maxBrightness = settings.value("BlinkyTape/maxBrightness", BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT).toInt();
+    const bool fixedBrightness = settings.value("BlinkyTape/fixedBrightness", BLINKTAPE_FIXED_BRIGHTNESS_DEFAULT).toBool();
 
     // First, build the flash section for the sketch. This is the same for
     // all uploads
@@ -110,7 +118,7 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, const QList<Pattern
     // TODO: Test that the LED length is in range
 
     patternTable.append(makePatternTableHeader(patterns.count(), patterns.first().getLedCount()));
-    patternTable.append(makeBrightnessTable(maxBrightness));
+    patternTable.append(makeBrightnessTable(maxBrightness, fixedBrightness));
 
     unsigned int patternDataAddress = sketchSection.address + sketchSection.data.count();
 

@@ -8,6 +8,7 @@
 
 // TODO: This comes from avruploaddata.cpp
 #define BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT 36
+#define BLINKTAPE_FIXED_BRIGHTNESS_DEFAULT false
 
 // TODO: This comes from blinkypendantuploader.cpp
 #define BLINKYPENDANT_DISPLAYMODE_DEFAULT "POV"
@@ -30,6 +31,7 @@ Preferences::Preferences(QWidget *parent) :
     ui->blinkyTapeMaxBrightness->setMaximum(100);
     ui->blinkyTapeMaxBrightness->setMinimum(1);
     ui->blinkyTapeMaxBrightness->setValue(settings.value("BlinkyTape/maxBrightness", BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT).toInt());
+    ui->blinkyTapeFixedBrightness->setChecked(settings.value("BlinkyTape/fixedBrightness", BLINKTAPE_FIXED_BRIGHTNESS_DEFAULT).toBool());
 
     ui->blinkyPendantDisplayMode->addItem("POV");
     ui->blinkyPendantDisplayMode->addItem("Timed");
@@ -77,6 +79,9 @@ void Preferences::accept()
 
     if(ui->blinkyTapeMaxBrightness->value() != settings.value("BlinkyTape/maxBrightness", BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT).toInt())
         settings.setValue("BlinkyTape/maxBrightness", ui->blinkyTapeMaxBrightness->value());
+
+    if(ui->blinkyTapeFixedBrightness->isChecked() != settings.value("BlinkyTape/fixedBrightness", BLINKTAPE_FIXED_BRIGHTNESS_DEFAULT).toBool())
+        settings.setValue("BlinkyTape/fixedBrightness", ui->blinkyTapeFixedBrightness->isChecked());
 
     if(ui->blinkyPendantDisplayMode->currentText() != settings.value("BlinkyPendant/displayMode", BLINKYPENDANT_DISPLAYMODE_DEFAULT).toString())
         settings.setValue("BlinkyPendant/displayMode", ui->blinkyPendantDisplayMode->currentText());

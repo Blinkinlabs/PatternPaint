@@ -34,13 +34,14 @@ void BlinkyTapeUploadDataTests::makePatternTableEntryTest()
 
 void BlinkyTapeUploadDataTests::makeBrightnessTest_data()
 {
-    QTest::addColumn<int>("brightness");
+    QTest::addColumn<int>("maxBrightness");
+    QTest::addColumn<bool>("fixedBrightness");
     QTest::addColumn<QByteArray>("expectedResponse");
 
-    QTest::newRow("0") << 0 << QByteArray(8, (char)0);
-    QTest::newRow("-1") << -1 << QByteArray(8, (char)0);
+    QTest::newRow("0") << 0 << false << QByteArray(8, (char)0);
+    QTest::newRow("-1") << -1 << false << QByteArray(8, (char)0);
 
-    QTest::newRow("1") << 1 << QByteArray()
+    QTest::newRow("1") << 1 << false << QByteArray()
                             .append((char)3)
                             .append((char)2)
                             .append((char)1)
@@ -50,7 +51,7 @@ void BlinkyTapeUploadDataTests::makeBrightnessTest_data()
                             .append((char)1)
                             .append((char)2);
 
-    QTest::newRow("100") << 100 << QByteArray()
+    QTest::newRow("100") << 100 << false << QByteArray()
                             .append((char)255)
                             .append((char)191)
                             .append((char)114)
@@ -60,7 +61,7 @@ void BlinkyTapeUploadDataTests::makeBrightnessTest_data()
                             .append((char)114)
                             .append((char)191);
 
-    QTest::newRow("101") << 101 << QByteArray()
+    QTest::newRow("101") << 101 << false << QByteArray()
                             .append((char)255)
                             .append((char)191)
                             .append((char)114)
@@ -69,14 +70,35 @@ void BlinkyTapeUploadDataTests::makeBrightnessTest_data()
                             .append((char)41)
                             .append((char)114)
                             .append((char)191);
+
+    QTest::newRow("1") << 1 << true << QByteArray()
+                            .append((char)3)
+                            .append((char)3)
+                            .append((char)3)
+                            .append((char)3)
+                            .append((char)3)
+                            .append((char)3)
+                            .append((char)3)
+                            .append((char)3);
+
+    QTest::newRow("1") << 100 << true << QByteArray()
+                            .append((char)255)
+                            .append((char)255)
+                            .append((char)255)
+                            .append((char)255)
+                            .append((char)255)
+                            .append((char)255)
+                            .append((char)255)
+                            .append((char)255);
 }
 
 void BlinkyTapeUploadDataTests::makeBrightnessTest()
 {
-    QFETCH(int, brightness);
+    QFETCH(int, maxBrightness);
+    QFETCH(bool, fixedBrightness);
     QFETCH(QByteArray, expectedResponse);
 
-    QCOMPARE(makeBrightnessTable(brightness), expectedResponse);
+    QCOMPARE(makeBrightnessTable(maxBrightness, fixedBrightness), expectedResponse);
 }
 
 
