@@ -16,12 +16,12 @@ TIMESTAMP_SERVER='http://rfc3161timestamp.globalsign.com/advanced'
 # Location of the QT tools
 if [ -z ${QTDIR+x} ]; then
 	echo "QTDIR not defined- please set it to the location containing the Qt version to build against. For example:"
-	echo "  export QTDIR=/c/Qt/Qt5.8.0/5.8/mingw53_32"
+	echo "  export QTDIR=/c/Qt/5.13.0/mingw73_32"
 	exit 1
 fi
 
 # Location of the MINGW libraries (Installed as part of Qt)
-MINGW_BIN=${QTDIR}/../../Tools/mingw530_32/bin
+MINGW_BIN=${QTDIR}/../../Tools/mingw730_32/bin
 
 QMAKE=${QTDIR}/bin/qmake
 MAKE=${MINGW_BIN}/mingw32-make
@@ -60,10 +60,10 @@ BLINKYPENDANT=${DRIVERS}/Blinkypendant
 EIGHTBYEIGHT=${DRIVERS}/EightByEight
 
 # Winsparkle library release
-WINSPARKLE=${BASEDIR}/thirdparty/WinSparkle-0.5.3
+WINSPARKLE=${BASEDIR}/thirdparty/WinSparkle-0.6.0
 
 # libusb library release
-LIBUSB=${BASEDIR}/thirdparty/libusb-1.0.21-win
+LIBUSB=${BASEDIR}/thirdparty/libusb-1.0.22-win
 
 
 

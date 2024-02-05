@@ -34,9 +34,10 @@ float ExponentialBrightness::bFactor() const {
 
 QColor ExponentialBrightness::correct(const QColor &uncorrected) const
 {
-    int r = round(255*pow(uncorrected.redF(), rFactor_));
-    int g = round(255*pow(uncorrected.greenF(), gFactor_));
-    int b = round(255*pow(uncorrected.blueF(), bFactor_));
+    return uncorrected;
+//    int r = round(255*pow(uncorrected.redF(), rFactor_));
+//    int g = round(255*pow(uncorrected.greenF(), gFactor_));
+//    int b = round(255*pow(uncorrected.blueF(), bFactor_));
 
-    return QColor(r,g,b);
+//    return QColor(r,g,b);
 }
