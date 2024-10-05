@@ -36,7 +36,7 @@ BlinkyTape::BlinkyTape(QSerialPortInfo info, QObject *parent) :
     serialInfo(info)
 {
     serial = new QSerialPort(this);
-    serial->setSettingsRestoredOnClose(false);
+    //serial->setSettingsRestoredOnClose(false);
 
     connect(serial, &QSerialPort::errorOccurred,
             this, &BlinkyTape::handleError);

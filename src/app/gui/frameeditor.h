@@ -22,7 +22,7 @@ public:
     /// Re-size the display grid and selector based on new widget geometery
     void resizeEvent(QResizeEvent *resizeEvent);
 
-    void enterEvent(QEvent *event);
+    void enterEvent(QEnterEvent *event);
     void leaveEvent(QEvent *event);
 
     // Pass messages to the selected instrument

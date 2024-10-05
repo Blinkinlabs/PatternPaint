@@ -6,7 +6,7 @@ SerialCommandQueue::SerialCommandQueue(QObject *parent) :
     QObject(parent),
     serial(this)
 {
-    serial.setSettingsRestoredOnClose(false);
+    //serial.setSettingsRestoredOnClose(false);
 
     connect(&serial, &QSerialPort::errorOccurred,
             this, &SerialCommandQueue::handleSerialError);

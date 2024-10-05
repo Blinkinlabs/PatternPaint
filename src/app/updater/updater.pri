@@ -39,7 +39,8 @@ win32 {
     SOURCES += \
         $$PWD/winsparkleautoupdater.cpp
 
-    SPARKLE_PATH = ../../thirdparty/WinSparkle-0.7.0
+    # SPARKLE_PATH = ../../thirdparty/WinSparkle-0.7.0
+    SPARKLE_PATH = C:\Users\matt\repos\PatternPaint\thirdparty\WinSparkle-0.7.0
     INCLUDEPATH += $$SPARKLE_PATH/include
 
     win32-msvc* {
@@ -49,7 +50,7 @@ win32 {
         LIBS += $$SPARKLE_LIB
     }
     win32-g++ {
-        SPARKLE_DLL = $$SPARKLE_PATH/Release/WinSparkle.dll
+        SPARKLE_DLL = $$SPARKLE_PATH/x64/Release/WinSparkle.dll
 
         LIBS += $$SPARKLE_DLL
     }

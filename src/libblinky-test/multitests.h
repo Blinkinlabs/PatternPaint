@@ -201,7 +201,7 @@ namespace MultiTests {
                 // Insert suffix before file extension
                 newFilename = oldFilename.left( oldFilename.lastIndexOf(".") );
             }
-            if( newFilename.contains(QRegExp(".*_\\d+$")) ){
+            if( newFilename.contains(QRegularExpression(".*_\\d+$")) ){
                 // File seem to already have a digital suffix
                 newFilename = newFilename.left( newFilename.lastIndexOf("_") );
             }

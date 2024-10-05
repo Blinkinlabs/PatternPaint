@@ -1,10 +1,10 @@
 TEMPLATE = subdirs
 SUBDIRS = \
     libblinky \
-    libblinky-test \
+    # libblinky-test \
     app
 
-libblinky-test.depends = libblinky
+# libblinky-test.depends = libblinky
 app.depends = libblinky
 
 

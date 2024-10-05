@@ -273,7 +273,7 @@ void FrameEditor::updateGrid()
                          y*scale);
 }
 
-void FrameEditor::enterEvent(QEvent *event)
+void FrameEditor::enterEvent(QEnterEvent *event)
 {
     // Force a screen update here, to draw the instrument preview
     update();

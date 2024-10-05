@@ -15,7 +15,8 @@ macx {
 }
 
 win32 {
-    LIBUSB_PATH = ../../thirdparty/libusb-1.0.23-win
+    # LIBUSB_PATH = ..\..\thirdparty\libusb-1.0.23-win
+    LIBUSB_PATH = C:\Users\matt\repos\PatternPaint\thirdparty\libusb-1.0.23-win
 
     INCLUDEPATH += $$LIBUSB_PATH/include
 
@@ -26,7 +27,7 @@ win32 {
         LIBS += $$LIBUSB_LIB
     }
     win32-g++ {
-        LIBUSB_DLL = $$LIBUSB_PATH/MinGW32/dll/libusb-1.0.dll
+        LIBUSB_DLL = $$LIBUSB_PATH/MinGW64/dll/libusb-1.0.dll
 
         LIBS += $$LIBUSB_DLL
     }
