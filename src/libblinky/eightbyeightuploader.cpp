@@ -80,7 +80,7 @@ bool EightByEightUploader::storePatterns(BlinkyController &controller,
 
         // Calculate the number of serial transactions that will occur in this upload
         // TODO
-        maxProgress += 4 + 2*data.count()/CHUNK_SIZE_BYTES;
+        maxProgress += 4 + 2*data.size()/CHUNK_SIZE_BYTES;
     }
 
     setProgress(0);

@@ -1,6 +1,5 @@
 #include "avr109commands.h"
 #include "bytearrayhelpers.h"
-#include "serialcommandqueue.h"
 
 #include <QDebug>
 
@@ -57,7 +56,7 @@ SerialCommand writeFlashPage(const QByteArray &data)
 
     QByteArray command;
     command.append('B'); // command: write memory
-    command += ByteArrayHelpers::uint16ToByteArrayBig(paddedData.count());  // write size (bytes)
+    command += ByteArrayHelpers::uint16ToByteArrayBig(paddedData.size());  // write size (bytes)
     command.append('F'); // memory type: flash
     command += paddedData;
 
@@ -77,7 +76,7 @@ SerialCommand verifyFlashPage(const QByteArray &data)
 
     QByteArray command;
     command.append('g'); // command: verify memory
-    command += ByteArrayHelpers::uint16ToByteArrayBig(paddedData.count()); // read size (bytes)
+    command += ByteArrayHelpers::uint16ToByteArrayBig(paddedData.size()); // read size (bytes)
     command.append('F'); // memory type: flash
 
     QByteArray response;
@@ -90,7 +89,7 @@ SerialCommand writeEepromBlock(const QByteArray &data)
 {
     QByteArray command;
     command.append('B'); // command: write memory
-    command += ByteArrayHelpers::uint16ToByteArrayBig(data.count());  // write size (bytes)
+    command += ByteArrayHelpers::uint16ToByteArrayBig(data.size());  // write size (bytes)
     command.append('E'); // memory type: eeprom
     command += data;
 

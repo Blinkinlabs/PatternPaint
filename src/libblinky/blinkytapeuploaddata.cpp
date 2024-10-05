@@ -120,7 +120,7 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, const QList<Pattern
     patternTable.append(makePatternTableHeader(patterns.count(), patterns.first().getLedCount()));
     patternTable.append(makeBrightnessTable(maxBrightness, fixedBrightness));
 
-    unsigned int patternDataAddress = sketchSection.address + sketchSection.data.count();
+    unsigned int patternDataAddress = sketchSection.address + sketchSection.data.size();
 
     // Now, for each pattern, append the image data to the sketch
     for (PatternWriter pattern : patterns) {
@@ -129,13 +129,13 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, const QList<Pattern
                  << "Frame count:" << pattern.getFrameCount()
                  << "Frame delay:" << pattern.getFrameDelay()
                  << "Count:" << pattern.getDataAsBinary().length()
-                 << "Offset:" << patternDataAddress + patternData.count();
+                 << "Offset:" << patternDataAddress + patternData.size();
 
         // TOD: Test that all the values are in range
 
         // Build the table entry for this pattern
         patternTable.append(makePatternTableEntry(pattern.getEncoding(),
-                                                  patternDataAddress + patternData.count(),
+                                                  patternDataAddress + patternData.size(),
                                                   pattern.getFrameCount(),
                                                   pattern.getFrameDelay(),
                                                   pattern.getRepeatCount()));
@@ -163,13 +163,13 @@ bool BlinkyTapeUploadData::init(const QString &firmwareName, const QList<Pattern
         qDebug() << "Flash Section"
                  << "name:" << section.name
                  << "address:" << section.address
-                 << "size:" << section.data.count();
+                 << "size:" << section.data.size();
 
     for(MemorySection &section : eepromData)
         qDebug() << "EEPROM Section"
                  << "name:" << section.name
                  << "address:" << section.address
-                 << "size:" << section.data.count();
+                 << "size:" << section.data.size();
 
     return true;
 }

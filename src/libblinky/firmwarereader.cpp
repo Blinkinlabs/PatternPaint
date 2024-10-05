@@ -123,7 +123,7 @@ bool FirmwareReader::load(const QString& fileName)
             }
 
             data.data.append(lineData);
-            nextAddress += lineData.count();
+            nextAddress += lineData.size();
 
             break;
 
@@ -138,7 +138,7 @@ bool FirmwareReader::load(const QString& fileName)
     }
 
     inputFile.close();
-    qDebug() << "Firmware size:" << data.data.count();
+    qDebug() << "Firmware size:" << data.data.size();
 
     return true;
 }

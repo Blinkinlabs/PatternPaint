@@ -56,7 +56,7 @@ uint32_t byteArrayToUint32Little(const QByteArray &data)
 {
     uint32_t value = 0;
 
-    if (data.count() != 4)
+    if (data.size() != 4)
         return 0;
 
     value += (uint8_t)data[0];
@@ -71,7 +71,7 @@ uint32_t byteArrayToUint32Big(const QByteArray &data)
 {
     uint32_t value = 0;
 
-    if (data.count() != 4)
+    if (data.size() != 4)
         return 0;
 
     value += (uint8_t)data[0] << 24;

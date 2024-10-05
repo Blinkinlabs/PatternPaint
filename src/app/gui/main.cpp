@@ -35,15 +35,23 @@ int main(int argc, char *argv[])
 
     // Translator for the Qt library
     QTranslator qtTranslator;
-    qtTranslator.load("qt_" + locale,
-            QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    app.installTranslator(&qtTranslator);
+    if(qtTranslator.load("qt_" + locale,
+                          QLibraryInfo::path(QLibraryInfo::TranslationsPath))) {
+        app.installTranslator(&qtTranslator);
+    }
+    else {
+        qDebug() << "Could not load translator for qt library";
+    }
 
     // Translator for PatternPaint
     QTranslator appTranslator;
-    appTranslator.load("patternpaint_" + locale,
-                       ":/translations");
-    app.installTranslator(&appTranslator);
+    if(appTranslator.load("patternpaint_" + locale,
+                           ":/translations")) {
+        app.installTranslator(&appTranslator);
+    }
+    else {
+        qDebug() << "Could not load translator for patternpaint";
+    }
 
     MainWindow w;
     w.show();

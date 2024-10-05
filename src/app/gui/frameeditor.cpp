@@ -292,7 +292,7 @@ void FrameEditor::mousePressEvent(QMouseEvent *event)
     if (!hasImage() || instrument.isNull())
         return;
 
-    instrument->mousePressEvent(event, frameData, frameToImage(event->x(),event->y()));
+    instrument->mousePressEvent(event, frameData, frameToImage(event->position().x(),event->position().y()));
     lazyUpdate();
 }
 
@@ -304,7 +304,7 @@ void FrameEditor::mouseMoveEvent(QMouseEvent *event)
     if(!mouseMoveIntervalFilter.check())
         return;
 
-    QPoint mousePoint = frameToImage(event->x(),event->y());
+    QPoint mousePoint = frameToImage(event->position().x(),event->position().y());
 
     // Filter the move event if it didn't result in a move to a new image pixel
     if (mousePoint == lastMousePoint)
@@ -312,7 +312,7 @@ void FrameEditor::mouseMoveEvent(QMouseEvent *event)
 
     lastMousePoint = mousePoint;
 
-    instrument->mouseMoveEvent(event, frameData, frameToImage(event->x(),event->y()));
+    instrument->mouseMoveEvent(event, frameData, frameToImage(event->position().x(),event->position().y()));
     lazyUpdate();
 }
 
@@ -321,7 +321,7 @@ void FrameEditor::mouseReleaseEvent(QMouseEvent *event)
     if (!hasImage() || instrument.isNull())
         return;
 
-    instrument->mouseReleaseEvent(event, *this, frameData, frameToImage(event->x(),event->y()));
+    instrument->mouseReleaseEvent(event, *this, frameData, frameToImage(event->position().x(),event->position().y()));
     lazyUpdate();
 }
 

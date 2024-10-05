@@ -47,17 +47,17 @@ bool LightBuddyUploader::storePatterns(BlinkyController &controller,
             return false;
         }
 
-        if (patternWriter.getDataAsBinary().count() > MAX_PATTERN_SIZE) {
+        if (patternWriter.getDataAsBinary().size() > MAX_PATTERN_SIZE) {
             errorString = QString("Pattern too big to fit in memory! Size=%1, Max size=%2").arg(
-                patternWriter.getDataAsBinary().count()).arg(MAX_PATTERN_SIZE);
+                patternWriter.getDataAsBinary().size()).arg(MAX_PATTERN_SIZE);
             return false;
         }
 
         // Workaround for color order swap on lightbuddy- change RGB to BGR.
         // TODO: Update the lightbuddy firmware so we don't need to do this.
-        qDebug() << "size: " << patternWriter.getDataAsBinary().count()/3;
+        qDebug() << "size: " << patternWriter.getDataAsBinary().size()/3;
         QByteArray mungedPatternData;
-        for(int pixel = 0; pixel < patternWriter.getDataAsBinary().count()/3; pixel++) {
+        for(int pixel = 0; pixel < patternWriter.getDataAsBinary().size()/3; pixel++) {
             mungedPatternData.append(patternWriter.getDataAsBinary().at(pixel*3+2));
             mungedPatternData.append(patternWriter.getDataAsBinary().at(pixel*3+1));
             mungedPatternData.append(patternWriter.getDataAsBinary().at(pixel*3+0));
@@ -74,13 +74,13 @@ bool LightBuddyUploader::storePatterns(BlinkyController &controller,
         //data += patternWriter.getData();
         data += mungedPatternData;
 
-        while (data.count()%FLASH_PAGE_SIZE != 0)
+        while (data.size()%FLASH_PAGE_SIZE != 0)
             data.append((char)0x255);
 
         flashData.append(data);
 
         // Calculate the number of serial transactions that will occur in this upload
-        maxProgress += data.count()/FLASH_PAGE_SIZE+2;
+        maxProgress += data.size()/FLASH_PAGE_SIZE+2;
     }
 
     setProgress(0);

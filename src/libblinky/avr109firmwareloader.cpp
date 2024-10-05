@@ -163,7 +163,7 @@ void Avr109FirmwareLoader::reallyStartUpload() {
     // There are 4 commands for each page-
     // setaddress, writeflashpage, setaddress, verifyflashpage
     for (MemorySection flashSection : flashData)
-        maxProgress += 4*flashSection.data.count()/FLASH_MEMORY_PAGE_SIZE_BYTES;
+        maxProgress += 4*flashSection.data.size()/FLASH_MEMORY_PAGE_SIZE_BYTES;
 
     // There are two commands for each EEPROM section-
     // setaddress, write eeprom data
@@ -373,6 +373,8 @@ void Avr109FirmwareLoader::doWork()
             commandQueue.enqueue(Avr109Commands::writeEeprom(section.data, section.address));
             // TODO: Verify EEPROM?
         }
+
+        break;
     }
 
     case State_ResetBootloader:
