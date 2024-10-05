@@ -6,7 +6,7 @@ src/*/Makefile
 src/*/release
 src/*/debug
 src/*.user
-build-*
+src/build/*
 PatternPaint/*.user
 windows-drivers/*
 firmware/*
