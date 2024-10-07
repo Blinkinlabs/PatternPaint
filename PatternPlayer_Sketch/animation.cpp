@@ -80,8 +80,6 @@ void Animation::reset() {
 
 void Animation::draw(struct CRGB strip[]) {
   (this->*drawFunction)(strip);
-
-  LEDS.show();
   
   frameIndex = (frameIndex + 1)%frameCount;
   if(frameIndex == 0) {

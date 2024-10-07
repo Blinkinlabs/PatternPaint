@@ -181,6 +181,12 @@ void loop()
 
   pattern.draw(leds);
 
+  if(buttonState) {
+    leds[0] = CRGB(30,30,30);
+  }
+  
+  LEDS.show();
+
   if(pattern.getDone() && !singlePatternRepeatMode) {
     setPattern(currentPattern+1);
   }
