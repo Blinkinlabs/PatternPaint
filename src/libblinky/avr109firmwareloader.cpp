@@ -162,7 +162,7 @@ void Avr109FirmwareLoader::reallyStartUpload() {
 
     // There are 4 commands for each page-
     // setaddress, writeflashpage, setaddress, verifyflashpage
-    for (MemorySection flashSection : flashData)
+    for (MemorySection& flashSection : flashData)
         maxProgress += 4*flashSection.data.size()/FLASH_MEMORY_PAGE_SIZE_BYTES;
 
     // There are two commands for each EEPROM section-

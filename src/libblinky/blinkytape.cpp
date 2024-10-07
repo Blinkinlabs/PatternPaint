@@ -1,6 +1,5 @@
 #include "blinkytape.h"
 
-#include "blinkycontrollerinfo.h"
 #include "blinkytapeuploader.h"
 #include "eightbyeightuploader.h"
 #include "blinkypendantuploader.h"
@@ -98,7 +97,7 @@ void BlinkyTape::resetTimer_timeout()
         return;
     }
 
-    serial->setBaudRate(QSerialPort::Baud1200);
+    qDebug() << "Response from setbaudrate:" << serial->setBaudRate(QSerialPort::Baud1200);
 
     // setBaudRate() doesn't seem to be reliable if called too quickly after the port
     // is opened. In this case,
@@ -204,13 +203,15 @@ void BlinkyTape::handleBaudRateChanged(qint32 baudRate, QSerialPort::Directions)
 {
     if (baudRate == QSerialPort::Baud115200) {
         qDebug() << "Baud rate updated to 115200!";
+
     } else if (baudRate == QSerialPort::Baud1200 && resetTriesRemaining > 0) {
         qDebug() << "Baud rate updated to 1200bps, closing!";
 
         resetTimer.stop();
         close();
-    } else if (baudRate == QSerialPort::Baud1200) {
-        qDebug() << "Baud rate updated to 1200bps spuriously";
+    }
+    else {
+        qDebug() << "Baud rate updated to " << baudRate << "bps supriously";
     }
 }
 

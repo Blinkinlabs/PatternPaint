@@ -6,9 +6,10 @@
 #include <QDebug>
 #include <QDir>
 
-// TODO: This comes from avruploaddata.cpp
+// TODO: This comes from blinkytapeuploaddata.cpp
 #define BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT 36
-#define BLINKTAPE_FIXED_BRIGHTNESS_DEFAULT false
+#define BLINKYTAPE_BUTTON_SHORT_PRESS_DEFAULT 1
+#define BLINKYTAPE_BUTTON_LONG_PRESS_DEFAULT 2
 
 // TODO: This comes from blinkypendantuploader.cpp
 #define BLINKYPENDANT_DISPLAYMODE_DEFAULT "POV"
@@ -31,7 +32,22 @@ Preferences::Preferences(QWidget *parent) :
     ui->blinkyTapeMaxBrightness->setMaximum(100);
     ui->blinkyTapeMaxBrightness->setMinimum(1);
     ui->blinkyTapeMaxBrightness->setValue(settings.value("BlinkyTape/maxBrightness", BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT).toInt());
-    ui->blinkyTapeFixedBrightness->setChecked(settings.value("BlinkyTape/fixedBrightness", BLINKTAPE_FIXED_BRIGHTNESS_DEFAULT).toBool());
+
+    // Note: these must be synchronized with the BlinkyTape firmware
+    ui->buttonShortPress->addItem("Disabled", 0);
+    ui->buttonShortPress->addItem("Raise/lower brightness", 1);
+    ui->buttonShortPress->addItem("Advance to next pattern", 2);
+    ui->buttonShortPress->addItem("Toggle single-pattern repeat", 3);
+    ui->buttonShortPress->setCurrentIndex(ui->buttonShortPress->findData(settings.value("BlinkyTape/buttonShortPress", BLINKYTAPE_BUTTON_SHORT_PRESS_DEFAULT).toInt()));
+
+    // Note: these must be synchronized with the BlinkyTape firmware
+    ui->buttonLongPress->addItem("Disabled", 0);
+    ui->buttonLongPress->addItem("Raise/lower brightness", 1);
+    ui->buttonLongPress->addItem("Advance to next pattern", 2);
+    ui->buttonLongPress->addItem("Toggle single-pattern repeat", 3);
+    ui->buttonLongPress->setCurrentIndex(ui->buttonLongPress->findData(settings.value("BlinkyTape/buttonLongPress", BLINKYTAPE_BUTTON_LONG_PRESS_DEFAULT).toInt()));
+
+//    ui->buttonLongPress->setCurrentText(settings.value("BlinkyTape/buttonLongPress", BLINKYTAPE_BUTTON_LONG_PRESS_DEFAULT).toString());
 
     ui->blinkyPendantDisplayMode->addItem("POV");
     ui->blinkyPendantDisplayMode->addItem("Timed");
@@ -80,11 +96,15 @@ void Preferences::accept()
     if(ui->blinkyTapeMaxBrightness->value() != settings.value("BlinkyTape/maxBrightness", BLINKYTAPE_MAX_BRIGHTNESS_DEFAULT).toInt())
         settings.setValue("BlinkyTape/maxBrightness", ui->blinkyTapeMaxBrightness->value());
 
-    if(ui->blinkyTapeFixedBrightness->isChecked() != settings.value("BlinkyTape/fixedBrightness", BLINKTAPE_FIXED_BRIGHTNESS_DEFAULT).toBool())
-        settings.setValue("BlinkyTape/fixedBrightness", ui->blinkyTapeFixedBrightness->isChecked());
-
     if(ui->blinkyPendantDisplayMode->currentText() != settings.value("BlinkyPendant/displayMode", BLINKYPENDANT_DISPLAYMODE_DEFAULT).toString())
         settings.setValue("BlinkyPendant/displayMode", ui->blinkyPendantDisplayMode->currentText());
+
+    if(ui->buttonShortPress->currentData().toInt() != settings.value("BlinkyTape/buttonShortPress", BLINKYTAPE_BUTTON_SHORT_PRESS_DEFAULT).toInt())
+        settings.setValue("BlinkyTape/buttonShortPress", ui->buttonShortPress->currentData().toInt());
+
+    if(ui->buttonLongPress->currentData().toInt() != settings.value("BlinkyTape/buttonLongPress", BLINKYTAPE_BUTTON_LONG_PRESS_DEFAULT).toInt())
+        settings.setValue("BlinkyTape/buttonLongPress", ui->buttonLongPress->currentData().toInt());
+
 
     QString locale = getLanguageMap().key(ui->setLanguage->currentText());
     if(locale != settings.value("PatternPaint/language", DEFAULT_LANGUAGE).toString())

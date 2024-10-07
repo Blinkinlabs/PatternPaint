@@ -16,7 +16,7 @@ LIBBLINKY_EXPORT QByteArray makePatternTableHeader(uint8_t patternCount, uint16_
 
 LIBBLINKY_EXPORT QByteArray makePatternTableEntry(PatternWriter::Encoding encodig, uint16_t offset, uint16_t frameCount, uint16_t frameDelay, uint16_t repeatCount);
 
-LIBBLINKY_EXPORT QByteArray makeBrightnessTable(int maxBrightnessPercent, bool fixedBrightness);
+LIBBLINKY_EXPORT QByteArray makeBrightnessTable(int maxBrightnessPercent);
 
 /// Utility class for assembling flash sections for the BlinkyTape
 class LIBBLINKY_EXPORT BlinkyTapeUploadData
