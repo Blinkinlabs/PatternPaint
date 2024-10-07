@@ -19,27 +19,25 @@ CLEDController* controller;   // LED controller
 
 #define BRIGHTNESS_STEPS (8)
 
-// Data from pattern table
+// Settings data
+uint8_t currentPattern;       // Index of the current pattern
+uint8_t currentBrightness;
+uint8_t shortPressBehavior;
+uint8_t longPressBehavior;
 uint8_t patternCount;         // Number of available patterns
 uint16_t ledCount;            // Number of LEDs used in the current sketch
 uint8_t brightnesSteps[BRIGHTNESS_STEPS]; // Brightness steps
-uint8_t shortPressBehavior;
-uint8_t longPressBehavior;
 
-uint8_t currentPattern;       // Index of the current patter
 Animation pattern;            // Current pattern
 
-uint8_t currentBrightness;
-uint8_t lastBrightness;
+bool singlePatternRepeatMode = false;
 
 // Button interrupt variables and Interrupt Service Routine
 uint8_t buttonState = 0;
-bool buttonDebounced;
 long buttonDownTime = 0;
+long buttonRepeatTime = 0;
 long buttonPressTime = 0;
 
-#define BUTTON_SHORT_PRESS_TIME   (1)      // Time to hold the button down to switch brightness
-#define BUTTON_LONG_PRESS_TIME    (1000)   // Time to hold the button down to switch patterns
 
 
 
@@ -69,6 +67,21 @@ void setBrightness(uint8_t newBrightness) {
   LEDS.setBrightness(brightnesSteps[currentBrightness]);
 }
 
+void handleButtonPress(uint8_t function) {
+  if(function == BUTTON_FUNCTION_DISABLED) {
+    return;
+  }
+  else if(function == BUTTON_FUNCTION_BRIGHTNESS) {
+    setBrightness(currentBrightness + 1);
+  }
+  else if(function == BUTTON_FUNCTION_ADVANCE_PATTERN) {
+    setPattern(currentPattern + 1);
+  }
+  else if(function == BUTTON_FUNCTION_TOGGLE_SINGLE_REPEAT) {
+    singlePatternRepeatMode = !singlePatternRepeatMode;
+  }
+}
+
 // Called when the button is both pressed and released.
 ISR(PCINT0_vect) {
   buttonState = !(PINB & (1 << PINB6)); // Reading state of the PB6 (remember that HIGH == released)
@@ -76,7 +89,7 @@ ISR(PCINT0_vect) {
   if (buttonState) {
     // On button down, record the time so we can convert this into a gesture later
     buttonDownTime = millis();
-    buttonDebounced = false;
+    buttonRepeatTime = buttonDownTime;
 
     // And configure and start timer4 interrupt.
     TCCR4B = 0x0F; // Slowest prescaler
@@ -87,32 +100,31 @@ ISR(PCINT0_vect) {
 
   }
   else {
-    TIMSK4 = 0;  // turn off the interrupt
+    // On button up, turn off the timer interrupt
+    TIMSK4 = 0;
+
+    // And, if the button was only pressed for a short time, handle the short button press.
+    buttonPressTime = millis() - buttonDownTime;
+
+    if((buttonPressTime > BUTTON_SHORT_PRESS_TIME) && (buttonPressTime < BUTTON_LONG_PRESS_TIME)) {
+      handleButtonPress(shortPressBehavior);
+    }
   }
 }
 
 // This is called every xx ms while the button is being held down; it counts down then displays a
 // visual cue and changes the pattern.
 ISR(TIMER4_OVF_vect) {
-  // If the user is still holding down the button after the first cycle, they were serious about it.
-  if (buttonDebounced == false) {
-    buttonDebounced = true;
-
-    lastBrightness = currentBrightness;
-    setBrightness(currentBrightness + 1);
-  }
-
-  // If we've waited long enough, switch the pattern
+  // If we've waited long enough, fire a long press
   // TODO: visual indicator
-  buttonPressTime = millis() - buttonDownTime;
-  if (buttonPressTime > BUTTON_LONG_PRESS_TIME) {
-    // first unroll the brightness!
-    setBrightness(lastBrightness);
+  
+  buttonPressTime = millis() - buttonRepeatTime;
+  if (buttonPressTime >= BUTTON_LONG_PRESS_TIME) {
 
-    setPattern(currentPattern + 1);
+    handleButtonPress(longPressBehavior);
 
     // Finally, reset the button down time, so we don't advance again too quickly
-    buttonDownTime = millis();
+    buttonRepeatTime = millis();
   }
 }
 
@@ -169,7 +181,7 @@ void loop()
 
   pattern.draw(leds);
 
-  if(pattern.getDone()) {
+  if(pattern.getDone() && !singlePatternRepeatMode) {
     setPattern(currentPattern+1);
   }
 

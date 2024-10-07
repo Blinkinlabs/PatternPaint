@@ -39,4 +39,13 @@ const uint16_t MAX_LEDS = 512;       // Maximum number of LEDs that can be contr
 #define FRAME_DELAY_OFFSET        (5)    // Frame delay (2 bytes)
 #define FRAME_REPEAT_COUNT_OFFSET (7)    // Repeat count (2 bytes)
 
+// Button function definitions
+#define BUTTON_FUNCTION_DISABLED 0
+#define BUTTON_FUNCTION_BRIGHTNESS 1
+#define BUTTON_FUNCTION_ADVANCE_PATTERN 2
+#define BUTTON_FUNCTION_TOGGLE_SINGLE_REPEAT 3
+
+#define BUTTON_SHORT_PRESS_TIME   (1)      // Time to hold the button down to switch brightness
+#define BUTTON_LONG_PRESS_TIME    (1000)   // Time to hold the button down to switch patterns
+
 #endif

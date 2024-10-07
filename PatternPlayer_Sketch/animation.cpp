@@ -108,7 +108,7 @@ uint16_t Animation::getRepeatCount() const {
 }
 
 bool Animation::getDone() const {
-  return (autoAdvance && (repeatCount == 0));
+  return (autoAdvance && (repeatCount == 0) && (frameIndex == 0));
 }
 
 void Animation::drawRgb24(struct CRGB strip[]) {
