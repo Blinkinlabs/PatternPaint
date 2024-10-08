@@ -82,7 +82,7 @@ void ColorChooser::on_currentColorChanged(const QColor &color)
     currentColor = color;
     update();
 
-    emit(sendColor(color));
+    emit sendColor(color);
 }
 
 void ColorChooser::mousePressEvent(QMouseEvent *event)

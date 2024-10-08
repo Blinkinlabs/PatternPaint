@@ -174,7 +174,7 @@ bool BlinkyTape::open()
 
     resetTriesRemaining = 0;
 
-    emit(connectionStatusChanged(true));
+    emit connectionStatusChanged(true);
 
 #if defined(CONNECTION_SCANNER_TIMER)
     // Schedule the connection scanner
@@ -190,7 +190,7 @@ void BlinkyTape::close()
 
     resetTriesRemaining = 0;
 
-    emit(connectionStatusChanged(isConnected()));
+    emit connectionStatusChanged(isConnected());
 }
 
 void BlinkyTape::handleReadData()

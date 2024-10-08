@@ -146,7 +146,7 @@ void Esp8266FirmwareLoader::doWork()
                                  magicLength, flashData.length(), ESP_BLOCK_SIZE, 0));
 
         unsigned int sequence = 0;
-        for(QByteArray chunk : flashData) {
+        for(const QByteArray& chunk : flashData) {
             commandQueue.enqueue(Esp8266BootloaderCommands::flashDownloadData(
                                      sequence, chunk));
             sequence++;
@@ -166,7 +166,7 @@ void Esp8266FirmwareLoader::doWork()
     case State_Done:
     {
         commandQueue.close();
-        emit(finished(true));
+        emit finished(true);
 
         break;
     }
@@ -199,7 +199,7 @@ void Esp8266FirmwareLoader::handleError(QString error)
     serialPort.close();
     commandQueue.close();
 
-    emit(finished(false));
+    emit finished(false);
 }
 
 void Esp8266FirmwareLoader::handleCommandFinished(QString command, QByteArray returnData)
@@ -234,5 +234,5 @@ void Esp8266FirmwareLoader::setProgress(int newProgress)
 
     int progressPercent = (progress*100)/maxProgress;
 
-    emit(progressChanged(progressPercent));
+    emit progressChanged(progressPercent);
 }

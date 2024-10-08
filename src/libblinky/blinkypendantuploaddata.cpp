@@ -49,7 +49,7 @@ bool BlinkyPendantUploadData::init(DisplayMode displayMode, const QList<PatternW
 
     QByteArray patternData;
 
-    for (PatternWriter pattern : patternWriters) {
+    for (const PatternWriter& pattern : patternWriters) {
         // Make sure we have an image compatible with the BlinkyPendant
         if (pattern.getLedCount() != 10) {
             errorString = "Wrong pattern size- must be 10 pixels high!";

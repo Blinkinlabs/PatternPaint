@@ -47,7 +47,7 @@ bool EightByEightUploader::storePatterns(BlinkyController &controller,
     maxProgress = 1;    // For the initial erase command
 
     // For each pattern, append the image data to the sketch
-    for (PatternWriter patternWriter : patternWriters) {
+    for (const PatternWriter& patternWriter : patternWriters) {
         if (patternWriter.getEncoding() != PatternWriter::RGB24) {
             errorString = "EightByEight only supports RGB24 encoding";
             return false;
@@ -176,7 +176,7 @@ void EightByEightUploader::handleError(QString error)
 
     commandQueue.close();
 
-    emit(finished(false));
+    emit finished(false);
 }
 
 void EightByEightUploader::handleCommandStillRunning(QString command)
@@ -239,7 +239,7 @@ void EightByEightUploader::handleLastCommandFinished()
     case State_unlockFileAccess:
         commandQueue.close();
         state = State_Done;
-        emit(finished(true));
+        emit finished(true);
         break;
 
     default:
@@ -259,7 +259,7 @@ void EightByEightUploader::setProgress(int newProgress)
 
     int progressPercent = (progress*100)/maxProgress;
 
-    emit(progressChanged(progressPercent));
+    emit progressChanged(progressPercent);
 }
 
 void EightByEightUploader::setDialogText()
@@ -276,5 +276,5 @@ void EightByEightUploader::setDialogText()
     float flashUsedPercent = float(flashUsed)*100/FLASH_MEMORY_AVAILABLE;
     textLabel.append(QString("Flash used: %1%").arg(QString::number(flashUsedPercent,'f', 1)));
 
-    emit(setText(textLabel));
+    emit setText(textLabel);
 }

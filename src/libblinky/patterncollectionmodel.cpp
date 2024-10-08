@@ -52,7 +52,7 @@ void PatternCollectionModel::on_patternDataChanged(const QModelIndex &topLeft, c
     if (topLeft.row() == 0) {
         QVector<int> emitRoles;
         emitRoles.append(Qt::DisplayRole);
-        emit(dataChanged(index(0), index(patterns.count()-1), emitRoles));
+        emit dataChanged(index(0), index(patterns.count()-1), emitRoles);
     }
 }
 
@@ -100,7 +100,7 @@ bool PatternCollectionModel::setData(const QModelIndex &index, const QVariant &v
     if (role == Qt::EditRole) {
         // Find the UUID
         QPointer<Pattern> source;
-        for (QPointer<Pattern> pattern : patterns) {
+        for (const QPointer<Pattern>& pattern : patterns) {
             if (pattern->getUuid() == value.toUuid()) {
                 source = pattern;
                 break;

@@ -296,7 +296,7 @@ void MainWindow::populateExamplesMenu(QString directory, QMenu *menu)
     QDir examplesDir(directory);
     QFileInfoList examplesList = examplesDir.entryInfoList();
 
-    for (QFileInfo fileInfo : examplesList) {
+    for (const QFileInfo& fileInfo : examplesList) {
         // If we found a directory, create a submenu and call ourselves again to populate it
         if (fileInfo.isDir()) {
             QMenu *submenu = new QMenu(this);
@@ -998,7 +998,7 @@ void MainWindow::applyScene(const SceneTemplate &scene)
         QDir examplesDir(scene.examples);
         QFileInfoList examplesList = examplesDir.entryInfoList();
 
-        for (QFileInfo fileinfo : examplesList) {
+        for (const QFileInfo& fileinfo : examplesList) {
             if (!fileinfo.isDir()) {
                 Pattern::PatternType type = Pattern::Scrolling;
                 if (fileinfo.fileName().endsWith(".frames.png"))
@@ -1114,7 +1114,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
 
         actionSave_to_Blinky->setEnabled(false);
 
-        emit(patternStatusChanged(false));
+        emit patternStatusChanged(false);
         return;
     }
 
@@ -1166,7 +1166,7 @@ void MainWindow::on_patternCollectionCurrentChanged(const QModelIndex &current, 
     connect(timeline->model(), &QAbstractItemModel::dataChanged,
             this, &MainWindow::on_PatternDataChanged);
 
-    emit(patternStatusChanged(true));
+    emit patternStatusChanged(true);
 }
 
 void MainWindow::on_timelineSelectedChanged(const QModelIndex &current, const QModelIndex &)

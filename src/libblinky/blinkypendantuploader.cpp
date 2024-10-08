@@ -134,7 +134,7 @@ void BlinkyPendantUploader::handleError(QString error)
 
     commandQueue.close();
 
-    emit(finished(false));
+    emit finished(false);
 }
 
 void BlinkyPendantUploader::handleCommandFinished(QString command, QByteArray returnData)
@@ -148,7 +148,7 @@ void BlinkyPendantUploader::handleCommandFinished(QString command, QByteArray re
     // TODO: Let the receiver handle this instead.
     if (command == "stopWrite") {
         commandQueue.close();
-        emit(finished(true));
+        emit finished(true);
     }
 }
 
@@ -163,5 +163,5 @@ void BlinkyPendantUploader::setProgress(int newProgress)
 
     int progressPercent = (progress*100)/maxProgress;
 
-    emit(progressChanged(progressPercent));
+    emit progressChanged(progressPercent);
 }

@@ -14,7 +14,7 @@ PatternFrameListView::~PatternFrameListView()
 void PatternFrameListView::resizeEvent(QResizeEvent *event)
 {
     // Propigate the new size to the delegate
-    this->itemDelegate()->sizeHintChanged(QModelIndex());
+    emit this->itemDelegate()->sizeHintChanged(QModelIndex());
 
     QListView::resizeEvent(event);
 }

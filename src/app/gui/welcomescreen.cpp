@@ -72,5 +72,5 @@ void WelcomeScreen::accept()
         scene.examples = "";
 
     // Send scene apply signal here
-    emit(sceneSelected(scene));
+    emit sceneSelected(scene);
 }

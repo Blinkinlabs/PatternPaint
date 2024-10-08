@@ -155,7 +155,7 @@ QList<SerialCommand> writeEeprom(const QByteArray &data, unsigned int startAddre
     commands.append(setAddress(startAddress));
 
     // Write the data in small chunks, so that the write doesn't time out.
-    for (QByteArray chunk : ByteArrayHelpers::chunkData(data, EEPROM_CHUNK_SIZE_BYTES))
+    for (const QByteArray& chunk : ByteArrayHelpers::chunkData(data, EEPROM_CHUNK_SIZE_BYTES))
         commands.append(writeEepromBlock(chunk));
 
     return commands;

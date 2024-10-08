@@ -41,7 +41,7 @@ bool LightBuddyUploader::storePatterns(BlinkyController &controller,
     maxProgress = 1;    // For the initial erase command
 
     // For each pattern, append the image data to the sketch
-    for (PatternWriter patternWriter : patternWriters) {
+    for (const PatternWriter& patternWriter : patternWriters) {
         if (patternWriter.getEncoding() != PatternWriter::RGB24) {
             errorString = "Lightbuddy only supports RGB24 encoding";
             return false;
@@ -159,7 +159,7 @@ void LightBuddyUploader::handleError(QString error)
 
     commandQueue.close();
 
-    emit(finished(false));
+    emit finished(false);
 }
 
 void LightBuddyUploader::handleCommandStillRunning(QString command)
@@ -191,7 +191,7 @@ void LightBuddyUploader::handleCommandFinished(QString command, QByteArray retur
         if (state == State_Done) {
             // TODO: Separate these with a small delay?
             commandQueue.close();
-            emit(finished(true));
+            emit finished(true);
         } else {
             doWork();
         }
@@ -209,5 +209,5 @@ void LightBuddyUploader::setProgress(int newProgress)
 
     int progressPercent = (progress*100)/maxProgress;
 
-    emit(progressChanged(progressPercent));
+    emit progressChanged(progressPercent);
 }

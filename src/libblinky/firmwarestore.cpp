@@ -24,7 +24,7 @@ QStringList FirmwareStore::listAvailableFirmware()
 {
     QStringList firmwareNames;
 
-    for(QString firmwarePath : listFirmwareSearchPaths()) {
+    for(const QString& firmwarePath : listFirmwareSearchPaths()) {
         QDir directory(firmwarePath);
         if (!directory.exists())
             continue;
@@ -37,7 +37,7 @@ QStringList FirmwareStore::listAvailableFirmware()
 
 QString FirmwareStore::getFirmwareDirectoryName(const QString &name)
 {
-    for(QString firmwarePath : listFirmwareSearchPaths()) {
+    for(const  QString& firmwarePath : listFirmwareSearchPaths()) {
         QDir directory(firmwarePath);
         if (directory.exists(name))
             return directory.absoluteFilePath(name);

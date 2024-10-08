@@ -89,9 +89,9 @@ void FrameEditor::setScaleMode(FrameEditor::ScaleMode newScaleMode)
     qDebug() << "newScaleMode:" << newScaleMode;
     scaleMode = newScaleMode;
 
-    emit(fitToHeightChanged(scaleMode == FIT_TO_HEIGHT));
-    emit(fitToWidthChanged(scaleMode == FIT_TO_WIDTH));
-    emit(fitToScreenChanged(scaleMode == FIT_TO_SCREEN));
+    emit fitToHeightChanged(scaleMode == FIT_TO_HEIGHT);
+    emit fitToWidthChanged(scaleMode == FIT_TO_WIDTH);
+    emit fitToScreenChanged(scaleMode == FIT_TO_SCREEN);
 
     updateSize();
     update();
@@ -439,7 +439,7 @@ void FrameEditor::applyInstrument(QImage &newImage)
     painter.drawImage(0, 0, newImage);
     painter.end();
 
-    emit(dataEdited(frameIndex, frameData));
+    emit dataEdited(frameIndex, frameData);
 }
 
 void FrameEditor::pinchTriggered(QPinchGesture *gesture)

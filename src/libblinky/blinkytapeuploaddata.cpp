@@ -1,6 +1,5 @@
 #include "blinkytapeuploaddata.h"
 
-#include "blinkytape.h"
 #include "firmwarestore.h"
 
 #include "bytearrayhelpers.h"

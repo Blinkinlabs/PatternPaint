@@ -146,15 +146,15 @@ void SerialCommandQueue::handleReadData()
         break;
 
     case SerialCommand::RESPONSE_TOO_MUCH_DATA:
-        emit(errorOccured(queue.front().getErrorString()));
+        emit errorOccured(queue.front().getErrorString()) ;
         break;
 
     case SerialCommand::RESPONSE_INVALID_MASK:
-        emit(errorOccured(queue.front().getErrorString()));
+        emit errorOccured(queue.front().getErrorString());
         break;
 
     case SerialCommand::RESPONSE_MISMATCH:
-        emit(errorOccured(queue.front().getErrorString()));
+        emit errorOccured(queue.front().getErrorString());
         break;
 
     case SerialCommand::RESPONSE_MATCH:
@@ -195,7 +195,7 @@ void SerialCommandQueue::handleSerialError(QSerialPort::SerialPortError error)
         return;
     }
 
-    emit(errorOccured(serial.errorString()));
+    emit errorOccured(serial.errorString()) ;
 
     close();
 }
@@ -208,13 +208,13 @@ void SerialCommandQueue::handleCommandTimerTimeout()
         QString errorMessage = QString("Command %1 timed out").arg((queue.front().name));
 
         qCritical() << errorMessage;
-        emit(errorOccured(errorMessage));
+        emit errorOccured(errorMessage);
 
         return;
     }
 
     commandTimeoutTimer.start(COMMAND_STILL_RUNNING_INTERVAL_DEFAULT);
-    emit(commandStillRunning(queue.front().name));
+    emit commandStillRunning(queue.front().name);
 }
 
 

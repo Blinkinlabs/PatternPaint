@@ -63,7 +63,7 @@ void Avr109FirmwareLoader::setProgress(int newProgress)
 
     int progressPercent = (progress*100)/maxProgress;
 
-    emit(progressChanged(progressPercent));
+    emit progressChanged(progressPercent);
 }
 
 void Avr109FirmwareLoader::setDialogText()
@@ -84,7 +84,7 @@ void Avr109FirmwareLoader::setDialogText()
     float flashUsedPercent = float(flashUsed)*100/FLASH_MEMORY_AVAILABLE;
     textLabel.append(QString("Flash used: %1%").arg(QString::number(flashUsedPercent,'f', 1)));
 
-    emit(setText(textLabel));
+    emit setText(textLabel);
 }
 
 // TODO: Remove this in favor of a global bootloader search utility.
@@ -205,7 +205,7 @@ void Avr109FirmwareLoader::handleError(QString error)
 
     commandQueue.close();
 
-    emit(finished(false));
+    emit finished(false);
 }
 
 void Avr109FirmwareLoader::handleCommandFinished(QString command, QByteArray returnData)
@@ -239,7 +239,7 @@ void Avr109FirmwareLoader::handleLastCommandFinished()
 
     case State_ResetBootloader:
         commandQueue.close();
-        emit(finished(true));
+        emit finished(true);
         break;
 
     default:

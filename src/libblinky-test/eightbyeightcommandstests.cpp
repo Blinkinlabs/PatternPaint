@@ -74,7 +74,6 @@ void EightByEightCommandsTests::openFileTest()
 
 void EightByEightCommandsTests::openFileNameTooLongCropsTest()
 {
-    QString name(31, 'x');  // Max filename length is 30 characters
     QString expectedName(30, 'x');
 
     EightByEightCommands::FileMode mode = EightByEightCommands::FileMode_Read;
