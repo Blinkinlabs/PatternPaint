@@ -15,15 +15,15 @@ TIMESTAMP_SERVER='http://rfc3161timestamp.globalsign.com/advanced'
 # Location of the QT tools
 if [ -z ${QTDIR+x} ]; then
 	echo "QTDIR not defined- please set it to the location containing the Qt version to build against. For example:"
-	echo "  export QTDIR=/c/Qt/5.15.0/mingw81_32"
+	echo "  export QTDIR=/c/Qt/6.7.3/mingw_64"
 	exit 1
 fi
 
-# Location of the MINGW libraries (Installed as part of Qt)
-MINGW_BIN=${QTDIR}/../../Tools/mingw810_32/bin
+# Note: we expect mingw tools to be on the path:
+# export PATH=/c/qt/tools/mingw1120_64/bin:${PATH}
 
 QMAKE=${QTDIR}/bin/qmake
-MAKE=${MINGW_BIN}/mingw32-make
+MAKE=mingw32-make
 
 # Project root
 BASEDIR=`pwd`
@@ -32,7 +32,7 @@ BASEDIR=`pwd`
 SOURCEDIR=${BASEDIR}/src
 
 # Location to build PatternPaint
-BUILDDIR=${BASEDIR}/build-dist-windows
+BUILDDIR=${BASEDIR}/src/build/build-dist-windows
 
 # Location of the Windows SDK and WDK
 # Note: Both WDK 8.1 and WDK 10 are needed. 8.1 is the last WDK that contains
@@ -75,21 +75,21 @@ source ./gitversion.sh
 mkdir -p ${BUILDDIR}
 pushd ${BUILDDIR}
 
-PATH=${MINGW_BIN}:${PATH} ${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
+${QMAKE} ${SOURCEDIR}/PatternPaint.pro \
 	-spec win32-g++
 	
 #${MAKE} clean
-PATH=${MINGW_BIN}:${PATH} ${MAKE} -j6
+${MAKE} -j32
 
 popd
 
 ################## Run Unit Tests ##############################
-pushd ${BUILDDIR}
-
-PATH=${PATH}:libblinky/release:${QTDIR}/bin:${QTDIR}/plugins/platforms:${WINSPARKLE}/release:${LIBUSB}/MinGW32/dll libblinky-test/release/libblinky-test
-
-popd
-
+#pushd ${BUILDDIR}
+#
+#PATH=${PATH}:libblinky/release:${QTDIR}/bin:${QTDIR}/plugins/platforms:${WINSPARKLE}/release:${LIBUSB}/MinGW32/dll libblinky-test/release/libblinky-test
+#
+#popd
+#
 ################## Get device driver repositories ##############
 function getRepo {
 	# $1 is output directory
@@ -135,30 +135,29 @@ cp ${BUILDDIR}/libblinky/release/blinky.dll ${OUTDIR}
 # Note: This list of DLLs must be determined by hand, using Dependency Walker
 # Also, the .nsi file should be synchronized with this list, otherwise the file
 # will not actually be included by the installer.
-cp ${QTDIR}/bin/libgcc_s_dw2-1.dll ${OUTDIR}
+cp ${QTDIR}/bin/libgcc_s_seh-1.dll ${OUTDIR}
 cp ${QTDIR}/bin/libstdc++-6.dll ${OUTDIR}
-cp ${QTDIR}/bin/libgcc_s_dw2-1.dll ${OUTDIR}
 cp ${QTDIR}/bin/libwinpthread-1.dll ${OUTDIR}
 
-cp ${QTDIR}/bin/Qt5Core.dll ${OUTDIR}
-cp ${QTDIR}/bin/Qt5Core.dll ${OUTDIR}
-cp ${QTDIR}/bin/Qt5Gui.dll ${OUTDIR}
-cp ${QTDIR}/bin/Qt5Widgets.dll ${OUTDIR}
-cp ${QTDIR}/bin/Qt5Gui.dll ${OUTDIR}
-cp ${QTDIR}/bin/Qt5SerialPort.dll ${OUTDIR}
+cp ${QTDIR}/bin/Qt6Core.dll ${OUTDIR}
+cp ${QTDIR}/bin/Qt6Core.dll ${OUTDIR}
+cp ${QTDIR}/bin/Qt6Gui.dll ${OUTDIR}
+cp ${QTDIR}/bin/Qt6Widgets.dll ${OUTDIR}
+cp ${QTDIR}/bin/Qt6Gui.dll ${OUTDIR}
+cp ${QTDIR}/bin/Qt6SerialPort.dll ${OUTDIR}
 
 cp ${QTDIR}/plugins/platforms/qwindows.dll ${OUTDIR}/platforms/
 
 cp ${QTDIR}/plugins/imageformats/qgif.dll ${OUTDIR}/imageformats/
 cp ${QTDIR}/plugins/imageformats/qjpeg.dll ${OUTDIR}/imageformats/
 cp ${QTDIR}/plugins/imageformats/qsvg.dll ${OUTDIR}/imageformats/
-cp ${QTDIR}/plugins/imageformats/qtiff.dll ${OUTDIR}/imageformats/
+#cp ${QTDIR}/plugins/imageformats/qtiff.dll ${OUTDIR}/imageformats/
 
 # Winsparkle Files
-cp ${WINSPARKLE}/release/WinSparkle.dll ${OUTDIR}
+cp ${WINSPARKLE}/x64/release/WinSparkle.dll ${OUTDIR}
 
 # libusb Files
-cp ${LIBUSB}/MinGW32/dll/libusb-1.0.dll ${OUTDIR}
+cp ${LIBUSB}/MinGW64/dll/libusb-1.0.dll ${OUTDIR}
 
 # BlinkyTape Driver files
 cp ${BLINKYTAPE}/avr/driver/blinkinlabs.inf ${OUTDIR}/driver/blinkytape/
@@ -206,7 +205,7 @@ cp "${WIN_KIT_DPINST}/redist/DIFx/dpinst/MultiLin/x64/dpinst.exe" ${OUTDIR}/driv
 # For some reason the NSIS file is run from the directory it's located in?
 pushd ${BUILDDIR}
 
-cp ../patternpaint.nsi patternpaint.nsi
+cp ../../../patternpaint.nsi patternpaint.nsi
 
 
 # Update the version info in the NSI, fail if it didn't change
