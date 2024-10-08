@@ -64,7 +64,7 @@ EIGHTBYEIGHT=${DRIVERS}/EightByEight
 WINSPARKLE=${BASEDIR}/thirdparty/WinSparkle-0.8.1
 
 # libusb library release
-LIBUSB=${BASEDIR}/thirdparty/libusb-1.0.23-win
+LIBUSB=${BASEDIR}/thirdparty/libusb-1.0.27-win
 
 
 
@@ -157,7 +157,7 @@ cp ${QTDIR}/plugins/imageformats/qsvg.dll ${OUTDIR}/imageformats/
 cp ${WINSPARKLE}/x64/release/WinSparkle.dll ${OUTDIR}
 
 # libusb Files
-cp ${LIBUSB}/MinGW64/dll/libusb-1.0.dll ${OUTDIR}
+cp ${LIBUSB}/MinGW64/dll/msys-usb-1.0.dll ${OUTDIR}
 
 # BlinkyTape Driver files
 cp ${BLINKYTAPE}/avr/driver/blinkinlabs.inf ${OUTDIR}/driver/blinkytape/

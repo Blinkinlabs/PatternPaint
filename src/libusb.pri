@@ -15,18 +15,18 @@ macx {
 }
 
 win32 {
-    LIBUSB_PATH = ..\..\..\..\thirdparty\libusb-1.0.23-win
+    LIBUSB_PATH = ../../../../thirdparty/libusb-1.0.27-win
 
     INCLUDEPATH += $$LIBUSB_PATH/include
 
     win32-msvc* {
-        LIBUSB_DLL = $$LIBUSB_PATH/MS64/dll/libusb-1.0.dll
-        LIBUSB_LIB = $$LIBUSB_PATH/MS64/dll/libusb-1.0.lib
+        LIBUSB_DLL = $$LIBUSB_PATH/VS2019/MS64/dll/libusb-1.0.dll
+        LIBUSB_LIB = $$LIBUSB_PATH/VS2019/MS64/dll/libusb-1.0.lib
 
         LIBS += $$LIBUSB_LIB
     }
     win32-g++ {
-        LIBUSB_DLL = $$LIBUSB_PATH/MinGW64/dll/libusb-1.0.dll
+        LIBUSB_DLL = $$LIBUSB_PATH/MinGW64/dll/msys-usb-1.0.dll
 
         LIBS += $$LIBUSB_DLL
     }
