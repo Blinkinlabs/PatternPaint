@@ -228,7 +228,12 @@ void Avr109FirmwareLoader::handleLastCommandFinished()
         break;
 
     case State_WriteFlashData:
-        state = State_WriteEepromData;
+        if(eepromData.length() > 0) {
+            state = State_WriteEepromData;
+        }
+        else {
+            state = State_ResetBootloader;
+        }
         doWork();
         break;
 
@@ -379,6 +384,7 @@ void Avr109FirmwareLoader::doWork()
 
     case State_ResetBootloader:
     {
+        qDebug() << "!!!!!!!!!!!!!!!!! queuing a reset";
         commandQueue.enqueue(Avr109Commands::reset());
 
         break;
