@@ -84,12 +84,12 @@ ${MAKE} -j32
 popd
 
 ################## Run Unit Tests ##############################
-#pushd ${BUILDDIR}
-#
-#PATH=${PATH}:libblinky/release:${QTDIR}/bin:${QTDIR}/plugins/platforms:${WINSPARKLE}/release:${LIBUSB}/MinGW32/dll libblinky-test/release/libblinky-test
-#
-#popd
-#
+pushd ${BUILDDIR}
+
+PATH=${PATH}:libblinky/release:${QTDIR}/bin:${QTDIR}/plugins/platforms:${WINSPARKLE}/x64/release:${LIBUSB}/MinGW64/dll libblinky-test/release/libblinky-test
+
+popd
+
 ################## Get device driver repositories ##############
 function getRepo {
 	# $1 is output directory

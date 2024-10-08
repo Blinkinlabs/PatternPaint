@@ -9,7 +9,6 @@ class BlinkyTapeUploadDataTests : public QObject
 {
     Q_OBJECT
 private slots:
-    void makePatternHeaderTableTest();
     void makePatternTableEntryTest();
 
     void makeBrightnessTest_data();

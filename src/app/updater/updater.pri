@@ -56,7 +56,7 @@ win32 {
     }
 
     # Copy the Sparkle DLL into the build directory so that it can be used
-    QMAKE_PRE_LINK += copy $$shell_path($$SPARKLE_DLL)  $$shell_path($$OUT_PWD) &
+    QMAKE_PRE_LINK += $$QMAKE_COPY $$shell_path($$SPARKLE_DLL)  $$shell_path($$OUT_PWD) &
 }
 
 
