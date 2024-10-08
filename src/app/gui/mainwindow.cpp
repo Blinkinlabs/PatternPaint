@@ -364,10 +364,11 @@ int MainWindow::getFrameCount()
 
 void MainWindow::drawTimer_timeout()
 {
-    if (getFrameCount() == 0)
+    const int framecount = getFrameCount();
+    if (framecount == 0)
         return;
 
-    setFrameIndex((getCurrentFrameIndex()+1)%getFrameCount());
+    setFrameIndex((getCurrentFrameIndex()+1)%framecount);
 }
 
 void MainWindow::connectionScannerTimer_timeout()
@@ -1253,7 +1254,11 @@ void MainWindow::on_actionStepForward_triggered()
     if (patternCollection.isEmpty())
         return;
 
-    setFrameIndex((getCurrentFrameIndex()+1)%getFrameCount());
+    const int framecount = getFrameCount();
+    if (framecount == 0)
+        return;
+
+    setFrameIndex((getCurrentFrameIndex()+1)%framecount);
 }
 
 void MainWindow::on_actionStepBackward_triggered()
