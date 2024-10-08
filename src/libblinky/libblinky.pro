@@ -1,4 +1,4 @@
-QT += core widgets
+QT += core widgets serialport
 
 TARGET = blinky
 TEMPLATE = lib
@@ -45,7 +45,13 @@ HEADERS += \
     avr109firmwareloader.h \
     usbdeviceidentifier.h \
     blinkycontrollerinfo.h \
-    libblinkyglobal.h
+    libblinkyglobal.h \
+    blinkypendantuploader.h \
+    blinkytapeuploader.h \
+    serialcommandqueue.h \
+    blinkytape.h \
+    lightbuddyuploader.h \
+    usbutils.h
 
 SOURCES +=  \
     fixture.cpp \
@@ -81,30 +87,13 @@ SOURCES +=  \
     esp8266firmwareloader.cpp \
     avr109firmwareloader.cpp \
     usbdeviceidentifier.cpp \
-    blinkycontrollerinfo.cpp
-
-# For platforms that have serial ports
-# TODO: Pull hard-coded references to BlinkyTape from the gui, allowing this section to be switchable
-#has_serial {
-    QT += serialport
-
-    HEADERS += \
-        blinkypendantuploader.h \
-        blinkytapeuploader.h \
-        serialcommandqueue.h \
-        blinkytape.h \
-        lightbuddyuploader.h \
-        usbutils.h
-
-    SOURCES += \
-        blinkypendantuploader.cpp \
-        blinkytapeuploader.cpp \
-        serialcommandqueue.cpp \
-        blinkytape.cpp \
-        lightbuddyuploader.cpp \
-        usbutils.cpp
-
-#}
+    blinkycontrollerinfo.cpp \
+    blinkypendantuploader.cpp \
+    blinkytapeuploader.cpp \
+    serialcommandqueue.cpp \
+    blinkytape.cpp \
+    lightbuddyuploader.cpp \
+    usbutils.cpp
 
 RESOURCES += \
     firmware/firmware.qrc
